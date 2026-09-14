@@ -3,8 +3,10 @@
 
   inputs = {
     # Pinned to the same nixpkgs rev as SystemNix (compat doctrine):
-    # services.stalwart 0.16.20, services.parsedmarc 11.0.1,
-    # services.mailpit, swaks 20240103.0, imapsync 2.314 all verified present.
+    # services.stalwart (package pinned to 0.15.5 by nixpkgs - the 0.16.x
+    # package exists as stalwart_0_16 but is NOT yet compatible with the
+    # module), services.parsedmarc 11.0.1, services.mailpit, swaks
+    # 20240103.0, imapsync 2.314 all verified present.
     nixpkgs.url = "github:NixOS/nixpkgs/eaad089433ca2bb662274377d33df3d0e51ef28b";
   };
 

@@ -16,8 +16,13 @@
 #     extra, which the nixpkgs package does not ship - if a queryable sink
 #     is ever wanted, override the package with python3Packages.psycopg
 #     (3.3.4 is in nixpkgs) and set settings.postgresql.* instead.
-#   - Secrets: set `password = { _secret = "/path"; }` - the nixpkgs module
-#     renders the file contents into the ini at unit start.
+#   - Secrets: set `imap.password._secret = /path;` (PATH literal, not a
+#     string - the typed option is nullOr (either path (attrsOf path))). The
+#     nixpkgs unit renders the file contents into the ini at unit start.
+#   - parsedmarc 11 reads the CONNECTION settings from the [imap] section
+#     and raises ConfigurationError if host/user/password are missing there;
+#     [mailbox] carries behavior flags only (watch/delete/batch_size) -
+#     verified against parsedmarc/cli.py.
 {
   config,
   lib,
@@ -43,19 +48,21 @@ in
     settings = lib.mkOption {
       type = lib.types.attrsOf lib.types.anything;
       default = { };
-      example = {
-        mailbox = {
-          host = "mail.example.com";
-          port = 993;
-          ssl = true;
-          user = "dmarc@example.com";
-          password._secret = "/run/secrets/dmarc-imap-password";
-          watch = true;
-        };
-      };
+      example = lib.literalExpression ''
+        {
+          imap = {
+            host = "mail.example.com";
+            port = 993;
+            ssl = true;
+            user = "dmarc@example.com";
+            password._secret = /run/secrets/dmarc-imap-password;
+          };
+          mailbox.watch = true;
+        }
+      '';
       description = ''
         Passthrough to services.parsedmarc.settings (parsedmarc.ini).
-        At minimum set `mailbox` (host/user/password with _secret) - see
+        At minimum set `imap` (host/user/password with _secret) - see
         https://domainaware.github.io/parsedmarc/#configuration-file
       '';
     };
