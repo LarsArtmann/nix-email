@@ -41,7 +41,8 @@ let
 in
 builtins.derivation {
   name = "dmarc-eval";
-  inherit system;
+  system = system;
+  PATH = "${nixpkgs.legacyPackages.${system}.coreutils}/bin:${nixpkgs.legacyPackages.${system}.gnugrep}/bin";
   passAsFile = [ "rendered" ];
   inherit rendered;
   builder = "/bin/sh";

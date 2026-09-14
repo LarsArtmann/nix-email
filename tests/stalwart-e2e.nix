@@ -44,8 +44,10 @@ pkgs.testers.runNixOSTest {
 
     with subtest("SMTP: full dialogue, unknown recipient rejected 5xx"):
         machine.succeed(
-            "swaks --server 127.0.0.1:25 --from probe@example.test --to nobody@example.test --quit-after RCPT 2>&1 | grep -E '<- *5[0-9][0-9]'"
+            "swaks --server 127.0.0.1:25 --ehlo probe.example.test --from probe@example.test --to nobody@example.test --quit-after RCPT > /tmp/swaks.log 2>&1 || true"
         )
+        machine.succeed("cat /tmp/swaks.log >&2")
+        machine.succeed("grep -E '<- *5[0-9][0-9]' /tmp/swaks.log")
 
     with subtest("IMAPS: implicit TLS with IMAP greeting"):
         machine.succeed(
