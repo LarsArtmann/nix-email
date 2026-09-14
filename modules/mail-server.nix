@@ -80,6 +80,13 @@ in
       inherit (cfg) stateVersion;
       openFirewall = lib.mkDefault true;
       settings = {
+        # Implicit-TLS listeners (465/993) are DEAD without a certificate:
+        # live-observed "No TLS certificates available" in the VM test.
+        # Default to Stalwart's generated self-signed cert so a fresh
+        # deployment serves TLS out of the box; override with real cert
+        # material or ACME on the production host (mkDefault loses to any
+        # consumer-provided certificate.* settings).
+        certificate.default.self-signed = lib.mkDefault true;
         server = {
           hostname = lib.mkDefault cfg.hostname;
           listener = {
