@@ -1,0 +1,141 @@
+# nix-email
+
+Declarative mail stack for LarsArtmann hosts: an opinionated
+[Stalwart](https://stalw.art) mail-server wrapper + a light parsedmarc
+DMARC/TLS-RPT monitor, packaged as a NixOS flake for consumption by
+[SystemNix](../SystemNix) (upstream-flake pattern, like InboxClean/DiscordSync).
+
+Architecture (per `~/projects/reports/selfhosted-email-guide.md`): self-hosted
+**inbound** on a Hetzner VPS (residential evo-x2 can never be an MX),
+**outbound** relayed through Resend (clean-IP deliverability), DMARC reports
+polled and parsed on evo-x2. Heavy stacks (Mailcow 6-8 GiB, Elasticsearch for
+parsedmarc, Piler archiving) are deliberately rejected: Stalwart is one Rust
+binary (~512 MB-1 GiB RAM) with spam filter, DKIM, JMAP, CalDAV/CardDAV and
+web admin built in.
+
+## What is built and verified (2026-09-14)
+
+| Piece | State |
+| --- | --- |
+| `modules/mail-server.nix` | Done. VM-tested E2E (see below) |
+| `modules/dmarc-monitor.nix` | Done. Eval contract-tested; needs a live IMAP mailbox to exercise |
+| Mailpit for dev/CI | Use nixpkgs `services.mailpit.instances` directly - no wrapper adds value |
+| VPS host, DNS cutover, migration, Gatus wiring | Planned - see "Go-live runbook" |
+
+`nix flake check` runs both tests against the SAME nixpkgs pin as SystemNix
+(`eaad089`, NixOS 26.11):
+
+- `stalwart-e2e`: real Stalwart 0.15.5 in a VM - service up, full SMTP
+  dialogue with unknown-recipient 550 rejection, implicit-TLS IMAPS greeting,
+  loopback HTTP admin, no panics.
+- `dmarc-eval`: eval-time contract - enables parsedmarc, heavy sinks off,
+  `general.output` lands, `_secret` password survives the option types.
+
+## Module: `services.mail-server`
+
+Enables nixpkgs `services.stalwart` with one RFC-compliant listener set:
+
+| Port | Listener | Notes |
+| --- | --- | --- |
+| 25 | smtp | inbound MX, STARTTLS advertised |
+| 587 | submission | client auth + STARTTLS |
+| 465 | submissions | implicit TLS |
+| 993 | imaps | implicit TLS |
+| httpBind (default `127.0.0.1:8080`) | http | web admin / JMAP - reverse-proxy it, never expose raw |
+
+Options: `enable`, `hostname` (FQDN, asserted to contain a dot), `httpBind`,
+`stateVersion` (passed to the nixpkgs module, default `"26.11"`). Everything
+else flows through `services.stalwart.settings` (all wrapper values are
+`mkDefault` - consumer settings win). Defaults set: listeners above and
+`certificate.self-signed = true` so implicit-TLS works out of the box
+(override with real certs/ACME on the VPS).
+
+Outbound smarthost relaying (Stalwart -> Resend) is a per-host `settings`
+addition - determine exact `queue.*` keys on the VPS go-live, do not guess
+them from memory.
+
+## Module: `services.dmarc-monitor`
+
+Enables nixpkgs `services.parsedmarc` (11.0.1) with the heavy sinks OFF:
+parsedmarc polls the `rua` mailboxes over IMAP and writes JSON+CSV reports to
+`outputDirectory` (default `/var/lib/parsedmarc/reports`). Options: `enable`,
+`outputDirectory`, `settings` (passthrough). Closes domains-repo findings
+H1/H2 (rua reports go nowhere today).
+
+## SystemNix integration (planned shape)
+
+```nix
+# flake.nix input
+nix-email.url = "git+ssh://git@github.com/LarsArtmann/nix-email";
+# consumer wrapper (DiscordSync pattern): import nixosModules.default, layer
+# sops template for the IMAP password, port registration (lib/ports.nix),
+# harden overrides, onFailure -> Discord, Gatus checks, backup-coordination
+# for outputDirectory.
+```
+
+Gatus checks for the VPS (on evo-x2, external viewpoint):
+
+```yaml
+- name: smtp-mx
+  url: "starttls://mail.<domain>:25"
+  conditions: [ "[CONNECTED] == true", "[CERTIFICATE_EXPIRATION] > 720h" ]
+- name: imaps
+  url: "tls://mail.<domain>:993"
+  conditions: [ "[CONNECTED] == true", "[CERTIFICATE_EXPIRATION] > 720h" ]
+```
+
+## Go-live runbook (outline)
+
+1. Provision Hetzner VPS (CX22-class); NixOS via the existing
+   domains-repo cloud-init path. Set rDNS/PTR to the mail hostname.
+   Outbound stays via Resend on 587 (Hetzner filters outbound :25 for new
+   accounts - irrelevant to this design).
+2. Stalwart admin bootstrap is the first-run web wizard (local httpBind via
+   SSH tunnel): set admin password, create accounts/domains, DKIM keys.
+3. Terraform (`domains` repo): new `stalwart-mail` module - MX, SPF
+   (`v=spf1 mx -all`), DKIM txt, DMARC with `rua=mailto:dmarc@<domain>`,
+   MTA-STS + `_smtp._tls` TLS-RPT records; point `rua` mailboxes at the VPS.
+4. Migrate mailboxes BEFORE the MX switch (imapsync 2.314 is in nixpkgs);
+   lower MX TTL first, keep Workspace alive ~2 weeks as rollback.
+5. evo-x2: enable `dmarc-monitor` against the `dmarc@` IMAP mailbox; drive
+   the DMARC ladder (`none -> quarantine -> reject`) from the report data.
+6. Backups: VPS filesystem on btrfs; snapshot THEN borg/restic (RocksDB is
+   crash-consistent under an atomic snapshot, corrupted under naive
+   file-level copies of a running server). Pull to the evo-x2 pool via
+   backup-coordination.
+7. DR: sops secrets for the VPS must also encrypt to a repo-level recovery
+   age key, not only the VPS host key - a rebuilt VPS gets a new host key
+   and would otherwise lose every secret (chicken-and-egg).
+
+## Verified-facts ledger (do not re-derive from memory)
+
+- nixpkgs `services.stalwart` runs **0.15.5**; `stalwart_0_16` exists but is
+  module-incompatible. The report's "0.16.20" praise does not apply to the
+  module until nixpkgs moves.
+- TLS cert key is `certificate.self-signed` (NO `.default` level) - verified
+  against the binary and a live handshake. Without any cert, implicit-TLS
+  listeners log "No TLS certificates available" and serve nothing.
+- parsedmarc 11: connection settings MUST be in the `[imap]` ini section
+  (missing host/user/password raises ConfigurationError); `[mailbox]` is
+  behavior flags only. nixpkgs' typed `_secret` support exists only on
+  `settings.imap.*`. There is NO SQLite sink; JSON/CSV files are the
+  zero-dependency output. A `[postgresql]` sink exists but needs the
+  `psycopg` extra (not in the nixpkgs package; psycopg 3.3.4 is available
+  for an override).
+- parsedmarc `_secret` values must be PATHS (store paths / sops template
+  paths), not strings, and never path literals in flake source (pure eval).
+- swaks marks SMTP error-response lines with `<**`, success with `<-`; RCPT
+  policy checks (SPF/DNSBL) stall ~30 s per lookup in a DNS-less VM - tests
+  need `--timeout 120`.
+- Stalwart downloads ASN/Geo IP data from cdn.jsdelivr.net at first start -
+  offline environments log "Resource error" lines (benign) and need egress.
+- Metrics: Stalwart telemetry has a Prometheus exporter (event
+  `telemetry.prometheus-exporter-error` in the binary); the exact scrape
+  wiring is UNVERIFIED - nail it on the VPS go-live before advertising it.
+
+## Non-goals
+
+Piler (archiving - maildir snapshots + paperless cover personal use),
+Mailcow/Mailu (Docker-first, heavy), Elasticsearch for parsedmarc (a search
+stack to read 16 domains' DMARC mail), a wrapper around
+`services.mailpit.instances` (single option, nothing to layer).
