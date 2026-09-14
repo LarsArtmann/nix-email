@@ -80,11 +80,12 @@ pkgs.testers.runNixOSTest {
         machine.succeed("grep -E '(<-|<\\*\\*) *5[0-9][0-9]' /tmp/swaks.log")
 
     with subtest("IMAPS: implicit TLS with IMAP greeting"):
-        # The self-signed certificate is generated asynchronously at first
-        # start; retry until the greeting answers (observed race up to ~30s).
+        # The self-signed certificate (rcgen) is generated asynchronously at
+        # first start and can take tens of seconds in the entropy-poor,
+        # DNS-less VM (observed >80s once) - poll instead of single-shotting.
         machine.wait_until_succeeds(
             "echo | openssl s_client -connect 127.0.0.1:993 2>/dev/null | grep -q 'OK'",
-            timeout=90,
+            timeout=180,
         )
 
     with subtest("HTTP admin/JMAP answers on loopback"):
@@ -108,20 +109,22 @@ pkgs.testers.runNixOSTest {
             )
         )
 
+    def create_account(name):
+        # "roles": ["user"] is REQUIRED - without it the account authenticates
+        # but submission is refused with 550 5.7.1 "not authorized to use
+        # this service" (the webadmin adds it silently; observed live in VM).
+        create_principal({
+            "type": "individual",
+            "name": name,
+            "emails": [name],
+            "roles": ["user"],
+            "secrets": ["${testHash}"],
+        })
+
     with subtest("management API: create domain and accounts"):
         create_principal({"type": "domain", "name": "example.test"})
-        create_principal({
-            "type": "individual",
-            "name": "user1@example.test",
-            "emails": ["user1@example.test"],
-            "secrets": ["${testHash}"],
-        })
-        create_principal({
-            "type": "individual",
-            "name": "user2@example.test",
-            "emails": ["user2@example.test"],
-            "secrets": ["${testHash}"],
-        })
+        create_account("user1@example.test")
+        create_account("user2@example.test")
 
     with subtest("submission: authenticated SMTP on 587 delivers to INBOX"):
         machine.succeed(
