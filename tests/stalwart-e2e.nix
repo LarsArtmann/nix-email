@@ -43,11 +43,16 @@ pkgs.testers.runNixOSTest {
     machine.wait_for_open_port(25, timeout=60)
 
     with subtest("SMTP: full dialogue, unknown recipient rejected 5xx"):
+        # --timeout 120: the RCPT decision runs SPF/DNSBL checks whose
+        # resolver calls stall ~30s each in the DNS-less VM before failing
+        # (deterministic NXDOMAIN-timeout behavior, live-observed). The
+        # module defaults keep the DNS checks - a real MX should do them.
         machine.succeed(
-            "swaks --server 127.0.0.1:25 --ehlo probe.example.test --from probe@example.test --to nobody@example.test --quit-after RCPT > /tmp/swaks.log 2>&1 || true"
+            "swaks --timeout 120 --server 127.0.0.1:25 --ehlo probe.example.test --from probe@example.test --to nobody@example.test --quit-after RCPT > /tmp/swaks.log 2>&1 || true"
         )
         machine.succeed("cat /tmp/swaks.log >&2")
-        machine.succeed("grep -E '<- *5[0-9][0-9]' /tmp/swaks.log")
+        # swaks marks error-response lines with "<**" and success with "<-"
+        machine.succeed("grep -E '(<-|<\\*\\*) *5[0-9][0-9]' /tmp/swaks.log")
 
     with subtest("IMAPS: implicit TLS with IMAP greeting"):
         machine.succeed(
