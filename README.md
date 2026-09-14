@@ -88,8 +88,10 @@ Gatus checks for the VPS (on evo-x2, external viewpoint):
 
 1. Provision Hetzner VPS (CX22-class); NixOS via the existing
    domains-repo cloud-init path. Set rDNS/PTR to the mail hostname.
-   Outbound stays via Resend on 587 (Hetzner filters outbound :25 for new
-   accounts - irrelevant to this design).
+   Outbound stays via Resend on 587 (UNVERIFIED CLAIM: "Hetzner filters
+   outbound :25 for new accounts" is from memory, not checked against
+   Hetzner's current policy - irrelevant to this design either way, but do
+   not quote it as fact).
 2. Stalwart admin bootstrap is the first-run web wizard (local httpBind via
    SSH tunnel): set admin password, create accounts/domains, DKIM keys.
 3. Terraform (`domains` repo): new `stalwart-mail` module - MX, SPF
@@ -99,9 +101,12 @@ Gatus checks for the VPS (on evo-x2, external viewpoint):
    lower MX TTL first, keep Workspace alive ~2 weeks as rollback.
 5. evo-x2: enable `dmarc-monitor` against the `dmarc@` IMAP mailbox; drive
    the DMARC ladder (`none -> quarantine -> reject`) from the report data.
-6. Backups: VPS filesystem on btrfs; snapshot THEN borg/restic (RocksDB is
-   crash-consistent under an atomic snapshot, corrupted under naive
-   file-level copies of a running server). Pull to the evo-x2 pool via
+6. Backups: UNVERIFIED ASSUMPTION - "btrfs snapshot then borg/restic is
+   crash-consistent for RocksDB" is general-engine folklore, not checked
+   against Stalwart's own backup mechanism. The binary contains a backup
+   manager (common/src/manager/backup.rs) and purge tooling: investigate
+   Stalwart's native export/backup API FIRST and prefer it; only fall back
+   to snapshot+borg if verified. Pull results to the evo-x2 pool via
    backup-coordination.
 7. DR: sops secrets for the VPS must also encrypt to a repo-level recovery
    age key, not only the VPS host key - a rebuilt VPS gets a new host key
