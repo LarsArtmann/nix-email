@@ -24,6 +24,48 @@ let
   # Fixed salt => deterministic hash of "testpass" (sha512-crypt $6$,
   # the exact format the webadmin hashes account passwords with).
   testHash = "$6$StalwartTestSalt$gagC41V16GV6khfXMiraIyZLKuYDgSyRzVfM0TaSFNMRqkLewQ5d/b9Ns0uc1Rr4DWD15BxHHzh2XaC4ZAS97.";
+
+  # Runs INSIDE the VM (the testScript itself runs on the driver host):
+  # polls IMAPS on loopback until a message containing the needle arrives
+  # in user2's INBOX. Delivery is async (queue -> local delivery) and the
+  # self-signed cert handshake can be slow on first connect.
+  imapProbe = pkgs.writers.writePython3Bin "imap-probe" { } ''
+    import imaplib
+    import ssl
+    import sys
+    import time
+
+    needle = sys.argv[1].encode()
+    deadline = time.time() + 180
+    ctx = ssl.create_default_context()
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
+    last_err = None
+    while time.time() < deadline:
+        try:
+            with imaplib.IMAP4_SSL("127.0.0.1", 993, ssl_context=ctx) as imap:
+                imap.login("user2@example.test", "testpass")
+                status, _ = imap.select("INBOX")
+                assert status == "OK"
+                status, data = imap.search(None, "ALL")
+                assert status == "OK"
+                for num in data[0].split():
+                    status, msg = imap.fetch(num, "(RFC822)")
+                    body = b"".join(
+                        part[1] for part in msg if isinstance(part, tuple)
+                    )
+                    if needle in body:
+                        print("needle found in INBOX")
+                        sys.exit(0)
+                imap.close()
+        except Exception as err:
+            last_err = err
+            print("retry: {}".format(err), file=sys.stderr)
+        time.sleep(3)
+    msg = "needle never arrived (last error: {})".format(last_err)
+    print(msg, file=sys.stderr)
+    sys.exit(1)
+  '';
 in
 pkgs.testers.runNixOSTest {
   name = "stalwart-e2e";
@@ -49,7 +91,7 @@ pkgs.testers.runNixOSTest {
         pkgs.swaks
         pkgs.openssl
         pkgs.curl
-        (pkgs.python3.withPackages (ps: [ ]))
+        imapProbe
       ];
 
       virtualisation.memorySize = 2048;
@@ -57,9 +99,6 @@ pkgs.testers.runNixOSTest {
 
   testScript = ''
     import json
-    import imaplib
-    import ssl
-    import time
 
     start_all()
 
@@ -137,32 +176,9 @@ pkgs.testers.runNixOSTest {
         machine.succeed("cat /tmp/swaks-sub.log >&2")
         machine.succeed("! grep -q '<\\*\\*' /tmp/swaks-sub.log")
 
-        # Delivery is async (queue -> local delivery). Poll IMAPS for the needle.
-        ctx = ssl.create_default_context()
-        ctx.check_hostname = False
-        ctx.verify_mode = ssl.CERT_NONE
-        deadline = time.time() + 120
-        found = False
-        last_err = None
-        while time.time() < deadline and not found:
-            try:
-                with imaplib.IMAP4_SSL("127.0.0.1", 993, ssl_context=ctx) as imap:
-                    imap.login("user2@example.test", "testpass")
-                    imap.select("INBOX")
-                    status, data = imap.search(None, "ALL")
-                    assert status == "OK", data
-                    for num in data[0].split():
-                        status, msg = imap.fetch(num, "(RFC822)")
-                        body = b"".join(part[1] for part in msg if isinstance(part, tuple))
-                        if b"needle-576a4565b70f5a4c" in body:
-                            found = True
-                            print("delivered message fetched via IMAPS")
-                    imap.close()
-            except Exception as err:
-                last_err = err
-            if not found:
-                time.sleep(3)
-        assert found, "message with needle never arrived in user2 INBOX (last error: {})".format(last_err)
+        # Delivery is async (queue -> local delivery); probe IMAPS until the
+        # needle message appears in user2's INBOX (script runs in the VM).
+        machine.succeed("imap-probe needle-576a4565b70f5a4c")
 
     with subtest("no crashes"):
         machine.succeed("! journalctl -u stalwart -b 0 | grep -qiE 'panic|fatal error'")
