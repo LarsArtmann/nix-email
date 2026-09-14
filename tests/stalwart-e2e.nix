@@ -94,7 +94,7 @@ pkgs.testers.runNixOSTest {
             "curl -fsS -u admin:test-admin-secret http://127.0.0.1:8080/api/principal -o /tmp/principals.json"
         )
         machine.succeed(
-            "curl -fsS -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/api/principal | grep -q 401"
+            "curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/api/principal | grep -q 401"
         )
 
     def create_principal(payload):
