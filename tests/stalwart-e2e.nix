@@ -106,6 +106,26 @@ pkgs.testers.runNixOSTest {
     machine.wait_for_open_port(25, timeout=60)
     machine.wait_for_open_port(8080, timeout=60)
 
+    def create_principal(payload):
+        machine.succeed(
+            "curl -fsS -u admin:test-admin-secret -H 'Content-Type: application/json' "
+            "-X POST http://127.0.0.1:8080/api/principal -d '{}'".format(
+                json.dumps(payload)
+            )
+        )
+
+    def create_account(name):
+        # "roles": ["user"] is REQUIRED - without it the account authenticates
+        # but submission is refused with 550 5.7.1 "not authorized to use
+        # this service" (the webadmin adds it silently; observed live in VM).
+        create_principal({
+            "type": "individual",
+            "name": name,
+            "emails": [name],
+            "roles": ["user"],
+            "secrets": ["${testHash}"],
+        })
+
     # Provisioning MUST happen BEFORE any SMTP traffic: a MAIL FROM/RCPT to
     # a not-yet-existing domain poisons the directory's is_local_domain
     # NEGATIVE CACHE (default TTL 1h, crates/directory/src/core/cache.rs),
@@ -149,26 +169,6 @@ pkgs.testers.runNixOSTest {
         machine.succeed(
             "curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/api/principal | grep -q 401"
         )
-
-    def create_principal(payload):
-        machine.succeed(
-            "curl -fsS -u admin:test-admin-secret -H 'Content-Type: application/json' "
-            "-X POST http://127.0.0.1:8080/api/principal -d '{}'".format(
-                json.dumps(payload)
-            )
-        )
-
-    def create_account(name):
-        # "roles": ["user"] is REQUIRED - without it the account authenticates
-        # but submission is refused with 550 5.7.1 "not authorized to use
-        # this service" (the webadmin adds it silently; observed live in VM).
-        create_principal({
-            "type": "individual",
-            "name": name,
-            "emails": [name],
-            "roles": ["user"],
-            "secrets": ["${testHash}"],
-        })
 
     with subtest("submission: authenticated SMTP on 587 delivers to INBOX"):
         machine.succeed(
