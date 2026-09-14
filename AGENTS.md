@@ -10,10 +10,18 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
 
 - `nix flake check` - the full gate: eval contract + Stalwart VM E2E test
   (~2-4 min; the SMTP subtest intentionally waits out ~60 s of resolver
-  timeouts in the DNS-less VM).
+  timeouts in the DNS-less VM). NOTE: failed check results are CACHED - a
+  rerun without an input change replays the old verdict.
 - Local debug loop (much faster than the VM): run the pinned binary by hand
   with a minimal config in /tmp - see the pattern in the verified-facts
   ledger history (bind high ports, `certificate.self-signed = true`).
+- VM debug loop: realize the driver
+  (`nix-store -r $(nix-store -q --references $(nix eval --raw
+  .#checks.x86_64-linux.stalwart-e2e.drvPath) | grep nixos-test-driver)`)
+  and run a custom script with `--test-script /tmp/debug.py` (create output
+  dir first: `-o` requires an EXISTING directory). The driver's python runs
+  on the HOST - anything touching VM ports must be a packaged script or a
+  machine.succeed("...") command, never host-side socket code.
 
 ## Conventions
 
@@ -27,5 +35,8 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
 - Tests: VM E2E for behavior (stalwart-e2e), eval contract for wiring
   (dmarc-eval). Never weaken module defaults to make a test deterministic -
   fix the test (e.g. swaks --timeout), keep the product honest.
+- E2E ordering matters: provision domain/accounts BEFORE any SMTP probe -
+  a RCPT/MAIL FROM probe poisons the directory negative cache (1 h TTL)
+  and the domain then routes to MX instead of local (see README ledger).
 - SystemNix layers (sops, ports.nix, Gatus, onFailure, backup-coordination)
   belong to the CONSUMER wrapper, not here.
