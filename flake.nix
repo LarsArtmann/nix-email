@@ -38,11 +38,16 @@
         system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
+          # NixOS VM tests only run reliably on x86_64-linux (aarch64 VM test
+          # has never been executed here and is a known trap); the pure-eval
+          # contract test is arch-independent.
+          checks = {
+            dmarc-eval = import ./tests/dmarc-eval.nix { inherit nixpkgs system; };
+          } // nixpkgs.lib.optionalAttrs (system == "x86_64-linux") {
+            stalwart-e2e = import ./tests/stalwart-e2e.nix { inherit pkgs; };
+          };
         in
-        {
-          stalwart-e2e = import ./tests/stalwart-e2e.nix { inherit pkgs; };
-          dmarc-eval = import ./tests/dmarc-eval.nix { inherit nixpkgs system; };
-        }
+        checks
       );
     };
 }

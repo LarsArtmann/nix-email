@@ -27,7 +27,9 @@ web admin built in.
 
 - `stalwart-e2e`: real Stalwart 0.15.5 in a VM - service up, full SMTP
   dialogue with unknown-recipient 550 rejection, implicit-TLS IMAPS greeting,
-  loopback HTTP admin, no panics.
+  loopback HTTP admin, declarative `fallback-admin` bootstrap, accounts via
+  the management API, authenticated submission on 587 delivering into a real
+  INBOX fetched back over IMAPS, no panics.
 - `dmarc-eval`: eval-time contract - enables parsedmarc, heavy sinks off,
   `general.output` lands, `_secret` password survives the option types.
 
@@ -51,8 +53,8 @@ else flows through `services.stalwart.settings` (all wrapper values are
 (override with real certs/ACME on the VPS).
 
 Outbound smarthost relaying (Stalwart -> Resend) is a per-host `settings`
-addition - determine exact `queue.*` keys on the VPS go-live, do not guess
-them from memory.
+addition - the verified keys are in the ledger below (confirmed against the
+v0.15.5 source, not guessed).
 
 ## Module: `services.dmarc-monitor`
 
@@ -92,21 +94,30 @@ Gatus checks for the VPS (on evo-x2, external viewpoint):
    outbound :25 for new accounts" is from memory, not checked against
    Hetzner's current policy - irrelevant to this design either way, but do
    not quote it as fact).
-2. Stalwart admin bootstrap is the first-run web wizard (local httpBind via
-   SSH tunnel): set admin password, create accounts/domains, DKIM keys.
+2. Stalwart admin bootstrap: set `authentication.fallback-admin`
+   (`user` + `secret` - VERIFIED to work with an empty internal directory,
+   no first-run wizard needed) or use the web wizard over an SSH tunnel to
+   the loopback httpBind: create accounts/domains, DKIM keys. On the VPS the
+   secret must come from a credential file: `services.stalwart.credentials`
+   + `%{file:/run/credentials/stalwart.service/<key>%}` macro in settings
+   (sops on the consumer side).
 3. Terraform (`domains` repo): new `stalwart-mail` module - MX, SPF
    (`v=spf1 mx -all`), DKIM txt, DMARC with `rua=mailto:dmarc@<domain>`,
    MTA-STS + `_smtp._tls` TLS-RPT records; point `rua` mailboxes at the VPS.
+   Outbound relay through Resend - verified keys in the ledger below
+   (`queue.route."resend"` type=relay + `queue.strategy.route`).
 4. Migrate mailboxes BEFORE the MX switch (imapsync 2.314 is in nixpkgs);
    lower MX TTL first, keep Workspace alive ~2 weeks as rollback.
 5. evo-x2: enable `dmarc-monitor` against the `dmarc@` IMAP mailbox; drive
    the DMARC ladder (`none -> quarantine -> reject`) from the report data.
-6. Backups: UNVERIFIED ASSUMPTION - "btrfs snapshot then borg/restic is
-   crash-consistent for RocksDB" is general-engine folklore, not checked
-   against Stalwart's own backup mechanism. The binary contains a backup
-   manager (common/src/manager/backup.rs) and purge tooling: investigate
-   Stalwart's native export/backup API FIRST and prefer it; only fall back
-   to snapshot+borg if verified. Pull results to the evo-x2 pool via
+6. Backups (VERIFIED against v0.15.5 source): the binary ships a NATIVE
+   consistent export - `stalwart --config ... --export <dir>` (offline op:
+   runs instead of serving, then exits) writes lz4-framed dumps of ALL store
+   families (data, directory, blob, config, changelog, queue, report,
+   telemetry, tasks); `--import <dir>` restores. This is the preferred
+   primitive - no RocksDB-crash-consistency folklore needed. It is offline,
+   so schedule it as a stop/export/start unit or accept btrfs-snapshot
+   fallback for hot copies. Pull results to the evo-x2 pool via
    backup-coordination.
 7. DR: sops secrets for the VPS must also encrypt to a repo-level recovery
    age key, not only the VPS host key - a rebuilt VPS gets a new host key
@@ -134,9 +145,44 @@ Gatus checks for the VPS (on evo-x2, external viewpoint):
   need `--timeout 120`.
 - Stalwart downloads ASN/Geo IP data from cdn.jsdelivr.net at first start -
   offline environments log "Resource error" lines (benign) and need egress.
-- Metrics: Stalwart telemetry has a Prometheus exporter (event
-  `telemetry.prometheus-exporter-error` in the binary); the exact scrape
-  wiring is UNVERIFIED - nail it on the VPS go-live before advertising it.
+- Metrics (VERIFIED against v0.15.5 source): `metrics.prometheus.enable =
+  true`, optional `metrics.prometheus.auth.username`/`auth.secret` (HTTP
+  basic auth). Endpoint is `/metrics/prometheus` ON THE HTTP LISTENER - with
+  the loopback default that means a reverse-proxy route or ssh tunnel for
+  Prometheus; do not expose the whole admin port for it.
+- Outbound relay (VERIFIED against v0.15.5 source, closes the old "do not
+  guess" item): since 0.13 routing is expression-based. A smarthost is
+  `[queue.route."<id>"]` with `type = "relay"`, `address`, `port`,
+  `protocol = "smtp"`, `auth.username`, `auth.secret`, optional
+  `tls.implicit`. Select it with `queue.strategy.route` (an expression;
+  default routes local domains to `'local'`, everything else to `'mx'`).
+  The nixpkgs module ASSERTS against the pre-0.13 `queue.*.next-hop`.
+- Bootstrap admin (VERIFIED): `authentication.fallback-admin.user`/`.secret`
+  work with an empty internal directory. This is how the E2E test gets an
+  admin declaratively (the upstream reference config ships exactly this).
+- Account provisioning API (VERIFIED against webadmin source): `POST
+  /api/principal` (basic auth as admin) with `{"type": "individual",
+  "name": ..., "emails": [...], "secrets": ["<sha512-crypt $6$ hash>"]}` -
+  passwords are hashed CLIENT-side (pwhash sha512_crypt format).
+  `{"type": "domain", "name": ...}` makes a domain local. DKIM keygen via
+  `POST /api/dkim`.
+- DKIM signing (VERIFIED): keys live under `signature.<id>` with
+  `algorithm` (`rsa-sha256`/`ed25519-sha256`), `private-key` (inline PEM,
+  supports `%{file:...}%` macros), `domain`, `selector`. `auth.dkim.sign`
+  is an expression defaulting to sign local-domain mail with ids
+  `['rsa-' + sender_domain, 'ed25519-' + sender_domain]` - exactly the ids
+  the webadmin generates via `POST /api/dkim`.
+- TLS/ACME (VERIFIED key names): manual certs are `certificate.<id>.cert`
+  + `certificate.<id>.private-key`; built-in ACME is `acme.<id>.directory`,
+  `.contact`, `.challenge`, `.renew-before` (default 30d), DNS-challenge
+  extras `.origin`, `.polling-interval`, `.propagation-timeout`.
+- nixpkgs module secret injection: `services.stalwart.credentials` (attrsOf
+  path) becomes systemd LoadCredential files, referenced in settings as
+  `%{file:/run/credentials/stalwart.service/<key>%}` - the sops-compatible
+  way to feed the relay and admin secrets.
+- Inbound auth defaults need NO config: SPF/DMARC/iprev verification only
+  runs on port 25 (`local_port == 25` conditions), disabled on submission
+  ports; DKIM verify is `relaxed` everywhere.
 
 ## Non-goals
 
