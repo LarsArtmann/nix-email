@@ -106,6 +106,16 @@ pkgs.testers.runNixOSTest {
     machine.wait_for_open_port(25, timeout=60)
     machine.wait_for_open_port(8080, timeout=60)
 
+    # Provisioning MUST happen BEFORE any SMTP traffic: a MAIL FROM/RCPT to
+    # a not-yet-existing domain poisons the directory's is_local_domain
+    # NEGATIVE CACHE (default TTL 1h, crates/directory/src/core/cache.rs),
+    # and every later submission for that domain is then routed to the MX
+    # path instead of local delivery (observed in VM, 2026-09-14).
+    with subtest("management API: create domain and accounts"):
+        create_principal({"type": "domain", "name": "example.test"})
+        create_account("user1@example.test")
+        create_account("user2@example.test")
+
     with subtest("SMTP: full dialogue, unknown recipient rejected 5xx"):
         # --timeout 120: the RCPT decision runs SPF/DNSBL checks whose
         # resolver calls stall ~30s each in the DNS-less VM before failing
@@ -159,11 +169,6 @@ pkgs.testers.runNixOSTest {
             "roles": ["user"],
             "secrets": ["${testHash}"],
         })
-
-    with subtest("management API: create domain and accounts"):
-        create_principal({"type": "domain", "name": "example.test"})
-        create_account("user1@example.test")
-        create_account("user2@example.test")
 
     with subtest("submission: authenticated SMTP on 587 delivers to INBOX"):
         machine.succeed(

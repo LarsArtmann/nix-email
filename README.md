@@ -190,6 +190,15 @@ Gatus checks for the VPS (on evo-x2, external viewpoint):
   need `"roles": ["user"]` - without it auth succeeds but submission is
   refused with 550 5.7.1 "not authorized to use this service" (the webadmin
   adds the role silently).
+- Local-domain routing (VERIFIED in VM + source read, 2026-09-14): the
+  default queue route is `is_local_domain('*', rcpt_domain) -> 'local'`,
+  else MX. The directory NEGATIVELY caches `is_local_domain` misses for
+  1 HOUR (`directory.cache.ttl.negative`, default 3600s,
+  crates/directory/src/core/cache.rs). Consequence: ANY SMTP traffic
+  (even a MAIL FROM probe) touching a domain before it is provisioned
+  poisons the cache and routes that domain's mail to the MX path - in the
+  VM that means DNS timeouts, never local delivery. Provision domains
+  before first traffic, or lower the negative TTL on dev/test hosts.
 - DKIM signing (VERIFIED): keys live under `signature.<id>` with
   `algorithm` (`rsa-sha256`/`ed25519-sha256`), `private-key` (inline PEM,
   supports `%{file:...}%` macros), `domain`, `selector`. `auth.dkim.sign`
