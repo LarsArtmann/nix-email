@@ -80,8 +80,11 @@ pkgs.testers.runNixOSTest {
         machine.succeed("grep -E '(<-|<\\*\\*) *5[0-9][0-9]' /tmp/swaks.log")
 
     with subtest("IMAPS: implicit TLS with IMAP greeting"):
-        machine.succeed(
-            "echo | openssl s_client -connect 127.0.0.1:993 2>/dev/null | grep -q 'OK'"
+        # The self-signed certificate is generated asynchronously at first
+        # start; retry until the greeting answers (observed race up to ~30s).
+        machine.wait_until_succeeds(
+            "echo | openssl s_client -connect 127.0.0.1:993 2>/dev/null | grep -q 'OK'",
+            timeout=90,
         )
 
     with subtest("HTTP admin/JMAP answers on loopback"):

@@ -90,10 +90,13 @@ Gatus checks for the VPS (on evo-x2, external viewpoint):
 
 1. Provision Hetzner VPS (CX22-class); NixOS via the existing
    domains-repo cloud-init path. Set rDNS/PTR to the mail hostname.
-   Outbound stays via Resend on 587 (UNVERIFIED CLAIM: "Hetzner filters
-   outbound :25 for new accounts" is from memory, not checked against
-   Hetzner's current policy - irrelevant to this design either way, but do
-   not quote it as fact).
+   VERIFIED against Hetzner's official docs (docs.hetzner.com/cloud/servers/faq,
+   2026-09-14): Hetzner Cloud blocks ports **25 and 465 by default on all
+   cloud servers, enforced per account, both directions** - so inbound MX
+   traffic on :25 is blocked too for a new account. After 1 month + first
+   paid invoice, file a limit request (Hetzner Console > Limits) to unblock,
+   case-by-case approval. Port 587 is never blocked (Resend relay
+   unaffected). Plan the go-live AFTER the unblock is granted.
 2. Stalwart admin bootstrap: set `authentication.fallback-admin`
    (`user` + `secret` - VERIFIED to work with an empty internal directory,
    no first-run wizard needed) or use the web wizard over an SSH tunnel to
@@ -145,6 +148,14 @@ Gatus checks for the VPS (on evo-x2, external viewpoint):
   need `--timeout 120`.
 - Stalwart downloads ASN/Geo IP data from cdn.jsdelivr.net at first start -
   offline environments log "Resource error" lines (benign) and need egress.
+- Hetzner Cloud port policy (VERIFIED against docs.hetzner.com/cloud/servers/faq,
+  "Why can I not send any mails from my server?", 2026-09-14): ports 25 and
+  465 are blocked BY DEFAULT on all cloud servers, enforced per account,
+  both directions. Unblock via a limit request after 1 month + first paid
+  invoice (case-by-case). Port 587 is never blocked. Consequence: the
+  hybrid design is safe on outbound (relay via 587), but INBOUND MX on :25
+  requires the unblock before go-live - the community guides claiming
+  "Hetzner port 25 open by default" are outdated.
 - Metrics (VERIFIED against v0.15.5 source): `metrics.prometheus.enable =
   true`, optional `metrics.prometheus.auth.username`/`auth.secret` (HTTP
   basic auth). Endpoint is `/metrics/prometheus` ON THE HTTP LISTENER - with
