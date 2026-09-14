@@ -178,6 +178,15 @@ Gatus checks for the VPS (on evo-x2, external viewpoint):
   `tls.implicit`. Select it with `queue.strategy.route` (an expression;
   default routes local domains to `'local'`, everything else to `'mx'`).
   The nixpkgs module ASSERTS against the pre-0.13 `queue.*.next-hop`.
+  LIVE SPIKE 2026-09-14 (local binary + Mailpit): (a) an IfBlock route
+  needs INDEXED keys - `queue.strategy.route.1.if` / `.1.then` /
+  `.2.else`; a bare `if`/`then`/`else` fails to parse, and `else` must
+  sort AFTER `if` (else-before-if is a parse error); (b) the relay
+  address is resolved via DNS A lookup - a bare IP literal fails with
+  "record not found for MX", so use a resolvable hostname
+  (e.g. `smtp.resend.com`); (c) Stalwart REFUSES to relay to loopback
+  addresses ("host resolves loopback address") - a good SSRF guard, and
+  the reason the VM E2E cannot exercise the smarthost path.
 - Bootstrap admin (VERIFIED): `authentication.fallback-admin.user`/`.secret`
   work with an empty internal directory. This is how the E2E test gets an
   admin declaratively (the upstream reference config ships exactly this).
