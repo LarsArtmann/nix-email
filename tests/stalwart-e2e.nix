@@ -168,64 +168,6 @@
     sys.exit(0)
   '';
 
-  # GTUBE: the message must land in the Junk mailbox and NEVER in INBOX
-  # (filing happens at ingest; the Junk mailbox is created on first use).
-  # Args: needle [username [password]].
-  imapJunkProbe = pkgs.writers.writePython3Bin "imap-junk-probe" {} ''
-    import imaplib
-    import ssl
-    import sys
-    import time
-
-    needle = sys.argv[1].encode()
-    user = sys.argv[2] if len(sys.argv) > 2 else "user2@example.test"
-    password = sys.argv[3] if len(sys.argv) > 3 else "testpass"
-    deadline = time.time() + 180
-    ctx = ssl.create_default_context()
-    ctx.check_hostname = False
-    ctx.verify_mode = ssl.CERT_NONE
-    last_err = None
-    while time.time() < deadline:
-        try:
-            with imaplib.IMAP4_SSL("127.0.0.1", 993, ssl_context=ctx) as imap:
-                imap.login(user, password)
-                status, _ = imap.select("INBOX")
-                assert status == "OK"
-                status, data = imap.search(None, "ALL")
-                assert status == "OK"
-                for num in data[0].split():
-                    status, msg = imap.fetch(num, "(RFC822)")
-                    body = b"".join(
-                        part[1] for part in msg if isinstance(part, tuple)
-                    )
-                    if needle in body:
-                        print(
-                            "GTUBE message landed in INBOX (definitive)",
-                            file=sys.stderr,
-                        )
-                        sys.exit(1)
-                status, _ = imap.select("Junk")
-                if status == "OK":
-                    status, data = imap.search(None, "ALL")
-                    assert status == "OK"
-                    for num in data[0].split():
-                        status, msg = imap.fetch(num, "(RFC822)")
-                        body = b"".join(
-                            part[1] for part in msg if isinstance(part, tuple)
-                        )
-                        if needle in body:
-                            print("GTUBE message found in Junk")
-                            sys.exit(0)
-                imap.close()
-        except Exception as err:
-            last_err = err
-            print("retry: {}".format(err), file=sys.stderr)
-        time.sleep(3)
-    msg = "GTUBE message never reached Junk (last error: {})".format(last_err)
-    print(msg, file=sys.stderr)
-    sys.exit(1)
-  '';
-
   # Same polling shape, but additionally asserts that the needle message
   # carries a given header line in its header block (used for DKIM-Signature).
   # Finding the needle WITHOUT the header is definitive (headers are set at
