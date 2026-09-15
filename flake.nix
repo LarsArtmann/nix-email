@@ -48,6 +48,7 @@
           // nixpkgs.lib.optionalAttrs (system == "x86_64-linux") {
             stalwart-e2e = import ./tests/stalwart-e2e.nix {inherit pkgs;};
             stalwart-relay-e2e = import ./tests/stalwart-relay-e2e.nix {inherit pkgs;};
+            parsedmarc-e2e = import ./tests/parsedmarc-e2e.nix {inherit pkgs;};
           };
       in
         checks
