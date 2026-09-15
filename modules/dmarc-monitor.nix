@@ -126,7 +126,8 @@ in {
       ExecStartPre = lib.mkIf (!config.services.parsedmarc.provision.elasticsearch) (
         lib.mkAfter [
           (pkgs.writeShellScript "parsedmarc-strip-elasticsearch-section" ''
-            ${pkgs.gawk}/bin/awk '/^\\[/{keep = ($0 != "[elasticsearch]")} keep' \
+            set -eu
+            ${pkgs.gawk}/bin/awk '/^\[/{keep = ($0 != "[elasticsearch]")} keep' \
               /run/parsedmarc/parsedmarc.ini > /run/parsedmarc/parsedmarc.ini.tmp
             ${pkgs.coreutils}/bin/mv /run/parsedmarc/parsedmarc.ini.tmp \
               /run/parsedmarc/parsedmarc.ini
