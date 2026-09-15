@@ -79,6 +79,21 @@
         server.sendmail(sender_email, receiver_email, text)
         server.quit()
   '';
+
+  # Self-signed cert fixture for the TLS node. SANs matter: mailsuite's
+  # default verification context does HOSTNAME checks against the
+  # configured host (localhost), not just chain validation - a bare
+  # CN-only cert fails with a hostname mismatch.
+  imapTestCert =
+    pkgs.runCommand "dmarc-imap-test-cert" {
+      nativeBuildInputs = [pkgs.openssl];
+    } ''
+      mkdir -p $out
+      openssl req -x509 -newkey rsa:2048 -sha256 -days 3650 -nodes \
+        -keyout $out/key.pem -out $out/cert.pem \
+        -subj "/CN=localhost" \
+        -addext "subjectAltName=DNS:localhost,IP:127.0.0.1"
+    '';
 in
   pkgs.testers.runNixOSTest {
     name = "parsedmarc-e2e";
@@ -149,6 +164,46 @@ in
 
       services.postfix.settings.main.home_mailbox = "Maildir/";
 
+      environment.systemPackages = [
+        sendEmail
+        pkgs.jq
+      ];
+    };
+
+    # Production-shaped IMAPS variant: same localMail provision, but the
+    # dovecot fixture serves implicit TLS on 993 with a trusted cert and
+    # parsedmarc connects with ssl=true and DEFAULT verification on
+    # (create_default_context: chain + hostname). mkForce beats the
+    # provision's plain localhost:143/ssl=false definitions.
+    nodes.tls = {
+      config,
+      lib,
+      ...
+    }: {
+      imports = [../modules/dmarc-monitor.nix];
+
+      virtualisation.memorySize = 2048;
+
+      # Trust the fixture CA machine-wide so mailsuite's default
+      # verification context accepts the chain.
+      security.pki.certificateFiles = ["${imapTestCert}/cert.pem"];
+
+      services.dovecot2 = {
+        enablePAM = true;
+        settings = {
+          # Same 2.4 version-pin requirement as the plaintext node.
+          dovecot_config_version = config.services.dovecot2.package.version;
+          dovecot_storage_version = config.services.dovecot2.package.version;
+          mail_driver = "maildir";
+          mail_path = "~/Maildir";
+          ssl = "required";
+          # Dovecot 2.4 cert key names (the NixOS module's own rename
+          # assertion names them; 2.3 was ssl_cert/ssl_key).
+          ssl_server_cert_file = "<${imapTestCert}/cert.pem";
+          ssl_server_key_file = "<${imapTestCert}/key.pem";
+        };
+      };
+
       services.dmarc-monitor = {
         enable = true;
         settings.general.offline = true;
@@ -175,37 +230,6 @@ in
         pkgs.jq
       ];
     };
-
-    # Production-shaped IMAPS variant: same localMail provision, but the
-    # dovecot fixture serves implicit TLS on 993 with a trusted cert and
-    # parsedmarc connects with ssl=true and DEFAULT verification on
-    # (create_default_context: chain + hostname). mkForce beats the
-    # provision's plain localhost:143/ssl=false definitions.
-    nodes.tls = {config, lib, ...}: {
-      imports = [../modules/dmarc-monitor.nix];
-
-      virtualisation.memorySize = 2048;
-
-      # Trust the fixture CA machine-wide so mailsuite's default
-      # verification context accepts the chain.
-      security.pki.certificateFiles = ["${imapTestCert}/cert.pem"];
-
-      services.dovecot2 = {
-        enablePAM = true;
-        settings = {
-          inherit (config.services.dovecot2.settings)
-            dovecot_config_version
-            dovecot_storage_version
-            ;
-          mail_driver = "maildir";
-          mail_path = "~/Maildir";
-          ssl = "required";
-          # Dovecot 2.4 cert key names (the NixOS module's own rename
-          # assertion names them; 2.3 was ssl_cert/ssl_key).
-          ssl_server_cert_file = "<${imapTestCert}/cert.pem";
-          ssl_server_key_file = "<${imapTestCert}/key.pem";
-        };
-      };
 
     testScript = ''
       start_all()
@@ -306,6 +330,42 @@ in
           )
           machine.succeed(
               "! grep -qi 'Permission denied' /tmp/journal-parsedmarc.log"
+          )
+
+      # --- TLS node: the production-shaped IMAPS collection path ----------
+      tls.wait_for_unit("postfix.service")
+      tls.wait_for_unit("dovecot.service")
+      tls.wait_for_unit("parsedmarc.service")
+      tls.wait_for_open_port(25, timeout=60)
+      tls.wait_for_open_port(993, timeout=60)
+
+      with subtest("TLS variant: report collected over IMAPS 993"):
+          # The runtime ini must carry the production shape: ssl=true on
+          # port 993, and NO skip_certificate_verification escape hatch
+          # (mailsuite then verifies chain + hostname via its default
+          # context against the machine-trusted fixture cert).
+          tls.succeed("grep -q '^ssl=true$' /run/parsedmarc/parsedmarc.ini")
+          tls.succeed("grep -q '^port=993$' /run/parsedmarc/parsedmarc.ini")
+          tls.succeed(
+              "! grep -q 'skip_certificate_verification' /run/parsedmarc/parsedmarc.ini"
+          )
+          tls.succeed("send-email >&2")
+          tls.wait_until_succeeds(
+              "test -s /var/lib/parsedmarc/reports/aggregate.json",
+              timeout=120,
+          )
+          tls.succeed(
+              "jq -e '.[] | select(.report_metadata.report_id == \"2940\")' "
+              "/var/lib/parsedmarc/reports/aggregate.json"
+          )
+          # If certificate verification had failed, parsedmarc would
+          # crash-loop at the IMAP connect and the JSON above would never
+          # exist; assert the journal shows no TLS failures all the same.
+          tls.succeed(
+              "journalctl -u parsedmarc -b 0 -o cat > /tmp/journal-tls.log"
+          )
+          tls.succeed(
+              "! grep -qiE 'CERTIFICATE_VERIFY_FAILED|SSL:.+(WRONG|FAILED)' /tmp/journal-tls.log"
           )
     '';
   }
