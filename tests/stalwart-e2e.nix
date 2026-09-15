@@ -275,6 +275,7 @@ in
     testScript = ''
       import json
       import re
+      import time
 
       start_all()
 
@@ -306,13 +307,28 @@ in
       # poisons the directory negative cache (is_local_domain false -> the
       # domain takes the non-local path; this IS the documented provisioning
       # trap). The recovery subtest below proves the low TTL heals it.
+      #
+      # RUNTIME BUDGET (documented, measured per run below): the two RCPT
+      # probes in this test cost ~60-70 s of pure resolver timeouts. Each
+      # RCPT decision runs SPF + DNSBL lookups that stall ~30 s per lookup
+      # in the DNS-less VM before failing (deterministic timeout behavior,
+      # live-observed); the pre-provision poison probe and the
+      # unknown-recipient probe EACH pay that once. The module defaults
+      # keep the DNS checks on purpose (a real MX should do them) - the
+      # cost is the DNS-less VM's fault, not a product defect.
       with subtest("pre-provision probe poisons the directory negative cache"):
+          probe_t0 = time.monotonic()
           machine.succeed(
               "swaks --timeout 120 --server 127.0.0.1:25 --ehlo probe.example.test --from probe@example.test --to early@example.test --quit-after RCPT > /tmp/swaks-early.log 2>&1 || true"
           )
           machine.succeed("cat /tmp/swaks-early.log >&2")
           machine.succeed(
               "grep -E '(<-|<\\*\\*|<~\\*) *5[0-9][0-9]' /tmp/swaks-early.log"
+          )
+          machine.log(
+              "negative-cache poison probe wall cost: {:.0f}s (resolver timeouts)".format(
+                  time.monotonic() - probe_t0
+              )
           )
 
       # Provisioning MUST happen BEFORE any SMTP traffic: a MAIL FROM/RCPT to
@@ -348,12 +364,18 @@ in
           # resolver calls stall ~30s each in the DNS-less VM before failing
           # (deterministic NXDOMAIN-timeout behavior, live-observed). The
           # module defaults keep the DNS checks - a real MX should do them.
+          reject_t0 = time.monotonic()
           machine.succeed(
               "swaks --timeout 120 --server 127.0.0.1:25 --ehlo probe.example.test --from probe@example.test --to nobody@example.test --quit-after RCPT > /tmp/swaks.log 2>&1 || true"
           )
           machine.succeed("cat /tmp/swaks.log >&2")
           # swaks marks error-response lines with "<**" and success with "<-"
           machine.succeed("grep -E '(<-|<\\*\\*) *5[0-9][0-9]' /tmp/swaks.log")
+          machine.log(
+              "unknown-recipient probe wall cost: {:.0f}s (resolver timeouts)".format(
+                  time.monotonic() - reject_t0
+              )
+          )
 
       with subtest("IMAPS: implicit TLS with IMAP greeting"):
           # The self-signed certificate (rcgen) is generated asynchronously at
@@ -511,6 +533,16 @@ in
               "journalctl -u stalwart.service -b 0 -o cat > /tmp/journal-quota.log "
               + "&& grep -q 'Message rescheduled for delivery' /tmp/journal-quota.log",
               timeout=60,
+          )
+          # A SECOND reschedule line proves the queue RETRIES (the loop),
+          # not a one-off requeue - "retried forever" previously rested on
+          # a single journal line. wait_until_succeeds polls, so a slow
+          # retry backoff costs time, not flake. File-based count (grep -c
+          # consumes its input; no EPIPE trap).
+          machine.wait_until_succeeds(
+              "journalctl -u stalwart.service -b 0 -o cat > /tmp/journal-quota-2.log "
+              + "&& test \"$(grep -c 'Message rescheduled for delivery' /tmp/journal-quota-2.log)\" -ge 2",
+              timeout=300,
           )
 
       with subtest("spam: GTUBE message gets X-Spam-Status (no auto-Junk filing)"):

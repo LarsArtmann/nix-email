@@ -219,8 +219,11 @@ in
           )
 
       with subtest("CSV sink carries the same report"):
+          # Row count, not mere existence: `test -s` alone would pass on a
+          # header-only or truncated sink. The parsed report must produce a
+          # header line plus at least one data row.
           machine.succeed(
-              "test -s /var/lib/parsedmarc/reports/aggregate.csv"
+              "test \"$(wc -l < /var/lib/parsedmarc/reports/aggregate.csv)\" -ge 2"
           )
           machine.succeed(
               "grep -q 'example.com' /var/lib/parsedmarc/reports/aggregate.csv"

@@ -187,3 +187,9 @@ status-report/brutal-self-review HTML canonical outputs; intentional, not
 propagated into the skills.
 
 **Then per the skill: WAITING FOR INSTRUCTIONS.**
+
+---
+
+**Gate addendum (19:50 run, file-based assertions):** `nix flake check` →
+`FLAKECHECK_EXIT:0`, "all checks passed!", zero test failures - the
+pipe-to-file conversion is verified green on the exact end-state tree.
