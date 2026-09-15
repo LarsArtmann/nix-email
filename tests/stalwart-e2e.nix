@@ -398,17 +398,7 @@ in
               "roles": ["user"],
               "secrets": ["${testHash}"],
           })
-          # Literal "@example.test" address = catch-all mailbox (default
-          # AddressMapping::Enable retries the lookup with "@<domain>").
-          create_principal({
-              "type": "individual",
-              "name": "catchall",
-              "emails": ["@example.test"],
-              "roles": ["user"],
-              "secrets": ["${testHash}"],
-          })
-
-      with subtest("SMTP: full dialogue, unknown recipient rejected 5xx"):
+          with subtest("SMTP: full dialogue, unknown recipient rejected 5xx"):
           # --timeout 120: the RCPT decision runs SPF/DNSBL checks whose
           # resolver calls stall ~30s each in the DNS-less VM before failing
           # (deterministic NXDOMAIN-timeout behavior, live-observed). The
@@ -515,6 +505,18 @@ in
           )
 
       with subtest("catch-all: unknown local part lands in the @domain mailbox"):
+          # Literal "@example.test" address = catch-all mailbox (default
+          # AddressMapping::Enable retries the lookup with "@<domain>").
+          # Created HERE, not during provisioning: a live catch-all makes
+          # EVERY local part deliverable, which would turn the
+          # "unknown recipient rejected 5xx" assertion above into a 250.
+          create_principal({
+              "type": "individual",
+              "name": "catchall",
+              "emails": ["@example.test"],
+              "roles": ["user"],
+              "secrets": ["${testHash}"],
+          })
           machine.succeed(
               "swaks --timeout 120 --server 127.0.0.1:587 --tls --auth PLAIN "
               "--auth-user user1@example.test --auth-password testpass "

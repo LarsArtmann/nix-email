@@ -43,6 +43,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   formatting pass over all `.nix` files
 - GitHub repo topics (mail, nixos, nixos-module, stalwart, dmarc,
   email-server, nix-flake)
+- `stalwart-e2e` delivery-behavior subtests: alias (second `emails` entry)
+  and catch-all delivery, over-quota message accepted at SMTP but never
+  delivered, GTUBE message filed to Junk (not INBOX), and the
+  negative-cache poisoning + low-TTL recovery regression pair
+  (`directoryCacheTtlNegative = 5` in the test)
+- `parsedmarc-e2e` VM test fixes for the Dovecot 2.4 pin: explicit
+  `dovecot_config_version`/`dovecot_storage_version` (nixpkgs localMail
+  omits them) and the renamed `dovecot.service` unit (was `dovecot2.service`)
+- `LICENSE` (MIT); `docs/THREAT_MODEL.md` extended with the attacker-scenario
+  table and the out-of-scope/consumer-responsibilities list
 
 ### Changed
 
