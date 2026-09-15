@@ -109,9 +109,11 @@ any repo; they are Lars's calls.
    ceiling (CX22-class?), backup target (evo-x2 btrfs pool vs Hetzner
    StorageBox)?
 3. **License choice:** ~~repo is public (D3 visibility decided 2026-09-14) but
-   has no LICENSE.~~ RESOLVED 2026-09-15: MIT shipped as `LICENSE`
-   (`Copyright (c) 2026 Lars Artmann`); AGPL Stalwart is only wrapped, not
-   relicensed. Flipping the choice later is a one-file change.
+   has no LICENSE.~~ ~~RESOLVED 2026-09-15: MIT shipped~~ **REOPENED
+   2026-09-15:** the user explicitly did NOT confirm MIT (question answered
+   "no"). `LICENSE` currently says MIT (`Copyright (c) 2026 Lars Artmann`);
+   naming the actual choice is a one-file change plus a re-push. AGPL
+   Stalwart is only wrapped, not relicensed, regardless of choice.
 4. **README ops-detail level:** the public README carries go-live runbook
    detail (migration window, DR design) with recon value. Keep as-is, trim to
    outline, or move detail into a private consumer doc?
@@ -126,4 +128,7 @@ any repo; they are Lars's calls.
    (b) the consumer layer (SystemNix) owns the sieve, (c) tag-only, documented
    as the end state. This decides a product behavior, the test contract, and
    whether the mailsuite STARTTLS note should also propose a
-   disable-auto-STARTTLS knob upstream.
+   disable-auto-STARTTLS knob upstream. Status 2026-09-15: the user's answer
+   narrowed it to "in nix-email or not" - recommendation on the table is
+   (a) wrapper-owned (the spam/GTUBE test infrastructure lives here and any
+   consumer then gets consistent Junk behavior); awaiting the final call.
