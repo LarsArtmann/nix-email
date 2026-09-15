@@ -444,11 +444,11 @@ in
             # id replacing 'mx'.
             strategy.route = {
               "1" = {
-                if = "is_local_domain('*', rcpt_domain)";
-                then = "'local'";
+                "if" = "is_local_domain('*', rcpt_domain)";
+                "then" = "'local'";
               };
               "2" = {
-                else = "'${cfg.relay.routeId}'";
+                "else" = "'${cfg.relay.routeId}'";
               };
             };
           };
