@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-09-15
+
 ### Added
 
 - `services.mail-server.relay` option: outbound smarthost relaying via
@@ -94,6 +96,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   settings-based plan and the decision is re-posed in ROADMAP open question 6
 - License CONFIRMED as MIT by the user (2026-09-15, after an intermediate
   rejection); `LICENSE` stands as shipped
+- `parsedmarc-e2e` TLS node: the production-shaped IMAPS collection path
+  (port 993, `ssl=True`, mailsuite DEFAULT certificate verification via
+  `create_default_context` against a machine-trusted self-signed fixture
+  CA with proper SANs - not a skip-verification shortcut); the ini shape
+  (`ssl=True`, `port=993`, no `skip_certificate_verification`) is asserted
+  and the report round-trips over the TLS path (`tests/parsedmarc-e2e.nix`)
+- `parsedmarc-e2e` CSV sink row-count assertion (header + >= 1 data row)
+  instead of bare `test -s`
+- `stalwart-e2e` over-quota subtest now proves the RETRY LOOP (a SECOND
+  `Message rescheduled for delivery` line, observed ~120 s after the
+  first), not a one-off requeue; the two RCPT probes' resolver-timeout
+  cost is measured per run (~65 s each) so the runtime budget is
+  documented, not assumed
+- CI: strict lockstep guard - the flake's declared check set and CI's
+  expected-checks list must match EXACTLY (a vanished check AND an
+  unregistered new check both fail the gate); local negative-test proof
+  recorded
+- `tests/fixtures/debug-template.py`: the proven VM debug-loop script
+  pattern (per-listener port waits, provision-before-SMTP, file-based
+  greps, journal dump) preserved in-tree
+- README: "Pin-advance runbook" (both-locks-together bump procedure +
+  workaround-retirement re-check checklist: imapclient py3.14 starttls,
+  host-less `[elasticsearch]` emission, 0.15.5 key-set re-verification),
+  cross-linked from the module comments; SystemNix wrapper pointer in the
+  go-live runbook; pin-discipline rationale (hard rev vs `?ref=master`);
+  capability-audit ledger entry (v0.15.5 git-tag source grep: DKIM
+  rotation/automated DNS are 0.16-only; native report ingestion, OIDC,
+  TOTP, encryption-at-rest, autoconfig, POP3, JMAP-WS present; PROXY
+  protocol absent) with verdicts in the Pareto plan §10
+
+### Changed
+
+- aarch64 posture: one emulated `stalwart-e2e` run attempted (qemu
+  binfmt + TCG) - the aarch64 guest builds and boots, but boot alone
+  (~6 min) exceeds the test driver's shell-connect timeout and a full
+  E2E would run over an hour; decision documented in the flake trap
+  comment: manual-only, not CI-worthy
 
 ### Changed
 
@@ -105,6 +144,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- The two diagnosed nixpkgs bugs are now filed upstream and linked from
+  the README ledger entries: NixOS/nixpkgs#563651 (host-less
+  `[elasticsearch]` section with `provision.elasticsearch = false`) and
+  NixOS/nixpkgs#563652 (imapclient 4.0.1 `starttls()` assigns the
+  read-only `imaplib.IMAP4.file` on python 3.14)
 - parsedmarc dies at its first IMAP connect on this nixpkgs pin
   (imapclient 3.1.0 assigns `imaplib.IMAP4.file`, read-only since python
   3.14; AttributeError, exit 255). The wrapper pins the unit's binary to
