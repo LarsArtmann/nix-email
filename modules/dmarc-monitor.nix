@@ -90,11 +90,27 @@ in {
     # root-owned /var/lib. StateDirectory makes systemd create and chown
     # /var/lib/parsedmarc on every start; custom outputDirectories outside
     # it must exist already and are explicitly whitelisted here.
+    # The nixpkgs unit is already heavily sandboxed (DynamicUser,
+    # CapabilityBoundingSet="", PrivateDevices/Users/Mounts, Protect* for
+    # clock/hostname/kernel/control-groups/home, SystemCallFilter,
+    # RestrictAddressFamilies) - deliberately NOT duplicated here. The
+    # wrapper adds exactly what is missing on top; all mkDefault so a
+    # stricter consumer policy wins.
     systemd.services.parsedmarc.serviceConfig = {
       StateDirectory = lib.mkDefault "parsedmarc";
       # "-" prefix: the directory may not exist until parsedmarc's first
       # makedirs() - a missing path must not fail the unit at start.
       ReadWritePaths = ["-${cfg.outputDirectory}"];
+      # parsedmarc writes reports and nothing else: a read-only FS (with the
+      # StateDirectory auto-whitelisted by systemd) plus the remaining
+      # namespace/privilege restrictions the upstream unit omits.
+      ProtectSystem = lib.mkDefault "strict";
+      PrivateTmp = lib.mkDefault true;
+      NoNewPrivileges = lib.mkDefault true;
+      RestrictNamespaces = lib.mkDefault true;
+      RestrictRealtime = lib.mkDefault true;
+      RestrictSUIDSGID = lib.mkDefault true;
+      SystemCallArchitectures = lib.mkDefault "native";
     };
   };
 }
