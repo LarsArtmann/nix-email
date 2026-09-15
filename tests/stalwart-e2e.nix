@@ -360,7 +360,8 @@ in
           # first start and can take tens of seconds in the entropy-poor,
           # DNS-less VM (observed >80s once) - poll instead of single-shotting.
           machine.wait_until_succeeds(
-              "echo | openssl s_client -connect 127.0.0.1:993 2>/dev/null | grep -q 'OK'",
+              "echo | openssl s_client -connect 127.0.0.1:993 2>/dev/null > /tmp/tls-greeting.txt "
+              + "&& grep -q 'OK' /tmp/tls-greeting.txt",
               timeout=180,
           )
 
@@ -421,9 +422,14 @@ in
       with subtest("metrics: /metrics/prometheus answers on the HTTP listener"):
           # metrics.prometheus.enable has no auth configured here - the loopback
           # bind is the exposure control (README doctrine); assert the endpoint
-          # speaks Prometheus text format, not just any 200.
+          # speaks Prometheus text format, not just any 200. File-based, never
+          # `curl | grep -q`: under the test shell's pipefail, grep -q's early
+          # exit EPIPEs curl - observed ONCE as exit 23 (write error) on a
+          # MATCHING payload in CI (2026-09-15); the negated form would
+          # phantom-green for the same reason.
           machine.succeed(
-              "curl -fsS http://127.0.0.1:8080/metrics/prometheus | grep -qE '^# (HELP|TYPE)'"
+              "curl -fsS http://127.0.0.1:8080/metrics/prometheus -o /tmp/metrics.prom "
+              + "&& grep -qE '^# (HELP|TYPE)' /tmp/metrics.prom"
           )
 
       with subtest("journal: exactly the 2 known-benign config-build errors"):
@@ -502,7 +508,8 @@ in
           # string; it was tried and the gate caught it (the source-reading
           # lesson again).
           machine.wait_until_succeeds(
-              "journalctl -u stalwart.service -b 0 -o cat | grep -q 'Message rescheduled for delivery'",
+              "journalctl -u stalwart.service -b 0 -o cat > /tmp/journal-quota.log "
+              + "&& grep -q 'Message rescheduled for delivery' /tmp/journal-quota.log",
               timeout=60,
           )
 
@@ -564,6 +571,9 @@ in
           machine.succeed("imap-probe needle-576a4565b70f5a4c")
 
       with subtest("no crashes"):
-          machine.succeed("! journalctl -u stalwart -b 0 | grep -qiE 'panic|fatal error'")
+          machine.succeed(
+              "journalctl -u stalwart -b 0 > /tmp/journal-full.log "
+              + "&& ! grep -qiE 'panic|fatal error' /tmp/journal-full.log"
+          )
     '';
   }

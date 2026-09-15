@@ -96,3 +96,7 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
   non-goals, and the open user decisions (D1/D2 license) that gate them.
 - `CHANGELOG.md` - what changed. `docs/{status,planning,reviews}/` -
   point-in-time session snapshots (historical; annotated as work resolves).
+- `docs/TELEMETRY.md` - Stalwart telemetry best-practices guide (from
+  stalw.art docs fetched 2026-09-15; carries an upstream-object-model vs
+  pinned-0.15.5 version-skew caveat - verify keys against the binary
+  before wiring). `docs/THREAT_MODEL.md` - threat model.

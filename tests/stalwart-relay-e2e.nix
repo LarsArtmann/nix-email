@@ -145,7 +145,7 @@ in
           # REST API for the needle.
           smtp.wait_until_succeeds(
               "curl -fsS http://relay:8025/api/v1/messages -o /tmp/relay-messages.json "
-              + ""+ ""+&& "+&&  "+ ""+&& "+&&   grep -q '${relayNeedle}' /tmp/relay-messages.json",
+              + "&& grep -q '${relayNeedle}' /tmp/relay-messages.json",
               timeout=180,
           )
 
@@ -172,13 +172,13 @@ in
           )
           smtp.succeed(
               "curl -fsS http://relay:8025/api/v1/messages -o /tmp/relay-messages2.json "
-              + ""+ ""+&& "+&&  "+ ""+&& "+&&   ! grep -q 'local-needle-3a7d' /tmp/relay-messages2.json"
+              + "&& ! grep -q 'local-needle-3a7d' /tmp/relay-messages2.json"
           )
 
       with subtest("no crashes"):
           smtp.succeed(
               "journalctl -u stalwart -b 0 > /tmp/journal-full.log "
-              + ""+ ""+&& "+&&  "+ ""+&& "+&&   ! grep -qiE 'panic|fatal error' /tmp/journal-full.log"
+              + "&& ! grep -qiE 'panic|fatal error' /tmp/journal-full.log"
           )
     '';
   }
