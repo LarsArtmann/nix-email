@@ -21,11 +21,27 @@
 #       admin API stays 401
 #   12. Backup/restore: offline `--export`, wipe the store, `--import`,
 #       message survives the roundtrip
-#   13. Nothing panics in the journal
+#  13. Alias delivery: a second `emails` entry on a principal receives into
+#      the same account's INBOX (internal directory indexes every email ->
+#      EmailToId, crates/directory/src/backend/internal/lookup.rs:95)
+#  14. Catch-all: a principal holding the literal email "@example.test"
+#      receives mail for any unknown local part (default AddressMapping::
+#      Enable retries the lookup with "@<domain>", crates/common/src/
+#      addresses.rs:209)
+#  15. Account quota: `quota` (bytes) on a principal makes delivery RETRY
+#      forever with "Mailbox over quota." (crates/email/src/message/
+#      delivery.rs:223) - message accepted at SMTP time, never ingested
+#  16. Spam classification: a GTUBE subject is filed to the Junk mailbox,
+#      not INBOX (v0.15.5 ships the GTUBE rule; default session.data.
+#      spam-filter = true)
+#  17. Negative-cache expiry: a domain poisoned by a pre-provision probe
+#      becomes deliverable locally again within the configured
+#      directoryCacheTtlNegative (the 1h-trap regression guard)
+#  18. Nothing panics in the journal
 #
 # NOT covered (needs DNS + external relay creds): outbound smarthost relay
-# (see stalwart-relay-e2e), spam classification. Those stay live-host
-# go-live checks - see README verified-facts ledger for the keys.
+# (see stalwart-relay-e2e). Those stay live-host go-live checks - see
+# README verified-facts ledger for the keys.
 {pkgs}: let
   # Fixed salt => deterministic hash of "testpass" (sha512-crypt $6$,
   # the exact format the webadmin hashes account passwords with).
@@ -66,8 +82,9 @@
 
   # Runs INSIDE the VM (the testScript itself runs on the driver host):
   # polls IMAPS on loopback until a message containing the needle arrives
-  # in user2's INBOX. Delivery is async (queue -> local delivery) and the
-  # self-signed cert handshake can be slow on first connect.
+  # in the account's INBOX. Delivery is async (queue -> local delivery) and
+  # the self-signed cert handshake can be slow on first connect.
+  # Args: needle [username [password]] (defaults to user2@example.test).
   imapProbe = pkgs.writers.writePython3Bin "imap-probe" {} ''
     import imaplib
     import ssl
@@ -75,6 +92,8 @@
     import time
 
     needle = sys.argv[1].encode()
+    user = sys.argv[2] if len(sys.argv) > 2 else "user2@example.test"
+    password = sys.argv[3] if len(sys.argv) > 3 else "testpass"
     deadline = time.time() + 180
     ctx = ssl.create_default_context()
     ctx.check_hostname = False
@@ -83,7 +102,7 @@
     while time.time() < deadline:
         try:
             with imaplib.IMAP4_SSL("127.0.0.1", 993, ssl_context=ctx) as imap:
-                imap.login("user2@example.test", "testpass")
+                imap.login(user, password)
                 status, _ = imap.select("INBOX")
                 assert status == "OK"
                 status, data = imap.search(None, "ALL")
@@ -106,18 +125,58 @@
     sys.exit(1)
   '';
 
-  # Same polling shape, but additionally asserts that the needle message
-  # carries a given header line in its header block (used for DKIM-Signature).
-  # Finding the needle WITHOUT the header is definitive (headers are set at
-  # queue time) - fail fast instead of polling.
-  imapHeaderProbe = pkgs.writers.writePython3Bin "imap-header-probe" {} ''
+  # Asserts the needle NEVER lands in the account's INBOX during the
+  # window (quota enforcement: the message is queue-retried forever, so
+  # non-delivery is deterministic). Args: needle user password window_s.
+  imapAbsentProbe = pkgs.writers.writePython3Bin "imap-absent-probe" {} ''
     import imaplib
     import ssl
     import sys
     import time
 
     needle = sys.argv[1].encode()
-    header = sys.argv[2].encode()
+    user = sys.argv[2]
+    password = sys.argv[3]
+    deadline = time.time() + int(sys.argv[4])
+    ctx = ssl.create_default_context()
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
+    while time.time() < deadline:
+        try:
+            with imaplib.IMAP4_SSL("127.0.0.1", 993, ssl_context=ctx) as imap:
+                imap.login(user, password)
+                status, _ = imap.select("INBOX")
+                assert status == "OK"
+                status, data = imap.search(None, "ALL")
+                assert status == "OK"
+                for num in data[0].split():
+                    status, msg = imap.fetch(num, "(RFC822)")
+                    body = b"".join(
+                        part[1] for part in msg if isinstance(part, tuple)
+                    )
+                    if needle in body:
+                        print("over-quota message WAS delivered (definitive)", file=sys.stderr)
+                        sys.exit(1)
+                imap.close()
+        except Exception as err:
+            print("retry: {}".format(err), file=sys.stderr)
+        time.sleep(3)
+    print("needle never delivered within window")
+    sys.exit(0)
+  '';
+
+  # GTUBE: the message must land in the Junk mailbox and NEVER in INBOX
+  # (filing happens at ingest; the Junk mailbox is created on first use).
+  # Args: needle [username [password]].
+  imapJunkProbe = pkgs.writers.writePython3Bin "imap-junk-probe" {} ''
+    import imaplib
+    import ssl
+    import sys
+    import time
+
+    needle = sys.argv[1].encode()
+    user = sys.argv[2] if len(sys.argv) > 2 else "user2@example.test"
+    password = sys.argv[3] if len(sys.argv) > 3 else "testpass"
     deadline = time.time() + 180
     ctx = ssl.create_default_context()
     ctx.check_hostname = False
@@ -126,7 +185,65 @@
     while time.time() < deadline:
         try:
             with imaplib.IMAP4_SSL("127.0.0.1", 993, ssl_context=ctx) as imap:
-                imap.login("user2@example.test", "testpass")
+                imap.login(user, password)
+                status, _ = imap.select("INBOX")
+                assert status == "OK"
+                status, data = imap.search(None, "ALL")
+                assert status == "OK"
+                for num in data[0].split():
+                    status, msg = imap.fetch(num, "(RFC822)")
+                    body = b"".join(
+                        part[1] for part in msg if isinstance(part, tuple)
+                    )
+                    if needle in body:
+                        print("GTUBE message landed in INBOX (definitive)", file=sys.stderr)
+                        sys.exit(1)
+                status, _ = imap.select("Junk")
+                if status == "OK":
+                    status, data = imap.search(None, "ALL")
+                    assert status == "OK"
+                    for num in data[0].split():
+                        status, msg = imap.fetch(num, "(RFC822)")
+                        body = b"".join(
+                            part[1] for part in msg if isinstance(part, tuple)
+                        )
+                        if needle in body:
+                            print("GTUBE message found in Junk")
+                            sys.exit(0)
+                imap.close()
+        except Exception as err:
+            last_err = err
+            print("retry: {}".format(err), file=sys.stderr)
+        time.sleep(3)
+    msg = "GTUBE message never reached Junk (last error: {})".format(last_err)
+    print(msg, file=sys.stderr)
+    sys.exit(1)
+  '';
+
+  # Same polling shape, but additionally asserts that the needle message
+  # carries a given header line in its header block (used for DKIM-Signature).
+  # Finding the needle WITHOUT the header is definitive (headers are set at
+  # queue time) - fail fast instead of polling.
+  # Args: needle header [username [password]].
+  imapHeaderProbe = pkgs.writers.writePython3Bin "imap-header-probe" {} ''
+    import imaplib
+    import ssl
+    import sys
+    import time
+
+    needle = sys.argv[1].encode()
+    header = sys.argv[2].encode()
+    user = sys.argv[3] if len(sys.argv) > 3 else "user2@example.test"
+    password = sys.argv[4] if len(sys.argv) > 4 else "testpass"
+    deadline = time.time() + 180
+    ctx = ssl.create_default_context()
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
+    last_err = None
+    while time.time() < deadline:
+        try:
+            with imaplib.IMAP4_SSL("127.0.0.1", 993, ssl_context=ctx) as imap:
+                imap.login(user, password)
                 status, _ = imap.select("INBOX")
                 assert status == "OK"
                 status, data = imap.search(None, "ALL")
@@ -168,6 +285,10 @@ in
         enable = true;
         hostname = "mail.example.test";
         metrics.enable = true;
+        # Low negative-cache TTL so the poisoned-directory recovery subtest
+        # can observe the heal inside the test run (upstream default 3600 s
+        # would trap the test for an hour - that IS the documented trap).
+        directoryCacheTtlNegative = 5;
       };
 
       # Headless admin: the fallback-admin exists even with an empty
@@ -194,6 +315,8 @@ in
         pkgs.curl
         imapProbe
         imapHeaderProbe
+        imapAbsentProbe
+        imapJunkProbe
       ];
 
       virtualisation.memorySize = 2048;
@@ -229,6 +352,19 @@ in
               "secrets": ["${testHash}"],
           })
 
+      # PRE-PROVISION PROBE: touching example.test before the domain exists
+      # poisons the directory negative cache (is_local_domain false -> the
+      # domain takes the non-local path; this IS the documented provisioning
+      # trap). The recovery subtest below proves the low TTL heals it.
+      with subtest("pre-provision probe poisons the directory negative cache"):
+          machine.succeed(
+              "swaks --timeout 120 --server 127.0.0.1:25 --ehlo probe.example.test --from probe@example.test --to early@example.test --quit-after RCPT > /tmp/swaks-early.log 2>&1 || true"
+          )
+          machine.succeed("cat /tmp/swaks-early.log >&2")
+          machine.succeed(
+              "grep -E '(<-|<\\*\\*|<~\\*) *5[0-9][0-9]' /tmp/swaks-early.log"
+          )
+
       # Provisioning MUST happen BEFORE any SMTP traffic: a MAIL FROM/RCPT to
       # a not-yet-existing domain poisons the directory's is_local_domain
       # NEGATIVE CACHE (default TTL 1h, crates/directory/src/core/cache.rs),
@@ -238,6 +374,33 @@ in
           create_principal({"type": "domain", "name": "example.test"})
           create_account("user1@example.test")
           create_account("user2@example.test")
+          # quota = 1 BYTE: over-quota delivery retries forever ("Mailbox
+          # over quota.", delivery.rs:223) - never ingested.
+          create_principal({
+              "type": "individual",
+              "name": "user3@example.test",
+              "emails": ["user3@example.test"],
+              "roles": ["user"],
+              "secrets": ["${testHash}"],
+              "quota": 1,
+          })
+          # Second emails entry = alias (both map to the same account).
+          create_principal({
+              "type": "individual",
+              "name": "user4@example.test",
+              "emails": ["user4@example.test", "alias4@example.test"],
+              "roles": ["user"],
+              "secrets": ["${testHash}"],
+          })
+          # Literal "@example.test" address = catch-all mailbox (default
+          # AddressMapping::Enable retries the lookup with "@<domain>").
+          create_principal({
+              "type": "individual",
+              "name": "catchall",
+              "emails": ["@example.test"],
+              "roles": ["user"],
+              "secrets": ["${testHash}"],
+          })
 
       with subtest("SMTP: full dialogue, unknown recipient rejected 5xx"):
           # --timeout 120: the RCPT decision runs SPF/DNSBL checks whose
@@ -297,6 +460,23 @@ in
               "imap-header-probe needle-576a4565b70f5a4c 'd=example.test'"
           )
 
+      with subtest("negative-cache expiry: poisoned domain delivers again"):
+          # The pre-provision probe poisoned is_local_domain(example.test);
+          # with directoryCacheTtlNegative = 5 the entry heals within the
+          # test run instead of the 1h upstream default. Under the old
+          # default this submission would hang on the MX path (the trap).
+          machine.succeed("sleep 7")
+          machine.succeed(
+              "swaks --timeout 120 --server 127.0.0.1:587 --tls --auth PLAIN "
+              "--auth-user user1@example.test --auth-password testpass "
+              "--from user1@example.test --to user2@example.test "
+              "--header 'Subject: recovery-needle' --body 'needle-recovery-4b9f' "
+              "> /tmp/swaks-recovery.log 2>&1"
+          )
+          machine.succeed("cat /tmp/swaks-recovery.log >&2")
+          machine.succeed("! grep -q '<\\*\\*' /tmp/swaks-recovery.log")
+          machine.succeed("imap-probe needle-recovery-4b9f")
+
       with subtest("metrics: /metrics/prometheus answers on the HTTP listener"):
           # metrics.prometheus.enable has no auth configured here - the loopback
           # bind is the exposure control (README doctrine); assert the endpoint
@@ -313,6 +493,63 @@ in
           machine.succeed(
               "test \"$(journalctl -u stalwart -b 0 -o cat | grep -c 'Configuration build error')\" -eq 2"
           )
+
+      with subtest("alias: second emails entry delivers to the same account"):
+          machine.succeed(
+              "swaks --timeout 120 --server 127.0.0.1:587 --tls --auth PLAIN "
+              "--auth-user user1@example.test --auth-password testpass "
+              "--from user1@example.test --to alias4@example.test "
+              "--header 'Subject: alias-needle' --body 'needle-alias-2c8e' "
+              "> /tmp/swaks-alias.log 2>&1"
+          )
+          machine.succeed("cat /tmp/swaks-alias.log >&2")
+          machine.succeed("! grep -q '<\\*\\*' /tmp/swaks-alias.log")
+          machine.succeed(
+              "imap-probe needle-alias-2c8e user4@example.test testpass"
+          )
+
+      with subtest("catch-all: unknown local part lands in the @domain mailbox"):
+          machine.succeed(
+              "swaks --timeout 120 --server 127.0.0.1:587 --tls --auth PLAIN "
+              "--auth-user user1@example.test --auth-password testpass "
+              "--from user1@example.test --to stranger42@example.test "
+              "--header 'Subject: catchall-needle' --body 'needle-catchall-7d1a' "
+              "> /tmp/swaks-catchall.log 2>&1"
+          )
+          machine.succeed("cat /tmp/swaks-catchall.log >&2")
+          machine.succeed("! grep -q '<\\*\\*' /tmp/swaks-catchall.log")
+          machine.succeed(
+              "imap-probe needle-catchall-7d1a catchall@example.test testpass"
+          )
+
+      with subtest("quota: over-quota message accepted at SMTP, never delivered"):
+          machine.succeed(
+              "swaks --timeout 120 --server 127.0.0.1:587 --tls --auth PLAIN "
+              "--auth-user user1@example.test --auth-password testpass "
+              "--from user1@example.test --to user3@example.test "
+              "--header 'Subject: quota-needle' --body 'needle-quota-9e3b' "
+              "> /tmp/swaks-quota.log 2>&1"
+          )
+          machine.succeed("cat /tmp/swaks-quota.log >&2")
+          # Accepted at RCPT/DATA: quota is an ingest-stage check (451 +
+          # queue retry), not an SMTP-stage rejection.
+          machine.succeed("! grep -q '<\\*\\*' /tmp/swaks-quota.log")
+          machine.succeed(
+              "imap-absent-probe needle-quota-9e3b user3@example.test testpass 21"
+          )
+
+      with subtest("spam: GTUBE subject is filed to Junk, not INBOX"):
+          machine.succeed(
+              "swaks --timeout 120 --server 127.0.0.1:587 --tls --auth PLAIN "
+              "--auth-user user1@example.test --auth-password testpass "
+              "--from user1@example.test --to user2@example.test "
+              "--header 'Subject: XJS*C4JDBQADN1.NSBN3*2IDNEN*GTUBE-STANDARD-ANTI-UBE-TEST-EMAIL*C.34X' "
+              "--body 'needle-junk-5f7c' "
+              "> /tmp/swaks-junk.log 2>&1"
+          )
+          machine.succeed("cat /tmp/swaks-junk.log >&2")
+          machine.succeed("! grep -q '<\\*\\*' /tmp/swaks-junk.log")
+          machine.succeed("imap-junk-probe needle-junk-5f7c")
 
       with subtest("restart persistence: INBOX survives, admin stays locked"):
           machine.succeed("systemctl restart stalwart.service")
