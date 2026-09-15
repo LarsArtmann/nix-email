@@ -90,8 +90,6 @@ pkgs.testers.runNixOSTest {
   };
 
   testScript = ''
-    import json
-
     start_all()
 
     smtp.wait_for_unit("stalwart.service", timeout=180)

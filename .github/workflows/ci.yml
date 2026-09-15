@@ -1,0 +1,54 @@
+# Gate: nix flake check (eval contract + BOTH NixOS VM tests).
+#
+# Fail-closed rules (go-paperless lesson: a gate must PROVE it measured):
+#   - No `|| true`, no `-no-fail`, no step continues past a failure
+#     (GitHub Actions run steps fail on non-zero exit by default).
+#   - Before the check runs, the checks output is enumerated and must
+#     contain every expected check - a flake that silently stops exporting
+#     checks fails here, not somewhere downstream.
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  flake-check:
+    name: nix flake check
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@11bd1966bbeb425c6a04e8e6c1e9e6945c5c7c12 # v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@783ec02b6ced887d1a95687dcb4b09e2f4b4b7b5 # v17
+        with:
+          extra-conf: |
+            allow-import-from-derivation = true
+
+      - name: Cache Nix store
+        uses: DeterminateSystems/flakehub-cache-action@7573366a020080f0d1c02038f678832ae73f7134 # v1
+
+      - name: Parse all Nix files
+        run: |
+          find . -name '*.nix' -print0 | xargs -0 -n1 nix-instantiate --parse > /dev/null
+
+      - name: Assert the expected checks exist (fail-closed guard)
+        run: |
+          nix eval .#checks.x86_64-linux --json | tee /tmp/checks.json
+          for check in dmarc-eval stalwart-e2e stalwart-relay-e2e; do
+            jq -e "has(\"$check\")" /tmp/checks.json > /dev/null \
+              || { echo "FATAL: check '$check' is missing from .#checks - the gate would run less than it claims"; exit 1; }
+          done
+
+      - name: Run nix flake check (eval contract + VM tests)
+        run: nix flake check --print-build-logs
