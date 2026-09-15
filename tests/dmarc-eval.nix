@@ -56,16 +56,22 @@
   };
 
   # Regression guard for the [elasticsearch]-section workaround (README
-  # ledger 2026-09-15): the unit's LAST ExecStartPre must be the strip
-  # script - if nixpkgs changes the unit shape or the workaround is
+  # ledger 2026-09-15): the ExecStartPre list must hold the module's own
+  # ini-writing step AND the wrapper's strip script, with the strip LAST -
+  # the strip must therefore run AFTER the module rendered the ini. lib.last
+  # is an ordering proof only while the list has both entries (on a single
+  # non-list entry lib.last would return a CHARACTER), hence the length
+  # assertion below. If nixpkgs changes the unit shape or the workaround is
   # removed, this fails loudly instead of crashing parsedmarc at start.
-  stripScript = builtins.readFile (
-    lib.last cfg.systemd.services.parsedmarc.serviceConfig.ExecStartPre
-  );
+  execStartPre = cfg.systemd.services.parsedmarc.serviceConfig.ExecStartPre;
+  execStartPreCount = builtins.length execStartPre;
+  stripScript = builtins.readFile (lib.last execStartPre);
 
   versionOk = lib.versionAtLeast parsedmarcVersion "11";
 in
   assert versionOk || throw "dmarc-monitor contract is verified against parsedmarc >= 11 (got ${parsedmarcVersion}) - re-verify the [imap]/_secret/output semantics before touching the floor.";
+  assert lib.isList execStartPre || throw "dmarc-eval: parsedmarc ExecStartPre is not a list - lib.last would return a character, not the strip script; re-verify the unit shape.";
+  assert execStartPreCount >= 2 || throw "dmarc-eval: ExecStartPre must hold the module's ini step plus the wrapper's strip script (>= 2 entries, strip last) - got ${toString execStartPreCount}, which makes lib.last an invalid ordering proof.";
     builtins.derivation {
       name = "dmarc-eval";
       system = system;

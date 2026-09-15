@@ -30,7 +30,8 @@
 #      addresses.rs:209)
 #  15. Account quota: `quota` (bytes) on a principal makes delivery RETRY
 #      forever with "Mailbox over quota." (crates/email/src/message/
-#      delivery.rs:223) - message accepted at SMTP time, never ingested
+#      delivery.rs:225, source-verified) - message accepted at SMTP time,
+#      never ingested, and the retry REASON is asserted in the journal
 #  16. Spam classification: a GTUBE body message gets X-Spam-Status: Yes
 #      and is STILL delivered to INBOX (VM-verified 2026-09-15: the default
 #      filter scans authenticated submission but does NO Junk filing;
@@ -491,6 +492,13 @@ in
           machine.succeed("! grep -q '<\\*\\*' /tmp/swaks-quota.log")
           machine.succeed(
               "imap-absent-probe needle-quota-9e3b user3@example.test testpass 21"
+          )
+          # Transcript-backed, not comment-only: the queue logs the
+          # TemporaryFailure reason verbatim when it retries the delivery
+          # ("Mailbox over quota.", crates/email/src/message/delivery.rs:225).
+          machine.wait_until_succeeds(
+              "journalctl -u stalwart.service -b 0 -o cat | grep -q 'Mailbox over quota'",
+              timeout=60,
           )
 
       with subtest("spam: GTUBE message gets X-Spam-Status (no auto-Junk filing)"):
