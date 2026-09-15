@@ -51,6 +51,7 @@
     elasticsearch = cfg.services.parsedmarc.provision.elasticsearch;
     geoIp = cfg.services.parsedmarc.provision.geoIp;
     stateDirectory = cfg.systemd.services.parsedmarc.serviceConfig.StateDirectory;
+    execStart = cfg.systemd.services.parsedmarc.serviceConfig.ExecStart;
     inherit parsedmarcVersion;
   };
 
@@ -81,6 +82,7 @@ in
           grep -q '"geoIp":false' "$renderedPath"
           grep -q '"_secret":"/nix/store' "$renderedPath"
           grep -q '"stateDirectory":"parsedmarc"' "$renderedPath"
+          grep -q 'python3.13-parsedmarc' "$renderedPath"
           grep -q '"\\[elasticsearch\\]"' "$stripScriptPath"
           grep -q 'keep' "$stripScriptPath"
           touch "$out"
