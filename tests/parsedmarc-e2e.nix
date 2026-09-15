@@ -116,7 +116,9 @@ in
       start_all()
 
       machine.wait_for_unit("postfix.service")
-      machine.wait_for_unit("dovecot2.service")
+      # The 2.4 module renamed the unit: systemd.services.dovecot (was
+      # dovecot2.service on 2.3-era nixpkgs).
+      machine.wait_for_unit("dovecot.service")
       machine.wait_for_unit("parsedmarc.service")
       machine.wait_for_open_port(25, timeout=60)
       machine.wait_for_open_port(143, timeout=60)

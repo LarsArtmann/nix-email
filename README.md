@@ -316,7 +316,10 @@ json/yaml/markdown.
   parsedmarc `provision.localMail` enables dovecot2 WITHOUT them (also
   still uses the renamed `services.dovecot2.protocols`, warning-only).
   Any localMail consumer must pin both versions itself
-  (`tests/parsedmarc-e2e.nix` does; found 2026-09-15).
+  (`tests/parsedmarc-e2e.nix` does; found 2026-09-15). Same migration also
+  renamed the UNIT: `systemd.services.dovecot` (was `dovecot2.service`) -
+  `wait_for_unit "dovecot2.service"` fails with "inactive, no pending jobs"
+  even though dovecot is running (observed in parsedmarc-e2e, 2026-09-15).
 
 ## Non-goals
 
