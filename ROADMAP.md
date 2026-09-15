@@ -109,11 +109,10 @@ any repo; they are Lars's calls.
    ceiling (CX22-class?), backup target (evo-x2 btrfs pool vs Hetzner
    StorageBox)?
 3. **License choice:** ~~repo is public (D3 visibility decided 2026-09-14) but
-   has no LICENSE.~~ ~~RESOLVED 2026-09-15: MIT shipped~~ **REOPENED
-   2026-09-15:** the user explicitly did NOT confirm MIT (question answered
-   "no"). `LICENSE` currently says MIT (`Copyright (c) 2026 Lars Artmann`);
-   naming the actual choice is a one-file change plus a re-push. AGPL
-   Stalwart is only wrapped, not relicensed, regardless of choice.
+   has no LICENSE.~~ RESOLVED 2026-09-15 (confirmed by the user after an
+   intermediate rejection): MIT, as shipped in `LICENSE`
+   (`Copyright (c) 2026 Lars Artmann`). AGPL Stalwart is only wrapped, not
+   relicensed.
 4. **README ops-detail level:** the public README carries go-live runbook
    detail (migration window, DR design) with recon value. Keep as-is, trim to
    outline, or move detail into a private consumer doc?
