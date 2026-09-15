@@ -19,7 +19,11 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
   (`nix-store -r $(nix-store -q --references $(nix eval --raw
   .#checks.x86_64-linux.stalwart-e2e.drvPath) | grep nixos-test-driver)`)
   and run a custom script with `--test-script /tmp/debug.py` (create output
-  dir first: `-o` requires an EXISTING directory). The driver's python runs
+  dir first: `-o` requires an EXISTING directory). NOTE: the references grep
+  yields the driver's `.drv`; `nix-store -r` prints the realized OUTPUT path,
+  and the binary is at `<output>/bin/nixos-test-driver` (calling
+  `<output>/nixos-test-driver` directly is a silent-looking "no such file").
+  The driver's python runs
   on the HOST - anything touching VM ports must be a packaged script or a
   machine.succeed("...") command, never host-side socket code.
 - Gate commands never wear pipes (`cmd | tail` can print PASSED on a failing
@@ -65,6 +69,10 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
 - Gate commands redirect, never pipe: `nix flake check > /tmp/gate.log 2>&1;
   echo "EXIT:$?" >> /tmp/gate.log`, then read the log. A pipe reports the
   FILTER's exit code - two fake greens shipped that way in one session.
+- No new test assertion without a transcript: grep the line you assert from
+  an existing test log or a debug VM run first. Reading it in upstream source
+  is NOT evidence of what the journal/log prints (the `Mailbox over quota.`
+  vs `Message rescheduled for delivery` lesson, 2026-09-15).
 - Extract cross-file identifiers mechanically (`grep -o`, `od`, `git diff`
   read-back after multi-line edits) rather than trusting eyes or memory;
   from-memory identifiers have produced corrupted store paths and wrong
