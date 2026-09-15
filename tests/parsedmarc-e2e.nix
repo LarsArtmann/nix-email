@@ -107,7 +107,15 @@ in
       # is the mbox in /var/mail, which dovecot's maildir INBOX would
       # never see - observed as "empty INBOX forever" in testing).
 
-      services.dmarc-monitor.enable = true;
+      services.dmarc-monitor = {
+        enable = true;
+        # parsedmarc 11 does DNS at PARSE time (reverse-DNS map, geolocation)
+        # against Cloudflare/Google by default (constants.py
+        # RECOMMENDED_DNS_NAMESERVERS = 1.1.1.1, 8.8.8.8) - in the DNS-less
+        # VM every lookup stalls and parsing never completes. offline=true
+        # skips all online enrichment ([general] offline, cli.py:778).
+        settings.general.offline = true;
+      };
 
       # The nixpkgs parsedmarc module's localMail provision: dovecot + postfix
       # + dmarc system user + runtime-randomized IMAP password, and the
