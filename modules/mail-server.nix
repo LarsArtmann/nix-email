@@ -429,17 +429,18 @@ in
           queue = {
             # Smarthost definition - exact key set verified against v0.15.5
             # parse_route (type/address/port/protocol required; auth and
-            # tls.implicit optional).
+            # tls.implicit optional). mkDefault on every leaf: consumers
+            # override via services.stalwart.settings without conflicts.
             route."${cfg.relay.routeId}" = {
-              type = "relay";
-              address = cfg.relay.address;
-              port = cfg.relay.port;
-              protocol = "smtp";
-              tls.implicit = cfg.relay.tlsImplicit;
+              type = lib.mkDefault "relay";
+              address = lib.mkDefault cfg.relay.address;
+              port = lib.mkDefault cfg.relay.port;
+              protocol = lib.mkDefault "smtp";
+              tls.implicit = lib.mkDefault cfg.relay.tlsImplicit;
             } // lib.optionalAttrs (cfg.relay.username != null) {
               auth = {
-                username = cfg.relay.username;
-                secret = credentialMacro "mail-server-relay";
+                username = lib.mkDefault cfg.relay.username;
+                secret = lib.mkDefault (credentialMacro "mail-server-relay");
               };
             };
 
@@ -448,7 +449,7 @@ in
             # sort after `if`. Shape mirrors the v0.15.5 built-in default
             # (is_local_domain -> 'local', else -> 'mx') with the relay
             # id replacing 'mx'.
-            strategy.route = {
+            strategy.route = lib.mkDefault {
               "1" = {
                 "if" = "is_local_domain('*', rcpt_domain)";
                 "then" = "'local'";
