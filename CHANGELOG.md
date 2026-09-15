@@ -9,6 +9,59 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- `services.mail-server.relay` option: outbound smarthost relaying via
+  verified `queue.route.<id>` + `queue.strategy.route` generation (v0.15.5
+  source-verified key set, IfBlock indexed-key shape, eval assertions for
+  IP-literal and half-configured auth), `modules/mail-server.nix`
+- `stalwart-relay-e2e` two-node VM test: Stalwart + Mailpit smarthost -
+  non-local submission transits the relay, local routing never leaks to it,
+  relay hostname resolved via dnsmasq (Stalwart's resolver ignores
+  /etc/hosts) (`tests/stalwart-relay-e2e.nix`)
+- `metrics.enable` wrapper option wiring `metrics.prometheus.*`, with a
+  `/metrics/prometheus` format assertion in the E2E
+- `directoryCacheTtlNegative` wrapper option
+  (`directory."internal".cache.ttl.negative`)
+- `certificate` option tier (`self-signed | acme | manual`) with
+  completeness assertions and ignore-warnings; manual mode registers the
+  cert as the SNI catch-all via `certificate.<id>.default` (v0.15.5
+  source-verified)
+- NixOS warning when `httpBind` is non-loopback (README listener doctrine)
+- `stalwart-e2e` subtests: DKIM signing (declarative `signature.<id>`,
+  header asserted on the stored message), journal hygiene (exactly the 2
+  known-benign config-build errors), restart persistence, offline
+  backup/restore drill (`--export` → wipe → `--import`)
+- `dmarc-eval`: parsedmarc >= 11 version floor guard and forced rendering of
+  the real unit config (the ini generation with secret replacement is now
+  actually exercised); `StateDirectory` wiring asserted
+- CI: `.github/workflows/ci.yml` - fail-closed `nix flake check` with an
+  expected-checks guard (asserts every check exists before the gate runs)
+- `CONTRIBUTING.md` (verified-facts ledger rules), `docs/THREAT_MODEL.md`
+  (loopback-guard boundaries, admin exposure policy, secret inventory),
+  `renovate.json` (nix manager, approval-gated, SystemNix pairing note),
+  `git-town.toml`
+- `nix fmt` support: flake `formatter` output (alejandra) + one full
+  formatting pass over all `.nix` files
+- GitHub repo topics (mail, nixos, nixos-module, stalwart, dmarc,
+  email-server, nix-flake)
+
+### Changed
+
+- parsedmarc wrapper now sets `StateDirectory` + `ReadWritePaths`: the
+  nixpkgs unit runs as a DynamicUser with no writable state, so the default
+  `/var/lib/parsedmarc/reports` output could never have worked (found by
+  forcing the unit; parsedmarc 11.0.1 makedirs()es the output dir as the
+  dynamic user) - `modules/dmarc-monitor.nix`
+
+### Fixed
+
+- `dmarc-eval` encoded the wrong `_secret` contract: the nixpkgs ini
+  generator requires an absolute path STRING (`isString` gate) and throws on
+  path values - a real host unit would have failed to build its config. The
+  ledger entry was corrected accordingly (README)
+- Relay E2E transcript assertion now accepts the observed `<~*` swaks marker
+  (550 RCPT refusal arrives with the timeout-receive variant, not `<-` /
+  `<**`); lesson recorded in the README ledger
+
 - NixOS flake exporting `nixosModules.default/.mail-server/.dmarc-monitor`,
   nixpkgs pinned to SystemNix's lock rev (`eaad089`, NixOS 26.11)
 - `services.mail-server` wrapper: RFC listener set (25/587/465/993 + loopback

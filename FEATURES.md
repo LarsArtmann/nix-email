@@ -29,38 +29,42 @@
 | Self-signed TLS bootstrap default                                                       | 🟢 `FULLY_FUNCTIONAL`     | `certificate.self-signed = true` default (`modules/mail-server.nix:94`); IMAPS handshake exercised in the E2E test |
 | Firewall opens exactly the public ports (25/465/587/993, never the loopback admin port) | 🟢 `FULLY_FUNCTIONAL`     | `modules/mail-server.nix:125-133`; `openFirewall = false` + explicit list (eval-verified 2026-09-15)               |
 | Full delivery path (provision → submission 587 → INBOX → IMAPS fetch)                   | 🟢 `FULLY_FUNCTIONAL`     | End-to-end in `tests/stalwart-e2e.nix` ("submission" subtest)                                                      |
-| Outbound smarthost relay (Resend)                                                       | 🟡 `PARTIALLY_FUNCTIONAL` | Verified config keys documented in README ledger (local spike 2026-09-14); no wrapper option, no VM E2E            |
-| Metrics / Prometheus endpoint                                                           | 🟡 `PARTIALLY_FUNCTIONAL` | Keys + endpoint source-verified (`README.md` ledger); no wrapper option, no assertion                              |
-| DKIM signing                                                                            | 🟡 `PARTIALLY_FUNCTIONAL` | Key names source-verified; no defaults, never exercised                                                            |
-| Native backup / restore (`--export`/`--import`)                                         | 🟡 `PARTIALLY_FUNCTIONAL` | Mechanism source-verified; no systemd unit, no restore drill                                                       |
-| Certificate tier (`acme`/`manual` beyond self-signed)                                   | ⚪ `PLANNED`              | Verified key names in ledger; no option surface                                                                    |
+| Outbound smarthost relay (Resend)                                                       | 🟢 `FULLY_FUNCTIONAL`     | `services.mail-server.relay` generates verified `queue.route`/`queue.strategy.route`; relay path E2E'd in the two-node `tests/stalwart-relay-e2e.nix` (auth-less variant; Resend SASL rides the same LoadCredential macro mechanism) |
+| Metrics / Prometheus endpoint                                                           | 🟢 `FULLY_FUNCTIONAL`     | `metrics.enable` wrapper option; `/metrics/prometheus` format asserted in the E2E                                   |
+| DKIM signing                                                                            | 🟢 `FULLY_FUNCTIONAL`     | Declarative `signature.<id>` exercised in the E2E - `DKIM-Signature` + `d=` asserted on the stored message          |
+| Native backup / restore (`--export`/`--import`)                                         | 🟢 `FULLY_FUNCTIONAL`     | Offline export → wipe → import drill in the E2E; message survives the roundtrip                                     |
+| Certificate tier (`self-signed` \| `acme` \| `manual`)                                  | 🟢 `FULLY_FUNCTIONAL`     | Eval-verified emissions + completeness assertions; acme/manual need a live host run to be runtime-exercised         |
+| Directory negative-cache TTL knob                                                       | 🟢 `FULLY_FUNCTIONAL`     | `directoryCacheTtlNegative` → `directory."internal".cache.ttl.negative` (eval-verified)                             |
 | Declarative domains/accounts provisioning                                               | ⚪ `PLANNED`              | API recipe verified and used by the test; philosophy call pending (see ROADMAP open questions)                     |
 
 ## DMARC monitor module (`services.dmarc-monitor`)
 
 | Feature                                 | Status                    | Notes                                                                             |
 | --------------------------------------- | ------------------------- | --------------------------------------------------------------------------------- |
-| parsedmarc wrapper, heavy sinks off     | 🟢 `FULLY_FUNCTIONAL`     | `modules/dmarc-monitor.nix:71-86`; asserted in `tests/dmarc-eval.nix`             |
-| JSON/CSV output directory default       | 🟢 `FULLY_FUNCTIONAL`     | `general.output` lands in rendered settings; eval-contract asserted               |
-| `_secret` file-based IMAP password      | 🟢 `FULLY_FUNCTIONAL`     | Store-path survival asserted in `tests/dmarc-eval.nix`                            |
+| parsedmarc wrapper, heavy sinks off     | 🟢 `FULLY_FUNCTIONAL`     | `modules/dmarc-monitor.nix`; asserted in `tests/dmarc-eval.nix`             |
+| JSON/CSV output directory default       | 🟢 `FULLY_FUNCTIONAL`     | `general.output` + `StateDirectory` writability fix (the DynamicUser gap, 2026-09-15); eval-contract asserted |
+| `_secret` file-based IMAP password      | 🟢 `FULLY_FUNCTIONAL`     | Absolute-path STRING contract enforced by the eval test forcing the real ini generation |
 | Live IMAP polling of a real rua mailbox | 🟡 `PARTIALLY_FUNCTIONAL` | Never run against a real mailbox (needs D1 mailbox decision) - eval contract only |
 
 ## Test suite
 
-| Feature                    | Status                | Notes                                                                                                              |
-| -------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| `stalwart-e2e` VM test     | 🟢 `FULLY_FUNCTIONAL` | Full path incl. provisioning API, 550 rejection, IMAPS fetch, no-crash gate; 3 consecutive green runs (2026-09-14) |
-| `dmarc-eval` contract test | 🟢 `FULLY_FUNCTIONAL` | Pure eval, arch-independent                                                                                        |
+| Feature                      | Status                | Notes                                                                                                        |
+| ---------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `stalwart-e2e` VM test       | 🟢 `FULLY_FUNCTIONAL` | Full path incl. provisioning API, 550 rejection, IMAPS fetch, DKIM, metrics, journal count, restart persistence, backup drill |
+| `stalwart-relay-e2e` VM test | 🟢 `FULLY_FUNCTIONAL` | Two-node smarthost relay path (stalwart → Mailpit) + local-routing non-leak assertion                         |
+| `dmarc-eval` contract test   | 🟢 `FULLY_FUNCTIONAL` | Pure eval, arch-independent; forces the parsedmarc ini generation + version floor guard                       |
 
 ## Repository infrastructure
 
-| Feature                | Status                    | Notes                                                                |
-| ---------------------- | ------------------------- | -------------------------------------------------------------------- |
-| `nix flake check` gate | 🟢 `FULLY_FUNCTIONAL`     | Both checks green; x86_64 runs, aarch64 eval-only                    |
-| Formatter (dprint)     | 🟡 `PARTIALLY_FUNCTIONAL` | `dprint.json` covers json/yaml/markdown/dockerfile; no nix formatter |
-| CI (GitHub Actions)    | ⚪ `PLANNED`              | No `.github/` - local gate only                                      |
-| LICENSE                | ⚪ `PLANNED`              | License choice pending                                               |
-| Verified-facts ledger  | 🟢 `FULLY_FUNCTIONAL`     | `README.md`; zero UNVERIFIED claims (2026-09-14)                     |
+| Feature                       | Status                    | Notes                                                                |
+| ----------------------------- | ------------------------- | -------------------------------------------------------------------- |
+| `nix flake check` gate        | 🟢 `FULLY_FUNCTIONAL`     | All checks green; x86_64 VM runs, aarch64 eval-only (documented)     |
+| Formatter (dprint + alejandra) | 🟢 `FULLY_FUNCTIONAL`    | `nix fmt` via the flake `formatter` output; dprint covers json/yaml/markdown |
+| CI (GitHub Actions)           | 🟢 `FULLY_FUNCTIONAL`     | `.github/workflows/ci.yml` - fail-closed `nix flake check` with an expected-checks guard |
+| Repo topics                   | 🟢 `FULLY_FUNCTIONAL`     | mail/nixos/nixos-module/stalwart/dmarc/email-server/nix-flake        |
+| Renovate (nixpkgs input)      | 🟢 `FULLY_FUNCTIONAL`     | `renovate.json` - nix manager approval-gated, SystemNix pairing note |
+| LICENSE                       | ⚪ `PLANNED`              | License choice pending                                               |
+| Verified-facts ledger         | 🟢 `FULLY_FUNCTIONAL`     | `README.md`; zero UNVERIFIED claims                                  |
 
 ## Integration (consumers of this flake)
 
