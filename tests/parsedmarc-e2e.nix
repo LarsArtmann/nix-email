@@ -189,19 +189,22 @@ in
           )
 
       with subtest("parsed aggregate JSON carries the report's identity"):
-          # report_id 2940, org infonacot.gob.mx, policy domain example.com -
-          # straight from the sample's metadata (nixpkgs' test asserts the
-          # same report_id against its Elasticsearch sink).
+          # report_id 2940, org "XYZ Corporation", policy domain example.com
+          # - the parsed XML's OWN metadata: the sample FILENAME says
+          # infonacot.gob.mx but the XML body's org_name is XYZ Corporation
+          # (verified by parsing the fixture with the pinned parsedmarc).
+          # Plain `jq -e '.[] | select(...)': NO -s slurp (it would wrap the
+          # array and make select test the inner array instead of reports).
           machine.succeed(
-              "jq -es '.[] | select(.report_metadata.report_id == \"2940\")' "
+              "jq -e '.[] | select(.report_metadata.report_id == \"2940\")' "
               "/var/lib/parsedmarc/reports/aggregate.json"
           )
           machine.succeed(
-              "jq -es '.[] | select(.report_metadata.org_name == \"infonacot.gob.mx\")' "
+              "jq -e '.[] | select(.report_metadata.org_name == \"XYZ Corporation\")' "
               "/var/lib/parsedmarc/reports/aggregate.json"
           )
           machine.succeed(
-              "jq -es '.[] | select(.policy_published.domain == \"example.com\")' "
+              "jq -e '.[] | select(.policy_published.domain == \"example.com\")' "
               "/var/lib/parsedmarc/reports/aggregate.json"
           )
 
