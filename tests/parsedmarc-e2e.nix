@@ -163,14 +163,22 @@ in
           "! grep -q '@imap-password@' /run/parsedmarc/parsedmarc.ini"
       )
       machine.succeed(
-          # The nixpkgs module always renders an inert [elasticsearch]
-          # section (option defaults) - the WRAPPER's contract is that no
-          # sink TARGET is configured: no splunk_hec section, no hosts
-          # line anywhere in the ini.
+          # The WRAPPER's contract is that no sink TARGET is configured:
+          # no splunk_hec section, no hosts line anywhere in the ini.
           "! grep -qiE '^\\[splunk_hec\\]' /run/parsedmarc/parsedmarc.ini"
       )
       machine.succeed(
           "! grep -qiE '^hosts' /run/parsedmarc/parsedmarc.ini"
+      )
+      machine.succeed(
+          # The strip workaround's OWN contract, asserted directly: with
+          # Elasticsearch off, nixpkgs still renders an inert host-less
+          # [elasticsearch] section (cert_path/ssl are typed and survive
+          # the module's null/[]/{} filter) - it must be provably GONE
+          # from the runtime ini. parsedmarc merely STARTING is necessary
+          # but not sufficient: cli.py only refuses a section that is
+          # present AND hosts-less.
+          "! grep -qiE '^\\[elasticsearch\\]' /run/parsedmarc/parsedmarc.ini"
       )
       machine.succeed(
           # ini renders key=value with NO spaces (parsedmarc.nix flips
@@ -184,8 +192,10 @@ in
           # fixed filenames (save_output writes aggregate.json/csv, verified
           # against parsedmarc 11.0.1 __init__.py save_output).
           machine.wait_until_succeeds(
+              # Healthy parse is ~9 s; 120 s bounds a hang 13x over
+              # without making a slow-but-working parse flaky.
               "test -s /var/lib/parsedmarc/reports/aggregate.json",
-              timeout=300,
+              timeout=120,
           )
 
       with subtest("parsed aggregate JSON carries the report's identity"):
