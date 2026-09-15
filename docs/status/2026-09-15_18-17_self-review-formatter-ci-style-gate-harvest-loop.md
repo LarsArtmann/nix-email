@@ -166,3 +166,44 @@ current; do not re-harvest. The concrete short list:
 unmasked (redirected log, exit echoed into the file).
 
 **Then per the skill: WAITING FOR INSTRUCTIONS.**
+
+---
+
+## Post-report addendum (18:20 → 19:20, answers received and executed)
+
+§g was answered: **push = "both, plain"** (executed), **MIT = NOT confirmed**
+(TODO_LIST/ROADMAP updated; the actual license choice is still open), and
+**Junk filing** came back as a question ("in nix-email or not?") - answered
+in the session close-out: recommendation is wrapper-owned in nix-email
+(option a), awaiting the final word.
+
+Execution after the answers, in order:
+
+1. **Both repos pushed** (nix-email `1f8bb52..6efff9d`, SystemNix
+   `ad6edcbb..ee85f1ff`), after the daemon committed the answer-driven doc
+   updates.
+2. **First-ever nix-email CI run failed at Set up job:** all three pinned
+   action SHAs in `ci.yml` were WRONG (checkout was one digit off the real
+   v4.2.2 SHA `11bd71...` vs the pinned `11bd19...`) - written from memory in
+   a prior session and never validated because the repo was never pushed.
+   The identifier-from-memory failure mode, now in `uses:` lines. Repinned
+   from the real tag refs (commit `c6aa0fa`).
+3. **Second run failed on MY aarch64 step:** forcing the aarch64 check's
+   outPath builds its strip script - "platform mismatch" on the x86_64
+   runner. The step only worked locally because this host HAS emulation:
+   "works on my machine" was literally emulation-dependent. Step made
+   shape-only (`attrNames`, genuinely arch-independent), deep build stays a
+   locally-verified fact (commit `b80137f`).
+4. **Third run: GREEN** - `Enforce alejandra formatting`, expected-checks
+   guard, aarch64 shape guard, and the full `nix flake check` (VM tests
+   included) all success on GitHub runners (run 34999737899). The daemon
+   had a commit blind spot during this window; per the buildflow skill's
+   guidance the two CI fixes were committed explicitly (narrow, single-file
+   commits) and pushed within the push authorization.
+5. **SystemNix CI failed too - PRE-EXISTING, not this session's change:**
+   runs at 15:53 and 16:19 (before any of today's pushes) failed the same
+   way. Root cause identified: `flake.nix:448` pins
+   `git+file:///home/lars/projects/branching-flow` - a local-path input that
+   can never resolve on CI ("Secret history scan" also failing, unchecked).
+   Fixing that is SystemNix-territory work (the nix-private-go-repos
+   prepared-source pattern), deliberately not started here.
