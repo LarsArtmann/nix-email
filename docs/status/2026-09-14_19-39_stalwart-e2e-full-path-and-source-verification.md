@@ -30,8 +30,8 @@
 
 1. **E2E behavioral coverage**: full inbound+local path done; outbound relay (Resend), DKIM signing, spam classification, quota, aliases, Junk handling all documented NOT-covered (need DNS/keys — partly go-live items, partly VM-testable with effort).
 2. **Parallel-session coordination**: concurrent edits from another session (README UNVERIFIED rewrites, flake arch-gating, test reorder) raced mine twice; both times resolved by re-reading and merging (their reorder was sound but shipped a Python NameError — `def` after first call — which I fixed). Final state verified green, but mid-session I authored edits against stale file contents twice (see d).
-3. **Security hardening of public repo**: audit complete, fixes proposed (genericize `mail.larsartmann.cloud` example, trim runbook ops detail) — awaiting user call.
-4. **Push state**: repo created and initial push done at session start; the 9 commits from the research/test work are local-only (by the no-push rule — needs explicit go-ahead).
+3. **Security hardening of public repo**: audit complete, fixes proposed (~~genericize `mail.larsartmann.cloud` example~~ done 2026-09-15, trim runbook ops detail) — ~~awaiting user call~~ trim decision open, ROADMAP Q4.
+4. ~~**Push state**: repo created and initial push done at session start; the 9 commits from the research/test work are local-only (by the no-push rule — needs explicit go-ahead).~~ done (pushed - origin/master == master, verified 2026-09-15)
 
 ## c) NOT STARTED (known, deliberate)
 
@@ -45,7 +45,7 @@
 8. DKIM key generation automation (`POST /api/dkim` or declarative `signature.<id>`).
 9. Backup timer unit around `stalwart --export` (+ restore drill).
 10. Recovery age-key DR setup (runbook step 7).
-11. TODO_LIST.md / FEATURES.md / ROADMAP.md do not exist in this repo (status reports + README currently carry the load; see e).
+11. ~~TODO_LIST.md / FEATURES.md / ROADMAP.md do not exist in this repo (status reports + README currently carry the load; see e).~~ done (docs-health pass 2026-09-15)
 
 ## d) TOTALLY FUCKED UP (honest ledger)
 
@@ -62,8 +62,8 @@
 
 1. **Provision-before-probe is a product hazard, not just a test rule**: any pre-provision SMTP touch on a domain bounces its mail for up to 1h (negative cache). Consider exposing `directory."internal".cache.ttl.negative` guidance (or a wrapper mkDefault) for dev/test hosts; on the VPS, provision domains FIRST in the runbook (done in docs, enforce during go-live).
 2. **The E2E suite still cannot test outbound** — a `queue.route` relay pointed at an in-VM dummy SMTP sink (python `aiosmtpd`-style listener via a small systemd service in the test node) would make relay/DKIM-signing testable hermetically. This is the single highest-value test investment available.
-3. **Ledger vs TODO split brain risk**: verified facts live in README (right), but actionable next steps have no TODO_LIST.md; status-report (f) sections keep re-generating them. Create TODO_LIST.md and harvest.
-4. **Push cadence**: repo created at session start, everything since is unpushed — 9 commits of drift. Decide a push policy (manual gate vs push-on-green).
+3. ~~**Ledger vs TODO split brain risk**: verified facts live in README (right), but actionable next steps have no TODO_LIST.md; status-report (f) sections keep re-generating them. Create TODO_LIST.md and harvest.~~ done (docs-health pass 2026-09-15 - TODO_LIST.md created and this report harvested)
+4. ~~**Push cadence**: repo created at session start, everything since is unpushed — 9 commits of drift. Decide a push policy (manual gate vs push-on-green).~~ done (repo pushed; manual-gate practice stands)
 5. **Test determinism budget**: E2E is now ~2.5–4 min with two intentional DNS-stall waits (~60s) and poll loops; acceptable, but a second VM test file would multiply CI time — keep one VM test, grow subtests inside it.
 6. **Session-wide tool discipline**: rg flag misuse, stale-file edits, and stdin-driver misuse all share one root cause — assuming tool behavior instead of reading it. (Process fix: 10-second `--help`/fresh View before first use of any invocation pattern this session.)
 7. **Journal detail visibility**: Stalwart's serial-console lines hide event DETAILS (only `journalctl -o verbose` shows them); the test's no-crash gate greps names only — a details-level assertion would catch more, but needs a curated benign-list (resolver/pyzor/ASN-download lines) to stay honest.
@@ -72,12 +72,12 @@
 ## f) Next up to 50
 
 **Repo & hygiene (1–8)**
-1. Push the 9 local commits to origin (after user go-ahead).
-2. Genericize `example = "mail.larsartmann.cloud"` in `modules/mail-server.nix:42` to `mail.example.com`.
+1. ~~Push the 9 local commits to origin (after user go-ahead).~~ done (pushed - origin/master == master, verified 2026-09-15)
+2. ~~Genericize `example = "mail.larsartmann.cloud"` in `modules/mail-server.nix:42` to `mail.example.com`.~~ done (docs-health pass 2026-09-15 - genericized to mail.example.com)
 3. Trim/move operational runbook detail (migration window, DR key design, backup topology) out of the public README.
 4. Create TODO_LIST.md + FEATURES.md (this report's (f) as seed).
-5. Add `.gitignore` entry for `docs/status/*.html` artifacts if HTML reports ever land (currently .md only).
-6. Clean /tmp debris (stalwart-src, tarball, nms clone) — or leave to reboot, but note it.
+5. ~~Add `.gitignore` entry for `docs/status/*.html` artifacts if HTML reports ever land (currently .md only).~~ **Won't implement — HTML reports are committed deliberately (docs/reviews); no artifact class to ignore.**
+6. ~~Clean /tmp debris (stalwart-src, tarball, nms clone) — or leave to reboot, but note it.~~ done (/tmp debris (stalwart tarball, src, nms clone) trashed 2026-09-15)
 7. Add flake check GitHub Action (nix flake check on x86_64-linux) mirroring the local gate.
 8. Repo topics/description polish on GitHub (mail, nixos, stalwart, dmarc).
 
@@ -85,18 +85,18 @@
 9. Outbound relay test: in-VM dummy SMTP sink + `queue.route."sink"` + assert the sink receives the message.
 10. DKIM signing test: declarative `signature.<id>` with a test RSA key, assert `DKIM-Signature` header on submission.
 11. DKIM keygen via `POST /api/dkim`, then sign — mirrors the webadmin flow end-to-end.
-12. Assert anonymous admin API stays 401 across restarts (auth survives RocksDB state).
+12. ~~Assert anonymous admin API stays 401 across restarts (auth survives RocksDB state).~~ **Won't implement — DUPLICATE - covered by the TODO_LIST restart-persistence row (401 across restart).**
 13. Test `metrics.prometheus.enable = true` → `/metrics/prometheus` returns 200 (and 401 with auth set).
 14. Quota test (nixos-mailserver pattern): 1KB quota account, second mail bounces.
 15. Alias/catch-all principal test (emails[] with extra alias).
 16. Junk-folder delivery probe variant (spam-flagged message lands in Junk, not INBOX).
-17. Restart-persistence test: deliver, `systemctl restart stalwart`, message still in INBOX (state survives).
+17. ~~Restart-persistence test: deliver, `systemctl restart stalwart`, message still in INBOX (state survives).~~ **Won't implement — DUPLICATE - covered by the TODO_LIST restart-persistence row.**
 18. Details-level journal assertion with curated benign-filter (resolver.type, pyzor, ASN "Resource error", "No TLS certificates available" during cert-gen window).
 19. Add dmarc-eval assertion that wrapper output survives `nixosOption` docs rendering (option docstring drift check).
 20. Drive the E2E with `--gc-roots` in CI to avoid store GC between check and debug.
 
 **Module surface (21–28)**
-21. Consider `openFirewall` split: module currently opens ALL listener ports incl. 8080? (verify — httpBind is loopback so `parsePorts` may still add 8080 to firewall; if so, gate it).
+21. ~~Consider `openFirewall` split: module currently opens ALL listener ports incl. 8080? (verify — httpBind is loopback so `parsePorts` may still add 8080 to firewall; if so, gate it).~~ done (docs-health pass 2026-09-15 - verified real (parsePorts opens 8080) and fixed: wrapper opens exactly 25/465/587/993, openFirewall off)
 22. Add `domains` list option (auto-create domain principals at first boot via systemd oneshot + fallback-admin) — kills the provision-before-probe hazard operationally.
 23. Same oneshot could declaratively sync accounts from a list (idempotent POST /api/principal via `wantedBy`).
 24. Wrapper option for relay (`services.mail-server.relay = { address, port, username, secretFile; }`) generating the verified `queue.route` + `queue.strategy.route` TOML — turns the ledger entry into product.
@@ -127,14 +127,28 @@
 45. Consider `systemd` hardening overrides for parsedmarc service (ProtectSystem etc.) as mkDefault suggestions.
 
 **Docs & meta (46–50)**
-46. README: replace "What is built and verified (2026-09-14)" date-stamp convention with per-section dates (stalwart vs dmarc diverge soon).
+46. ~~README: replace "What is built and verified (2026-09-14)" date-stamp convention with per-section dates (stalwart vs dmarc diverge soon).~~ **Won't implement — single-session project so far; revisit when sections diverge.**
 47. CONTRIBUTING note: verified-facts ledger rules (how to add a bullet: source-path citation or VM observation date).
-48. Link the two 2026-09-14 status reports from README or drop them from docs/rot tracking.
+48. ~~Link the two 2026-09-14 status reports from README or drop them from docs/rot tracking.~~ done (AGENTS.md Documentation map links the docs/ trees)
 49. Record the nixos-mailserver lessons section in README (currently only in session history) — 3 lines max.
 50. Add `flake-check-all-systems` note (aarch64 intentionally omitted per flake gating; document why in README).
 
 ## g) Questions I cannot answer myself
 
-1. **Push or hold?** The 9 session commits are local-only (no-push rule). Push to `origin/master` now, or do you want to review the README/test diff first?
-2. **Public vs private repo, and runbook trimming?** The audit found no secrets but real recon value (hostname example, migration window, DR design). Keep public + trim ops detail, keep public as-is, or go private?
+1. ~~**Push or hold?** The 9 session commits are local-only (no-push rule). Push to `origin/master` now, or do you want to review the README/test diff first?~~ done (pushed - origin/master == master, verified 2026-09-15)
+2. ~~**Public vs private repo**, and runbook trimming?~~ Repo stays **public** (decided by publication, 2026-09-14); the trimming half is open as ROADMAP Q4. The audit found no secrets but real recon value (~~hostname example~~ genericized 2026-09-15, migration window, DR design).
 3. **Declarative provisioning in the wrapper (f.22/23):** should `services.mail-server` grow `domains`/`accounts` options (systemd oneshot creating principals idempotently), or does account state stay strictly imperative/webadmin per Stalwart doctrine? This is a product-philosophy call (declarative drift vs. operational simplicity) I can argue either way.
+
+---
+
+## Resolution (2026-09-15, docs-health pass)
+
+The verification work (a) all stands. Open items are tracked elsewhere now:
+bounded work lives in `TODO_LIST.md` (CI, topics, relay/DKIM/metrics/cert-tier
+tests and options, dmarc-eval guard, CONTRIBUTING); the gated go-live tier
+lives in `ROADMAP.md` themes; the D1/provisioning/runbook-trim questions live
+in `ROADMAP.md` "Open questions". Smaller backlog ideas not yet promoted
+(f/11, f/19, f/20, f/28, f/42, f/43, f/49, f/50) remain unmarked here and
+should be promoted to TODO_LIST when picked up. Section (d) and the process
+lessons in (e) are historical records of that session, deliberately left as
+written.
