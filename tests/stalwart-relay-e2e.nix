@@ -95,13 +95,22 @@ in
 
       # dnsmasq must be answering before we provision: the relay A lookup for
       # "relay" rides on it.
-      smtp.wait_until_succeeds("dig +short relay @127.0.0.1 | grep -q .", timeout=120)
+      # Assertions are file-based, never `producer | grep -q`: the test
+      # shell runs with pipefail, and grep -q exiting at first match EPIPEs
+      # the producer - the metrics curl in stalwart-e2e returned exit 23
+      # (write error) on a MATCHING payload once (2026-09-15). Under pipefail
+      # the negated form is worse: `! producer | grep -q` phantom-greens.
+      smtp.wait_until_succeeds(
+          "dig +short relay @127.0.0.1 > /tmp/dig-relay.txt && grep -q . /tmp/dig-relay.txt",
+          timeout=120,
+      )
 
       # The self-signed certificate is generated asynchronously at first start
       # and can take >80s in an entropy-poor VM - wait for a real TLS handshake
       # so the STARTTLS submissions below cannot flake on cert timing.
       smtp.wait_until_succeeds(
-          "echo | openssl s_client -connect 127.0.0.1:993 2>/dev/null | grep -q 'OK'",
+          "echo | openssl s_client -connect 127.0.0.1:993 2>/dev/null > /tmp/tls-greeting.txt "
+          + "&& grep -q 'OK' /tmp/tls-greeting.txt",
           timeout=180,
       )
 
@@ -135,7 +144,8 @@ in
           # Queue -> strategy -> relay -> mailpit is async; poll the Mailpit
           # REST API for the needle.
           smtp.wait_until_succeeds(
-              "curl -fsS http://relay:8025/api/v1/messages | grep -q '${relayNeedle}'",
+              "curl -fsS http://relay:8025/api/v1/messages -o /tmp/relay-messages.json "
+              + ""+ ""+&& "+&&  "+ ""+&& "+&&   grep -q '${relayNeedle}' /tmp/relay-messages.json",
               timeout=180,
           )
 
@@ -161,10 +171,14 @@ in
               "grep -E '(<-|<\\*\\*|<~\\*) *5[0-9][0-9]' /tmp/swaks-local.log"
           )
           smtp.succeed(
-              "! curl -fsS http://relay:8025/api/v1/messages | grep -q 'local-needle-3a7d'"
+              "curl -fsS http://relay:8025/api/v1/messages -o /tmp/relay-messages2.json "
+              + ""+ ""+&& "+&&  "+ ""+&& "+&&   ! grep -q 'local-needle-3a7d' /tmp/relay-messages2.json"
           )
 
       with subtest("no crashes"):
-          smtp.succeed("! journalctl -u stalwart -b 0 | grep -qiE 'panic|fatal error'")
+          smtp.succeed(
+              "journalctl -u stalwart -b 0 > /tmp/journal-full.log "
+              + ""+ ""+&& "+&&  "+ ""+&& "+&&   ! grep -qiE 'panic|fatal error' /tmp/journal-full.log"
+          )
     '';
   }
