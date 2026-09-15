@@ -2,15 +2,25 @@
 # (a) flip services.parsedmarc.enable, (b) keep the heavy sinks off, and
 # (c) land general.output in the rendered settings with consumer settings
 # still mergeable. Pure eval - no VM, no services started.
+#
+# The wrapper's contract is verified against parsedmarc 11 semantics
+# ([imap] connection section, `_secret` paths, no SQLite sink). Pin the
+# floor here so an accidental nixpkgs pin move below 11 fails loudly
+# instead of rendering a config against changed semantics.
 {
   nixpkgs,
   system,
 }:
 let
+  pkgs = nixpkgs.legacyPackages.${system};
+  lib = nixpkgs.lib;
+
+  parsedmarcVersion = pkgs.parsedmarc.version;
+
   # Path literals are forbidden in pure flake eval; a store path satisfies
   # the attrsOf-path secret type the same way a sops template path would on
   # a real host.
-  secretFile = nixpkgs.legacyPackages.${system}.writeText "dmarc-password" "dummy";
+  secretFile = pkgs.writeText "dmarc-password" "dummy";
 
   cfg =
     (nixpkgs.lib.nixosSystem {
@@ -37,12 +47,16 @@ let
     settings = cfg.services.parsedmarc.settings;
     elasticsearch = cfg.services.parsedmarc.provision.elasticsearch;
     geoIp = cfg.services.parsedmarc.provision.geoIp;
+    stateDirectory = cfg.systemd.services.parsedmarc.serviceConfig.StateDirectory;
+    inherit parsedmarcVersion;
   };
-in
+
+  versionOk = lib.versionAtLeast parsedmarcVersion "11";in
+assert versionOk || throw "dmarc-monitor contract is verified against parsedmarc >= 11 (got ${parsedmarcVersion}) - re-verify the [imap]/_secret/output semantics before touching the floor.";
 builtins.derivation {
   name = "dmarc-eval";
   system = system;
-  PATH = "${nixpkgs.legacyPackages.${system}.coreutils}/bin:${nixpkgs.legacyPackages.${system}.gnugrep}/bin";
+  PATH = "${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin";
   passAsFile = [ "rendered" ];
   inherit rendered;
   builder = "/bin/sh";
@@ -54,6 +68,7 @@ builtins.derivation {
       grep -q '"elasticsearch":false' "$renderedPath"
       grep -q '"geoIp":false' "$renderedPath"
       grep -q '"_secret":"/nix/store' "$renderedPath"
+      grep -q '"stateDirectory":"parsedmarc"' "$renderedPath"
       touch "$out"
     ''
   ];

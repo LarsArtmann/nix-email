@@ -83,5 +83,18 @@ in
         }
       ];
     };
+
+    # The nixpkgs unit runs as a DynamicUser and prepares NO writable state,
+    # while parsedmarc 11.0.1 os.makedirs()es the output directory on first
+    # write - as the dynamic user that hits "Permission denied" on the
+    # root-owned /var/lib. StateDirectory makes systemd create and chown
+    # /var/lib/parsedmarc on every start; custom outputDirectories outside
+    # it must exist already and are explicitly whitelisted here.
+    systemd.services.parsedmarc.serviceConfig = {
+      StateDirectory = lib.mkDefault "parsedmarc";
+      # "-" prefix: the directory may not exist until parsedmarc's first
+      # makedirs() - a missing path must not fail the unit at start.
+      ReadWritePaths = [ "-${cfg.outputDirectory}" ];
+    };
   };
 }
