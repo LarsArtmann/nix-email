@@ -32,11 +32,28 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
   (NOT `services.stalwart-mail` - collides with an nixpkgs rename alias).
 - All wrapper defaults are `mkDefault`; consumers override via
   `services.stalwart.settings` / `services.parsedmarc.settings`.
+  EXCEPTION: `networking.firewall.allowedTCPPorts` in mail-server.nix is a
+  plain definition - a `mkDefault` list on that option is silently dropped
+  to `[]` by the base firewall modules on this nixpkgs pin (verified
+  empirically; `services.openssh.ports` mkDefault behaves normally).
 - Tests: VM E2E for behavior (stalwart-e2e), eval contract for wiring
   (dmarc-eval). Never weaken module defaults to make a test deterministic -
   fix the test (e.g. swaks --timeout), keep the product honest.
 - E2E ordering matters: provision domain/accounts BEFORE any SMTP probe -
   a RCPT/MAIL FROM probe poisons the directory negative cache (1 h TTL)
   and the domain then routes to MX instead of local (see README ledger).
+  Related API gotchas (also in the README ledger): individuals created via
+  `POST /api/principal` need `"roles": ["user"]` or submission is refused;
+  relay `queue.route` IfBlocks need INDEXED keys and resolvable hostnames.
 - SystemNix layers (sops, ports.nix, Gatus, onFailure, backup-coordination)
   belong to the CONSUMER wrapper, not here.
+
+## Documentation map
+
+- `README.md` - architecture, module docs, go-live runbook, VERIFIED-FACTS
+  LEDGER (fact + method + date; do not re-derive config keys from memory).
+- `FEATURES.md` - honest feature inventory by status.
+- `TODO_LIST.md` - open bounded work. `ROADMAP.md` - long-term themes,
+  non-goals, and the open user decisions (D1/D2 license) that gate them.
+- `CHANGELOG.md` - what changed. `docs/{status,planning,reviews}/` -
+  point-in-time session snapshots (historical; annotated as work resolves).

@@ -20,7 +20,11 @@ web admin built in.
 | `modules/mail-server.nix` | Done. VM-tested E2E (see below) |
 | `modules/dmarc-monitor.nix` | Done. Eval contract-tested; needs a live IMAP mailbox to exercise |
 | Mailpit for dev/CI | Use nixpkgs `services.mailpit.instances` directly - no wrapper adds value |
-| VPS host, DNS cutover, migration, Gatus wiring | Planned - see "Go-live runbook" |
+| VPS host, DNS cutover, migration, Gatus wiring | Planned - see "Go-live runbook" and ROADMAP.md (gated on the D1/D2 decisions) |
+
+Open work lives in [TODO_LIST.md](TODO_LIST.md); the honest feature
+inventory in [FEATURES.md](FEATURES.md); long-term direction and the gating
+user decisions in [ROADMAP.md](ROADMAP.md).
 
 `nix flake check` runs both tests against the SAME nixpkgs pin as SystemNix
 (`eaad089`, NixOS 26.11):
@@ -50,7 +54,10 @@ Options: `enable`, `hostname` (FQDN, asserted to contain a dot), `httpBind`,
 else flows through `services.stalwart.settings` (all wrapper values are
 `mkDefault` - consumer settings win). Defaults set: listeners above and
 `certificate.self-signed = true` so implicit-TLS works out of the box
-(override with real certs/ACME on the VPS).
+(override with real certs/ACME on the VPS). Firewall: the wrapper opens
+exactly 25/465/587/993 (nixpkgs' `openFirewall` is off - it would also open
+the loopback admin port on every interface); consumer port lists merge
+additively.
 
 Outbound smarthost relaying (Stalwart -> Resend) is a per-host `settings`
 addition - the verified keys are in the ledger below (confirmed against the
@@ -67,8 +74,8 @@ H1/H2 (rua reports go nowhere today).
 ## SystemNix integration (planned shape)
 
 ```nix
-# flake.nix input
-nix-email.url = "git+ssh://git@github.com/LarsArtmann/nix-email";
+# flake.nix input (repo is public; git+ssh also works)
+nix-email.url = "github:LarsArtmann/nix-email";
 # consumer wrapper (DiscordSync pattern): import nixosModules.default, layer
 # sops template for the IMAP password, port registration (lib/ports.nix),
 # harden overrides, onFailure -> Discord, Gatus checks, backup-coordination
