@@ -72,6 +72,7 @@
 ## f) Next up to 50
 
 **Repo & hygiene (1–8)**
+
 1. ~~Push the 9 local commits to origin (after user go-ahead).~~ done (pushed - origin/master == master, verified 2026-09-15)
 2. ~~Genericize `example = "mail.larsartmann.cloud"` in `modules/mail-server.nix:42` to `mail.example.com`.~~ done (docs-health pass 2026-09-15 - genericized to mail.example.com)
 3. Trim/move operational runbook detail (migration window, DR key design, backup topology) out of the public README.

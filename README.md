@@ -15,11 +15,11 @@ web admin built in.
 
 ## What is built and verified (2026-09-14)
 
-| Piece | State |
-| --- | --- |
-| `modules/mail-server.nix` | Done. VM-tested E2E (see below) |
-| `modules/dmarc-monitor.nix` | Done. Eval contract-tested; needs a live IMAP mailbox to exercise |
-| Mailpit for dev/CI | Use nixpkgs `services.mailpit.instances` directly - no wrapper adds value |
+| Piece                                          | State                                                                         |
+| ---------------------------------------------- | ----------------------------------------------------------------------------- |
+| `modules/mail-server.nix`                      | Done. VM-tested E2E (see below)                                               |
+| `modules/dmarc-monitor.nix`                    | Done. Eval contract-tested; needs a live IMAP mailbox to exercise             |
+| Mailpit for dev/CI                             | Use nixpkgs `services.mailpit.instances` directly - no wrapper adds value     |
 | VPS host, DNS cutover, migration, Gatus wiring | Planned - see "Go-live runbook" and ROADMAP.md (gated on the D1/D2 decisions) |
 
 Open work lives in [TODO_LIST.md](TODO_LIST.md); the honest feature
@@ -41,13 +41,13 @@ user decisions in [ROADMAP.md](ROADMAP.md).
 
 Enables nixpkgs `services.stalwart` with one RFC-compliant listener set:
 
-| Port | Listener | Notes |
-| --- | --- | --- |
-| 25 | smtp | inbound MX, STARTTLS advertised |
-| 587 | submission | client auth + STARTTLS |
-| 465 | submissions | implicit TLS |
-| 993 | imaps | implicit TLS |
-| httpBind (default `127.0.0.1:8080`) | http | web admin / JMAP - reverse-proxy it, never expose raw |
+| Port                                | Listener    | Notes                                                 |
+| ----------------------------------- | ----------- | ----------------------------------------------------- |
+| 25                                  | smtp        | inbound MX, STARTTLS advertised                       |
+| 587                                 | submission  | client auth + STARTTLS                                |
+| 465                                 | submissions | implicit TLS                                          |
+| 993                                 | imaps       | implicit TLS                                          |
+| httpBind (default `127.0.0.1:8080`) | http        | web admin / JMAP - reverse-proxy it, never expose raw |
 
 Options: `enable`, `hostname` (FQDN, asserted to contain a dot), `httpBind`,
 `stateVersion` (passed to the nixpkgs module, default `"26.11"`). Everything
@@ -87,10 +87,10 @@ Gatus checks for the VPS (on evo-x2, external viewpoint):
 ```yaml
 - name: smtp-mx
   url: "starttls://mail.<domain>:25"
-  conditions: [ "[CONNECTED] == true", "[CERTIFICATE_EXPIRATION] > 720h" ]
+  conditions: ["[CONNECTED] == true", "[CERTIFICATE_EXPIRATION] > 720h"]
 - name: imaps
   url: "tls://mail.<domain>:993"
-  conditions: [ "[CONNECTED] == true", "[CERTIFICATE_EXPIRATION] > 720h" ]
+  conditions: ["[CONNECTED] == true", "[CERTIFICATE_EXPIRATION] > 720h"]
 ```
 
 ## Go-live runbook (outline)
@@ -109,8 +109,8 @@ Gatus checks for the VPS (on evo-x2, external viewpoint):
    no first-run wizard needed) or use the web wizard over an SSH tunnel to
    the loopback httpBind: create accounts/domains, DKIM keys. On the VPS the
    secret must come from a credential file: `services.stalwart.credentials`
-   + `%{file:/run/credentials/stalwart.service/<key>%}` macro in settings
-   (sops on the consumer side).
+   - `%{file:/run/credentials/stalwart.service/<key>%}` macro in settings
+     (sops on the consumer side).
 3. Terraform (`domains` repo): new `stalwart-mail` module - MX, SPF
    (`v=spf1 mx -all`), DKIM txt, DMARC with `rua=mailto:dmarc@<domain>`,
    MTA-STS + `_smtp._tls` TLS-RPT records; point `rua` mailboxes at the VPS.
@@ -223,9 +223,9 @@ Gatus checks for the VPS (on evo-x2, external viewpoint):
   `['rsa-' + sender_domain, 'ed25519-' + sender_domain]` - exactly the ids
   the webadmin generates via `POST /api/dkim`.
 - TLS/ACME (VERIFIED key names): manual certs are `certificate.<id>.cert`
-  + `certificate.<id>.private-key`; built-in ACME is `acme.<id>.directory`,
-  `.contact`, `.challenge`, `.renew-before` (default 30d), DNS-challenge
-  extras `.origin`, `.polling-interval`, `.propagation-timeout`.
+  - `certificate.<id>.private-key`; built-in ACME is `acme.<id>.directory`,
+    `.contact`, `.challenge`, `.renew-before` (default 30d), DNS-challenge
+    extras `.origin`, `.polling-interval`, `.propagation-timeout`.
 - nixpkgs module secret injection: `services.stalwart.credentials` (attrsOf
   path) becomes systemd LoadCredential files, referenced in settings as
   `%{file:/run/credentials/stalwart.service/<key>%}` - the sops-compatible
