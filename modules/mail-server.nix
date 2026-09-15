@@ -39,7 +39,7 @@ in
 
     hostname = lib.mkOption {
       type = lib.types.str;
-      example = "mail.larsartmann.cloud";
+      example = "mail.example.com";
       description = ''
         The mail server's FQDN. Used for the SMTP banner, HelO/greeting, and
         must match the DNS MX/PTR story of the host (rDNS at the provider
@@ -78,7 +78,11 @@ in
     services.stalwart = {
       enable = true;
       inherit (cfg) stateVersion;
-      openFirewall = lib.mkDefault true;
+      # nixpkgs' openFirewall derives ports from ALL listener binds, which
+      # would punch the loopback-only httpBind port (8080) through the
+      # firewall on every interface. Open exactly the public listener ports
+      # below instead; loopback needs no firewall rule.
+      openFirewall = lib.mkDefault false;
       settings = {
         # Implicit-TLS listeners (465/993) are DEAD without a certificate:
         # live-observed "No TLS certificates available" in the VM test. The
@@ -117,5 +121,18 @@ in
         };
       };
     };
+
+    # The module owns the listener contract, so it owns the firewall ports
+    # for it. Plain definition (NOT mkDefault): on this nixpkgs pin a
+    # mkDefault list here is silently dropped to [] (empirically verified,
+    # 2026-09-14; services.openssh.ports mkDefault works fine - something in
+    # the base firewall modules filters weaker-priority defs). Lists concat:
+    # consumer port lists merge additively; mkForce yours to replace.
+    networking.firewall.allowedTCPPorts = [
+      25
+      465
+      587
+      993
+    ];
   };
 }
