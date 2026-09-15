@@ -148,8 +148,13 @@ Gatus checks for the VPS (on evo-x2, external viewpoint):
   zero-dependency output. A `[postgresql]` sink exists but needs the
   `psycopg` extra (not in the nixpkgs package; psycopg 3.3.4 is available
   for an override).
-- parsedmarc `_secret` values must be PATHS (store paths / sops template
-  paths), not strings, and never path literals in flake source (pure eval).
+- parsedmarc `_secret` values must be absolute path STRINGS
+  (`password._secret = "/run/secrets/dmarc-imap-password";`) - the nixpkgs
+  ini generator gates on `isString v._secret` and THROWS on path values
+  ("unsupported type path"), and path literals are forbidden in flake source
+  anyway (pure eval). Corrected 2026-09-15: an earlier phrasing here said
+  "PATHS, not strings", which read as "path values" - it always meant
+  "a path pointing at the secret file, given as a string".
 - swaks marks SMTP error-response lines with `<**`, success with `<-`; RCPT
   policy checks (SPF/DNSBL) stall ~30 s per lookup in a DNS-less VM - tests
   need `--timeout 120`.

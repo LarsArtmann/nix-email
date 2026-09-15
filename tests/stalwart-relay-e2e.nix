@@ -71,6 +71,7 @@ pkgs.testers.runNixOSTest {
           pkgs.swaks
           pkgs.curl
           pkgs.dnsutils
+          pkgs.openssl
         ];
 
         virtualisation.memorySize = 2048;
