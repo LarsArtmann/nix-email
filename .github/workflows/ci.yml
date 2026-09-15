@@ -27,16 +27,16 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@11bd1966bbeb425c6a04e8e6c1e9e6945c5c7c12 # v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2 (SHA resolved via git ref tags/v4.2.2 - the previously pinned 11bd1966... never existed)
 
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@783ec02b6ced887d1a95687dcb4b09e2f4b4b7b5 # v17
+        uses: DeterminateSystems/nix-installer-action@21a544727d0c62386e78b4befe52d19ad12692e3 # v17 (SHA resolved via git ref tags/v17)
         with:
           extra-conf: |
             allow-import-from-derivation = true
 
       - name: Cache Nix store
-        uses: DeterminateSystems/flakehub-cache-action@7573366a020080f0d1c02038f678832ae73f7134 # v1
+        uses: DeterminateSystems/flakehub-cache-action@146f476c94460cb634f9ade79470fcbc3f7e5b36 # v1 (SHA resolved via git ref tags/v1)
 
       - name: Parse all Nix files
         run: |
