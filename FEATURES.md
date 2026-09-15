@@ -61,7 +61,7 @@
 | ----------------------------- | ------------------------- | -------------------------------------------------------------------- |
 | `nix flake check` gate        | 🟢 `FULLY_FUNCTIONAL`     | All checks green; x86_64 VM runs, aarch64 eval-only (documented) - `dmarc-eval` also verified to BUILD for aarch64 (2026-09-15) |
 | Formatter (dprint + alejandra) | 🟢 `FULLY_FUNCTIONAL`    | `nix fmt` via the flake `formatter` output; dprint covers json/yaml/markdown |
-| CI (GitHub Actions)           | 🟢 `FULLY_FUNCTIONAL`     | `.github/workflows/ci.yml` - fail-closed `nix flake check` with an expected-checks guard plus an arch-independent aarch64 check-set evaluation |
+| CI (GitHub Actions)           | 🟢 `FULLY_FUNCTIONAL`     | `.github/workflows/ci.yml` - fail-closed `nix flake check` with an expected-checks guard, alejandra format enforcement, and an aarch64 check-set shape assertion |
 | Repo topics                   | 🟢 `FULLY_FUNCTIONAL`     | mail/nixos/nixos-module/stalwart/dmarc/email-server/nix-flake        |
 | Renovate (nixpkgs input)      | 🟢 `FULLY_FUNCTIONAL`     | `renovate.json` - nix manager approval-gated, SystemNix pairing note |
 | LICENSE                       | 🟢 `FULLY_FUNCTIONAL`     | MIT shipped (`Copyright (c) 2026 Lars Artmann`); flipping the choice is a one-file change                           |

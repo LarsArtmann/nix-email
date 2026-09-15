@@ -70,9 +70,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - `dmarc-eval` asserts `ExecStartPre` ORDER - the module's ini-writing step
   plus the wrapper's strip script (>= 2 entries, strip last) - so `lib.last`
   remains a real ordering proof rather than a string's last character
-- CI evaluates the aarch64 check set (VM checks stay deliberately
-  x86_64-gated); `nix build .#checks.aarch64-linux.dmarc-eval` verified green
-  on the dev host, so the aarch64 posture is no longer documentation-only
+- CI asserts the aarch64 check-set SHAPE (`attrNames`, genuinely
+  arch-independent - forcing the outPath needs to BUILD the aarch64 strip
+  script, which fails without emulation, as the first CI run proved); the
+  deep aarch64 build of `dmarc-eval` was verified green locally with
+  emulation, so the aarch64 posture is no longer documentation-only. CI also
+  gained fail-closed action-SHA validation by fire: the workflow's pinned
+  action SHAs never existed (one digit off on checkout v4.2.2) and were
+  repinned from the real tag refs after the first-ever run failed at Set up
+  job
 - `docs/THREAT_MODEL.md` gained the catch-all enumeration-tradeoff row;
   AGENTS.md gained a working-rules section (mechanical gate pattern,
   identifier extraction, root-file existence check)
