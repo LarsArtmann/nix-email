@@ -140,7 +140,7 @@ in
       services.postfix.settings.main.home_mailbox = "Maildir/";
 
       environment.systemPackages = [
-        (sendEmail)
+        sendEmail
         pkgs.jq
       ];
     };
