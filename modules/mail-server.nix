@@ -21,10 +21,12 @@
 #   http admin/JMAP listener binds LOOPBACK ONLY by default - expose via a
 #   reverse proxy (Caddy protectedVHost / native OIDC doctrine), never raw.
 #
-# Outbound delivery is deliberately NOT set here: relaying through a
-# smarthost (Resend) is a per-host `settings` addition - see README for the
-# exact keys once the VPS exists. Direct-to-MX from a fresh VPS IP is the
-# reputation trap the selfhosted-email guide warns about.
+# Outbound delivery defaults to direct-to-MX. Setting `relay` hands every
+# non-local message to an authenticated smarthost (Resend) instead - the
+# generated `queue.route`/`queue.strategy.route` keys are verified against the
+# v0.15.5 source AND a live Mailpit spike (see README verified-facts ledger).
+# Direct-to-MX from a fresh VPS IP is the reputation trap the selfhosted-email
+# guide warns about.
 {
   config,
   lib,
@@ -32,6 +34,25 @@
 }:
 let
   cfg = config.services.mail-server;
+
+  # Mirrors nixpkgs' stalwart module: the unit is stalwart-mail.service on
+  # stateVersion < 26.05 and stalwart.service since. The LoadCredential
+  # mount path embeds the unit name, so secret macros must too.
+  stalwartUnit =
+    if lib.versionOlder cfg.stateVersion "26.05" then "stalwart-mail" else "stalwart";
+  credentialMacro = key: "%{file:/run/credentials/${stalwartUnit}.service/${key}}%";
+
+  # The HTTP bind is "<host>:<port>"; extract the host part to judge loopback.
+  httpBindHost =
+    let
+      m = builtins.match "(.*):[0-9]+" cfg.httpBind;
+    in
+    if m == null then cfg.httpBind else builtins.head m;
+  httpBindIsLoopback =
+    lib.hasPrefix "127." httpBindHost
+    || httpBindHost == "localhost"
+    || httpBindHost == "[::1]"
+    || httpBindHost == "::1";
 in
 {
   options.services.mail-server = {
@@ -65,6 +86,201 @@ in
         machine. Only touch when migrating an existing install.
       '';
     };
+
+    relay = lib.mkOption {
+      type = lib.types.nullOr (lib.types.submodule {
+        options = {
+          address = lib.mkOption {
+            type = lib.types.str;
+            example = "smtp.resend.com";
+            description = ''
+              Smarthost hostname. Must be DNS-resolvable: Stalwart resolves
+              relay targets via A lookup and REFUSES bare IP literals
+              ("record not found for MX" - live-observed, README ledger).
+            '';
+          };
+          port = lib.mkOption {
+            type = lib.types.port;
+            default = 587;
+            description = ''
+              Submission port on the smarthost: 587 = STARTTLS
+              (tlsImplicit = false), 465 = implicit TLS (tlsImplicit = true).
+              Resend offers both; Hetzner never blocks 587.
+            '';
+          };
+          username = lib.mkOption {
+            type = lib.types.nullOr lib.types.str;
+            default = null;
+            description = ''
+              SASL username for the smarthost. Set together with secretFile
+              (or neither - auth is all-or-nothing).
+            '';
+          };
+          secretFile = lib.mkOption {
+            type = lib.types.nullOr lib.types.path;
+            default = null;
+            description = ''
+              Path to the relay password (sops template / credential file on
+              real hosts). Fed through systemd LoadCredential and referenced
+              from the Stalwart config via a %{file:...}% macro, so the
+              password never lands in the world-readable TOML.
+            '';
+          };
+          tlsImplicit = lib.mkOption {
+            type = lib.types.bool;
+            default = false;
+            description = "true = implicit TLS (465-style), false = STARTTLS (587-style).";
+          };
+          routeId = lib.mkOption {
+            type = lib.types.str;
+            default = "smarthost";
+            description = ''
+              Identifier of the generated `queue.route` entry; the strategy
+              expression routes non-local mail to this id.
+            '';
+          };
+        };
+      });
+      default = null;
+      description = ''
+        Outbound smarthost relay. null (default) = direct-to-MX delivery.
+        When set, mail for NON-local domains is handed to this relay; local
+        delivery is untouched. Generates (verified against v0.15.5 source):
+        `queue.route.<routeId>` and `queue.strategy.route` with the exact
+        default-shape expression (is_local_domain -> 'local', else -> relay).
+      '';
+    };
+
+    metrics = {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = ''
+          Expose Prometheus metrics at /metrics/prometheus ON THE HTTP
+          LISTENER (loopback by default: scrape via a reverse-proxy route or
+          SSH tunnel - never expose the whole admin port for it). Optional
+          basic auth via `services.stalwart.settings.metrics.prometheus.auth`.
+        '';
+      };
+    };
+
+    directoryCacheTtlNegative = lib.mkOption {
+      type = lib.types.nullOr lib.types.ints.positive;
+      default = null;
+      example = 60;
+      description = ''
+        Negative-cache TTL in seconds for internal-directory lookups
+        (`directory."internal".cache.ttl.negative`; upstream default 3600).
+        A miss is cached for this long, so ANY SMTP traffic touching a domain
+        before it is provisioned routes that domain's mail to the MX path
+        until the TTL expires (the 1h trap in the README ledger). Dev/test
+        hosts want this low; leave null to keep the upstream default.
+      '';
+    };
+
+    certificate = lib.mkOption {
+      description = ''
+        TLS certificate tier. Exactly one mode's material is generated - the
+        modes are mutually exclusive by construction (nixos-mailserver
+        x509-certificate pattern).
+      '';
+      default = { mode = "self-signed"; };
+      type = lib.types.submodule {
+        options = {
+          mode = lib.mkOption {
+            type = lib.types.enum [
+              "self-signed"
+              "acme"
+              "manual"
+            ];
+            default = "self-signed";
+            description = ''
+              self-signed (default): Stalwart generates a cert at first start
+              (asynchronously - can take >80 s in entropy-poor VMs).
+              acme: Stalwart's built-in ACME client (dns-01 additionally needs
+              `acme.<id>.provider`/`.secret` via settings passthrough).
+              manual: cert/key files via systemd LoadCredential.
+            '';
+          };
+          acme = {
+            id = lib.mkOption {
+              type = lib.types.str;
+              default = "letsencrypt";
+              description = "Identifier of the generated `acme.<id>` entry.";
+            };
+            directory = lib.mkOption {
+              type = lib.types.str;
+              default = "https://acme-v02.api.letsencrypt.org/directory";
+              description = "ACME directory URL.";
+            };
+            contact = lib.mkOption {
+              type = lib.types.listOf lib.types.str;
+              default = [ ];
+              example = [ "mailto:hostmaster@example.com" ];
+              description = ''
+                Contact addresses (required - Stalwart fails config parse on
+                an empty contact, verified against v0.15.5 source).
+              '';
+            };
+            domains = lib.mkOption {
+              type = lib.types.listOf lib.types.str;
+              default = [ ];
+              example = [ "mail.example.com" ];
+              description = ''
+                Domains to issue certificates for (required; wildcards only
+                with the dns-01 challenge - upstream-validated).
+              '';
+            };
+            challenge = lib.mkOption {
+              type = lib.types.enum [
+                "http-01"
+                "tls-alpn-01"
+                "dns-01"
+              ];
+              default = "http-01";
+              description = ''
+                ACME challenge type. http-01 needs port 80 reachable on the
+                mail hostname; tls-alpn-01 needs the TLS listener itself.
+              '';
+            };
+            default = lib.mkOption {
+              type = lib.types.bool;
+              default = true;
+              description = ''
+                Make this ACME manager the default when SNI does not match a
+                known certificate (`acme.<id>.default` in Stalwart).
+              '';
+            };
+          };
+          manual = {
+            id = lib.mkOption {
+              type = lib.types.str;
+              default = "wrapper";
+              description = "Identifier of the generated `certificate.<id>` entry.";
+            };
+            certFile = lib.mkOption {
+              type = lib.types.nullOr lib.types.path;
+              default = null;
+              description = "PEM-encoded certificate chain file (required in manual mode).";
+            };
+            keyFile = lib.mkOption {
+              type = lib.types.nullOr lib.types.path;
+              default = null;
+              description = "PEM-encoded private key file (required in manual mode).";
+            };
+            default = lib.mkOption {
+              type = lib.types.bool;
+              default = true;
+              description = ''
+                Serve this certificate when SNI does not match any known
+                certificate (`certificate.<id>.default = true` registers it
+                under the "*" catch-all - verified against v0.15.5 source).
+              '';
+            };
+          };
+        };
+      };
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -73,6 +289,41 @@ in
         assertion = lib.hasInfix "." cfg.hostname;
         message = "services.mail-server.hostname must be an FQDN (got \"${cfg.hostname}\") - a bare host name breaks MX/PTR alignment.";
       }
+    ]
+    ++ lib.optionals (cfg.relay != null) [
+      {
+        assertion = builtins.match ".*[a-zA-Z].*" cfg.relay.address != null;
+        message = "services.mail-server.relay.address must be a DNS-resolvable hostname (got \"${cfg.relay.address}\") - Stalwart resolves relay targets via A lookup and refuses bare IP literals with \"record not found for MX\". Give the smarthost a hostname (e.g. smtp.resend.com).";
+      }
+      {
+        assertion = (cfg.relay.username == null) == (cfg.relay.secretFile == null);
+        message = "services.mail-server.relay: set username AND secretFile together (or neither) - partial SASL credentials would fail at first submission.";
+      }
+    ]
+    ++ lib.optionals (cfg.certificate.mode == "acme") [
+      {
+        assertion = cfg.certificate.acme.contact != [ ];
+        message = "services.mail-server.certificate.acme.contact must list at least one contact address - Stalwart rejects an empty ACME contact at config parse (verified against v0.15.5 source).";
+      }
+      {
+        assertion = cfg.certificate.acme.domains != [ ];
+        message = "services.mail-server.certificate.acme.domains must list at least one domain (typically the mail hostname) - with no domains Stalwart registers no ACME provider and the implicit-TLS listeners serve nothing.";
+      }
+    ]
+    ++ lib.optionals (cfg.certificate.mode == "manual") [
+      {
+        assertion = cfg.certificate.manual.certFile != null && cfg.certificate.manual.keyFile != null;
+        message = "services.mail-server.certificate.manual: both certFile and keyFile are required in manual mode - a certificate without its key (or vice versa) is silently unusable and implicit-TLS would serve nothing.";
+      }
+    ];
+
+    warnings = lib.optionals (cfg.enable && !httpBindIsLoopback) [
+      ''
+        services.mail-server.httpBind ("${cfg.httpBind}") is not a loopback address: the Stalwart
+        web admin, JMAP and REST management API would be exposed raw on every interface.
+        README doctrine: keep the bind on loopback and put a TLS-terminating reverse proxy
+        (with auth) in front instead.
+      ''
     ];
 
     services.stalwart = {
@@ -83,43 +334,126 @@ in
       # firewall on every interface. Open exactly the public listener ports
       # below instead; loopback needs no firewall rule.
       openFirewall = lib.mkDefault false;
-      settings = {
-        # Implicit-TLS listeners (465/993) are DEAD without a certificate:
-        # live-observed "No TLS certificates available" in the VM test. The
-        # key is `certificate.self-signed` (verified against the 0.15.5
-        # binary - there is no .default level). Default to Stalwart's
-        # generated self-signed cert so a fresh deployment serves TLS out of
-        # the box; override with real cert material or ACME on the
-        # production host (mkDefault loses to consumer settings).
-        certificate.self-signed = lib.mkDefault true;
-        server = {
-          hostname = lib.mkDefault cfg.hostname;
-          listener = {
-            smtp = {
-              bind = [ "[::]:25" ];
-              protocol = "smtp";
-            };
-            submission = {
-              bind = [ "[::]:587" ];
-              protocol = "smtp";
-            };
-            submissions = {
-              bind = [ "[::]:465" ];
-              protocol = "smtp";
-              tls.implicit = true;
-            };
-            imaps = {
-              bind = [ "[::]:993" ];
-              protocol = "imap";
-              tls.implicit = true;
-            };
-            http = {
-              bind = [ cfg.httpBind ];
-              protocol = "http";
+
+      credentials = lib.mkMerge [
+        (lib.mkIf (cfg.relay != null && cfg.relay.username != null) {
+          mail-server-relay = toString cfg.relay.secretFile;
+        })
+        (lib.mkIf (cfg.certificate.mode == "manual" && cfg.certificate.manual.certFile != null) {
+          mail-server-certificate = toString cfg.certificate.manual.certFile;
+        })
+        (lib.mkIf (cfg.certificate.mode == "manual" && cfg.certificate.manual.keyFile != null) {
+          mail-server-certificate-key = toString cfg.certificate.manual.keyFile;
+        })
+      ];
+
+      settings = lib.mkMerge [
+        {
+          server = {
+            hostname = lib.mkDefault cfg.hostname;
+            listener = {
+              smtp = {
+                bind = [ "[::]:25" ];
+                protocol = "smtp";
+              };
+              submission = {
+                bind = [ "[::]:587" ];
+                protocol = "smtp";
+              };
+              submissions = {
+                bind = [ "[::]:465" ];
+                protocol = "smtp";
+                tls.implicit = true;
+              };
+              imaps = {
+                bind = [ "[::]:993" ];
+                protocol = "imap";
+                tls.implicit = true;
+              };
+              http = {
+                bind = [ cfg.httpBind ];
+                protocol = "http";
+              };
             };
           };
-        };
-      };
+
+          # Implicit-TLS listeners (465/993) are DEAD without a certificate:
+          # live-observed "No TLS certificates available" in the VM test. In
+          # self-signed mode the key is `certificate.self-signed` (verified
+          # against the 0.15.5 binary - there is no .default level); in
+          # acme/manual mode the tier below owns the material instead.
+          certificate = lib.mkMerge [
+            (lib.mkIf (cfg.certificate.mode == "self-signed") {
+              self-signed = lib.mkDefault true;
+            })
+            (lib.mkIf (cfg.certificate.mode == "manual") {
+              "${cfg.certificate.manual.id}" = {
+                cert = credentialMacro "mail-server-certificate";
+                private-key = credentialMacro "mail-server-certificate-key";
+                # Register as the "*" catch-all: without this the cert only
+                # matches its own SANs via SNI and an SNI-less handshake
+                # serves nothing (v0.15.5 source, parse_certificates).
+                default = lib.mkDefault cfg.certificate.manual.default;
+              };
+            })
+          ];
+
+          acme = lib.mkIf (cfg.certificate.mode == "acme") {
+            "${cfg.certificate.acme.id}" = {
+              inherit (cfg.certificate.acme)
+                directory
+                contact
+                domains
+                challenge
+                default
+                ;
+            };
+          };
+        }
+
+        (lib.mkIf cfg.metrics.enable {
+          metrics.prometheus.enable = lib.mkDefault true;
+        })
+
+        (lib.mkIf (cfg.directoryCacheTtlNegative != null) {
+          directory."internal".cache.ttl.negative = cfg.directoryCacheTtlNegative;
+        })
+
+        (lib.mkIf (cfg.relay != null) {
+          queue = {
+            # Smarthost definition - exact key set verified against v0.15.5
+            # parse_route (type/address/port/protocol required; auth and
+            # tls.implicit optional).
+            route."${cfg.relay.routeId}" = {
+              type = "relay";
+              address = cfg.relay.address;
+              port = cfg.relay.port;
+              protocol = "smtp";
+              tls.implicit = cfg.relay.tlsImplicit;
+            } // lib.optionalAttrs (cfg.relay.username != null) {
+              auth = {
+                username = cfg.relay.username;
+                secret = credentialMacro "mail-server-relay";
+              };
+            };
+
+            # Route expression. IfBlocks need INDEXED keys (live spike in the
+            # README ledger: a bare if/then fails to parse) and `else` must
+            # sort after `if`. Shape mirrors the v0.15.5 built-in default
+            # (is_local_domain -> 'local', else -> 'mx') with the relay
+            # id replacing 'mx'.
+            strategy.route = {
+              "1" = {
+                if = "is_local_domain('*', rcpt_domain)";
+                then = "'local'";
+              };
+              "2" = {
+                else = "'${cfg.relay.routeId}'";
+              };
+            };
+          };
+        })
+      ];
     };
 
     # The module owns the listener contract, so it owns the firewall ports
