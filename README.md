@@ -470,7 +470,8 @@ json/yaml/markdown.
   the principal's email addresses: a principal named `catchall` with email
   `catchall@example.test` cannot log in as the email address, only as
   `catchall` (accounts whose name IS their address never trip this).
-- NIXPKGS BUG (workaround shipped 2026-09-15): with
+- NIXPKGS BUG (workaround shipped 2026-09-15; filed upstream as
+  NixOS/nixpkgs#563651): with
   `provision.elasticsearch = false`, the parsedmarc module's settings
   submodule still MATERIALIZES `elasticsearch.cert_path` (types.path,
   defaults to the CA bundle) and `.ssl` (types.bool, defaults false).
@@ -486,7 +487,8 @@ json/yaml/markdown.
   (`elasticsearch.ssl`/`.cert_path` defaults pass the same
   `lib.filterAttrsRecursive` null/[]/{} filter), so the issue is still live
   upstream, not stale.
-- NIXPKGS BUG (workaround shipped 2026-09-15): on this rev the NixOS
+- NIXPKGS BUG (workaround shipped 2026-09-15; filed upstream as
+  NixOS/nixpkgs#563652): on this rev the NixOS
   python scope resolves imapclient 3.1.0 for parsedmarc, and 3.1.0 is
   incompatible with python 3.14 (the VM's interpreter): its
   `IMAP4WithTimeout.open()` assigns `self.file`, a read-only property

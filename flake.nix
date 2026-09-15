@@ -38,9 +38,16 @@
     checks = forAllSystems (
       system: let
         pkgs = nixpkgs.legacyPackages.${system};
-        # NixOS VM tests only run reliably on x86_64-linux (aarch64 VM test
-        # has never been executed here and is a known trap); the pure-eval
-        # contract test is arch-independent.
+        # NixOS VM tests only run reliably on x86_64-linux. MEASURED
+        # 2026-09-15 (one emulated stalwart-e2e attempt on an x86 host with
+        # qemu-aarch64 binfmt): the aarch64 guest BUILDS and BOOTS fine
+        # (arm64 kernel + systemd reach userspace), but TCG emulation is so
+        # slow that boot alone (~6 min) exceeds the test driver's
+        # shell-connect timeout, and a full E2E (cert generation + the
+        # ~131 s of DNS-less resolver stalls) would run well over an hour.
+        # Decision: documented-manual - NOT worth CI time; anyone porting to
+        # aarch64 re-runs it on real ARM hardware. The pure-eval contract
+        # test below is arch-independent and runs everywhere.
         checks =
           {
             dmarc-eval = import ./tests/dmarc-eval.nix {inherit nixpkgs system;};

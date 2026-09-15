@@ -354,11 +354,13 @@ in
       tls.wait_for_unit("parsedmarc.service")
 
       with subtest("TLS variant: report collected over IMAPS 993"):
-          # The runtime ini must carry the production shape: ssl=true on
-          # port 993, and NO skip_certificate_verification escape hatch
-          # (mailsuite then verifies chain + hostname via its default
-          # context against the machine-trusted fixture cert).
-          tls.succeed("grep -q '^ssl=true$' /run/parsedmarc/parsedmarc.ini")
+          # The runtime ini must carry the production shape: ssl=True on
+          # port 993 (the module's ini generator renders bools Python-style,
+          # "True"/"False" - parsedmarc.nix mkValueString), and NO
+          # skip_certificate_verification escape hatch (mailsuite then
+          # verifies chain + hostname via its default context against the
+          # machine-trusted fixture cert).
+          tls.succeed("grep -q '^ssl=True$' /run/parsedmarc/parsedmarc.ini")
           tls.succeed("grep -q '^port=993$' /run/parsedmarc/parsedmarc.ini")
           tls.succeed(
               "! grep -q 'skip_certificate_verification' /run/parsedmarc/parsedmarc.ini"
