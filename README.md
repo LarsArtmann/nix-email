@@ -465,6 +465,28 @@ json/yaml/markdown.
   `catchall`. Accounts created by the webadmin never trip this because
   their name IS their address - a scripting/API-created account with a
   non-address name must be probed by name.
+- SIEVE/JUNK-FILING architecture in 0.15.5 (source-verified 2026-09-15
+  against the pinned store source, while implementing wrapper-owned Junk
+  filing - it is NOT implementable via settings):
+  - Settings keys exist (`sieve.trusted.scripts.<id>.contents`,
+    `sieve.untrusted.scripts.<id>.contents`; crates/common/src/config/
+    scripts.rs `Scripting::parse`) - but the TRUSTED runtime is built with
+    `.without_capabilities([FileInto, Mailbox, ...])` (same file), so a
+    settings script can NEVER file a message anywhere.
+  - Delivery-time sieve runs ONLY the recipient account's ACTIVE script
+    fetched from the STORE (crates/email/src/message/delivery.rs:
+    `sieve_script_get_active(account_id)`; `None` -> plain INBOX ingest -
+    which is why GTUBE mail lands in INBOX).
+  - Settings-defined UNTRUSTED scripts are include-libraries for user
+    scripts (crates/email/src/sieve/ingest.rs:187), not entry points.
+  - `X-Spam-Status` is added at ingest from the SMTP-session spam verdict
+    (crates/email/src/message/ingest.rs:319).
+  - No OSS management-API endpoint sets an account's active sieve script
+    (JMAP per-account, or the enterprise webadmin) - the OSS CLI has no
+    sieve subcommand either.
+  Consequence: Junk filing on this pin is per-account (webmail-managed
+  sieve or per-account JMAP automation), not declarable from the wrapper.
+  Revisit if 0.16+ grows server-side filing.
 
 ## Non-goals
 

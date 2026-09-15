@@ -122,12 +122,13 @@ any repo; they are Lars's calls.
    Stalwart doctrine? Arguable either way (declarative drift vs operational
    simplicity).
 6. **Spam/Junk ownership:** 0.15.5 tags spam (`X-Spam-Status`) but never files
-   it to Junk. Options: (a) this wrapper ships a declarative sieve for all
-   accounts (the GTUBE subtest then upgrades to assert real Junk filing),
-   (b) the consumer layer (SystemNix) owns the sieve, (c) tag-only, documented
-   as the end state. This decides a product behavior, the test contract, and
-   whether the mailsuite STARTTLS note should also propose a
-   disable-auto-STARTTLS knob upstream. Status 2026-09-15: the user's answer
-   narrowed it to "in nix-email or not" - recommendation on the table is
-   (a) wrapper-owned (the spam/GTUBE test infrastructure lives here and any
-   consumer then gets consistent Junk behavior); awaiting the final call.
+   it to Junk. The 2026-09-15 answer "wrapper-owned" hit a source-verified
+   wall: settings-defined sieve scripts CANNOT fileinto in 0.15.5 (trusted
+   runtime drops FileInto; delivery runs only the per-account active script
+   from the store - README ledger). Revised options: (a) per-account JMAP
+   provisioning automation in the wrapper (heavy, couples to account
+   lifecycle - adjacent to open question 5), (b) user/webmail-managed sieve
+   per account (zero wrapper code, manual per account), (c) tag-only as the
+   documented end state, (d) upstream feature request for declarative
+   server-side filing and revisit on 0.16+. Recommendation: (c) now + (d)
+   as the path to (a) later; awaiting the final call.

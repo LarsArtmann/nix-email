@@ -87,6 +87,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   `(sendEmail)` paren slip in `tests/parsedmarc-e2e.nix` was the proof it
   could. NOTE: bare `nix fmt` dies on alejandra 4.0.0 (stdin mode) - the
   invocation is `nix fmt .` (AGENTS documents it)
+- Verified-facts ledger: the 0.15.5 sieve/Junk-filing architecture entry
+  (settings scripts cannot `fileinto`; delivery runs only the per-account
+  active script from the store) - source-verified while implementing the
+  wrapper-owned Junk filing the user had chosen; the finding overturned the
+  settings-based plan and the decision is re-posed in ROADMAP open question 6
+- License CONFIRMED as MIT by the user (2026-09-15, after an intermediate
+  rejection); `LICENSE` stands as shipped
 
 ### Changed
 
