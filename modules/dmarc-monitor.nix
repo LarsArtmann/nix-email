@@ -26,6 +26,7 @@
 {
   config,
   lib,
+  pkgs,
   ...
 }: let
   cfg = config.services.dmarc-monitor;
@@ -111,6 +112,27 @@ in {
       RestrictRealtime = lib.mkDefault true;
       RestrictSUIDSGID = lib.mkDefault true;
       SystemCallArchitectures = lib.mkDefault "native";
+      # WORKAROUND (nixpkgs bug, README ledger 2026-09-15): with
+      # provision.elasticsearch = false the module's settings submodule
+      # still materializes elasticsearch.cert_path (types.path, defaults
+      # to the CA bundle) and .ssl (types.bool); both survive the module's
+      # null/[]/{} filter, so the rendered ini carries an [elasticsearch]
+      # section WITHOUT hosts and parsedmarc 11 refuses to start
+      # ("hosts setting missing from the elasticsearch config section",
+      # cli.py ConfigurationError). Neither key can be nulled through the
+      # option types, so strip the section from the RENDERED ini after the
+      # module's own ExecStartPre. Guarded: a real [elasticsearch] (ES
+      # provisioned) must survive.
+      ExecStartPre = lib.mkIf (!config.services.parsedmarc.provision.elasticsearch) (
+        lib.mkAfter [
+          (pkgs.writeShellScript "parsedmarc-strip-elasticsearch-section" ''
+            ${pkgs.gawk}/bin/awk '/^\\[/{keep = ($0 != "[elasticsearch]")} keep' \
+              /run/parsedmarc/parsedmarc.ini > /run/parsedmarc/parsedmarc.ini.tmp
+            ${pkgs.coreutils}/bin/mv /run/parsedmarc/parsedmarc.ini.tmp \
+              /run/parsedmarc/parsedmarc.ini
+          '')
+        ]
+      );
     };
   };
 }
