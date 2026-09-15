@@ -297,6 +297,26 @@ json/yaml/markdown.
   write, which fails on root-owned /var/lib without `StateDirectory`
   (verified 2026-09-15 against parsedmarc.nix + parsedmarc/__init__.py:3478;
   the wrapper now sets StateDirectory).
+- `mkDefault` lists on `networking.firewall.allowedTCPPorts` are silently
+  dropped (ROOT-CAUSED 2026-09-15, closing the 2026-09-14 symptom-only
+  entry): `lib/modules.nix filterOverrides'` keeps only numerically-lowest
+  priority definitions - lists concat WITHIN a tier, never across - and base
+  nixpkgs ships unconditional `[]` defs at priority 100 on that option from
+  modules whose services are DISABLED: podman `network-socket.nix:95`
+  (`lib.optional (enable && openFirewall) port`) and `udp-over-tcp.nix:276`
+  (`getFirewallPorts`). Verified via
+  `options.<name>.definitionsWithLocations` (the debugging tool for any
+  "where did my definition go" mystery) plus a priority bisect (100
+  survives, 101 drops). The `lib.optional`-instead-of-`mkIf` shape is the
+  upstream anti-pattern: `mkIf false` contributes NO definition, an
+  evaluated `[]` still wins its priority tier. `services.openssh.ports` has
+  no such base def, which is why mkDefault works fine there.
+- Dovecot 2.4 (this nixpkgs pin) ASSERTS on explicit
+  `dovecot_config_version`/`dovecot_storage_version` - and nixpkgs'
+  parsedmarc `provision.localMail` enables dovecot2 WITHOUT them (also
+  still uses the renamed `services.dovecot2.protocols`, warning-only).
+  Any localMail consumer must pin both versions itself
+  (`tests/parsedmarc-e2e.nix` does; found 2026-09-15).
 
 ## Non-goals
 

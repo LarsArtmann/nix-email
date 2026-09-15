@@ -1,0 +1,43 @@
+direction: down
+
+operator: Lars (SystemNix maintainer) {shape: person}
+
+systemnix: SystemNix consumer host (out of this repo's scope, wrapper layer) {
+  sops: sops-nix secrets + templates (relay password, DMARC IMAP password)
+  caddy: Caddy reverse proxy (protected vhost + TLS)
+  gatus: Gatus health checks (SMTP/IMAP/HTTP probes)
+  alerting: systemd onFailure -> Discord webhook
+  backup: backup-coordination (restic over /var/lib/stalwart + reports)
+  ports: ports.nix (firewall ownership)
+  stalwart: nix-email flake input -> services.mail-server + services.dmarc-monitor
+}
+
+stalwart: Stalwart 0.15.5 {
+  listeners: 25 / 587 / 465 / 993 (public) + 8080 (loopback)
+  store: RocksDB mail store {shape: cylinder}
+  acme: ACME (dns-01 wildcard) + manual cert fallback
+  relay_route: queue.strategy.route -> smarthost
+}
+
+resend: smtp.resend.com (authenticated smarthost) {shape: cloud}
+dns_provider: DNS zone (MX, SPF, DKIM, DMARC, TLS-RPT, _dmarc rua) {shape: cloud}
+prometheus: Prometheus + Gatus scrape targets {shape: person}
+discord: Discord ops channel {shape: cloud}
+restic: Encrypted offsite backup target {shape: cylinder}
+users: Mail clients (IMAPS/JMAP/submission) {shape: person}
+internet: Internet senders/verifiers {shape: cloud}
+
+operator -> systemnix: declares intent in Nix
+systemnix.sops -> systemnix.stalwart: templates render secrets to LoadCredential
+systemnix.ports -> systemnix.stalwart: firewall ports stay owned by the wrapper
+systemnix.stalwart -> stalwart: configures (wrapper defaults + overrides)
+internet -> stalwart.listeners: inbound MX + DMARC rua reports
+users -> stalwart.listeners: submission + IMAPS/JMAP
+stalwart.listeners -> systemnix.caddy: JMAP/webadmin via reverse proxy
+systemnix.caddy -> prometheus: /metrics/prometheus scrape route
+stalwart.relay_route -> resend: non-local delivery (reputation offload)
+stalwart.acme -> dns_provider: dns-01 challenges, zone records
+dns_provider -> stalwart.listeners: resolves this host's own records
+systemnix.gatus -> stalwart.listeners: probes; on failure
+systemnix.alerting -> discord: page on onFailure
+systemnix.backup -> restic: nightly store + report-sink snapshots
