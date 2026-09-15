@@ -437,7 +437,7 @@ json/yaml/markdown.
   Revert when nixpkgs ships an imapclient compatible with 3.14's
   imaplib.
 - mailsuite (parsedmarc's IMAP layer) AUTO-ACTIVATES STARTTLS whenever the
-  server advertises the capability (mailsuite/imap.py: `if not ssl and
+  server advertises the capability (mailsuite/imap.py:284: `if not ssl and
   b"STARTTLS" in self.capabilities()`). A dovecot that advertises STARTTLS
   without usable certificate material therefore breaks plaintext-IMAP
   consumers with `SSL: WRONG_VERSION_NUMBER` at connect - the VM's
