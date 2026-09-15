@@ -412,6 +412,19 @@ json/yaml/markdown.
   the principal's email addresses: a principal named `catchall` with email
   `catchall@example.test` cannot log in as the email address, only as
   `catchall` (accounts whose name IS their address never trip this).
+- NIXPKGS BUG (workaround shipped 2026-09-15): with
+  `provision.elasticsearch = false`, the parsedmarc module's settings
+  submodule still MATERIALIZES `elasticsearch.cert_path` (types.path,
+  defaults to the CA bundle) and `.ssl` (types.bool, defaults false).
+  Both survive the module's null/[]/{} config filter, so the rendered ini
+  carries `[elasticsearch]` with no `hosts` - and parsedmarc 11 raises
+  "hosts setting missing from the elasticsearch config section"
+  (ConfigurationError, exit 255) at start. Neither key can be nulled
+  through its option type, so `modules/dmarc-monitor.nix` strips the
+  section from the RENDERED ini via a guarded `ExecStartPre` (only while
+  ES is off); `tests/dmarc-eval.nix` asserts the workaround stays wired.
+  Upstream-able: the module should not emit the section when ES is not
+  provisioned.
 - IMAP/IMAPS LOGIN resolves by principal NAME (VM-verified 2026-09-15 via
   curl-imaps probe): a principal named `catchall` with email
   `catchall@example.test` CANNOT log in as the email address, only as

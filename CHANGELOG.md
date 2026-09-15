@@ -65,6 +65,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- parsedmarc unit fails to start with parsedmarc 11 ("hosts setting
+  missing from the elasticsearch config section"): nixpkgs' module
+  materializes a host-less `[elasticsearch]` section (cert_path + ssl
+  survive the empty filter) even with `provision.elasticsearch = false`.
+  The wrapper now strips that section from the rendered ini (guarded:
+  only while ES is off), and `dmarc-eval` asserts the workaround
+  (README ledger entry; upstream-able)
 - `dmarc-eval` encoded the wrong `_secret` contract: the nixpkgs ini
   generator requires an absolute path STRING (`isString` gate) and throws on
   path values - a real host unit would have failed to build its config. The

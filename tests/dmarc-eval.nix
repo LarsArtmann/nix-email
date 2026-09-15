@@ -54,6 +54,14 @@
     inherit parsedmarcVersion;
   };
 
+  # Regression guard for the [elasticsearch]-section workaround (README
+  # ledger 2026-09-15): the unit's LAST ExecStartPre must be the strip
+  # script - if nixpkgs changes the unit shape or the workaround is
+  # removed, this fails loudly instead of crashing parsedmarc at start.
+  stripScript = builtins.readFile (
+    lib.last cfg.systemd.services.parsedmarc.serviceConfig.ExecStartPre
+  );
+
   versionOk = lib.versionAtLeast parsedmarcVersion "11";
 in
   assert versionOk || throw "dmarc-monitor contract is verified against parsedmarc >= 11 (got ${parsedmarcVersion}) - re-verify the [imap]/_secret/output semantics before touching the floor.";
@@ -61,8 +69,8 @@ in
       name = "dmarc-eval";
       system = system;
       PATH = "${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin";
-      passAsFile = ["rendered"];
-      inherit rendered;
+      passAsFile = ["rendered" "stripScript"];
+      inherit rendered stripScript;
       builder = "/bin/sh";
       args = [
         "-c"
@@ -73,6 +81,8 @@ in
           grep -q '"geoIp":false' "$renderedPath"
           grep -q '"_secret":"/nix/store' "$renderedPath"
           grep -q '"stateDirectory":"parsedmarc"' "$renderedPath"
+          grep -q '"\\[elasticsearch\\]"' "$stripScriptPath"
+          grep -q 'keep' "$stripScriptPath"
           touch "$out"
         ''
       ];
