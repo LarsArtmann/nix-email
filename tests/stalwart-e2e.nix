@@ -31,9 +31,10 @@
 #  15. Account quota: `quota` (bytes) on a principal makes delivery RETRY
 #      forever with "Mailbox over quota." (crates/email/src/message/
 #      delivery.rs:223) - message accepted at SMTP time, never ingested
-#  16. Spam classification: a GTUBE subject is filed to the Junk mailbox,
-#      not INBOX (v0.15.5 ships the GTUBE rule; default session.data.
-#      spam-filter = true)
+#  16. Spam classification: a GTUBE body message gets X-Spam-Status: Yes
+#      and is STILL delivered to INBOX (VM-verified 2026-09-15: the default
+#      filter scans authenticated submission but does NO Junk filing;
+#      Junk routing is consumer sieve territory - README ledger)
 #  17. Negative-cache expiry: a domain poisoned by a pre-provision probe
 #      becomes deliverable locally again within the configured
 #      directoryCacheTtlNegative (the 1h-trap regression guard)
@@ -264,7 +265,6 @@ in
         imapProbe
         imapHeaderProbe
         imapAbsentProbe
-        imapJunkProbe
       ];
 
       virtualisation.memorySize = 2048;
@@ -493,18 +493,24 @@ in
               "imap-absent-probe needle-quota-9e3b user3@example.test testpass 21"
           )
 
-      with subtest("spam: GTUBE subject is filed to Junk, not INBOX"):
+      with subtest("spam: GTUBE message gets X-Spam-Status (no auto-Junk filing)"):
+          # GTUBE rides the BODY (the canonical vector - the rule does not
+          # match subject-only text). VM-verified defaults 2026-09-15: the
+          # filter scans authenticated submission too, tags X-Spam-Status,
+          # and delivers to INBOX; no server-side Junk filing (README
+          # ledger has the experiment - filing would be consumer sieve
+          # territory).
           machine.succeed(
               "swaks --timeout 120 --server 127.0.0.1:587 --tls --auth PLAIN "
               "--auth-user user1@example.test --auth-password testpass "
               "--from user1@example.test --to user2@example.test "
-              "--header 'Subject: XJS*C4JDBQADN1.NSBN3*2IDNEN*GTUBE-STANDARD-ANTI-UBE-TEST-EMAIL*C.34X' "
-              "--body 'needle-junk-5f7c' "
+              "--header 'Subject: spamcheck-gtube' "
+              "--body 'XJS*C4JDBQADN1.NSBN3*2IDNEN*GTUBE-STANDARD-ANTI-UBE-TEST-EMAIL*C.34X needle-junk-5f7c' "
               "> /tmp/swaks-junk.log 2>&1"
           )
           machine.succeed("cat /tmp/swaks-junk.log >&2")
           machine.succeed("! grep -q '<\\*\\*' /tmp/swaks-junk.log")
-          machine.succeed("imap-junk-probe needle-junk-5f7c")
+          machine.succeed("imap-header-probe needle-junk-5f7c 'X-Spam-Status'")
 
       with subtest("restart persistence: INBOX survives, admin stays locked"):
           machine.succeed("systemctl restart stalwart.service")

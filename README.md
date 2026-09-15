@@ -65,7 +65,7 @@ stalwart.queue -> internet.mx_senders: direct-to-MX when relay = null
 stalwart.queue -> relay: non-local mail when services.mail-server.relay set
 stalwart.smtp_in -> stalwart.store: local delivery
 stalwart.directory -> stalwart.store: principal/domain lookups
-stalwart.spam -> stalwart.store: files Junk via GTUBE/rules
+stalwart.spam -> stalwart.store: tags X-Spam-Status (GTUBE/rules); INBOX by default, no auto-Junk filing
 stalwart.dkim -> stalwart.queue: signs outbound
 stalwart.acme -> letsencrypt: issues certificates
 stalwart.smtp_in -> dns: SPF/DNSBL/DKIM lookups
@@ -401,6 +401,17 @@ json/yaml/markdown.
   part deliverable - `RCPT TO:<nobody@example.test>` then answers
   `250 2.1.5 OK` and any "unknown recipient rejected 5xx" assertion fails.
   Create the catch-all principal AFTER the rejection probe (the E2E does).
+- Spam filter DEFAULTS (VM-verified 2026-09-15 via GTUBE experiment): the
+  built-in rule filter scans authenticated submission on 587 too, adds
+  `X-Spam-Status` (GTUBE in the BODY triggers; subject-only text does not
+  match the rule), and STILL delivers to INBOX. There is NO server-side
+  auto-filing into the Junk mailbox in 0.15.5 - routing spam to Junk is a
+  sieve/consumer concern. Journal noise to expect: "Spam classifier model
+  not found" (the statistical classifier has no trained model; the rule
+  engine works without it). IMAP LOGIN resolves by principal NAME, not by
+  the principal's email addresses: a principal named `catchall` with email
+  `catchall@example.test` cannot log in as the email address, only as
+  `catchall` (accounts whose name IS their address never trip this).
 - IMAP/IMAPS LOGIN resolves by principal NAME (VM-verified 2026-09-15 via
   curl-imaps probe): a principal named `catchall` with email
   `catchall@example.test` CANNOT log in as the email address, only as

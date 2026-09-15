@@ -45,7 +45,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   email-server, nix-flake)
 - `stalwart-e2e` delivery-behavior subtests: alias (second `emails` entry)
   and catch-all delivery, over-quota message accepted at SMTP but never
-  delivered, GTUBE message filed to Junk (not INBOX), and the
+  delivered, GTUBE spam detection (X-Spam-Status tagging; v0.15.5 files NO
+  Junk folder by default - ledger entry), and the
   negative-cache poisoning + low-TTL recovery regression pair
   (`directoryCacheTtlNegative = 5` in the test)
 - `parsedmarc-e2e` VM test fixes for the Dovecot 2.4 pin: explicit

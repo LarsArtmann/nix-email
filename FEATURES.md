@@ -50,7 +50,7 @@
 
 | Feature                      | Status                | Notes                                                                                                        |
 | ---------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------ |
-| `stalwart-e2e` VM test       | 🟢 `FULLY_FUNCTIONAL` | Full path incl. provisioning API, 550 rejection, IMAPS fetch, DKIM, metrics, journal count, restart persistence, backup drill, alias + catch-all delivery, over-quota refusal-to-deliver, GTUBE Junk filing, negative-cache poisoning + low-TTL recovery |
+| `stalwart-e2e` VM test       | 🟢 `FULLY_FUNCTIONAL` | Full path incl. provisioning API, 550 rejection, IMAPS fetch, DKIM, metrics, journal count, restart persistence, backup drill, alias + catch-all delivery, over-quota refusal-to-deliver, GTUBE spam tagging (X-Spam-Status; no auto-Junk filing), negative-cache poisoning + low-TTL recovery |
 | `stalwart-relay-e2e` VM test | 🟢 `FULLY_FUNCTIONAL` | Two-node smarthost relay path (stalwart → Mailpit) + local-routing non-leak assertion                         |
 | `parsedmarc-e2e` VM test     | 🟢 `FULLY_FUNCTIONAL` | Dovecot 2.4 config-version pins + unit-rename handling; parsedmarc unit runs against the local IMAP endpoint |
 | `dmarc-eval` contract test   | 🟢 `FULLY_FUNCTIONAL` | Pure eval, arch-independent; forces the parsedmarc ini generation + version floor guard                       |

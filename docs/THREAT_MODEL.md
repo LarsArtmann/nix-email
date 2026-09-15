@@ -89,7 +89,7 @@ template path string - see the ledger for the `_secret` string contract).
 | Probing the topology by mailing a not-yet-provisioned domain | Availability trap, not disclosure | The directory negatively caches `is_local_domain` misses for 1 h by default, misrouting later mail to the MX path (README ledger; the E2E carries a poisoning + low-TTL-recovery regression subtest). |
 | SSRF via relay targets | Refused for loopback | Upstream refuses loopback-resolving relay targets; the wrapper additionally rejects IP literals at eval (above). |
 | Anonymous admin API access, across restarts | 401 | Asserted in the E2E, including after `systemctl restart`. |
-| Spam into user mailboxes | Filtered | Stalwart spam filter enabled by the wrapper; the E2E asserts a GTUBE message files to Junk, not INBOX. |
+| Spam into user mailboxes | Tagged, not auto-filed | The GTUBE experiment (2026-09-15): 0.15.5 scans authenticated submission too and adds `X-Spam-Status`, but delivers spam to INBOX by default - Junk routing is consumer sieve territory. The E2E asserts the tagging contract. |
 | Secrets leaking through the Nix store or module system | Prevented by construction | All secrets are files (LoadCredential / sops) referenced via `%{file:...}%`; the wrapper declares path options only. |
 | Oversized mail exhausting storage | Bounded per-principal | Stalwart per-account quota; the E2E asserts an over-quota message is accepted at SMTP but never delivered (quota subtest). |
 
