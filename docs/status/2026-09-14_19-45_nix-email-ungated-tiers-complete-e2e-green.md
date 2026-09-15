@@ -158,5 +158,6 @@ are tracked elsewhere now: bounded work in `TODO_LIST.md` (SystemNix wrapper,
 two-node relay test, CI, cache/metrics/relay/cert options, aarch64 posture,
 LICENSE-blocked); the D-gated VPS/terraform/migration/monitoring tier in
 `ROADMAP.md` themes; D1/D2 and the license question in `ROADMAP.md` "Open
-questions". Section (d) and the process lessons in (e) are historical records
-of that session, deliberately left as written.
+questions". f/49 (auto-commit daemon policy) is a user-level call and stays
+unmarked here. Section (d) and the process lessons in (e) are historical
+records of that session, deliberately left as written.

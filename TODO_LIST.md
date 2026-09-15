@@ -49,13 +49,14 @@
 
 ## Low Impact
 
-| Task                                                                                                             | Status    | Impact | Effort | Evidence                                                                         |
-| ---------------------------------------------------------------------------------------------------------------- | --------- | ------ | ------ | -------------------------------------------------------------------------------- |
-| Extend E2E with quota, alias/catch-all, and Junk-delivery subtests (keep ONE VM test file - CI time budget)      | 🔴 `TODO` | Low    | 1h     | `docs/status/2026-09-14_19-39` f/14-16; `tests/stalwart-e2e.nix`                 |
-| Details-level journal assertion with curated benign-filter (resolver/pyzor/ASN lines)                            | 🔴 `TODO` | Low    | 30min  | `docs/status/2026-09-14_19-39` f/18; benign list partially in `README.md` ledger |
-| dmarc-eval: guard the `_secret`/`general.output` contract against nixpkgs pin moves (versionOlder on parsedmarc) | 🔴 `TODO` | Low    | 20min  | `tests/dmarc-eval.nix` assumes current option shapes                             |
-| parsedmarc service hardening suggestions (ProtectSystem etc. as mkDefaults)                                      | 🔴 `TODO` | Low    | 20min  | `modules/dmarc-monitor.nix` sets no hardening                                    |
-| d2 architecture diagram in README (hosts, flows, decisions)                                                      | 🔴 `TODO` | Low    | 30min  | `docs/planning/2026-09-14_18-37` H6.1                                            |
-| CONTRIBUTING note: how to add a verified-facts ledger bullet (source-path citation or VM observation date)       | 🔴 `TODO` | Low    | 15min  | `docs/status/2026-09-14_19-39` f/47; rules live only in README                   |
-| Renovate/dependabot for the nixpkgs input (must stay paired with SystemNix's lock - note in config)              | 🔴 `TODO` | Low    | 30min  | `AGENTS.md` convention states the pairing; no automation                         |
-| git-town.toml (match sibling-repo workflow)                                                                      | 🔴 `TODO` | Low    | 10min  | `docs/status/2026-09-14_17-05` f/32                                              |
+| Task                                                                                                              | Status    | Impact | Effort | Evidence                                                                         |
+| ----------------------------------------------------------------------------------------------------------------- | --------- | ------ | ------ | -------------------------------------------------------------------------------- |
+| Extend E2E with quota, alias/catch-all, and Junk-delivery subtests (keep ONE VM test file - CI time budget)       | 🔴 `TODO` | Low    | 1h     | `docs/status/2026-09-14_19-39` f/14-16; `tests/stalwart-e2e.nix`                 |
+| Regression VM test for the `is_local_domain` negative-cache ordering (guard against the poisoning fix regressing) | 🔴 `TODO` | Low    | 30min  | `docs/status/2026-09-14_19-45` f/12; root cause in `README.md` ledger            |
+| Details-level journal assertion with curated benign-filter (resolver/pyzor/ASN lines)                             | 🔴 `TODO` | Low    | 30min  | `docs/status/2026-09-14_19-39` f/18; benign list partially in `README.md` ledger |
+| dmarc-eval: guard the `_secret`/`general.output` contract against nixpkgs pin moves (versionOlder on parsedmarc)  | 🔴 `TODO` | Low    | 20min  | `tests/dmarc-eval.nix` assumes current option shapes                             |
+| parsedmarc service hardening suggestions (ProtectSystem etc. as mkDefaults)                                       | 🔴 `TODO` | Low    | 20min  | `modules/dmarc-monitor.nix` sets no hardening                                    |
+| d2 architecture diagram in README (hosts, flows, decisions)                                                       | 🔴 `TODO` | Low    | 30min  | `docs/planning/2026-09-14_18-37` H6.1                                            |
+| CONTRIBUTING note: how to add a verified-facts ledger bullet (source-path citation or VM observation date)        | 🔴 `TODO` | Low    | 15min  | `docs/status/2026-09-14_19-39` f/47; rules live only in README                   |
+| Renovate/dependabot for the nixpkgs input (must stay paired with SystemNix's lock - note in config)               | 🔴 `TODO` | Low    | 30min  | `AGENTS.md` convention states the pairing; no automation                         |
+| git-town.toml (match sibling-repo workflow)                                                                       | 🔴 `TODO` | Low    | 10min  | `docs/status/2026-09-14_17-05` f/32                                              |
