@@ -102,6 +102,14 @@ pkgs.testers.runNixOSTest {
     # "relay" rides on it.
     smtp.wait_until_succeeds("dig +short relay @127.0.0.1 | grep -q .", timeout=120)
 
+    # The self-signed certificate is generated asynchronously at first start
+    # and can take >80s in an entropy-poor VM - wait for a real TLS handshake
+    # so the STARTTLS submissions below cannot flake on cert timing.
+    smtp.wait_until_succeeds(
+        "echo | openssl s_client -connect 127.0.0.1:993 2>/dev/null | grep -q 'OK'",
+        timeout=180,
+    )
+
     with subtest("provision domain and sender account before any traffic"):
         # Same negative-cache discipline as the single-node E2E: provision
         # BEFORE any SMTP touches the domain.
@@ -137,17 +145,20 @@ pkgs.testers.runNixOSTest {
         )
 
     with subtest("local path: strategy still routes local domains locally"):
+        # nobody@example.test does NOT exist - local routing must answer with
+        # a 5xx recipient lookup failure (NOT a silent relay to Mailpit, and
+        # NOT an MX timeout). swaks exits non-zero on the 5xx, so run it with
+        # "|| true" and assert on the transcript (swaks marks error-response
+        # lines with "<**", success with "<-") - same pattern as the
+        # single-node E2E.
         smtp.succeed(
             "swaks --timeout 120 --server 127.0.0.1:587 --tls --auth PLAIN "
             "--auth-user user1@example.test --auth-password testpass "
             "--from user1@example.test --to nobody@example.test "
             "--header 'Subject: local-e2e' --body 'local-needle-3a7d' "
-            "> /tmp/swaks-local.log 2>&1"
+            "> /tmp/swaks-local.log 2>&1 || true"
         )
         smtp.succeed("cat /tmp/swaks-local.log >&2")
-        # nobody@example.test does NOT exist - local routing must answer with
-        # a 5xx recipient lookup failure (NOT a silent relay to Mailpit, and
-        # NOT an MX timeout).
         smtp.succeed("grep -E '(<-|<\\*\\*) *5[0-9][0-9]' /tmp/swaks-local.log")
         smtp.succeed(
             "! curl -fsS http://relay:8025/api/v1/messages | grep -q 'local-needle-3a7d'"
