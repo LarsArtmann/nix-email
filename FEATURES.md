@@ -27,7 +27,7 @@
 | RFC listener set (25/587/465/993 + loopback http) | 🟢 `FULLY_FUNCTIONAL` | `modules/mail-server.nix:91-120`; SMTP dialogue + IMAPS asserted in `tests/stalwart-e2e.nix`           |
 | FQDN hostname assertion                     | 🟢 `FULLY_FUNCTIONAL`     | `modules/mail-server.nix:71-76`; eval-time assertion                                                   |
 | Self-signed TLS bootstrap default            | 🟢 `FULLY_FUNCTIONAL`     | `certificate.self-signed = true` default; IMAPS handshake exercised in the E2E test                    |
-| Firewall opens exactly the public ports (25/465/587/993, never the loopback admin port) | 🟢 `FULLY_FUNCTIONAL` | `modules/mail-server.nix:125-136`; `openFirewall = false` + explicit list (eval-verified 2026-09-14) |
+| Firewall opens exactly the public ports (25/465/587/993, never the loopback admin port) | 🟢 `FULLY_FUNCTIONAL` | `modules/mail-server.nix:125-136`; `openFirewall = false` + explicit list (eval-verified 2026-09-15) |
 | Full delivery path (provision → submission 587 → INBOX → IMAPS fetch) | 🟢 `FULLY_FUNCTIONAL` | End-to-end in `tests/stalwart-e2e.nix` ("submission" subtest)                          |
 | Outbound smarthost relay (Resend)           | 🟡 `PARTIALLY_FUNCTIONAL` | Verified config keys documented in README ledger (local spike 2026-09-14); no wrapper option, no VM E2E |
 | Metrics / Prometheus endpoint               | 🟡 `PARTIALLY_FUNCTIONAL` | Keys + endpoint source-verified (`README.md` ledger); no wrapper option, no assertion                   |

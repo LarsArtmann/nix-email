@@ -22,6 +22,9 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
   dir first: `-o` requires an EXISTING directory). The driver's python runs
   on the HOST - anything touching VM ports must be a packaged script or a
   machine.succeed("...") command, never host-side socket code.
+- Gate commands never wear pipes (`cmd | tail` can print PASSED on a failing
+  run); test assertions are transcribed from observed transcripts, not from
+  expected output (the swaks `<**` vs `<-` lesson).
 
 ## Conventions
 

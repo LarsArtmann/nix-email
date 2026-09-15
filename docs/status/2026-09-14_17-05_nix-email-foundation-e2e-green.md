@@ -29,28 +29,28 @@
 | # | Item | Works now | Missing | Effort |
 | - | ---- | --------- | ------- | ------ |
 | 1 | dmarc-monitor validation | Module + eval contract green | Never ran against a real IMAP mailbox with real DMARC reports (needs the rua-mailbox decision, see g/1) | M |
-| 2 | Verified-facts ledger | 5 of 7 facts empirically proven (binary run / VM transcript / source read) | 2 explicitly UNVERIFIED and documented as such: Stalwart Prometheus scrape wiring, Resend smarthost `queue.*` keys | M |
-| 3 | Git history | Tree complete + green | Split across **7 auto-daemon heuristic commits** + 1 explicit commit (`c2a0604` got only README+AGENTS — the daemon raced every earlier `git add`). Story fragmented; violates commit-per-task doctrine. My fault for batching at the end | S |
+| ~~2~~ | ~~Verified-facts ledger~~ done at `85ec2e8` | ~~5 of 7 facts empirically proven (binary run / VM transcript / source read)~~ | ~~2 explicitly UNVERIFIED and documented as such: Stalwart Prometheus scrape wiring, Resend smarthost `queue.*` keys~~ | ~~M~~ |
+| ~~3~~ | ~~Git history~~ **Won't implement — history stands - rewriting committed daemon history is forbidden.** | ~~Tree complete + green~~ | ~~Split across **7 auto-daemon heuristic commits** + 1 explicit commit (`c2a0604` got only README+AGENTS — the daemon raced every earlier `git add`). Story fragmented; violates commit-per-task doctrine. My fault for batching at the end~~ | ~~S~~ |
 | 4 | CI | Nothing | No `.github/workflows` at all (every sibling repo has nix-check) | M |
-| 5 | checks arch coverage | Defined for x86_64 + aarch64 | aarch64 `stalwart-e2e` **never executed** — if CI ever evaluates `--system aarch64-linux` it runs a slow TCG VM test. Restrict to x86_64 | S |
+| ~~5~~ | ~~checks arch coverage~~ done at `8bfddfe` | ~~Defined for x86_64 + aarch64~~ | ~~aarch64 `stalwart-e2e` **never executed** — if CI ever evaluates `--system aarch64-linux` it runs a slow TCG VM test. Restrict to x86_64~~ | ~~S~~ |
 
 ## c) NOT STARTED
 
 1. **VPS host** — NixOS system entry, Hetzner provisioning (domains-repo cloud-init path), rDNS/PTR, real ACME TLS replacing self-signed
-2. **Resend smarthost outbound** from Stalwart (keys unverified, see b/2)
-3. **Stalwart admin bootstrap automation** — the first-run web wizard is interactive; no provisioning oneshot exists
+2. **Resend smarthost outbound** from Stalwart (~~keys unverified, see b/2~~ keys VERIFIED 2026-09-14, README ledger + `c927922`)
+3. ~~**Stalwart admin bootstrap automation** — the first-run web wizard is interactive; no provisioning oneshot exists~~ done (fallback-admin + POST /api/principal recipe verified, used by the E2E test; VPS oneshot in ROADMAP)
 4. **Terraform `stalwart-mail` module** in domains repo: MX, SPF, DKIM, DMARC-with-rua, MTA-STS, `_smtp._tls` TLS-RPT
 5. **SystemNix consumer wrapper**: flake input, `lib/ports.nix`, sops templates, onFailure→Discord, Gatus entries, homepage tile, backup-coordination
 6. **Gatus starttls/tls/cert-expiry checks** (YAML drafted in README, not deployed)
 7. **Mailbox migration** (imapsync 2.314 in nixpkgs) + dual-MX rollback window
 8. **DMARC ladder** (none→quarantine→reject) driven by parsedmarc data — closes domains findings H1/H2
-9. **Backup/DR**: btrfs snapshot + borg pull to evo-x2 pool; recovery age key in the sops key group
+9. ~~**Backup/DR**: btrfs snapshot + borg pull to evo-x2 pool; recovery age key in the sops key group~~ done (native --export verified, README ledger; VPS backup unit in ROADMAP)
 10. **Downstream consumers**: InboxClean (Gmail→JMAP/IMAP spike), Paperless mail accounts (kill Gmail app passwords), smartd remote-alert path (currently rides the mail relay — circular-dependency risk flagged in SystemNix gatus-config:1807)
 11. **Repo hygiene**: LICENSE, formatter (treefmt/alejandra/dprint), pre-commit, git-town.toml, Renovate
-12. **docs-health files**: TODO_LIST.md, FEATURES.md, ROADMAP.md, CHANGELOG.md — none exist
+12. ~~**docs-health files**: TODO_LIST.md, FEATURES.md, ROADMAP.md, CHANGELOG.md — none exist~~ done (docs-health pass 2026-09-15)
 13. **Tiny DMARC viewer** over the JSON/CSV (the report's gap #3)
 14. **PostgreSQL sink variant** (psycopg 3.3.4 override) — optional upgrade path
-15. **Mailpit devshell/CI app** for relay E2E tests (documented as "use nixpkgs directly", nothing wired)
+15. ~~**Mailpit devshell/CI app** for relay E2E tests (documented as "use nixpkgs directly", nothing wired)~~ **Won't implement — decided non-goal - README documents services.mailpit.instances directly.**
 
 ## d) TOTALLY FUCKED UP
 
@@ -72,22 +72,22 @@
 5. **Local-binary debug loop first** (run Stalwart in /tmp with a minimal config) — ~10× faster than the VM per config-key question; VM test remains the integration truth. Partially formalized in AGENTS.md.
 6. **Gate commands never wear pipes.**
 7. **Read source files to the end** — the monitoring report was read to line 500 of a longer file (references section skipped; no harm found, but completeness rule).
-8. **Clean up scratch state**: `/tmp/swtest` (config.toml + sqlite) still on disk from the cert-key experiment.
-9. **Deliberate arch scoping** for VM-test checks (see b/5).
+8. ~~**Clean up scratch state**: `/tmp/swtest` (config.toml + sqlite) still on disk from the cert-key experiment.~~ done (/tmp/swtest verified gone 2026-09-14)
+9. ~~**Deliberate arch scoping** for VM-test checks (see b/5).~~ done at `8bfddfe`
 
 ## f) Next tasks (ranked; 1–10 commit-worthy, 11+ are ROADMAP fuel)
 
 | # | Task | Impact | Effort | Cat |
 | - | ---- | ------ | ------ | --- |
 | 1 | Decide the Workspace fork (g/1) — gates the entire VPS build-out | Critical | S | Decision |
-| 2 | Verify Stalwart Prometheus/metrics scrape on a live instance (extend the /tmp loop or VM) then wire Gatus/system-health | High | S | Feature |
-| 3 | Determine + VM-test the Resend smarthost `queue.*` keys for 0.15.5 (ledger unverified-fact #2) | High | M | Feature |
-| 4 | Restrict `stalwart-e2e` to x86_64-linux (aarch64 TCG trap) | High | S | Bug |
+| 2 | ~~Verify Stalwart Prometheus/metrics scrape on a live instance (extend the /tmp loop or VM)~~ (verified, README ledger) then wire Gatus/system-health | High | S | Feature |
+| ~~3~~ | ~~Determine + VM-test the Resend smarthost `queue.*` keys for 0.15.5 (ledger unverified-fact #2)~~ done at `c927922` | ~~High~~ | ~~M~~ | ~~Feature~~ |
+| ~~4~~ | ~~Restrict `stalwart-e2e` to x86_64-linux (aarch64 TCG trap)~~ done at `8bfddfe` | ~~High~~ | ~~S~~ | ~~Bug~~ |
 | 5 | CI workflow: adapted nix-check.yml (flake check + input hygiene) | High | M | Quality |
-| 6 | docs-health BUILD: TODO_LIST/FEATURES/ROADMAP/CHANGELOG from this report | High | S | Docs |
-| 7 | LICENSE + visibility decision (g/3) | Medium | S | Cleanup |
+| ~~6~~ | ~~docs-health BUILD: TODO_LIST/FEATURES/ROADMAP/CHANGELOG from this report~~ done (docs-health pass 2026-09-15) | ~~High~~ | ~~S~~ | ~~Docs~~ |
+| 7 | ~~LICENSE + visibility decision (g/3)~~ visibility decided 2026-09-14 (repo public); LICENSE choice open, ROADMAP Q3 | Medium | S | Cleanup |
 | 8 | Formatter + pre-commit (treefmt/alejandra/statix/deadnix, match SystemNix) | Medium | S | Quality |
-| 9 | Delete `/tmp/swtest` | Low | S | Cleanup |
+| ~~9~~ | ~~Delete `/tmp/swtest`~~ done — /tmp/swtest verified gone 2026-09-14 | ~~Low~~ | ~~S~~ | ~~Cleanup~~ |
 | 10 | SystemNix flake input + consumer wrapper skeleton (after 7) | High | M | Feature |
 | 11 | VPS host NixOS entry + Hetzner provisioning via domains cloud-init path | Critical | L | Feature |
 | 12 | Real ACME TLS on VPS (replace self-signed default) | High | M | Feature |
@@ -100,7 +100,7 @@
 | 19 | parsedmarc live validation against a real rua mailbox | High | M | Quality |
 | 20 | DMARC ladder rollout plan driven by report data (closes domains H1/H2) | High | L | Ops |
 | 21 | dmarc VM test with dovecot + seeded DMARC report mail (beyond eval-only) | Medium | M | Quality |
-| 22 | Mailpit devshell app + relay E2E test usage | Medium | S | Feature |
+| ~~22~~ | ~~Mailpit devshell app + relay E2E test usage~~ **Won't implement — decided non-goal - README says use services.mailpit.instances directly.** | ~~Medium~~ | ~~S~~ | ~~Feature~~ |
 | 23 | InboxClean JMAP/IMAP spike (post-mailbox-migration) | Medium | L | Feature |
 | 24 | Paperless mail-account migration off Gmail app passwords | Medium | M | Ops |
 | 25 | smartd remote-alert path off the mail relay (break circular dependency) | Medium | S | Ops |
@@ -109,9 +109,9 @@
 | 28 | NixOS test for `httpBind` loopback enforcement (assert public bind rejected/warned) | Medium | S | Quality |
 | 29 | d2 architecture diagram in README | Low | S | Docs |
 | 30 | Renovate/dependabot for the nixpkgs input | Medium | S | Quality |
-| 31 | nixpkgs bump policy: pair with SystemNix lock; watch for module moving past 0.15.5 | Medium | S | Docs |
+| ~~31~~ | ~~nixpkgs bump policy: pair with SystemNix lock; watch for module moving past 0.15.5~~ done — AGENTS.md convention documents the SystemNix pairing | ~~Medium~~ | ~~S~~ | ~~Docs~~ |
 | 32 | git-town.toml | Low | S | Cleanup |
-| 33 | AGENTS.md: add "assertions from transcripts" + "no pipes on gates" rules | Low | S | Docs |
+| ~~33~~ | ~~AGENTS.md: add "assertions from transcripts" + "no pipes on gates" rules~~ done (docs-health pass 2026-09-15 (95d5dcb + this pass)) | ~~Low~~ | ~~S~~ | ~~Docs~~ |
 | 34 | Stalwart OIDC (Pocket ID) integration for the admin UI, if supported | Low | M | Feature |
 | 35 | Post-cutover: retire/keep decision documentation for the Resend-only path | Low | S | Docs |
 
@@ -119,10 +119,22 @@
 
 1. **Retire Google Workspace for the Stalwart VPS, or keep Workspace and run only the monitoring half?** This decides VPS scope, migration, cost, and availability risk. Nothing in any repo answers it (domains review Q-list leaves mailbox hosting untouched).
 2. **Where should the VPS live and what is the budget ceiling?** Which Hetzner project/account (the domains repo already runs a fixed-IP Hetzner cloud runner), CX22-class vs smaller, and whether backups pull to the evo-x2 pool or a StorageBox. Billing/infra placement is yours.
-3. **Is nix-email public (`github:LarsArtmann/nix-email`) or private (git+ssh)?** Decides the SystemNix input URL shape, CI auth path, and whether a LICENSE is needed. (A wrapper of AGPL Stalwart config is not relicensing, but the repo visibility call is yours.)
+3. ~~**Is nix-email public (`github:LarsArtmann/nix-email`) or private (git+ssh)?** Decides the SystemNix input URL shape, CI auth path, and whether a LICENSE is needed. (A wrapper of AGPL Stalwart config is not relicensing, but the repo visibility call is yours.)~~ done (answered 2026-09-14 - repo published PUBLIC; license choice still open, ROADMAP Q3)
 
 ---
 
 **Format note**: user requested `.md` explicitly; the status-report skill's canonical HTML format was overridden for this file only.
 
-_Point-in-time snapshot written 2026-09-14 17:05 CEST. Section (f) is the HARVEST input for a future docs-health run (this repo has no TODO_LIST.md yet — task #6)._
+_Point-in-time snapshot written 2026-09-14 17:05 CEST. Section (f) is the HARVEST input for a future docs-health run (~~this repo has no TODO_LIST.md yet — task #6~~ harvested 2026-09-14)._
+
+---
+
+## Resolution (2026-09-15, docs-health pass)
+
+The foundation items (a) all stand. Open items are no longer tracked here:
+D1/D2 and the license/runbook/provisioning questions live in `ROADMAP.md`
+("Open questions"); bounded work (CI, relay wrapper option, two-node relay
+test, SystemNix consumer, formatters, LICENSE) lives in `TODO_LIST.md`; the
+gated VPS/terraform/migration tier lives in `ROADMAP.md` themes. Sections (d)
+and the process lessons in (e) are historical records of that session and are
+deliberately left as written.
