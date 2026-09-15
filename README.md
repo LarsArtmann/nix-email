@@ -33,9 +33,20 @@ user decisions in [ROADMAP.md](ROADMAP.md).
   dialogue with unknown-recipient 550 rejection, implicit-TLS IMAPS greeting,
   loopback HTTP admin, declarative `fallback-admin` bootstrap, accounts via
   the management API, authenticated submission on 587 delivering into a real
-  INBOX fetched back over IMAPS, no panics.
+  INBOX fetched back over IMAPS, DKIM signing of the submission
+  (`DKIM-Signature` asserted on the stored message), Prometheus metrics
+  endpoint, journal-hygiene count (exactly the 2 known-benign config errors),
+  restart persistence, offline backup/restore drill (`--export`, wipe,
+  `--import`, message survives), no panics.
+- `stalwart-relay-e2e`: TWO-node VM - Stalwart with `relay` -> Mailpit
+  smarthost node. Non-local submission lands in Mailpit through the
+  generated `queue.route`/`queue.strategy.route`, local domains still
+  deliver locally (and never leak to the relay), relay hostname resolved via
+  dnsmasq (Stalwart's resolver ignores /etc/hosts).
 - `dmarc-eval`: eval-time contract - enables parsedmarc, heavy sinks off,
-  `general.output` lands, `_secret` password survives the option types.
+  `general.output` lands, `_secret` password survives the option types AND
+  the real ini generation (the unit's config render is forced, so a wrong
+  `_secret` shape fails here, not on a host).
 
 ## Module: `services.mail-server`
 
@@ -49,15 +60,39 @@ Enables nixpkgs `services.stalwart` with one RFC-compliant listener set:
 | 993                                 | imaps       | implicit TLS                                          |
 | httpBind (default `127.0.0.1:8080`) | http        | web admin / JMAP - reverse-proxy it, never expose raw |
 
-Options: `enable`, `hostname` (FQDN, asserted to contain a dot), `httpBind`,
-`stateVersion` (passed to the nixpkgs module, default `"26.11"`). Everything
+Options: `enable`, `hostname` (FQDN, asserted to contain a dot), `httpBind`
+(loopback default; a NixOS warning fires on non-loopback binds),
+`stateVersion`, `relay` (outbound smarthost, see below), `metrics.enable`
+(`/metrics/prometheus` on the HTTP listener), `directoryCacheTtlNegative`
+(kills the 1h negative-cache trap on dev/test hosts), and `certificate`
+(`self-signed | acme | manual` tier with completeness assertions). Everything
 else flows through `services.stalwart.settings` (all wrapper values are
-`mkDefault` - consumer settings win). Defaults set: listeners above and
-`certificate.self-signed = true` so implicit-TLS works out of the box
-(override with real certs/ACME on the VPS). Firewall: the wrapper opens
-exactly 25/465/587/993 (nixpkgs' `openFirewall` is off - it would also open
-the loopback admin port on every interface); consumer port lists merge
-additively.
+`mkDefault` - consumer settings win). Defaults set: listeners above and the
+self-signed certificate tier so implicit-TLS works out of the box. Firewall:
+the wrapper opens exactly 25/465/587/993 (nixpkgs' `openFirewall` is off -
+it would also open the loopback admin port on every interface); consumer
+port lists merge additively.
+
+### Outbound relay (`services.mail-server.relay`)
+
+null (default) = direct-to-MX. When set, non-local mail transits the
+smarthost - the wrapper generates `queue.route.<routeId>` +
+`queue.strategy.route` (IfBlock shape verified against the v0.15.5 source
+AND a live two-node VM test, `stalwart-relay-e2e`):
+
+```nix
+services.mail-server.relay = {
+  address = "smtp.resend.com"; # hostname REQUIRED - IP literals are refused
+  port = 587;                  # 587 = STARTTLS, 465 = implicit (tlsImplicit)
+  username = "resend";
+  secretFile = "/run/secrets/resend-smtp-password"; # LoadCredential + %{file:...}% macro
+};
+```
+
+Local-domain delivery is untouched (`is_local_domain` stays on the local
+queue). Relaying to loopback targets is refused by Stalwart (SSRF guard) and
+exercised by the two-node E2E; the auth-less form (`username = null`) is
+valid for trusted internal smarthosts.
 
 Outbound smarthost relaying (Stalwart -> Resend) is a per-host `settings`
 addition - the verified keys are in the ledger below (confirmed against the
@@ -133,6 +168,17 @@ Gatus checks for the VPS (on evo-x2, external viewpoint):
    age key, not only the VPS host key - a rebuilt VPS gets a new host key
    and would otherwise lose every secret (chicken-and-egg).
 
+## Platform support
+
+The VM tests gate `stalwart-e2e`/`stalwart-relay-e2e` to **x86_64-linux
+ONLY**. Nobody has ever executed them under qemu-aarch64 (slow-TCO trap
+noted in the flake); `dmarc-eval` is arch-independent and runs everywhere.
+ARM users: the modules themselves are arch-neutral Nix - only the VM test
+gate is missing - but treat aarch64 as untested until someone runs it.
+
+`nix fmt` (alejandra) formats all `.nix` files; dprint covers
+json/yaml/markdown.
+
 ## Verified-facts ledger (do not re-derive from memory)
 
 - nixpkgs `services.stalwart` runs **0.15.5**; `stalwart_0_16` exists but is
@@ -155,9 +201,12 @@ Gatus checks for the VPS (on evo-x2, external viewpoint):
   anyway (pure eval). Corrected 2026-09-15: an earlier phrasing here said
   "PATHS, not strings", which read as "path values" - it always meant
   "a path pointing at the secret file, given as a string".
-- swaks marks SMTP error-response lines with `<**`, success with `<-`; RCPT
-  policy checks (SPF/DNSBL) stall ~30 s per lookup in a DNS-less VM - tests
-  need `--timeout 120`.
+- swaks marks SMTP error-response lines with `<**`, success with `<-`, AND
+  (observed 2026-09-15, relay VM) a 550 RCPT refusal can arrive with the
+  `<~*` marker (its timeout-receive variant) - assert the marker set you
+  OBSERVED in the transcript, never the one you expected; tests need
+  `--timeout 120` because RCPT policy checks (SPF/DNSBL) stall ~30 s per
+  lookup in a DNS-less VM.
 - Two "Configuration build error" journal lines at startup in the DNS-less
   VM are BENIGN (details only visible via `journalctl -o verbose`):
   `resolver.type: no nameservers found in config` (nixpkgs module default
@@ -238,6 +287,16 @@ Gatus checks for the VPS (on evo-x2, external viewpoint):
 - Inbound auth defaults need NO config: SPF/DMARC/iprev verification only
   runs on port 25 (`local_port == 25` conditions), disabled on submission
   ports; DKIM verify is `relaxed` everywhere.
+- Stalwart's system resolver reads ONLY /etc/resolv.conf - it IGNORES
+  /etc/hosts (observed 2026-09-15, relay VM: dnsmasq on 127.0.0.1 bridging
+  /etc/hosts made `relay` resolvable; the NixOS test driver's /etc/hosts
+  injection alone did not). Same mechanism any VM test needs for hostname
+  relay targets.
+- The nixpkgs parsedmarc unit runs as a DynamicUser and prepares NO writable
+  state; parsedmarc 11.0.1 os.makedirs()es its output directory on first
+  write, which fails on root-owned /var/lib without `StateDirectory`
+  (verified 2026-09-15 against parsedmarc.nix + parsedmarc/__init__.py:3478;
+  the wrapper now sets StateDirectory).
 
 ## Non-goals
 

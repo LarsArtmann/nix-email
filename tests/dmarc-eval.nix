@@ -10,8 +10,7 @@
 {
   nixpkgs,
   system,
-}:
-let
+}: let
   pkgs = nixpkgs.legacyPackages.${system};
   lib = nixpkgs.lib;
 
@@ -55,25 +54,26 @@ let
     inherit parsedmarcVersion;
   };
 
-  versionOk = lib.versionAtLeast parsedmarcVersion "11";in
-assert versionOk || throw "dmarc-monitor contract is verified against parsedmarc >= 11 (got ${parsedmarcVersion}) - re-verify the [imap]/_secret/output semantics before touching the floor.";
-builtins.derivation {
-  name = "dmarc-eval";
-  system = system;
-  PATH = "${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin";
-  passAsFile = [ "rendered" ];
-  inherit rendered;
-  builder = "/bin/sh";
-  args = [
-    "-c"
-    ''
-      grep -q '"enabled":true' "$renderedPath"
-      grep -q '"output":"/var/lib/parsedmarc/reports"' "$renderedPath"
-      grep -q '"elasticsearch":false' "$renderedPath"
-      grep -q '"geoIp":false' "$renderedPath"
-      grep -q '"_secret":"/nix/store' "$renderedPath"
-      grep -q '"stateDirectory":"parsedmarc"' "$renderedPath"
-      touch "$out"
-    ''
-  ];
-}
+  versionOk = lib.versionAtLeast parsedmarcVersion "11";
+in
+  assert versionOk || throw "dmarc-monitor contract is verified against parsedmarc >= 11 (got ${parsedmarcVersion}) - re-verify the [imap]/_secret/output semantics before touching the floor.";
+    builtins.derivation {
+      name = "dmarc-eval";
+      system = system;
+      PATH = "${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin";
+      passAsFile = ["rendered"];
+      inherit rendered;
+      builder = "/bin/sh";
+      args = [
+        "-c"
+        ''
+          grep -q '"enabled":true' "$renderedPath"
+          grep -q '"output":"/var/lib/parsedmarc/reports"' "$renderedPath"
+          grep -q '"elasticsearch":false' "$renderedPath"
+          grep -q '"geoIp":false' "$renderedPath"
+          grep -q '"_secret":"/nix/store' "$renderedPath"
+          grep -q '"stateDirectory":"parsedmarc"' "$renderedPath"
+          touch "$out"
+        ''
+      ];
+    }

@@ -27,11 +27,9 @@
   config,
   lib,
   ...
-}:
-let
+}: let
   cfg = config.services.dmarc-monitor;
-in
-{
+in {
   options.services.dmarc-monitor = {
     enable = lib.mkEnableOption "DMARC/TLS-RPT report collection via parsedmarc (IMAP polling, JSON/CSV output, no search-stack dependency)";
 
@@ -47,7 +45,7 @@ in
 
     settings = lib.mkOption {
       type = lib.types.attrsOf lib.types.anything;
-      default = { };
+      default = {};
       example = lib.literalExpression ''
         {
           imap = {
@@ -96,7 +94,7 @@ in
       StateDirectory = lib.mkDefault "parsedmarc";
       # "-" prefix: the directory may not exist until parsedmarc's first
       # makedirs() - a missing path must not fail the unit at start.
-      ReadWritePaths = [ "-${cfg.outputDirectory}" ];
+      ReadWritePaths = ["-${cfg.outputDirectory}"];
     };
   };
 }

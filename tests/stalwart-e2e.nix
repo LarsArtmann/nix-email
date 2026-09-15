@@ -26,10 +26,7 @@
 # NOT covered (needs DNS + external relay creds): outbound smarthost relay
 # (see stalwart-relay-e2e), spam classification. Those stay live-host
 # go-live checks - see README verified-facts ledger for the keys.
-{
-  pkgs,
-}:
-let
+{pkgs}: let
   # Fixed salt => deterministic hash of "testpass" (sha512-crypt $6$,
   # the exact format the webadmin hashes account passwords with).
   testHash = "$6$StalwartTestSalt$gagC41V16GV6khfXMiraIyZLKuYDgSyRzVfM0TaSFNMRqkLewQ5d/b9Ns0uc1Rr4DWD15BxHHzh2XaC4ZAS97.";
@@ -71,7 +68,7 @@ let
   # polls IMAPS on loopback until a message containing the needle arrives
   # in user2's INBOX. Delivery is async (queue -> local delivery) and the
   # self-signed cert handshake can be slow on first connect.
-  imapProbe = pkgs.writers.writePython3Bin "imap-probe" { } ''
+  imapProbe = pkgs.writers.writePython3Bin "imap-probe" {} ''
     import imaplib
     import ssl
     import sys
@@ -113,7 +110,7 @@ let
   # carries a given header line in its header block (used for DKIM-Signature).
   # Finding the needle WITHOUT the header is definitive (headers are set at
   # queue time) - fail fast instead of polling.
-  imapHeaderProbe = pkgs.writers.writePython3Bin "imap-header-probe" { } ''
+  imapHeaderProbe = pkgs.writers.writePython3Bin "imap-header-probe" {} ''
     import imaplib
     import ssl
     import sys
@@ -161,13 +158,11 @@ let
     sys.exit(1)
   '';
 in
-pkgs.testers.runNixOSTest {
-  name = "stalwart-e2e";
+  pkgs.testers.runNixOSTest {
+    name = "stalwart-e2e";
 
-  nodes.machine =
-    { lib, ... }:
-    {
-      imports = [ ../modules/mail-server.nix ];
+    nodes.machine = {lib, ...}: {
+      imports = [../modules/mail-server.nix];
 
       services.mail-server = {
         enable = true;
@@ -204,160 +199,160 @@ pkgs.testers.runNixOSTest {
       virtualisation.memorySize = 2048;
     };
 
-  testScript = ''
-    import json
-    import re
+    testScript = ''
+      import json
+      import re
 
-    start_all()
+      start_all()
 
-    machine.wait_for_unit("stalwart.service", timeout=180)
-    machine.wait_for_open_port(25, timeout=60)
-    machine.wait_for_open_port(8080, timeout=60)
+      machine.wait_for_unit("stalwart.service", timeout=180)
+      machine.wait_for_open_port(25, timeout=60)
+      machine.wait_for_open_port(8080, timeout=60)
 
-    def create_principal(payload):
-        machine.succeed(
-            "curl -fsS -u admin:test-admin-secret -H 'Content-Type: application/json' "
-            "-X POST http://127.0.0.1:8080/api/principal -d '{}'".format(
-                json.dumps(payload)
-            )
-        )
+      def create_principal(payload):
+          machine.succeed(
+              "curl -fsS -u admin:test-admin-secret -H 'Content-Type: application/json' "
+              "-X POST http://127.0.0.1:8080/api/principal -d '{}'".format(
+                  json.dumps(payload)
+              )
+          )
 
-    def create_account(name):
-        # "roles": ["user"] is REQUIRED - without it the account authenticates
-        # but submission is refused with 550 5.7.1 "not authorized to use
-        # this service" (the webadmin adds it silently; observed live in VM).
-        create_principal({
-            "type": "individual",
-            "name": name,
-            "emails": [name],
-            "roles": ["user"],
-            "secrets": ["${testHash}"],
-        })
+      def create_account(name):
+          # "roles": ["user"] is REQUIRED - without it the account authenticates
+          # but submission is refused with 550 5.7.1 "not authorized to use
+          # this service" (the webadmin adds it silently; observed live in VM).
+          create_principal({
+              "type": "individual",
+              "name": name,
+              "emails": [name],
+              "roles": ["user"],
+              "secrets": ["${testHash}"],
+          })
 
-    # Provisioning MUST happen BEFORE any SMTP traffic: a MAIL FROM/RCPT to
-    # a not-yet-existing domain poisons the directory's is_local_domain
-    # NEGATIVE CACHE (default TTL 1h, crates/directory/src/core/cache.rs),
-    # and every later submission for that domain is then routed to the MX
-    # path instead of local delivery (observed in VM, 2026-09-14).
-    with subtest("management API: create domain and accounts"):
-        create_principal({"type": "domain", "name": "example.test"})
-        create_account("user1@example.test")
-        create_account("user2@example.test")
+      # Provisioning MUST happen BEFORE any SMTP traffic: a MAIL FROM/RCPT to
+      # a not-yet-existing domain poisons the directory's is_local_domain
+      # NEGATIVE CACHE (default TTL 1h, crates/directory/src/core/cache.rs),
+      # and every later submission for that domain is then routed to the MX
+      # path instead of local delivery (observed in VM, 2026-09-14).
+      with subtest("management API: create domain and accounts"):
+          create_principal({"type": "domain", "name": "example.test"})
+          create_account("user1@example.test")
+          create_account("user2@example.test")
 
-    with subtest("SMTP: full dialogue, unknown recipient rejected 5xx"):
-        # --timeout 120: the RCPT decision runs SPF/DNSBL checks whose
-        # resolver calls stall ~30s each in the DNS-less VM before failing
-        # (deterministic NXDOMAIN-timeout behavior, live-observed). The
-        # module defaults keep the DNS checks - a real MX should do them.
-        machine.succeed(
-            "swaks --timeout 120 --server 127.0.0.1:25 --ehlo probe.example.test --from probe@example.test --to nobody@example.test --quit-after RCPT > /tmp/swaks.log 2>&1 || true"
-        )
-        machine.succeed("cat /tmp/swaks.log >&2")
-        # swaks marks error-response lines with "<**" and success with "<-"
-        machine.succeed("grep -E '(<-|<\\*\\*) *5[0-9][0-9]' /tmp/swaks.log")
+      with subtest("SMTP: full dialogue, unknown recipient rejected 5xx"):
+          # --timeout 120: the RCPT decision runs SPF/DNSBL checks whose
+          # resolver calls stall ~30s each in the DNS-less VM before failing
+          # (deterministic NXDOMAIN-timeout behavior, live-observed). The
+          # module defaults keep the DNS checks - a real MX should do them.
+          machine.succeed(
+              "swaks --timeout 120 --server 127.0.0.1:25 --ehlo probe.example.test --from probe@example.test --to nobody@example.test --quit-after RCPT > /tmp/swaks.log 2>&1 || true"
+          )
+          machine.succeed("cat /tmp/swaks.log >&2")
+          # swaks marks error-response lines with "<**" and success with "<-"
+          machine.succeed("grep -E '(<-|<\\*\\*) *5[0-9][0-9]' /tmp/swaks.log")
 
-    with subtest("IMAPS: implicit TLS with IMAP greeting"):
-        # The self-signed certificate (rcgen) is generated asynchronously at
-        # first start and can take tens of seconds in the entropy-poor,
-        # DNS-less VM (observed >80s once) - poll instead of single-shotting.
-        machine.wait_until_succeeds(
-            "echo | openssl s_client -connect 127.0.0.1:993 2>/dev/null | grep -q 'OK'",
-            timeout=180,
-        )
+      with subtest("IMAPS: implicit TLS with IMAP greeting"):
+          # The self-signed certificate (rcgen) is generated asynchronously at
+          # first start and can take tens of seconds in the entropy-poor,
+          # DNS-less VM (observed >80s once) - poll instead of single-shotting.
+          machine.wait_until_succeeds(
+              "echo | openssl s_client -connect 127.0.0.1:993 2>/dev/null | grep -q 'OK'",
+              timeout=180,
+          )
 
-    with subtest("HTTP admin/JMAP answers on loopback"):
-        machine.succeed(
-            "curl -fsSL -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/ | grep -Eq '200|30[0-9]'"
-        )
+      with subtest("HTTP admin/JMAP answers on loopback"):
+          machine.succeed(
+              "curl -fsSL -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/ | grep -Eq '200|30[0-9]'"
+          )
 
-    with subtest("admin API: fallback-admin works, anonymous rejected"):
-        machine.succeed(
-            "curl -fsS -u admin:test-admin-secret http://127.0.0.1:8080/api/principal -o /tmp/principals.json"
-        )
-        machine.succeed(
-            "curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/api/principal | grep -q 401"
-        )
+      with subtest("admin API: fallback-admin works, anonymous rejected"):
+          machine.succeed(
+              "curl -fsS -u admin:test-admin-secret http://127.0.0.1:8080/api/principal -o /tmp/principals.json"
+          )
+          machine.succeed(
+              "curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/api/principal | grep -q 401"
+          )
 
-    with subtest("submission: authenticated SMTP on 587 delivers to INBOX"):
-        machine.succeed(
-            "swaks --timeout 120 --server 127.0.0.1:587 --tls --auth PLAIN "
-            "--auth-user user1@example.test --auth-password testpass "
-            "--from user1@example.test --to user2@example.test "
-            "--header 'Subject: e2e-needle' --body 'needle-576a4565b70f5a4c' "
-            "> /tmp/swaks-sub.log 2>&1"
-        )
-        machine.succeed("cat /tmp/swaks-sub.log >&2")
-        machine.succeed("! grep -q '<\\*\\*' /tmp/swaks-sub.log")
+      with subtest("submission: authenticated SMTP on 587 delivers to INBOX"):
+          machine.succeed(
+              "swaks --timeout 120 --server 127.0.0.1:587 --tls --auth PLAIN "
+              "--auth-user user1@example.test --auth-password testpass "
+              "--from user1@example.test --to user2@example.test "
+              "--header 'Subject: e2e-needle' --body 'needle-576a4565b70f5a4c' "
+              "> /tmp/swaks-sub.log 2>&1"
+          )
+          machine.succeed("cat /tmp/swaks-sub.log >&2")
+          machine.succeed("! grep -q '<\\*\\*' /tmp/swaks-sub.log")
 
-        # Delivery is async (queue -> local delivery); probe IMAPS until the
-        # needle message appears in user2's INBOX (script runs in the VM).
-        machine.succeed("imap-probe needle-576a4565b70f5a4c")
+          # Delivery is async (queue -> local delivery); probe IMAPS until the
+          # needle message appears in user2's INBOX (script runs in the VM).
+          machine.succeed("imap-probe needle-576a4565b70f5a4c")
 
-    with subtest("DKIM: submission is signed with the declarative signature"):
-        # The same needle message was submitted by user1@example.test (a
-        # local domain) - the default sign expression must have stamped a
-        # DKIM-Signature header with our selector onto it.
-        machine.succeed("imap-header-probe needle-576a4565b70f5a4c 'DKIM-Signature:'")
-        machine.succeed(
-            "imap-header-probe needle-576a4565b70f5a4c 'd=example.test'"
-        )
+      with subtest("DKIM: submission is signed with the declarative signature"):
+          # The same needle message was submitted by user1@example.test (a
+          # local domain) - the default sign expression must have stamped a
+          # DKIM-Signature header with our selector onto it.
+          machine.succeed("imap-header-probe needle-576a4565b70f5a4c 'DKIM-Signature:'")
+          machine.succeed(
+              "imap-header-probe needle-576a4565b70f5a4c 'd=example.test'"
+          )
 
-    with subtest("metrics: /metrics/prometheus answers on the HTTP listener"):
-        # metrics.prometheus.enable has no auth configured here - the loopback
-        # bind is the exposure control (README doctrine); assert the endpoint
-        # speaks Prometheus text format, not just any 200.
-        machine.succeed(
-            "curl -fsS http://127.0.0.1:8080/metrics/prometheus | grep -qE '^# (HELP|TYPE)'"
-        )
+      with subtest("metrics: /metrics/prometheus answers on the HTTP listener"):
+          # metrics.prometheus.enable has no auth configured here - the loopback
+          # bind is the exposure control (README doctrine); assert the endpoint
+          # speaks Prometheus text format, not just any 200.
+          machine.succeed(
+              "curl -fsS http://127.0.0.1:8080/metrics/prometheus | grep -qE '^# (HELP|TYPE)'"
+          )
 
-    with subtest("journal: exactly the 2 known-benign config-build errors"):
-        # In the DNS-less VM exactly two "Configuration build error" lines
-        # are BENIGN (details only via -o verbose): resolver.type with no
-        # nameservers, and the spam-filter.pyzor.host lookup. Any NEW config
-        # error (e.g. a malformed generated key) must fail this count.
-        machine.succeed(
-            "test \"$(journalctl -u stalwart -b 0 -o cat | grep -c 'Configuration build error')\" -eq 2"
-        )
+      with subtest("journal: exactly the 2 known-benign config-build errors"):
+          # In the DNS-less VM exactly two "Configuration build error" lines
+          # are BENIGN (details only via -o verbose): resolver.type with no
+          # nameservers, and the spam-filter.pyzor.host lookup. Any NEW config
+          # error (e.g. a malformed generated key) must fail this count.
+          machine.succeed(
+              "test \"$(journalctl -u stalwart -b 0 -o cat | grep -c 'Configuration build error')\" -eq 2"
+          )
 
-    with subtest("restart persistence: INBOX survives, admin stays locked"):
-        machine.succeed("systemctl restart stalwart.service")
-        machine.wait_for_unit("stalwart.service", timeout=120)
-        machine.wait_for_open_port(993, timeout=180)
-        machine.succeed("imap-probe needle-576a4565b70f5a4c")
-        machine.succeed(
-            "curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/api/principal | grep -q 401"
-        )
+      with subtest("restart persistence: INBOX survives, admin stays locked"):
+          machine.succeed("systemctl restart stalwart.service")
+          machine.wait_for_unit("stalwart.service", timeout=120)
+          machine.wait_for_open_port(993, timeout=180)
+          machine.succeed("imap-probe needle-576a4565b70f5a4c")
+          machine.succeed(
+              "curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/api/principal | grep -q 401"
+          )
 
-    with subtest("backup/restore: export, wipe, import, message survives"):
-        # `--export`/`--import` are OFFLINE ops: run instead of serving, then
-        # exit (README ledger, verified against v0.15.5 source). Extract the
-        # exact binary + config from the unit so the export reads the same
-        # RocksDB the service wrote.
-        machine.succeed("systemctl stop stalwart.service")
-        exec_line = machine.succeed(
-            "systemctl cat stalwart.service | grep -oP 'ExecStart=\\K.*' | tail -1"
-        ).strip()
-        m = re.search(r"(/nix/store/[^ ]+/bin/[^ ]+) --config=(\S+)", exec_line)
-        assert m, "could not parse ExecStart line: " + exec_line
-        sw_bin, sw_cfg = m.group(1), m.group(2)
+      with subtest("backup/restore: export, wipe, import, message survives"):
+          # `--export`/`--import` are OFFLINE ops: run instead of serving, then
+          # exit (README ledger, verified against v0.15.5 source). Extract the
+          # exact binary + config from the unit so the export reads the same
+          # RocksDB the service wrote.
+          machine.succeed("systemctl stop stalwart.service")
+          exec_line = machine.succeed(
+              "systemctl cat stalwart.service | grep -oP 'ExecStart=\\K.*' | tail -1"
+          ).strip()
+          m = re.search(r"(/nix/store/[^ ]+/bin/[^ ]+) --config=(\S+)", exec_line)
+          assert m, "could not parse ExecStart line: " + exec_line
+          sw_bin, sw_cfg = m.group(1), m.group(2)
 
-        machine.succeed("mkdir -p /tmp/backup")
-        machine.succeed("{} --config={} --export /tmp/backup".format(sw_bin, sw_cfg))
-        # The gate must prove it measured: an EMPTY export would make the
-        # later survival assertion vacuous.
-        machine.succeed("test -n \"$(ls -A /tmp/backup)\"")
+          machine.succeed("mkdir -p /tmp/backup")
+          machine.succeed("{} --config={} --export /tmp/backup".format(sw_bin, sw_cfg))
+          # The gate must prove it measured: an EMPTY export would make the
+          # later survival assertion vacuous.
+          machine.succeed("test -n \"$(ls -A /tmp/backup)\"")
 
-        machine.succeed("rm -rf /var/lib/stalwart/db")
-        machine.succeed("{} --config={} --import /tmp/backup".format(sw_bin, sw_cfg))
-        # import ran as root; the service account must own the store again
-        machine.succeed("chown -R stalwart:stalwart /var/lib/stalwart")
+          machine.succeed("rm -rf /var/lib/stalwart/db")
+          machine.succeed("{} --config={} --import /tmp/backup".format(sw_bin, sw_cfg))
+          # import ran as root; the service account must own the store again
+          machine.succeed("chown -R stalwart:stalwart /var/lib/stalwart")
 
-        machine.succeed("systemctl start stalwart.service")
-        machine.wait_for_unit("stalwart.service", timeout=120)
-        machine.wait_for_open_port(993, timeout=180)
-        machine.succeed("imap-probe needle-576a4565b70f5a4c")
+          machine.succeed("systemctl start stalwart.service")
+          machine.wait_for_unit("stalwart.service", timeout=120)
+          machine.wait_for_open_port(993, timeout=180)
+          machine.succeed("imap-probe needle-576a4565b70f5a4c")
 
-    with subtest("no crashes"):
-        machine.succeed("! journalctl -u stalwart -b 0 | grep -qiE 'panic|fatal error'")
-  '';
-}
+      with subtest("no crashes"):
+          machine.succeed("! journalctl -u stalwart -b 0 | grep -qiE 'panic|fatal error'")
+    '';
+  }

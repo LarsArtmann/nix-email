@@ -31,30 +31,31 @@
   config,
   lib,
   ...
-}:
-let
+}: let
   cfg = config.services.mail-server;
 
   # Mirrors nixpkgs' stalwart module: the unit is stalwart-mail.service on
   # stateVersion < 26.05 and stalwart.service since. The LoadCredential
   # mount path embeds the unit name, so secret macros must too.
   stalwartUnit =
-    if lib.versionOlder cfg.stateVersion "26.05" then "stalwart-mail" else "stalwart";
+    if lib.versionOlder cfg.stateVersion "26.05"
+    then "stalwart-mail"
+    else "stalwart";
   credentialMacro = key: "%{file:/run/credentials/${stalwartUnit}.service/${key}}%";
 
   # The HTTP bind is "<host>:<port>"; extract the host part to judge loopback.
-  httpBindHost =
-    let
-      m = builtins.match "(.*):[0-9]+" cfg.httpBind;
-    in
-    if m == null then cfg.httpBind else builtins.head m;
+  httpBindHost = let
+    m = builtins.match "(.*):[0-9]+" cfg.httpBind;
+  in
+    if m == null
+    then cfg.httpBind
+    else builtins.head m;
   httpBindIsLoopback =
     lib.hasPrefix "127." httpBindHost
     || httpBindHost == "localhost"
     || httpBindHost == "[::1]"
     || httpBindHost == "::1";
-in
-{
+in {
   options.services.mail-server = {
     enable = lib.mkEnableOption "an opinionated Stalwart mail server (all-in-one SMTP/IMAP/JMAP, built-in spam filter, web admin)";
 
@@ -184,7 +185,7 @@ in
         modes are mutually exclusive by construction (nixos-mailserver
         x509-certificate pattern).
       '';
-      default = { mode = "self-signed"; };
+      default = {mode = "self-signed";};
       type = lib.types.submodule {
         options = {
           mode = lib.mkOption {
@@ -215,8 +216,8 @@ in
             };
             contact = lib.mkOption {
               type = lib.types.listOf lib.types.str;
-              default = [ ];
-              example = [ "mailto:hostmaster@example.com" ];
+              default = [];
+              example = ["mailto:hostmaster@example.com"];
               description = ''
                 Contact addresses (required - Stalwart fails config parse on
                 an empty contact, verified against v0.15.5 source).
@@ -224,8 +225,8 @@ in
             };
             domains = lib.mkOption {
               type = lib.types.listOf lib.types.str;
-              default = [ ];
-              example = [ "mail.example.com" ];
+              default = [];
+              example = ["mail.example.com"];
               description = ''
                 Domains to issue certificates for (required; wildcards only
                 with the dns-01 challenge - upstream-validated).
@@ -284,53 +285,55 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    assertions = [
-      {
-        assertion = lib.hasInfix "." cfg.hostname;
-        message = "services.mail-server.hostname must be an FQDN (got \"${cfg.hostname}\") - a bare host name breaks MX/PTR alignment.";
-      }
-    ]
-    ++ lib.optionals (cfg.relay != null) [
-      {
-        assertion = builtins.match ".*[a-zA-Z].*" cfg.relay.address != null;
-        message = "services.mail-server.relay.address must be a DNS-resolvable hostname (got \"${cfg.relay.address}\") - Stalwart resolves relay targets via A lookup and refuses bare IP literals with \"record not found for MX\". Give the smarthost a hostname (e.g. smtp.resend.com).";
-      }
-      {
-        assertion = (cfg.relay.username == null) == (cfg.relay.secretFile == null);
-        message = "services.mail-server.relay: set username AND secretFile together (or neither) - partial SASL credentials would fail at first submission.";
-      }
-    ]
-    ++ lib.optionals (cfg.certificate.mode == "acme") [
-      {
-        assertion = cfg.certificate.acme.contact != [ ];
-        message = "services.mail-server.certificate.acme.contact must list at least one contact address - Stalwart rejects an empty ACME contact at config parse (verified against v0.15.5 source).";
-      }
-      {
-        assertion = cfg.certificate.acme.domains != [ ];
-        message = "services.mail-server.certificate.acme.domains must list at least one domain (typically the mail hostname) - with no domains Stalwart registers no ACME provider and the implicit-TLS listeners serve nothing.";
-      }
-    ]
-    ++ lib.optionals (cfg.certificate.mode == "manual") [
-      {
-        assertion = cfg.certificate.manual.certFile != null && cfg.certificate.manual.keyFile != null;
-        message = "services.mail-server.certificate.manual: both certFile and keyFile are required in manual mode - a certificate without its key (or vice versa) is silently unusable and implicit-TLS would serve nothing.";
-      }
-    ];
+    assertions =
+      [
+        {
+          assertion = lib.hasInfix "." cfg.hostname;
+          message = "services.mail-server.hostname must be an FQDN (got \"${cfg.hostname}\") - a bare host name breaks MX/PTR alignment.";
+        }
+      ]
+      ++ lib.optionals (cfg.relay != null) [
+        {
+          assertion = builtins.match ".*[a-zA-Z].*" cfg.relay.address != null;
+          message = "services.mail-server.relay.address must be a DNS-resolvable hostname (got \"${cfg.relay.address}\") - Stalwart resolves relay targets via A lookup and refuses bare IP literals with \"record not found for MX\". Give the smarthost a hostname (e.g. smtp.resend.com).";
+        }
+        {
+          assertion = (cfg.relay.username == null) == (cfg.relay.secretFile == null);
+          message = "services.mail-server.relay: set username AND secretFile together (or neither) - partial SASL credentials would fail at first submission.";
+        }
+      ]
+      ++ lib.optionals (cfg.certificate.mode == "acme") [
+        {
+          assertion = cfg.certificate.acme.contact != [];
+          message = "services.mail-server.certificate.acme.contact must list at least one contact address - Stalwart rejects an empty ACME contact at config parse (verified against v0.15.5 source).";
+        }
+        {
+          assertion = cfg.certificate.acme.domains != [];
+          message = "services.mail-server.certificate.acme.domains must list at least one domain (typically the mail hostname) - with no domains Stalwart registers no ACME provider and the implicit-TLS listeners serve nothing.";
+        }
+      ]
+      ++ lib.optionals (cfg.certificate.mode == "manual") [
+        {
+          assertion = cfg.certificate.manual.certFile != null && cfg.certificate.manual.keyFile != null;
+          message = "services.mail-server.certificate.manual: both certFile and keyFile are required in manual mode - a certificate without its key (or vice versa) is silently unusable and implicit-TLS would serve nothing.";
+        }
+      ];
 
-    warnings = lib.optionals (cfg.enable && !httpBindIsLoopback) [
-      ''
-        services.mail-server.httpBind ("${cfg.httpBind}") is not a loopback address: the Stalwart
-        web admin, JMAP and REST management API would be exposed raw on every interface.
-        README doctrine: keep the bind on loopback and put a TLS-terminating reverse proxy
-        (with auth) in front instead.
-      ''
-    ]
-    ++ lib.optionals (cfg.enable && cfg.certificate.mode != "acme" && (cfg.certificate.acme.contact != [ ] || cfg.certificate.acme.domains != [ ])) [
-      "services.mail-server.certificate.acme.* is set but certificate.mode is \"${cfg.certificate.mode}\" - the ACME settings are IGNORED. Set certificate.mode = \"acme\" to use them."
-    ]
-    ++ lib.optionals (cfg.enable && cfg.certificate.mode != "manual" && (cfg.certificate.manual.certFile != null || cfg.certificate.manual.keyFile != null)) [
-      "services.mail-server.certificate.manual.* is set but certificate.mode is \"${cfg.certificate.mode}\" - the manual certificate files are IGNORED. Set certificate.mode = \"manual\" to use them."
-    ];
+    warnings =
+      lib.optionals (cfg.enable && !httpBindIsLoopback) [
+        ''
+          services.mail-server.httpBind ("${cfg.httpBind}") is not a loopback address: the Stalwart
+          web admin, JMAP and REST management API would be exposed raw on every interface.
+          README doctrine: keep the bind on loopback and put a TLS-terminating reverse proxy
+          (with auth) in front instead.
+        ''
+      ]
+      ++ lib.optionals (cfg.enable && cfg.certificate.mode != "acme" && (cfg.certificate.acme.contact != [] || cfg.certificate.acme.domains != [])) [
+        "services.mail-server.certificate.acme.* is set but certificate.mode is \"${cfg.certificate.mode}\" - the ACME settings are IGNORED. Set certificate.mode = \"acme\" to use them."
+      ]
+      ++ lib.optionals (cfg.enable && cfg.certificate.mode != "manual" && (cfg.certificate.manual.certFile != null || cfg.certificate.manual.keyFile != null)) [
+        "services.mail-server.certificate.manual.* is set but certificate.mode is \"${cfg.certificate.mode}\" - the manual certificate files are IGNORED. Set certificate.mode = \"manual\" to use them."
+      ];
 
     services.stalwart = {
       enable = true;
@@ -359,25 +362,25 @@ in
             hostname = lib.mkDefault cfg.hostname;
             listener = {
               smtp = {
-                bind = [ "[::]:25" ];
+                bind = ["[::]:25"];
                 protocol = "smtp";
               };
               submission = {
-                bind = [ "[::]:587" ];
+                bind = ["[::]:587"];
                 protocol = "smtp";
               };
               submissions = {
-                bind = [ "[::]:465" ];
+                bind = ["[::]:465"];
                 protocol = "smtp";
                 tls.implicit = true;
               };
               imaps = {
-                bind = [ "[::]:993" ];
+                bind = ["[::]:993"];
                 protocol = "imap";
                 tls.implicit = true;
               };
               http = {
-                bind = [ cfg.httpBind ];
+                bind = [cfg.httpBind];
                 protocol = "http";
               };
             };
@@ -406,7 +409,8 @@ in
 
           acme = lib.mkIf (cfg.certificate.mode == "acme") {
             "${cfg.certificate.acme.id}" = {
-              inherit (cfg.certificate.acme)
+              inherit
+                (cfg.certificate.acme)
                 directory
                 contact
                 domains
@@ -431,18 +435,20 @@ in
             # parse_route (type/address/port/protocol required; auth and
             # tls.implicit optional). mkDefault on every leaf: consumers
             # override via services.stalwart.settings without conflicts.
-            route."${cfg.relay.routeId}" = {
-              type = lib.mkDefault "relay";
-              address = lib.mkDefault cfg.relay.address;
-              port = lib.mkDefault cfg.relay.port;
-              protocol = lib.mkDefault "smtp";
-              tls.implicit = lib.mkDefault cfg.relay.tlsImplicit;
-            } // lib.optionalAttrs (cfg.relay.username != null) {
-              auth = {
-                username = lib.mkDefault cfg.relay.username;
-                secret = lib.mkDefault (credentialMacro "mail-server-relay");
+            route."${cfg.relay.routeId}" =
+              {
+                type = lib.mkDefault "relay";
+                address = lib.mkDefault cfg.relay.address;
+                port = lib.mkDefault cfg.relay.port;
+                protocol = lib.mkDefault "smtp";
+                tls.implicit = lib.mkDefault cfg.relay.tlsImplicit;
+              }
+              // lib.optionalAttrs (cfg.relay.username != null) {
+                auth = {
+                  username = lib.mkDefault cfg.relay.username;
+                  secret = lib.mkDefault (credentialMacro "mail-server-relay");
+                };
               };
-            };
 
             # Route expression. IfBlocks need INDEXED keys (live spike in the
             # README ledger: a bare if/then fails to parse) and `else` must
