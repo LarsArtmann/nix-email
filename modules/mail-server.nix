@@ -470,11 +470,18 @@ in {
     };
 
     # The module owns the listener contract, so it owns the firewall ports
-    # for it. Plain definition (NOT mkDefault): on this nixpkgs pin a
-    # mkDefault list here is silently dropped to [] (empirically verified,
-    # 2026-09-14; services.openssh.ports mkDefault works fine - something in
-    # the base firewall modules filters weaker-priority defs). Lists concat:
-    # consumer port lists merge additively; mkForce yours to replace.
+    # for it. Plain definition (NOT mkDefault), root-caused 2026-09-15: the
+    # module system keeps only the numerically-LOWEST-priority definitions
+    # (lib/modules.nix filterOverrides'), and base nixpkgs ships UNCONDITIONAL
+    # empty defs at priority 100 on this option - podman's network-socket.nix
+    # (`lib.optional (enable && openFirewall) port`) and udp-over-tcp.nix
+    # (`getFirewallPorts cfg.tcp2udp`) both yield [] even when their services
+    # are disabled. A mkDefault list (priority 1000) is therefore discarded
+    # wholesale - lists concat only WITHIN one priority tier. `lib.optional`
+    # instead of `mkIf` is the upstream anti-pattern (mkIf contributes no
+    # definition when false); `services.openssh.ports` has no such base def,
+    # which is why mkDefault works fine THERE. Lists concat: consumer port
+    # lists merge additively; mkForce yours to replace.
     networking.firewall.allowedTCPPorts = [
       25
       465

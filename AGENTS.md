@@ -36,9 +36,13 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
 - All wrapper defaults are `mkDefault`; consumers override via
   `services.stalwart.settings` / `services.parsedmarc.settings`.
   EXCEPTION: `networking.firewall.allowedTCPPorts` in mail-server.nix is a
-  plain definition - a `mkDefault` list on that option is silently dropped
-  to `[]` by the base firewall modules on this nixpkgs pin (verified
-  empirically; `services.openssh.ports` mkDefault behaves normally).
+  plain definition. Root cause (2026-09-15, verified via
+  `options.<opt>.definitionsWithLocations`): the module system keeps only
+  lowest-priority defs (lib/modules.nix `filterOverrides'`), and base nixpkgs
+  ships unconditional `[]` defs at priority 100 on that option (podman
+  network-socket.nix `lib.optional`, udp-over-tcp.nix `getFirewallPorts`) -
+  so any mkDefault list there is discarded wholesale. Lists concat only
+  within one priority tier; `services.openssh.ports` has no such base def.
 - Tests: VM E2E for behavior (stalwart-e2e), eval contract for wiring
   (dmarc-eval). Never weaken module defaults to make a test deterministic -
   fix the test (e.g. swaks --timeout), keep the product honest.
