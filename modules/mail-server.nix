@@ -324,6 +324,12 @@ in
         README doctrine: keep the bind on loopback and put a TLS-terminating reverse proxy
         (with auth) in front instead.
       ''
+    ]
+    ++ lib.optionals (cfg.enable && cfg.certificate.mode != "acme" && (cfg.certificate.acme.contact != [ ] || cfg.certificate.acme.domains != [ ])) [
+      "services.mail-server.certificate.acme.* is set but certificate.mode is \"${cfg.certificate.mode}\" - the ACME settings are IGNORED. Set certificate.mode = \"acme\" to use them."
+    ]
+    ++ lib.optionals (cfg.enable && cfg.certificate.mode != "manual" && (cfg.certificate.manual.certFile != null || cfg.certificate.manual.keyFile != null)) [
+      "services.mail-server.certificate.manual.* is set but certificate.mode is \"${cfg.certificate.mode}\" - the manual certificate files are IGNORED. Set certificate.mode = \"manual\" to use them."
     ];
 
     services.stalwart = {
