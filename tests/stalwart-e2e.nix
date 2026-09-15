@@ -155,7 +155,10 @@
                         part[1] for part in msg if isinstance(part, tuple)
                     )
                     if needle in body:
-                        print("over-quota message WAS delivered (definitive)", file=sys.stderr)
+                        print(
+                            "over-quota message WAS delivered (definitive)",
+                            file=sys.stderr,
+                        )
                         sys.exit(1)
                 imap.close()
         except Exception as err:
@@ -196,7 +199,10 @@
                         part[1] for part in msg if isinstance(part, tuple)
                     )
                     if needle in body:
-                        print("GTUBE message landed in INBOX (definitive)", file=sys.stderr)
+                        print(
+                            "GTUBE message landed in INBOX (definitive)",
+                            file=sys.stderr,
+                        )
                         sys.exit(1)
                 status, _ = imap.select("Junk")
                 if status == "OK":
