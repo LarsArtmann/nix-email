@@ -52,6 +52,11 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
   Related API gotchas (also in the README ledger): individuals created via
   `POST /api/principal` need `"roles": ["user"]` or submission is refused;
   relay `queue.route` IfBlocks need INDEXED keys and resolvable hostnames.
+  More (README ledger, 2026-09-15): over-quota mail is ACCEPTED at RCPT and
+  retried forever - assert IMAP absence, not SMTP refusal; a catch-all
+  (`"@domain"` address) makes every local part deliverable, so it must be
+  created AFTER any unknown-recipient-rejection probe; and IMAP LOGIN
+  resolves by principal NAME, not by the principal's email addresses.
 - SystemNix layers (sops, ports.nix, Gatus, onFailure, backup-coordination)
   belong to the CONSUMER wrapper, not here.
 

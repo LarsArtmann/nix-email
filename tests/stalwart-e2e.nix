@@ -510,9 +510,11 @@ in
           # Created HERE, not during provisioning: a live catch-all makes
           # EVERY local part deliverable, which would turn the
           # "unknown recipient rejected 5xx" assertion above into a 250.
-          # First address = the login identity (IMAP auth does an exact
-          # principal lookup); the bare "@example.test" entry is what makes
-          # it the catch-all.
+          # The bare "@example.test" entry is what makes it the catch-all.
+          # The explicit "catchall@example.test" address keeps the mailbox
+          # addressable; IMAP LOGIN itself resolves by principal NAME
+          # ("catchall" - VM-verified 2026-09-15, README ledger), not by
+          # arbitrary email addresses of the principal.
           create_principal({
               "type": "individual",
               "name": "catchall",
@@ -530,7 +532,7 @@ in
           machine.succeed("cat /tmp/swaks-catchall.log >&2")
           machine.succeed("! grep -q '<\\*\\*' /tmp/swaks-catchall.log")
           machine.succeed(
-              "imap-probe needle-catchall-7d1a catchall@example.test testpass"
+              "imap-probe needle-catchall-7d1a catchall testpass"
           )
 
       with subtest("quota: over-quota message accepted at SMTP, never delivered"):

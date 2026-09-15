@@ -401,6 +401,12 @@ json/yaml/markdown.
   part deliverable - `RCPT TO:<nobody@example.test>` then answers
   `250 2.1.5 OK` and any "unknown recipient rejected 5xx" assertion fails.
   Create the catch-all principal AFTER the rejection probe (the E2E does).
+- IMAP/IMAPS LOGIN resolves by principal NAME (VM-verified 2026-09-15 via
+  curl-imaps probe): a principal named `catchall` with email
+  `catchall@example.test` CANNOT log in as the email address, only as
+  `catchall`. Accounts created by the webadmin never trip this because
+  their name IS their address - a scripting/API-created account with a
+  non-address name must be probed by name.
 
 ## Non-goals
 
