@@ -64,12 +64,24 @@ Raw ideas:
   remote-alert path decoupled from the mail relay (circular-dependency risk);
   InboxClean JMAP/IMAP spike post-migration
 - Blacklist (RBL) monitoring for the VPS IP
+- Spam/Junk policy productization: 0.15.5 only TAGS spam (`X-Spam-Status`) and
+  delivers to INBOX; putting spam in Junk needs a sieve layer (open question 6)
+- Gatus freshness check over the parsedmarc `aggregate.json` sink (verify it
+  does not duplicate the consumer registry's `backup.maxAgeHours` coverage)
 
 ### 5. Repo excellence
 
 - CI, nix formatter, Renovate (nixpkgs input must stay paired with SystemNix)
 - Threat-model doc; Stalwart OIDC (Pocket ID) for the admin UI if supported
 - Post-cutover: retire-or-keep decision documentation for the Resend-only path
+- Retire the two in-repo nixpkgs workarounds once upstream fixes land (host-less
+  `[elasticsearch]` emission; imapclient on python 3.14) - re-check on every
+  nixpkgs bump; the module comments carry the revert conditions
+- Upstream relations: file the two diagnosed nixpkgs issues and link them from
+  the ledger entries that describe the workarounds
+- aarch64: keep the VM tests x86_64-gated; the eval contract already builds for
+  aarch64 (verified 2026-09-15) - decide whether an emulated ARM VM run earns
+  its CI time
 
 ## Non-goals
 
@@ -108,3 +120,10 @@ any repo; they are Lars's calls.
    management API), or does account state stay imperative/webadmin per
    Stalwart doctrine? Arguable either way (declarative drift vs operational
    simplicity).
+6. **Spam/Junk ownership:** 0.15.5 tags spam (`X-Spam-Status`) but never files
+   it to Junk. Options: (a) this wrapper ships a declarative sieve for all
+   accounts (the GTUBE subtest then upgrades to assert real Junk filing),
+   (b) the consumer layer (SystemNix) owns the sieve, (c) tag-only, documented
+   as the end state. This decides a product behavior, the test contract, and
+   whether the mailsuite STARTTLS note should also propose a
+   disable-auto-STARTTLS knob upstream.

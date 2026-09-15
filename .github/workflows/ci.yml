@@ -50,5 +50,15 @@ jobs:
               || { echo "FATAL: check '$check' is missing from .#checks - the gate would run less than it claims"; exit 1; }
           done
 
+      - name: Evaluate the aarch64 check set (arch-independent guard)
+        run: |
+          # The VM checks are deliberately x86_64-gated (see flake.nix), so
+          # this proves the modules still EVALUATE for aarch64 - an
+          # arch-specific regression cannot hide behind the gate. The
+          # aarch64 build of dmarc-eval was verified green locally
+          # (2026-09-15); building it here would need ARM emulation, which
+          # the hosted runner does not have.
+          nix eval .#checks.aarch64-linux --json > /dev/null
+
       - name: Run nix flake check (eval contract + VM tests)
         run: nix flake check --print-build-logs

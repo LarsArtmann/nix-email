@@ -58,6 +58,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   Corporation"; `jq -e` without slurp)
 - `LICENSE` (MIT); `docs/THREAT_MODEL.md` extended with the attacker-scenario
   table and the out-of-scope/consumer-responsibilities list
+- `stalwart-e2e` over-quota subtest asserts the queue's retry reason in the
+  journal (`Mailbox over quota.`, source-verified at
+  `crates/email/src/message/delivery.rs:225`) instead of inferring it from
+  delivery absence
+- `parsedmarc-e2e` asserts the runtime ini is provably free of the inert
+  `[elasticsearch]` section (parsedmarc merely starting was necessary but not
+  sufficient evidence), and the aggregate-report wait tightened 300 s → 120 s
+  (a healthy parse takes ~9 s)
+- `dmarc-eval` asserts `ExecStartPre` ORDER - the module's ini-writing step
+  plus the wrapper's strip script (>= 2 entries, strip last) - so `lib.last`
+  remains a real ordering proof rather than a string's last character
+- CI evaluates the aarch64 check set (VM checks stay deliberately
+  x86_64-gated); `nix build .#checks.aarch64-linux.dmarc-eval` verified green
+  on the dev host, so the aarch64 posture is no longer documentation-only
+- `docs/THREAT_MODEL.md` gained the catch-all enumeration-tradeoff row;
+  AGENTS.md gained a working-rules section (mechanical gate pattern,
+  identifier extraction, root-file existence check)
 
 ### Changed
 
@@ -89,6 +106,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Relay E2E transcript assertion now accepts the observed `<~*` swaks marker
   (550 RCPT refusal arrives with the timeout-receive variant, not `<-` /
   `<**`); lesson recorded in the README ledger
+- The over-quota citation was corrected to `delivery.rs:225` (the quoted
+  reason line) in the README ledger and the test comments - the earlier
+  `:223` pointed one statement short of the string it claimed
 
 ## [0.1.0] - 2026-09-14
 

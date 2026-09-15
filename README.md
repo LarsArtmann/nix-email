@@ -393,7 +393,7 @@ json/yaml/markdown.
   principal field is an integer byte count on any individual
   (`POST /api/principal` with `"quota": 1`). An over-quota message is
   ACCEPTED at RCPT but never delivered - the queue retries forever with
-  "Mailbox over quota." (delivery.rs:223); there is no 5xx rejection at
+  "Mailbox over quota." (delivery.rs:225, source-verified); there is no 5xx rejection at
   SMTP time. Assert delivery-absence (IMAP), not SMTP refusal.
 - CATCH-ALL vs unknown-recipient rejection is a TEST-ORDERING trap
   (observed 2026-09-15): a principal with the literal `"@<domain>"` address
