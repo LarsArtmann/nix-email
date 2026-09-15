@@ -63,6 +63,11 @@ debug VM run first. Reading it in upstream source is NOT evidence of what the
 journal/log prints (the `Mailbox over quota.` vs `Message rescheduled for
 delivery` lesson, 2026-09-15).
 
+In-VM assertions are file-based, never `producer | grep -q`: the test shell
+runs pipefail, so grep -q's early exit can EPIPE the producer (observed as
+curl exit 23 on a matching payload, 2026-09-15) - and `! producer | grep -q`
+can phantom-green. Dump the producer to a file, then grep the file.
+
 ## Docs map
 
 - `README.md` - architecture, module docs, go-live runbook, ledger.

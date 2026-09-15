@@ -229,12 +229,18 @@ in
       with subtest("no file-output errors: StateDirectory fix holds"):
           # A "File output Error" in the journal is the exact symptom of the
           # DynamicUser-writes-to-root-owned-path bug the wrapper's
-          # StateDirectory/ReadWritePaths addition fixes.
+          # StateDirectory/ReadWritePaths addition fixes. Dump to a file, then
+          # grep the file: under pipefail, `journalctl | grep -q` EPIPEs
+          # journalctl when grep exits early, and the negated form can
+          # phantom-green (metrics-curl lesson, 2026-09-15).
           machine.succeed(
-              "! journalctl -u parsedmarc -b 0 -o cat | grep -qi 'File output Error'"
+              "journalctl -u parsedmarc -b 0 -o cat > /tmp/journal-parsedmarc.log"
           )
           machine.succeed(
-              "! journalctl -u parsedmarc -b 0 -o cat | grep -qi 'Permission denied'"
+              "! grep -qi 'File output Error' /tmp/journal-parsedmarc.log"
+          )
+          machine.succeed(
+              "! grep -qi 'Permission denied' /tmp/journal-parsedmarc.log"
           )
     '';
   }

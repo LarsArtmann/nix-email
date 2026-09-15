@@ -79,6 +79,11 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
   an existing test log or a debug VM run first. Reading it in upstream source
   is NOT evidence of what the journal/log prints (the `Mailbox over quota.`
   vs `Message rescheduled for delivery` lesson, 2026-09-15).
+- In-VM test assertions are file-based, never `producer | grep -q`: the test
+  shell runs pipefail, and grep -q's early exit EPIPEs the producer - the
+  metrics curl once failed CI with exit 23 (write error) on a MATCHING
+  payload (2026-09-15), and under pipefail the negated form
+  `! producer | grep -q` can phantom-green. Dump to /tmp, then grep the file.
 - Extract cross-file identifiers mechanically (`grep -o`, `od`, `git diff`
   read-back after multi-line edits) rather than trusting eyes or memory;
   from-memory identifiers have produced corrupted store paths and wrong
