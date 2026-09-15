@@ -1,0 +1,36 @@
+25 / 587 / 465 / 993 (public) + 8080 (loopback)
+ACME (dns-01 wildcard) + manual cert fallback
+backup-coordination (restic over /var/lib/stalwart + reports)
+Caddy reverse proxy (protected vhost + TLS)
+configures (wrapper defaults + overrides)
+declares intent in Nix
+Discord ops channel
+dns-01 challenges, zone records
+DNS zone (MX, SPF, DKIM, DMARC, TLS-RPT, _dmarc rua)
+Encrypted offsite backup target
+firewall ports stay owned by the wrapper
+Gatus health checks (SMTP/IMAP/HTTP probes)
+inbound MX + DMARC rua reports
+Internet senders/verifiers
+JMAP/webadmin via reverse proxy
+Lars (SystemNix maintainer)
+Mail clients (IMAPS/JMAP/submission)
+/metrics/prometheus scrape route
+nightly store + report-sink snapshots
+nix-email flake input -&gt; services.mail-server + services.dmarc-monitor
+non-local delivery (reputation offload)
+on failure
+page on onFailure
+ports.nix (firewall ownership)
+probes
+Prometheus + Gatus scrape targets
+queue.strategy.route -&gt; smarthost
+resolves this host&#39;s own records
+RocksDB mail store
+smtp.resend.com (authenticated smarthost)
+sops-nix secrets + templates (relay password, DMARC IMAP password)
+Stalwart 0.15.5
+submission + IMAPS/JMAP
+systemd onFailure -&gt; Discord webhook
+SystemNix consumer host (out of this repo&#39;s scope, wrapper layer)
+templates render secrets to LoadCredential

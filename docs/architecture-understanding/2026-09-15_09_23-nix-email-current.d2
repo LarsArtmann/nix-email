@@ -44,7 +44,7 @@ stalwart.queue -> internet.mx_senders: direct-to-MX when relay = null
 stalwart.queue -> relay: non-local mail when services.mail-server.relay set
 stalwart.smtp_in -> stalwart.store: local delivery
 stalwart.directory -> stalwart.store: principal/domain lookups
-stalwart.spam -> stalwart.store: files Junk via GTUBE/rules
+stalwart.spam -> stalwart.store: tags X-Spam-Status (GTUBE/rules); INBOX by default, no auto-Junk filing
 stalwart.dkim -> stalwart.queue: signs outbound
 stalwart.acme -> letsencrypt: issues certificates
 stalwart.smtp_in -> dns: SPF/DNSBL/DKIM lookups

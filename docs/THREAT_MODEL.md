@@ -92,6 +92,7 @@ template path string - see the ledger for the `_secret` string contract).
 | Spam into user mailboxes | Tagged, not auto-filed | The GTUBE experiment (2026-09-15): 0.15.5 scans authenticated submission too and adds `X-Spam-Status`, but delivers spam to INBOX by default - Junk routing is consumer sieve territory. The E2E asserts the tagging contract. |
 | Secrets leaking through the Nix store or module system | Prevented by construction | All secrets are files (LoadCredential / sops) referenced via `%{file:...}%`; the wrapper declares path options only. |
 | Oversized mail exhausting storage | Bounded per-principal | Stalwart per-account quota; the E2E asserts an over-quota message is accepted at SMTP but never delivered (quota subtest). |
+| Enumerating valid local parts by recipient probing | Impossible once a catch-all exists (deliberate tradeoff) | A principal holding the literal `"@domain"` address makes EVERY local part deliverable, so RCPT probing can no longer distinguish real mailboxes from invented ones. The E2E proves the delivery path; the ordering trap (create the catch-all AFTER any unknown-recipient probe, or the 550 assertion fails) is in the README ledger and AGENTS.md. |
 
 ## Out of scope / consumer responsibilities
 

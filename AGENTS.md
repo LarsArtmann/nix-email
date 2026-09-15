@@ -60,6 +60,19 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
 - SystemNix layers (sops, ports.nix, Gatus, onFailure, backup-coordination)
   belong to the CONSUMER wrapper, not here.
 
+## Working rules (learned the hard way)
+
+- Gate commands redirect, never pipe: `nix flake check > /tmp/gate.log 2>&1;
+  echo "EXIT:$?" >> /tmp/gate.log`, then read the log. A pipe reports the
+  FILTER's exit code - two fake greens shipped that way in one session.
+- Extract cross-file identifiers mechanically (`grep -o`, `od`, `git diff`
+  read-back after multi-line edits) rather than trusting eyes or memory;
+  from-memory identifiers have produced corrupted store paths and wrong
+  option names.
+- Before creating a file at the repo root, `ls` the WHOLE repo including
+  `docs/` - a duplicate `THREAT_MODEL.md` was once created beside
+  `docs/THREAT_MODEL.md` by checking only the root.
+
 ## Documentation map
 
 - `README.md` - architecture, module docs, go-live runbook, VERIFIED-FACTS

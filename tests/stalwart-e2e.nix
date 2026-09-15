@@ -324,7 +324,7 @@ in
           create_account("user1@example.test")
           create_account("user2@example.test")
           # quota = 1 BYTE: over-quota delivery retries forever ("Mailbox
-          # over quota.", delivery.rs:223) - never ingested.
+          # over quota.", delivery.rs:225) - never ingested.
           create_principal({
               "type": "individual",
               "name": "user3@example.test",

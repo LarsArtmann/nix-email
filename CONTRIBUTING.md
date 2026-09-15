@@ -49,9 +49,16 @@ for the pattern).
 timeouts in the DNS-less VM). Failed check results are CACHED - a rerun
 without an input change replays the old verdict.
 
-Gate commands never wear pipes (`cmd | tail` can print PASSED on a failing
-run), and test assertions are transcribed from observed transcripts, not
-from expected output.
+Gate commands never wear pipes: a pipe reports the FILTER's exit code, so
+`cmd | tail` can print PASSED on a failing run. Redirect and echo the exit
+code into the log instead, then read the log:
+
+```sh
+nix flake check > /tmp/gate.log 2>&1; echo "EXIT:$?" >> /tmp/gate.log
+```
+
+Test assertions are transcribed from observed transcripts, not from expected
+output.
 
 ## Docs map
 
