@@ -13,6 +13,75 @@ parsedmarc, Piler archiving) are deliberately rejected: Stalwart is one Rust
 binary (~512 MB-1 GiB RAM) with spam filter, DKIM, JMAP, CalDAV/CardDAV and
 web admin built in.
 
+## Architecture
+
+Current runtime shape (d2 source; rendered SVGs in
+`docs/architecture-understanding/`):
+
+```d2
+direction: down
+
+internet: Internet {
+  mx_senders: Remote MX senders {shape: cloud}
+  clients: Mail clients (IMAPS 993, JMAP, submission 587/465) {shape: person}
+  verifiers: DMARC verifiers (rua reports) {shape: cloud}
+}
+
+proxy: Reverse proxy (Caddy on consumer host, TLS)
+
+stalwart: Stalwart 0.15.5 (services.mail-server wrapper) {
+  smtp_in: SMTP listeners (25 MX, 587 submission, 465 submissions)
+  imaps: IMAPS listener (993, implicit TLS)
+  http: HTTP listener (127.0.0.1:8080, loopback only)
+  queue: Queue + routing strategy (is_local_domain -> local, else -> relay)
+  spam: Spam filter (GTUBE, rules)
+  dkim: DKIM signer (signature.<id>)
+  directory: Internal directory (negative-cache TTL option)
+  acme: ACME client (self-signed | acme | manual tiers)
+  store: RocksDB mail store {shape: cylinder}
+}
+
+relay: Smarthost relay (optional; e.g. smtp.resend.com, SASL) {shape: cloud}
+dns: DNS resolver (SPF, DNSBL, MX, DKIM keys) {shape: cloud}
+letsencrypt: Let's Encrypt (ACME) {shape: cloud}
+
+parsedmarc: parsedmarc 11 (services.dmarc-monitor wrapper) {
+  poller: IMAP poller (watch) on rua mailbox
+  output: Report sink (JSON + CSV files) {shape: cylinder}
+}
+
+viewer: Report viewer over the JSON/CSV sink {style.stroke-dash: 4}
+
+secrets: Consumer secrets (sops templates, SystemNix)
+prometheus: Prometheus scraper {shape: person}
+
+internet.mx_senders -> stalwart.smtp_in: delivers mail on 25
+internet.clients -> stalwart.smtp_in: AUTH + STARTTLS/TLS
+internet.clients -> stalwart.imaps: fetches mail
+internet.clients -> proxy: JMAP / webadmin
+proxy -> stalwart.http: forwards (loopback bind)
+internet.verifiers -> stalwart.smtp_in: aggregate reports to rua address
+stalwart.queue -> internet.mx_senders: direct-to-MX when relay = null
+stalwart.queue -> relay: non-local mail when services.mail-server.relay set
+stalwart.smtp_in -> stalwart.store: local delivery
+stalwart.directory -> stalwart.store: principal/domain lookups
+stalwart.spam -> stalwart.store: files Junk via GTUBE/rules
+stalwart.dkim -> stalwart.queue: signs outbound
+stalwart.acme -> letsencrypt: issues certificates
+stalwart.smtp_in -> dns: SPF/DNSBL/DKIM lookups
+stalwart.queue -> dns: MX resolution
+parsedmarc.poller -> stalwart.imaps: polls rua mailbox (IMAP 993)
+parsedmarc.poller -> parsedmarc.output: save_output (fixed filenames)
+parsedmarc.output -> viewer: JSON/CSV files (future read path)
+secrets -> stalwart.http: "LoadCredential + %{file:...}% config macros"
+prometheus -> proxy: GET /metrics/prometheus
+```
+
+The target deployment shape (SystemNix layering: sops, Caddy, Gatus,
+onFailure alerting, backups) is
+`docs/architecture-understanding/2026-09-15_09_23-nix-email-improved.svg`;
+the rendered current-state SVG sits next to it.
+
 ## What is built and verified (2026-09-14)
 
 | Piece                                          | State                                                                         |

@@ -79,16 +79,33 @@ in
 
       virtualisation.memorySize = 2048;
 
-      # Dovecot 2.4 on this nixpkgs pin REQUIRES explicit version pins
-      # (base-module assertions), but nixpkgs' parsedmarc localMail
-      # provision enables dovecot2 without setting them - any localMail
-      # consumer hits the assertion (upstream gap, verified in the pinned
-      # module source). The VM's storage is ephemeral, so pin both to the
-      # shipped package version (the module doc's auto-update variant).
-      services.dovecot2.settings = {
-        dovecot_config_version = config.services.dovecot2.package.version;
-        dovecot_storage_version = config.services.dovecot2.package.version;
+      services.dovecot2 = {
+        # nixpkgs' localMail provision ships no auth config: on this pin
+        # (dovecot 2.4) enablePAM defaults FALSE, so the auth service
+        # crash-loops with "No passdbs specified ... PLAIN mechanism needs
+        # one" and IMAP login is impossible (observed in this test,
+        # 2026-09-15). enablePAM adds the passdb/userdb blocks + PAM
+        # service; the dmarc system user authenticates via PAM unix auth.
+        enablePAM = true;
+        settings = {
+          # Dovecot 2.4 on this nixpkgs pin REQUIRES explicit version pins
+          # (base-module assertions), but nixpkgs' parsedmarc localMail
+          # provision enables dovecot2 without setting them - any localMail
+          # consumer hits the assertion (upstream gap, verified in the
+          # pinned module source). The VM's storage is ephemeral, so pin
+          # both to the shipped package version (the auto-update variant).
+          dovecot_config_version = config.services.dovecot2.package.version;
+          dovecot_storage_version = config.services.dovecot2.package.version;
+          # 2.4 needs explicit storage; must match postfix's home_mailbox
+          # below so the IMAP INBOX is exactly the Maildir postfix writes.
+          mail_driver = "maildir";
+          mail_path = "~/Maildir";
+        };
       };
+
+      # Deliver INTO the Maildir dovecot serves (postfix local(8) default
+      # is the mbox in /var/mail, which dovecot's maildir INBOX would
+      # never see - observed as "empty INBOX forever" in testing).
 
       services.dmarc-monitor.enable = true;
 
@@ -105,6 +122,8 @@ in
           hostname = "localhost";
         };
       };
+
+      services.postfix.settings.main.home_mailbox = "Maildir/";
 
       environment.systemPackages = [
         (sendEmail)
@@ -130,7 +149,14 @@ in
           "! grep -q '@imap-password@' /run/parsedmarc/parsedmarc.ini"
       )
       machine.succeed(
-          "! grep -qiE '^\\[(elasticsearch|splunk_hec)\\]' /run/parsedmarc/parsedmarc.ini"
+          # The nixpkgs module always renders an inert [elasticsearch]
+          # section (option defaults) - the WRAPPER's contract is that no
+          # sink TARGET is configured: no splunk_hec section, no hosts
+          # line anywhere in the ini.
+          "! grep -qiE '^\\[splunk_hec\\]' /run/parsedmarc/parsedmarc.ini"
+      )
+      machine.succeed(
+          "! grep -qiE '^hosts' /run/parsedmarc/parsedmarc.ini"
       )
       machine.succeed(
           "grep -q '^output = /var/lib/parsedmarc/reports$' /run/parsedmarc/parsedmarc.ini"
