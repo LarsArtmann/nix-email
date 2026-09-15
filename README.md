@@ -389,6 +389,18 @@ json/yaml/markdown.
   renamed the UNIT: `systemd.services.dovecot` (was `dovecot2.service`) -
   `wait_for_unit "dovecot2.service"` fails with "inactive, no pending jobs"
   even though dovecot is running (observed in parsedmarc-e2e, 2026-09-15).
+- Per-account storage QUOTA (VERIFIED in VM, 2026-09-15): the `quota`
+  principal field is an integer byte count on any individual
+  (`POST /api/principal` with `"quota": 1`). An over-quota message is
+  ACCEPTED at RCPT but never delivered - the queue retries forever with
+  "Mailbox over quota." (delivery.rs:223); there is no 5xx rejection at
+  SMTP time. Assert delivery-absence (IMAP), not SMTP refusal.
+- CATCH-ALL vs unknown-recipient rejection is a TEST-ORDERING trap
+  (observed 2026-09-15): a principal with the literal `"@<domain>"` address
+  (AddressMapping retries the lookup with `@<domain>`) makes EVERY local
+  part deliverable - `RCPT TO:<nobody@example.test>` then answers
+  `250 2.1.5 OK` and any "unknown recipient rejected 5xx" assertion fails.
+  Create the catch-all principal AFTER the rejection probe (the E2E does).
 
 ## Non-goals
 

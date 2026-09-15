@@ -398,7 +398,7 @@ in
               "roles": ["user"],
               "secrets": ["${testHash}"],
           })
-          with subtest("SMTP: full dialogue, unknown recipient rejected 5xx"):
+      with subtest("SMTP: full dialogue, unknown recipient rejected 5xx"):
           # --timeout 120: the RCPT decision runs SPF/DNSBL checks whose
           # resolver calls stall ~30s each in the DNS-less VM before failing
           # (deterministic NXDOMAIN-timeout behavior, live-observed). The
