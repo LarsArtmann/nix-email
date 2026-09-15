@@ -38,20 +38,20 @@ Sort: tier (decisions → research → hardening → integration → VPS → mig
 | --- | ------------------------------------------------------------------------------------------------------- | -------- | -------- | ------ | ---------- | ------------------------------------------------------------------------------------------ |
 | D1  | DECIDE: retire Google Workspace mailboxes for Stalwart VPS vs keep Workspace (monitoring-only)          | Decision | Critical | 10m    | user only  | Gates VPS scope, migration, cost, availability risk                                        |
 | D2  | DECIDE: VPS placement (which Hetzner project), size ceiling (CX22-class?), backup target (pool vs StorageBox) | Decision | Critical | 10m    | user only  | Gates provisioning + backup design                                                         |
-| D3  | DECIDE: repo visibility (public vs private git+ssh) + LICENSE                                            | Decision | High     | 10m    | user only  | Gates SystemNix input URL shape + CI auth                                                  |
-| R1  | Finish reading `selfhosted-email-guide.md` (200-560) + monitoring report tail; reconcile README runbook; verify-or-delete Hetzner :25 sentence | Research | Critical | 30m    | -          | Kills 2 memory-claims; runbook becomes source-derived                                      |
-| R2  | Delivery E2E VM test: provision account via Stalwart management API → SMTP → mailbox → IMAP fetch       | Research | Critical | 90m    | -          | THE 51% proof; unblocks admin-automation design                                            |
-| R3  | Smarthost relay spike: Mailpit as mock submission upstream in VM, verify `queue.*` keys on 0.15.5       | Research | Critical | 90m    | -          | Outbound design becomes fact; Mailpit finally earns its place                              |
-| R4  | Metrics endpoint probe (local binary + VM), codify assertion, wire Gatus shape                           | Research | High     | 30m    | -          | Closes ledger unverified-fact #1                                                           |
-| R5  | Stalwart native backup/export manager investigation; verify or replace the btrfs+borg assumption         | Research | Critical | 45m    | -          | Backup/DR design stops being folklore                                                      |
+| D3  | DECIDE: repo visibility ~~(public vs private git+ssh)~~ + LICENSE                                            | Decision | High     | 10m    | user only  | Visibility decided: **public** (published 2026-09-14); LICENSE choice open, ROADMAP Q3                                                  |
+| ~~R1~~  | ~~Finish reading `selfhosted-email-guide.md` (200-560) + monitoring report tail; reconcile README runbook; verify-or-delete Hetzner :25 sentence~~ done — 2026-09-14 - source reading finished, Hetzner claim verified against official docs (README ledger) | ~~Research~~ | ~~Critical~~ | ~~30m~~ | ~~-~~ | ~~Kills 2 memory-claims; runbook becomes source-derived~~ |
+| ~~R2~~  | ~~Delivery E2E VM test: provision account via Stalwart management API → SMTP → mailbox → IMAP fetch~~ done at `fbe9ca9` | ~~Research~~ | ~~Critical~~ | ~~90m~~ | ~~-~~ | ~~THE 51% proof; unblocks admin-automation design~~ |
+| R3  | Smarthost relay spike: ~~Mailpit as mock submission upstream in VM, verify `queue.*` keys on 0.15.5~~ mechanism VERIFIED locally (`c927922`; loopback guard blocks the VM path)       | Research | Critical | 90m    | -          | Round-trip two-node VM test in TODO_LIST; the real Resend path waits for D2                              |
+| ~~R4~~  | ~~Metrics endpoint probe (local binary + VM), codify assertion, wire Gatus shape~~ done — metrics keys + endpoint verified (README ledger) | ~~Research~~ | ~~High~~ | ~~30m~~ | ~~-~~ | ~~Closes ledger unverified-fact #1~~ |
+| ~~R5~~  | ~~Stalwart native backup/export manager investigation; verify or replace the btrfs+borg assumption~~ done — native --export backup verified (README ledger) | ~~Research~~ | ~~Critical~~ | ~~45m~~ | ~~-~~ | ~~Backup/DR design stops being folklore~~ |
 | R6  | Migration tooling: stalwart-vandelay vs imapsync on a scratch mailbox; decide + document                 | Research | High     | 45m    | -          | Migration runbook picks the right tool                                                     |
-| H1  | Fix aarch64 check trap: restrict `stalwart-e2e` to x86_64-linux                                          | Hardening | High    | 30m    | -          | Prevents a future slow-TCG CI surprise                                                     |
+| ~~H1~~  | ~~Fix aarch64 check trap: restrict `stalwart-e2e` to x86_64-linux~~ done at `8bfddfe` | ~~Hardening~~ | ~~High~~ | ~~30m~~ | ~~-~~ | ~~Prevents a future slow-TCG CI surprise~~ |
 | H2  | CI workflow (adapted nix-check.yml: flake check + input hygiene + fail-closed)                           | Hardening | High     | 60m    | -          | Every push gated like sibling repos                                                        |
 | H3  | Formatter + pre-commit: treefmt/alejandra/statix/deadnix, run over repo                                  | Hardening | Medium   | 45m    | -          | Repo matches LarsArtmann conventions                                                       |
-| H4  | docs-health BUILD: TODO_LIST.md, FEATURES.md, ROADMAP.md, CHANGELOG.md from status report                | Hardening | High     | 60m    | -          | Living task source exists (plans are snapshots)                                            |
+| ~~H4~~  | ~~docs-health BUILD: TODO_LIST.md, FEATURES.md, ROADMAP.md, CHANGELOG.md from status report~~ done (docs-health pass 2026-09-15) | ~~Hardening~~ | ~~High~~ | ~~60m~~ | ~~-~~ | ~~Living task source exists (plans are snapshots)~~ |
 | H5  | Module defaults from spike findings: `services.mail-server.relay.*` option + DKIM defaults + ledger updates | Hardening | Critical | 90m    | R2,R3      | Module becomes deployable, not just evaluable                                              |
-| H6  | d2 architecture diagram in README + AGENTS.md rules (assertions-from-transcripts, no-pipes-on-gates)     | Hardening | Medium   | 30m    | -          | Session knowledge stops dying in chat logs                                                 |
-| H7  | LICENSE + .gitignore polish + `/tmp/swtest` cleanup                                                      | Hardening | Medium   | 30m    | D3         | Repo legally + hygienically sound                                                          |
+| H6  | d2 architecture diagram in README + ~~AGENTS.md rules (assertions-from-transcripts, no-pipes-on-gates)~~ (`95d5dcb` + 2026-09-15)     | Hardening | Medium   | 30m    | -          | Diagram task open in TODO_LIST                                                 |
+| H7  | LICENSE + ~~.gitignore polish~~ (`21cab2c`) + ~~`/tmp/swtest` cleanup~~ (verified gone)                                                      | Hardening | Medium   | 30m    | D3         | LICENSE blocked on the license choice (ROADMAP Q3)                                                          |
 | I1  | SystemNix: add `nix-email` flake input + consumer wrapper skeleton (ports.nix, sops, onFailure, harden)  | Integration | Critical | 90m   | D3         | The "pluggable into SystemNix" promise becomes real                                        |
 | I2  | SystemNix: `dmarc-monitor` live wiring on evo-x2 (sops IMAP secret, Gatus liveness, backup-coordination) | Integration | High    | 90m    | D1 (mailbox location) | Domains-repo H1/H2 (rua blindness) finally closed                        |
 | I3  | SystemNix: Gatus starttls/tls/cert-expiry checks for `mail.<domain>`                                     | Integration | High    | 30m    | VPS live   | External-viewpoint uptime + cert monitoring                                                |
@@ -74,6 +74,9 @@ Counts: 33 tasks (3 decisions, 6 research, 7 hardening, 3 integration, 4 VPS, 2 
 ---
 
 ## 3. Fine-Grained Breakdown — ALL TODOs, max 12 min each
+
+_Micro-task statuses follow their section-2 parents (see the markers above
+and the appendix below)._
 
 Micro-task IDs encode the parent (`R2.3` = step 3 of R2). Every parent from section 2 is fully decomposed.
 
@@ -279,4 +282,16 @@ flowchart TD
 - Every migration step ends with: per-account parity evidence before the next step
 - Nothing in SystemNix's working mail-relay path is modified by this plan
 
-_Plan snapshot written 2026-09-14 18:37 CEST. Living copies of these tasks belong in TODO_LIST.md (H4)._
+_Plan snapshot written 2026-09-14 18:37 CEST. Living copies of these tasks belong in TODO_LIST.md (~~H4~~ done 2026-09-15 — they live there now; long-term/gated work in ROADMAP.md)._
+
+---
+
+## Status at annotation (2026-09-15, docs-health pass)
+
+| Tier | State |
+| ---- | ----- |
+| Decisions | D3 visibility decided (public); D1, D2, and the license choice open (ROADMAP "Open questions") |
+| Research | R1, R2, R4, R5 done; R3 mechanism verified (round-trip VM test in TODO_LIST); R6 blocked on D1 |
+| Hardening | H1, H4 done; H6, H7 partially done; H2 (CI), H3 (nix formatter), H5 (relay/DKIM options) open in TODO_LIST |
+| Integration | I1 unblocked (repo public), in TODO_LIST; I2, I3 gated on D1/VPS |
+| VPS / Terraform / Migration / Future | Gated on D1/D2 - ROADMAP themes |

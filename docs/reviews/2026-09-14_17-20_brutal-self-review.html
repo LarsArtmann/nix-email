@@ -926,7 +926,7 @@
 
         <div class="issue issue-critical">
           <span class="severity severity-critical">Blocking</span>
-          <h3>Source reading stopped mid-file — twice</h3>
+          <h3><del>Source reading stopped mid-file — twice</del> <small>done — R1 finished 2026-09-14; Hetzner claim verified against official docs (README ledger)</small></h3>
           <div class="where">~/projects/reports/selfhosted-email-guide.md (read to line 200 of ~560), open-source-email-monitoring-tools-report.md (to 500, references unread)</div>
           <p>
             The guide's unread two-thirds contains the actual recommended
@@ -943,7 +943,7 @@
 
         <div class="issue issue-critical">
           <span class="severity severity-critical">Blocking</span>
-          <h3>Operational config surface un-researched</h3>
+          <h3><del>Operational config surface un-researched</del> <small>done — relay/metrics/DKIM/backup keys source- and spike-verified 2026-09-14 (README ledger)</small></h3>
           <div class="where">Stalwart 0.15.5: queue.*/relay, metrics endpoint, ACME, DKIM signing, spam classifier seeding, Sieve, auto-ban</div>
           <p>
             The VM log even said "Spam classifier model not found" — observed,
@@ -961,7 +961,7 @@
 
         <div class="issue issue-critical">
           <span class="severity severity-critical">Blocking</span>
-          <h3>No account/delivery-level E2E</h3>
+          <h3><del>No account/delivery-level E2E</del> <small>done — full delivery path green since fbe9ca9 (2026-09-14)</small></h3>
           <div class="where">tests/stalwart-e2e.nix</div>
           <p>
             The test proves a mail can be REJECTED (550), not that one can be
@@ -984,7 +984,7 @@
 
         <div class="issue issue-important">
           <span class="severity severity-important">Important</span>
-          <h3>aarch64 check trap armed</h3>
+          <h3><del>aarch64 check trap armed</del> <small>done — stalwart-e2e restricted to x86_64-linux (8bfddfe)</small></h3>
           <div class="where">flake.nix checks = forAllSystems</div>
           <p>
             stalwart-e2e is defined for aarch64-linux but never run there; a
@@ -1036,10 +1036,10 @@
             <tr><td>mail-server module (listeners, TLS default, assertion)</td><td><span class="badge badge-fixed">Built</span></td><td>VM E2E green</td></tr>
             <tr><td>dmarc-monitor module (sinks off, [imap] correct)</td><td><span class="badge badge-fixed">Built</span></td><td>eval contract green</td></tr>
             <tr><td>Verified-facts ledger + runbook</td><td><span class="badge badge-high">Fixed live</span></td><td>2 claims corrected 17:15</td></tr>
-            <tr><td>Outbound relay, metrics, DKIM, backups, migration</td><td><span class="badge badge-critical">Not built</span></td><td>un-researched (above)</td></tr>
+            <tr><td>Outbound relay, metrics, DKIM, backups, migration</td><td><span class="badge badge-fixed"><del>Not built</del> recipes verified</span></td><td>keys verified in README ledger 2026-09-14; module options + two-node relay test in TODO_LIST</td></tr>
             <tr><td>VPS host, Terraform module, SystemNix consumer, Gatus</td><td><span class="badge badge-critical">Not built</span></td><td>status report (c)</td></tr>
-            <tr><td>Delivery-level E2E (account → mailbox → IMAP)</td><td><span class="badge badge-critical">Not built</span></td><td>this review, issue 3</td></tr>
-            <tr><td>CI, formatter, LICENSE, docs-health files</td><td><span class="badge badge-low">Not built</span></td><td>status report (c)</td></tr>
+            <tr><td>Delivery-level E2E (account → mailbox → IMAP)</td><td><span class="badge badge-fixed"><del>Not built</del> Built</span></td><td>fbe9ca9, 2026-09-14</td></tr>
+            <tr><td>CI, formatter, LICENSE, docs-health files</td><td><span class="badge badge-high"><del>Not built</del> Partial</span></td><td>docs-health files built 2026-09-15; dprint landed (21cab2c); CI + LICENSE open in TODO_LIST</td></tr>
           </tbody>
         </table>
 
@@ -1047,29 +1047,29 @@
         <div class="migration-step">
           <div class="migration-num">1</div>
           <div class="migration-content">
-            <h4>Finish the source reading</h4>
-            <p>selfhosted-email-guide.md lines 200+, monitoring report references; reconcile README runbook deltas.</p>
+            <h4><del>Finish the source reading</del></h4>
+            <p>Done 2026-09-14 (R1): guide tail read, Hetzner :25 policy verified, runbook reconciled. <ins>selfhosted-email-guide.md lines 200+, monitoring report references; reconcile README runbook deltas.</ins></p>
           </div>
         </div>
         <div class="migration-step">
           <div class="migration-num">2</div>
           <div class="migration-content">
-            <h4>Research spike AS CODE: Stalwart operational surface</h4>
-            <p>Mailpit as mock submission upstream in the VM test; verify relay keys, metrics endpoint, DKIM signing; graduate each verified key into module defaults + ledger.</p>
+            <h4><del>Research spike AS CODE: Stalwart operational surface</del></h4>
+            <p>Mostly done 2026-09-14 (R3/R4/R5): relay keys live-spiked, metrics + backup source-verified, ledger updated; the in-VM Mailpit round-trip remains open (TODO_LIST two-node test). <ins>Mailpit as mock submission upstream in the VM test; verify relay keys, metrics endpoint, DKIM signing; graduate each verified key into module defaults + ledger.</ins></p>
           </div>
         </div>
         <div class="migration-step">
           <div class="migration-num">3</div>
           <div class="migration-content">
-            <h4>Delivery-level E2E</h4>
-            <p>Provision an account via the Stalwart management API in the test; send → deliver → IMAP fetch; keep the 550 rejection test.</p>
+            <h4><del>Delivery-level E2E</del></h4>
+            <p>Done 2026-09-14 (fbe9ca9): provision → submit → deliver → IMAPS fetch, rejection test kept. <ins>Provision an account via the Stalwart management API in the test; send → deliver → IMAP fetch; keep the 550 rejection test.</ins></p>
           </div>
         </div>
         <div class="migration-step">
           <div class="migration-num">4</div>
           <div class="migration-content">
-            <h4>Backup mechanism investigation</h4>
-            <p>Evaluate Stalwart's native backup/export manager before any snapshot+borg design; fix or verify the README assumption.</p>
+            <h4><del>Backup mechanism investigation</del></h4>
+            <p>Done 2026-09-14 (R5): native <code>--export</code>/<code>--import</code> verified; snapshot+borg folklore replaced in the runbook. <ins>Evaluate Stalwart's native backup/export manager before any snapshot+borg design; fix or verify the README assumption.</ins></p>
           </div>
         </div>
         <div class="migration-step">
@@ -1082,13 +1082,13 @@
         <div class="migration-step">
           <div class="migration-num">6</div>
           <div class="migration-content">
-            <h4>Verify-or-delete remaining memory claims; restrict aarch64 checks</h4>
-            <p>Hetzner :25 policy sentence; checks = x86_64-only for the VM test.</p>
+            <h4><del>Verify-or-delete remaining memory claims; restrict aarch64 checks</del></h4>
+            <p>Done 2026-09-14: Hetzner sentence verified against official docs; checks gated x86_64-only (8bfddfe). <ins>Hetzner :25 policy sentence; checks = x86_64-only for the VM test.</ins></p>
           </div>
         </div>
 
         <footer class="footer">
-          Generated 2026-09-14 17:20 CEST &middot; The two README memory-claims were corrected live during this review &middot; Ghost systems: none (all built code is test-wired); split brain found: 1 (ledger), fixed
+          Generated 2026-09-14 17:20 CEST &middot; The two README memory-claims were corrected live during this review &middot; Ghost systems: none (all built code is test-wired); split brain found: 1 (ledger), fixed &middot; Annotated 2026-09-15 (docs-health): improvement steps 1&ndash;4 and 6 resolved, step 5 (migration tooling) still open &mdash; gated on D1
         </footer>
       </main>
     </div>
