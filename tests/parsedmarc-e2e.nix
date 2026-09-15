@@ -23,6 +23,15 @@
 #
 # Sample report: the same upstream sample nixpkgs' own parsedmarc VM test
 # uses (report_id 2940, org infonacot.gob.mx, policy domain example.com).
+#
+# TWO nodes, two IMAP shapes:
+#   machine - plaintext localMail (ssl="no" dovecot fixture; mailsuite
+#             auto-STARTTLS would break it otherwise - ledger entry)
+#   tls     - production-shaped IMAPS 993: self-signed cert with proper
+#             SANs, trusted machine-wide, parsedmarc ssl=true with
+#             DEFAULT certificate verification (parsedmarc only exposes
+#             skip_certificate_verification, default off; mailsuite uses
+#             create_default_context() - full chain + hostname checks)
 {pkgs}: let
   dmarcTestReport = pkgs.fetchurl {
     name = "dmarc-test-report";
@@ -104,7 +113,8 @@ in
           # STARTTLS it cannot complete - mailsuite auto-activates STARTTLS
           # whenever the capability is advertised (mailsuite/imap.py) and
           # the handshake dies with WRONG_VERSION_NUMBER. plaintext IMAP
-          # inside the VM loop; production rua mailboxes use real TLS.
+          # inside the VM loop; production rua mailboxes use real TLS
+          # (the `tls` node below exercises that path).
           ssl = "no";
         };
       };
@@ -139,11 +149,63 @@ in
 
       services.postfix.settings.main.home_mailbox = "Maildir/";
 
+      services.dmarc-monitor = {
+        enable = true;
+        settings.general.offline = true;
+      };
+
+      services.parsedmarc.provision = {
+        geoIp = false;
+        localMail = {
+          enable = true;
+          hostname = "localhost";
+        };
+      };
+
+      # Force the TLS path over the provision's plaintext defaults.
+      services.parsedmarc.settings.imap = {
+        port = lib.mkForce 993;
+        ssl = lib.mkForce true;
+      };
+
+      services.postfix.settings.main.home_mailbox = "Maildir/";
+
       environment.systemPackages = [
         sendEmail
         pkgs.jq
       ];
     };
+
+    # Production-shaped IMAPS variant: same localMail provision, but the
+    # dovecot fixture serves implicit TLS on 993 with a trusted cert and
+    # parsedmarc connects with ssl=true and DEFAULT verification on
+    # (create_default_context: chain + hostname). mkForce beats the
+    # provision's plain localhost:143/ssl=false definitions.
+    nodes.tls = {config, lib, ...}: {
+      imports = [../modules/dmarc-monitor.nix];
+
+      virtualisation.memorySize = 2048;
+
+      # Trust the fixture CA machine-wide so mailsuite's default
+      # verification context accepts the chain.
+      security.pki.certificateFiles = ["${imapTestCert}/cert.pem"];
+
+      services.dovecot2 = {
+        enablePAM = true;
+        settings = {
+          inherit (config.services.dovecot2.settings)
+            dovecot_config_version
+            dovecot_storage_version
+            ;
+          mail_driver = "maildir";
+          mail_path = "~/Maildir";
+          ssl = "required";
+          # Dovecot 2.4 cert key names (the NixOS module's own rename
+          # assertion names them; 2.3 was ssl_cert/ssl_key).
+          ssl_server_cert_file = "<${imapTestCert}/cert.pem";
+          ssl_server_key_file = "<${imapTestCert}/key.pem";
+        };
+      };
 
     testScript = ''
       start_all()
