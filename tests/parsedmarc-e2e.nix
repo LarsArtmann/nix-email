@@ -159,7 +159,9 @@ in
           "! grep -qiE '^hosts' /run/parsedmarc/parsedmarc.ini"
       )
       machine.succeed(
-          "grep -q '^output = /var/lib/parsedmarc/reports$' /run/parsedmarc/parsedmarc.ini"
+          # ini renders key=value with NO spaces (parsedmarc.nix flips
+          # mkKeyValueDefault "=") - verified against the rendered file.
+          "grep -q '^output=/var/lib/parsedmarc/reports$' /run/parsedmarc/parsedmarc.ini"
       )
 
       with subtest("aggregate report mailed into the local mailbox is parsed"):
