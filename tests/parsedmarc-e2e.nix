@@ -100,6 +100,12 @@ in
           # below so the IMAP INBOX is exactly the Maildir postfix writes.
           mail_driver = "maildir";
           mail_path = "~/Maildir";
+          # VM fixture: no TLS material, so dovecot would advertise
+          # STARTTLS it cannot complete - mailsuite auto-activates STARTTLS
+          # whenever the capability is advertised (mailsuite/imap.py) and
+          # the handshake dies with WRONG_VERSION_NUMBER. plaintext IMAP
+          # inside the VM loop; production rua mailboxes use real TLS.
+          ssl = "no";
         };
       };
 

@@ -65,6 +65,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- parsedmarc dies at its first IMAP connect on this nixpkgs pin
+  (imapclient 3.1.0 assigns `imaplib.IMAP4.file`, read-only since python
+  3.14; AttributeError, exit 255). The wrapper pins the unit's binary to
+  the same parsedmarc 11.0.1 built on python 3.13 (same rev, same
+  contract); `dmarc-eval` asserts the pin (README ledger entry;
+  upstream-able)
 - parsedmarc unit fails to start with parsedmarc 11 ("hosts setting
   missing from the elasticsearch config section"): nixpkgs' module
   materializes a host-less `[elasticsearch]` section (cert_path + ssl

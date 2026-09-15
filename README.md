@@ -425,6 +425,17 @@ json/yaml/markdown.
   ES is off); `tests/dmarc-eval.nix` asserts the workaround stays wired.
   Upstream-able: the module should not emit the section when ES is not
   provisioned.
+- NIXPKGS BUG (workaround shipped 2026-09-15): on this rev the NixOS
+  python scope resolves imapclient 3.1.0 for parsedmarc, and 3.1.0 is
+  incompatible with python 3.14 (the VM's interpreter): its
+  `IMAP4WithTimeout.open()` assigns `self.file`, a read-only property
+  since 3.14 - parsedmarc dies at the first IMAP connect with
+  AttributeError (exit 255) before any polling happens. The SAME rev
+  ships parsedmarc 11.0.1 on python 3.13, where 3.1.0 still works, so
+  the wrapper pins the unit's ExecStart to the python3.13 build (same
+  version, same CLI, same ini contract). `dmarc-eval` asserts the pin.
+  Revert when nixpkgs ships an imapclient compatible with 3.14's
+  imaplib.
 - IMAP/IMAPS LOGIN resolves by principal NAME (VM-verified 2026-09-15 via
   curl-imaps probe): a principal named `catchall` with email
   `catchall@example.test` CANNOT log in as the email address, only as
