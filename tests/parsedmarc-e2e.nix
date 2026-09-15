@@ -74,10 +74,21 @@ in
   pkgs.testers.runNixOSTest {
     name = "parsedmarc-e2e";
 
-    nodes.machine = {
+    nodes.machine = {config, ...}: {
       imports = [../modules/dmarc-monitor.nix];
 
       virtualisation.memorySize = 2048;
+
+      # Dovecot 2.4 on this nixpkgs pin REQUIRES explicit version pins
+      # (base-module assertions), but nixpkgs' parsedmarc localMail
+      # provision enables dovecot2 without setting them - any localMail
+      # consumer hits the assertion (upstream gap, verified in the pinned
+      # module source). The VM's storage is ephemeral, so pin both to the
+      # shipped package version (the module doc's auto-update variant).
+      services.dovecot2.settings = {
+        dovecot_config_version = config.services.dovecot2.package.version;
+        dovecot_storage_version = config.services.dovecot2.package.version;
+      };
 
       services.dmarc-monitor.enable = true;
 

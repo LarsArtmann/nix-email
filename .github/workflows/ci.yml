@@ -45,7 +45,7 @@ jobs:
       - name: Assert the expected checks exist (fail-closed guard)
         run: |
           nix eval .#checks.x86_64-linux --json | tee /tmp/checks.json
-          for check in dmarc-eval stalwart-e2e stalwart-relay-e2e; do
+          for check in dmarc-eval stalwart-e2e stalwart-relay-e2e parsedmarc-e2e; do
             jq -e "has(\"$check\")" /tmp/checks.json > /dev/null \
               || { echo "FATAL: check '$check' is missing from .#checks - the gate would run less than it claims"; exit 1; }
           done
