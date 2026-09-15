@@ -29,6 +29,12 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
 - Gate commands never wear pipes (`cmd | tail` can print PASSED on a failing
   run); test assertions are transcribed from observed transcripts, not from
   expected output (the swaks `<**` vs `<-` lesson).
+- `nix fmt .` (WITH the path): bare `nix fmt` forwards no paths, so
+  alejandra 4.0.0 reads STDIN and dies with `unexpected end of file` -
+  check-mode is `nix fmt -- . --check` (what CI enforces).
+- After editing ONE check, build THAT check first
+  (`nix build .#checks.x86_64-linux.<name> -L`), then the full gate - a
+  full-gate run just to discover a single subtest's typo costs ~9 min.
 
 ## Conventions
 

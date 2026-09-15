@@ -42,6 +42,9 @@ jobs:
         run: |
           find . -name '*.nix' -print0 | xargs -0 -n1 nix-instantiate --parse > /dev/null
 
+      - name: Enforce alejandra formatting (fail-closed)
+        run: nix fmt -- . --check
+
       - name: Assert the expected checks exist (fail-closed guard)
         run: |
           nix eval .#checks.x86_64-linux --json | tee /tmp/checks.json

@@ -76,6 +76,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - `docs/THREAT_MODEL.md` gained the catch-all enumeration-tradeoff row;
   AGENTS.md gained a working-rules section (mechanical gate pattern,
   identifier extraction, root-file existence check)
+- CI enforces alejandra formatting (`nix fmt -- . --check`, fail-closed) -
+  the gate previously parsed Nix but let style drift ship; a pre-existing
+  `(sendEmail)` paren slip in `tests/parsedmarc-e2e.nix` was the proof it
+  could. NOTE: bare `nix fmt` dies on alejandra 4.0.0 (stdin mode) - the
+  invocation is `nix fmt .` (AGENTS documents it)
 
 ### Changed
 

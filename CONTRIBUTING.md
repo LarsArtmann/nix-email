@@ -58,7 +58,10 @@ nix flake check > /tmp/gate.log 2>&1; echo "EXIT:$?" >> /tmp/gate.log
 ```
 
 Test assertions are transcribed from observed transcripts, not from expected
-output.
+output: grep the line you want to assert out of an existing test log or a
+debug VM run first. Reading it in upstream source is NOT evidence of what the
+journal/log prints (the `Mailbox over quota.` vs `Message rescheduled for
+delivery` lesson, 2026-09-15).
 
 ## Docs map
 
