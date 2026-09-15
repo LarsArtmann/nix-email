@@ -186,6 +186,21 @@ nix-email.url = "github:LarsArtmann/nix-email";
 # for outputDirectory.
 ```
 
+The consumer wrapper already exists as
+`SystemNix/modules/nixos/services/nix-email.nix` (sops secrets for the IMAP
+password / fallback-admin / relay password, onFailure alert routing, the
+integration-registry backup-freshness entry) and is eval-contract-tested in
+`SystemNix/tests/test-nix-email.nix` - enabling dmarc-monitor on evo-x2 is a
+consumer-config flip plus filling the real
+`platforms/nixos/secrets/nix-email.yaml` secret, not new wiring.
+
+PIN DISCIPLINE: SystemNix pins this repo by a hard rev/tag (not `?ref=master`):
+the wrapper is verified against the nixpkgs `services.stalwart` module (0.15.5)
+at a specific nixpkgs rev, and both repos deliberately pin the SAME nixpkgs
+rev (compat doctrine - bump both together; Renovate PRs are approval-gated so
+a nixpkgs move never lands unreviewed). InboxClean's `?ref=master` is fine
+there because it has no nixpkgs-version-sensitive contract; this repo does.
+
 Gatus checks for the VPS (on evo-x2, external viewpoint):
 
 ```yaml
@@ -224,6 +239,11 @@ Gatus checks for the VPS (on evo-x2, external viewpoint):
    lower MX TTL first, keep Workspace alive ~2 weeks as rollback.
 5. evo-x2: enable `dmarc-monitor` against the `dmarc@` IMAP mailbox; drive
    the DMARC ladder (`none -> quarantine -> reject`) from the report data.
+   Enablement goes through the SystemNix consumer wrapper
+   (`modules/nixos/services/nix-email.nix`): flip `services.dmarc-monitor.enable`
+   in the host config and fill the real IMAP-password secret - the sops
+   wiring, onFailure alerting, and backup-freshness check are already layered
+   and eval-tested there (see "SystemNix integration" above).
 6. Backups (VERIFIED against v0.15.5 source): the binary ships a NATIVE
    consistent export - `stalwart --config ... --export <dir>` (offline op:
    runs instead of serving, then exits) writes lz4-framed dumps of ALL store

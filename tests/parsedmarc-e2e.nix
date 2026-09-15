@@ -198,9 +198,12 @@ in
           mail_path = "~/Maildir";
           ssl = "required";
           # Dovecot 2.4 cert key names (the NixOS module's own rename
-          # assertion names them; 2.3 was ssl_cert/ssl_key).
-          ssl_server_cert_file = "<${imapTestCert}/cert.pem";
-          ssl_server_key_file = "<${imapTestCert}/key.pem";
+          # assertion names them; 2.3 was ssl_cert/ssl_key). NO "<" prefix:
+          # that is dovecot's read-value-from-file syntax - the module inlines
+          # the file contents into dovecot.conf and doveconf then dies parsing
+          # the first PEM line as a path (observed in this test, 2026-09-15).
+          ssl_server_cert_file = "${imapTestCert}/cert.pem";
+          ssl_server_key_file = "${imapTestCert}/key.pem";
         };
       };
 
@@ -224,6 +227,16 @@ in
       };
 
       services.postfix.settings.main.home_mailbox = "Maildir/";
+
+      # Boot-race resilience (fixture-level): parsedmarc connects to IMAPS
+      # at start; if it wins the race against dovecot's 993 listener it exits
+      # 1. The nixpkgs unit ships no Restart policy, so one lost race would
+      # leave it dead - a poller daemon should retry (SystemNix layers the
+      # same intent via startLimitBurst on the consumer side).
+      systemd.services.parsedmarc.serviceConfig = {
+        Restart = "on-failure";
+        RestartSec = "2s";
+      };
 
       environment.systemPackages = [
         sendEmail
@@ -335,9 +348,10 @@ in
       # --- TLS node: the production-shaped IMAPS collection path ----------
       tls.wait_for_unit("postfix.service")
       tls.wait_for_unit("dovecot.service")
-      tls.wait_for_unit("parsedmarc.service")
-      tls.wait_for_open_port(25, timeout=60)
       tls.wait_for_open_port(993, timeout=60)
+      # parsedmarc may still be in its boot-race restart loop; wait for it
+      # to settle into active after the listener exists.
+      tls.wait_for_unit("parsedmarc.service")
 
       with subtest("TLS variant: report collected over IMAPS 993"):
           # The runtime ini must carry the production shape: ssl=true on
