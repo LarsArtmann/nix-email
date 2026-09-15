@@ -159,7 +159,12 @@ pkgs.testers.runNixOSTest {
             "> /tmp/swaks-local.log 2>&1 || true"
         )
         smtp.succeed("cat /tmp/swaks-local.log >&2")
-        smtp.succeed("grep -E '(<-|<\\*\\*) *5[0-9][0-9]' /tmp/swaks-local.log")
+        # Observed transcript (VM, 2026-09-15): the 550 arrives with the
+        # "<~*" marker (swaks' timeout-receive variant), not "<-"/"<**" -
+        # assert the marker set actually observed, never the expected one.
+        smtp.succeed(
+            "grep -E '(<-|<\\*\\*|<~\\*) *5[0-9][0-9]' /tmp/swaks-local.log"
+        )
         smtp.succeed(
             "! curl -fsS http://relay:8025/api/v1/messages | grep -q 'local-needle-3a7d'"
         )

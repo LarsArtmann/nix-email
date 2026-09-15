@@ -50,5 +50,9 @@
         in
         checks
       );
+
+      # `nix fmt` - the one .nix formatter for this repo (dprint covers
+      # json/yaml/markdown only).
+      formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.alejandra);
     };
 }

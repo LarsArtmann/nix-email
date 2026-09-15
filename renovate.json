@@ -1,0 +1,19 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "labels": ["dependencies"],
+  "prConcurrentLimit": 2,
+  "schedule": ["before 4am on Monday"],
+  "github-actions": {
+    "enabled": true
+  },
+  "packageRules": [
+    {
+      "matchManagers": ["nix"],
+      "dependencyDashboardApproval": true
+    }
+  ],
+  "prBodyNotes": [
+    ":warning: **PAIRING DOCTRINE**: nix-email's nixpkgs pin must move TOGETHER with SystemNix's flake.lock (same rev - see AGENTS.md conventions). Merge only in the same window as the SystemNix bump and re-run `nix flake check` in BOTH repos. If nixpkgs moves `services.stalwart` past 0.15.5, note it in README first (the module pin is 0.15.5; 0.16.x is module-incompatible)."
+  ]
+}
