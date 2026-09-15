@@ -29,9 +29,10 @@
 #      Enable retries the lookup with "@<domain>", crates/common/src/
 #      addresses.rs:209)
 #  15. Account quota: `quota` (bytes) on a principal makes delivery RETRY
-#      forever with "Mailbox over quota." (crates/email/src/message/
-#      delivery.rs:225, source-verified) - message accepted at SMTP time,
-#      never ingested, and the retry REASON is asserted in the journal
+#      forever (code-level reason "Mailbox over quota.", delivery.rs:225;
+#      journal-visible signature: "Message rescheduled for delivery") -
+#      message accepted at SMTP time, never ingested, and the retry IS
+#      asserted in the journal
 #  16. Spam classification: a GTUBE body message gets X-Spam-Status: Yes
 #      and is STILL delivered to INBOX (VM-verified 2026-09-15: the default
 #      filter scans authenticated submission but does NO Junk filing;
@@ -323,8 +324,9 @@ in
           create_principal({"type": "domain", "name": "example.test"})
           create_account("user1@example.test")
           create_account("user2@example.test")
-          # quota = 1 BYTE: over-quota delivery retries forever ("Mailbox
-          # over quota.", delivery.rs:225) - never ingested.
+          # quota = 1 BYTE: over-quota delivery retries forever (reason
+          # "Mailbox over quota." at delivery.rs:225; journal logs only
+          # "Message rescheduled for delivery") - never ingested.
           create_principal({
               "type": "individual",
               "name": "user3@example.test",
@@ -493,11 +495,14 @@ in
           machine.succeed(
               "imap-absent-probe needle-quota-9e3b user3@example.test testpass 21"
           )
-          # Transcript-backed, not comment-only: the queue logs the
-          # TemporaryFailure reason verbatim when it retries the delivery
-          # ("Mailbox over quota.", crates/email/src/message/delivery.rs:225).
+          # Transcript-backed (VM debug run 2026-09-15): the journal at
+          # default verbosity NEVER logs the code-level reason "Mailbox over
+          # quota." (delivery.rs:225) - the observable retry signature is
+          # `Message rescheduled for delivery`. Do not re-assert the reason
+          # string; it was tried and the gate caught it (the source-reading
+          # lesson again).
           machine.wait_until_succeeds(
-              "journalctl -u stalwart.service -b 0 -o cat | grep -q 'Mailbox over quota'",
+              "journalctl -u stalwart.service -b 0 -o cat | grep -q 'Message rescheduled for delivery'",
               timeout=60,
           )
 

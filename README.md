@@ -394,7 +394,10 @@ json/yaml/markdown.
   (`POST /api/principal` with `"quota": 1`). An over-quota message is
   ACCEPTED at RCPT but never delivered - the queue retries forever with
   "Mailbox over quota." (delivery.rs:225, source-verified); there is no 5xx rejection at
-  SMTP time. Assert delivery-absence (IMAP), not SMTP refusal.
+  SMTP time. Assert delivery-absence (IMAP), not SMTP refusal. JOURNAL GOTCHA
+  (VM-observed 2026-09-15): the reason string is NOT logged at default
+  verbosity - the retry's journal signature is `Message rescheduled for
+  delivery`; do not grep for the reason text.
 - CATCH-ALL vs unknown-recipient rejection is a TEST-ORDERING trap
   (observed 2026-09-15): a principal with the literal `"@<domain>"` address
   (AddressMapping retries the lookup with `@<domain>`) makes EVERY local
@@ -424,7 +427,10 @@ json/yaml/markdown.
   section from the RENDERED ini via a guarded `ExecStartPre` (only while
   ES is off); `tests/dmarc-eval.nix` asserts the workaround stays wired.
   Upstream-able: the module should not emit the section when ES is not
-  provisioned.
+  provisioned. Re-checked against nixpkgs MASTER 2026-09-15: still present
+  (`elasticsearch.ssl`/`.cert_path` defaults pass the same
+  `lib.filterAttrsRecursive` null/[]/{} filter), so the issue is still live
+  upstream, not stale.
 - NIXPKGS BUG (workaround shipped 2026-09-15): on this rev the NixOS
   python scope resolves imapclient 3.1.0 for parsedmarc, and 3.1.0 is
   incompatible with python 3.14 (the VM's interpreter): its
@@ -435,7 +441,12 @@ json/yaml/markdown.
   the wrapper pins the unit's ExecStart to the python3.13 build (same
   version, same CLI, same ini contract). `dmarc-eval` asserts the pin.
   Revert when nixpkgs ships an imapclient compatible with 3.14's
-  imaplib.
+  imaplib. Upstream status 2026-09-15: imapclient 4.0.1 (the version on
+  nixpkgs master) DROPPED the `imap4.py` `open()` override entirely, so
+  the common connect path is fixed - but `imapclient.py` `starttls()`
+  still assigns `self._imap.file`, so 4.x on python 3.14 still breaks the
+  STARTTLS-upgrade path (`lib/python3.14/imaplib.py:337` is the read-only
+  property). Cite both halves when filing.
 - mailsuite (parsedmarc's IMAP layer) AUTO-ACTIVATES STARTTLS whenever the
   server advertises the capability (mailsuite/imap.py:284: `if not ssl and
   b"STARTTLS" in self.capabilities()`). A dovecot that advertises STARTTLS

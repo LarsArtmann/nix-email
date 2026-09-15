@@ -58,10 +58,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   Corporation"; `jq -e` without slurp)
 - `LICENSE` (MIT); `docs/THREAT_MODEL.md` extended with the attacker-scenario
   table and the out-of-scope/consumer-responsibilities list
-- `stalwart-e2e` over-quota subtest asserts the queue's retry reason in the
-  journal (`Mailbox over quota.`, source-verified at
-  `crates/email/src/message/delivery.rs:225`) instead of inferring it from
-  delivery absence
+- `stalwart-e2e` over-quota subtest asserts the queue's retry in the journal
+  (`Message rescheduled for delivery`, the observed signature - the
+  code-level reason `Mailbox over quota.` at `delivery.rs:225` is NOT logged
+  at default verbosity; the first attempt to assert it failed the gate and
+  the transcript fixed it)
 - `parsedmarc-e2e` asserts the runtime ini is provably free of the inert
   `[elasticsearch]` section (parsedmarc merely starting was necessary but not
   sufficient evidence), and the aggregate-report wait tightened 300 s → 120 s
