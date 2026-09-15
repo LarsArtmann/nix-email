@@ -353,3 +353,101 @@ This snapshot deliberately does not edit TODO_LIST.md/ROADMAP.md. New
 candidates introduced here (S-series → L05/L06/L26, plus verdict outputs of
 06e) should be HARVESTed into the living docs after user approval — say the
 word and docs-health HARVEST runs against this file.
+
+---
+
+## 10. Research findings (2026-09-15 evening session — L05/L06/L26 executed)
+
+Method: vendor compare page fetched as HTML (cell marks preserved — the
+markdown-format fetch had dropped them); release notes via GitHub API
+(v0.15.5 → v0.16.22); feature presence verified by grepping the **v0.15.5
+git tag source tarball** (`codeload.github.com/stalwartlabs/stalwart/tar.gz/
+refs/tags/v0.15.5`). Source-tag presence ≠ live-binary verification: absence
+of a code path is conclusive, presence still needs runtime confirmation
+before WIRING anything (the README ledger bar).
+
+### 05c. Edition x version cross-table
+
+| Candidate feature | Community ed. (current docs) | In 0.15.5 (tag source) | Verdict |
+|---|---|---|---|
+| Automated DKIM keygen + rotation | yes | **NO** (no rotation code; v0.16.0 release notes list it as new) | keep manual `POST /api/dkim` + sops recipe |
+| Automated DNS management (MX/TXT/TLSA...) | yes | **NO** (v0.16.0) | Terraform stays sole DNS truth; no split-brain on this pin |
+| DMARC/TLS-RPT/ARF report ingestion + storage | yes | **YES** — `smtp/src/reporting/`, AnalyzeReport at inbound, `report` store family (already survives `--export`), CLI `report.rs` lists/prints DMARC+TLS | see 06a |
+| Report visualization (webadmin) | yes | **UNVERIFIED** (webadmin is a prebuilt JS asset; compare-page claim is current-version) | see 06b |
+| OIDC (third-party providers) | yes | **YES** — `common/src/auth/oauth/{openid,oidc}.rs`, `http/src/auth/oauth/` | see 06c |
+| TOTP 2FA | yes | **YES** — `common/src/auth/mod.rs`, `directory/src/core/secret.rs` | available; account-level |
+| App passwords (labels/IP/expiry) | yes | labels/IP/expiry **NO** (v0.16.0); basic app passwords era-0.15 | nothing to do now |
+| Encryption-at-rest S/MIME + OpenPGP | yes | **YES** — `email/src/message/crypto.rs`, `management/crypto.rs`, `migration/encryption_v2.rs` | non-goal for single-user now |
+| Clustering (Zenoh/Kafka/NATS...) | yes | **YES** — `store/src/backend/zenoh` | non-goal (single VPS) |
+| PROXY protocol | yes | **NO** (no proxy-protocol parse in smtp inbound) | revisit on 0.16 module |
+| Autoconfig/Autodiscover | yes | **YES** — `http/src/autoconfig/` (MS Autodiscover **V2** = v0.16.0) | see 26a |
+| POP3 (STLS+SASL) | yes | **YES** — `crates/pop3/` | see 26c |
+| JMAP WebSocket transport | yes | **YES** — `jmap/src/websocket/upgrade.rs` | see 26c |
+| MTA-STS / DANE | yes | **YES** — inbound `mta_sts` handling + jmap submission paths | see 26a |
+| Prometheus metrics | "Limited" | endpoint VM-verified (ledger) | sufficient; "Limited" = OTel/alerts tier |
+
+### 06. Overlap review verdicts
+
+**06a — native report ingestion vs parsedmarc: KEEP BOTH (complement).**
+0.15.5 auto-analyzes inbound DMARC/TLS-RPT/ARF reports for mailboxes it
+hosts and stores them (free, default-on, survives export/import). It does
+NOT give a JSON/CSV sink, retention, or cross-server collection. parsedmarc
+stays primary: it keeps the architecture split (monitoring on evo-x2 polls
+the production VPS — monitoring survives a VPS outage) and feeds the
+JSON/CSV sink + Gatus freshness. Native ingestion is a free secondary
+readout via CLI/management API. Revisit only if parsedmarc upstream dies.
+
+**06b — tiny DMARC viewer: DEFER (park).** Native storage + CLI readout
+already exist on 0.15.5; build nothing until the live VPS webadmin is
+inspected (D1-gated) AND parsedmarc JSON proves insufficient.
+
+**06c — OIDC: SUPPORTED on 0.15.5 (source-verified: openid.rs/oidc.rs +
+oidc_* OAuthConfig keys).** Wiring is settings-passthrough (no wrapper
+option needed — doctrine 26d). Recommend wiring at D1-time in SystemNix
+(Pocket ID) when the admin UI moves behind the proxy; today loopback+tunnel
+already controls exposure.
+
+**06d — sieve-for-Junk: unchanged.** The ledger's source wall stands
+(settings scripts cannot fileinto; per-account active script only). Stays
+ROADMAP open question 6, recommendation (c) tag-only now + (d) upstream ask.
+
+**06e — ROADMAP deltas PROPOSED (harvest-gated, not applied):**
+- T4 "tiny DMARC viewer" → annotate DEFERRED per 06b.
+- T5 "OIDC if supported" → verified supported; reword "when D1".
+- T2 Terraform module → add 0.16-migration note: decide ONE DNS owner
+  (Terraform) and leave Stalwart's automated-DNS updater unconfigured (26e).
+- README non-goals → append POP3-off-by-default note (26c).
+
+### 26. Micro-decision outcomes (probe → decision)
+
+- **autoconfig**: present (http/src/autoconfig). No wrapper option — served
+  on the HTTP listener (loopback+proxy); exposing `autoconfig.<domain>` is a
+  consumer reverse-proxy concern. Settings passthrough suffices.
+- **PROXY protocol**: NOT in 0.15.5 → non-goal until the 0.16 module; also
+  conflicts with the direct-listener firewall design.
+- **DANE/MTA-STS inbound**: present. MTA-STS inbound needs the policy file
+  on an exposed HTTPS route (consumer proxy concern); DANE needs TLSA
+  records (Terraform `stalwart-mail` module should own them — feeds L17).
+- **encryption-at-rest**: present, per-account, self-service-portal managed.
+  NON-GOAL for single-user personal deployment (key-loss risk > benefit);
+  revisit if multi-user.
+- **TOTP**: present, per-account via webadmin. No wrapper option
+  (account-level concern, not host config).
+- **POP3**: present in 0.15.5, deliberately NOT in the wrapper listener
+  contract (25/465/587/993 only). NON-GOAL unless a legacy client appears;
+  a consumer can add it via `services.stalwart.settings`.
+- **JMAP-WS**: present; rides the HTTP listener so the WS upgrade works
+  through the reverse proxy unchanged. Nothing to do.
+- **FTS**: the internal FTS backend is Community and already part of the
+  store (no Elasticsearch). The existing "Elasticsearch for parsedmarc"
+  non-goal is a DIFFERENT thing and stands.
+- **26d wrapper doctrine (feeds ROADMAP Q5):** create a wrapper option only
+  when (1) a cross-option invariant must be asserted (relay half-config,
+  cert completeness, FQDN), (2) a security posture has a wrong default
+  (httpBind loopback warning, explicit firewall list), or (3) a verified
+  multi-key recipe exists that consumers would otherwise get wrong
+  (certificate tiers, relay IfBlock shape). Everything else stays
+  `services.stalwart.settings` passthrough with mkDefault.
+- **26e DNS split-brain guard**: no risk on 0.15.5 (no automated DNS
+  feature — source-verified absence). On any future 0.16 migration: ONE
+  owner (Terraform); do not configure Stalwart's DNS updater.

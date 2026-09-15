@@ -31,7 +31,8 @@
 }: let
   cfg = config.services.dmarc-monitor;
 
-  # Compatibility pin (README ledger 2026-09-15): the NixOS python scope
+  # Compatibility pin (README ledger 2026-09-15; re-check procedure:
+  # README "Pin-advance runbook"): the NixOS python scope
   # on this nixpkgs rev resolves imapclient 3.1.0, whose
   # IMAP4WithTimeout.open() assigns self.file - a read-only property since
   # python 3.14 - so parsedmarc crashes at its first IMAP connect
@@ -125,7 +126,8 @@ in {
       # ${lib.getExe pkgs.parsedmarc} (the py3.14 env). Same parsedmarc
       # version, same CLI, same ini contract - only the interpreter moves.
       ExecStart = lib.mkForce "${parsedmarcPackage}/bin/parsedmarc -c /run/parsedmarc/parsedmarc.ini";
-      # WORKAROUND (nixpkgs bug, README ledger 2026-09-15): with
+      # WORKAROUND (nixpkgs bug, README ledger 2026-09-15; retirement
+      # procedure: README "Pin-advance runbook"): with
       # provision.elasticsearch = false the module's settings submodule
       # still materializes elasticsearch.cert_path (types.path, defaults
       # to the CA bundle) and .ssl (types.bool); both survive the module's

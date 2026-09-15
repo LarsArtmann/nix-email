@@ -257,6 +257,41 @@ Gatus checks for the VPS (on evo-x2, external viewpoint):
    age key, not only the VPS host key - a rebuilt VPS gets a new host key
    and would otherwise lose every secret (chicken-and-egg).
 
+## Pin-advance runbook (consumer pin + workaround re-check)
+
+Run this whenever nixpkgs moves (Renovate is approval-gated; python deps
+inside nixpkgs are invisible to it, so the checks below are manual):
+
+1. **Bump both locks together** (compat doctrine): `nixpkgs` input in THIS
+   flake and in SystemNix's - same rev, same commit. Never land one without
+   the other.
+2. **Re-check the two shipped workarounds** (module comments carry the code
+   side; this is the procedure side):
+   - `[elasticsearch]` emission: rerun `nix build .#checks.x86_64-linux.dmarc-eval`
+     and the `parsedmarc-e2e` VM test. If nixpkgs stops materializing the
+     host-less section (check `nixos/modules/services/monitoring/parsedmarc.nix`
+     for a fixed `filterAttrsRecursive`/option shape), delete the guarded
+     `ExecStartPre` strip in `modules/dmarc-monitor.nix` and the matching
+     `dmarc-eval`/`parsedmarc-e2e` assertions in the same change.
+   - imapclient/python pin: check the NixOS python scope's `imapclient`
+     version. Revert `parsedmarcPackage` in `modules/dmarc-monitor.nix` (and
+     the `dmarc-eval` pin assertion) when nixpkgs ships an imapclient whose
+     `starttls()` no longer assigns `imaplib.IMAP4.file` on python 3.14
+     (imapclient 4.x fixed the plain connect path but NOT starttls as of
+     2026-09-15 - README ledger).
+   - Watch for `services.stalwart` passing 0.15.5: the wrapper's verified key
+     set (relay IfBlocks, certificate tiers) must be re-verified against the
+     new source before riding the bump.
+3. **Advance the SystemNix consumer pin**: update the `nix-email` input rev
+   (hard rev or release tag - see PIN DISCIPLINE above), `nix flake update
+   nix-email`, restore any option-gated test cases the old pin forced out
+   (the relay-credential assertions were the first instance), delete dead
+   option-existence guards, then `nix flake check` in BOTH repos. Gate
+   commands never wear pipes.
+4. Tag a release here when the modules changed; SystemNix's pin should
+   reference it (the consumer contract is versioned by the tag, the exact
+   rev stays locked in flake.lock).
+
 ## Platform support
 
 The VM tests gate `stalwart-e2e`/`stalwart-relay-e2e` to **x86_64-linux
@@ -485,6 +520,18 @@ json/yaml/markdown.
   `catchall`. Accounts created by the webadmin never trip this because
   their name IS their address - a scripting/API-created account with a
   non-address name must be probed by name.
+- CAPABILITY AUDIT vs 0.15.5 (2026-09-15; method: grep of the v0.15.5 git
+  tag source tarball + vendor compare page + v0.16.0 release notes - a
+  source-tag audit, NOT live-binary proof; presence claims below still need
+  runtime confirmation before wiring): automated DKIM rotation and automated
+  DNS management are **0.16.0 features** (not on this pin - the manual
+  `POST /api/dkim` recipe and Terraform-as-DNS-truth stand); native
+  DMARC/TLS-RPT/ARF ingestion IS on 0.15.5 (`smtp/src/reporting/`, report
+  store family, CLI/management readout) and is kept as a free complement to
+  parsedmarc, not a replacement; OIDC, TOTP, encryption-at-rest, autoconfig,
+  POP3, JMAP-WS, MTA-STS/DANE, Zenoh clustering are present in the 0.15.5
+  source; PROXY protocol is NOT (0.16+). Verdicts live in
+  `docs/planning/2026-09-15_19-23_nix-email-pareto-master-plan.md` §10.
 - SIEVE/JUNK-FILING architecture in 0.15.5 (source-verified 2026-09-15
   against the pinned store source, while implementing wrapper-owned Junk
   filing - it is NOT implementable via settings):
