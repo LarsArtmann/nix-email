@@ -17,10 +17,14 @@ let
 
   parsedmarcVersion = pkgs.parsedmarc.version;
 
-  # Path literals are forbidden in pure flake eval; a store path satisfies
-  # the attrsOf-path secret type the same way a sops template path would on
-  # a real host.
-  secretFile = pkgs.writeText "dmarc-password" "dummy";
+  # The nixpkgs parsedmarc module's _secret handling REQUIRES a string
+  # (isString gate in its ini generator; a path VALUE throws at unit
+  # generation, parsedmarc.nix:12). An absolute path STRING passes
+  # types.path and satisfies the generator - on a real host that is the
+  # sops template path. Forcing the rendered unit below also forces
+  # ini.generate, so this file genuinely exercises the secret-replacement
+  # contract, not just the settings shape.
+  secretFile = toString (pkgs.writeText "dmarc-password" "dummy");
 
   cfg =
     (nixpkgs.lib.nixosSystem {

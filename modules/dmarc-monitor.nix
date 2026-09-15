@@ -55,7 +55,9 @@ in
             port = 993;
             ssl = true;
             user = "dmarc@example.com";
-            password._secret = /run/secrets/dmarc-imap-password;
+            # NOTE: _secret must be an absolute path STRING - the nixpkgs
+            # ini generator throws on path VALUES (isString gate).
+            password._secret = "/run/secrets/dmarc-imap-password";
           };
           mailbox.watch = true;
         }
