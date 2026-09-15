@@ -35,12 +35,20 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
 - After editing ONE check, build THAT check first
   (`nix build .#checks.x86_64-linux.<name> -L`), then the full gate - a
   full-gate run just to discover a single subtest's typo costs ~9 min.
+- VM-test fixture traps (2026-09-15, both live-observed): dovecot settings
+  values must NOT use the `<path` prefix (that is dovecot's
+  read-value-from-file syntax - the NixOS module then inlines file CONTENTS
+  into dovecot.conf and doveconf dies parsing the first PEM line as a
+  path); the parsedmarc ini generator renders bools Python-style
+  (`ssl=True`, NOT `ssl=true`) - grep assertions must match `True`.
 
 ## Conventions
 
 - nixpkgs pinned to SystemNix's lock rev (compat doctrine). Bump both
   together; note in README when nixpkgs moves `services.stalwart` past
-  0.15.5.
+  0.15.5. The full bump + consumer-pin + workaround-retirement procedure
+  is the README "Pin-advance runbook" (SystemNix's pin references release
+  tags; current: v0.2.0).
 - Wrapper options are `services.mail-server` / `services.dmarc-monitor`
   (NOT `services.stalwart-mail` - collides with an nixpkgs rename alias).
 - All wrapper defaults are `mkDefault`; consumers override via

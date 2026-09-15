@@ -52,26 +52,26 @@
 | ---------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------ |
 | `stalwart-e2e` VM test       | 🟢 `FULLY_FUNCTIONAL` | Full path incl. provisioning API, 550 rejection, IMAPS fetch, DKIM, metrics, journal count, restart persistence, backup drill, alias + catch-all delivery, over-quota refusal-to-deliver (plus the queue's retry asserted in the journal via `Message rescheduled for delivery`), GTUBE spam tagging (X-Spam-Status; no auto-Junk filing), negative-cache poisoning + low-TTL recovery |
 | `stalwart-relay-e2e` VM test | 🟢 `FULLY_FUNCTIONAL` | Two-node smarthost relay path (stalwart → Mailpit) + local-routing non-leak assertion                         |
-| `parsedmarc-e2e` VM test     | 🟢 `FULLY_FUNCTIONAL` | Dovecot 2.4 config-version pins + unit-rename handling; parsedmarc unit runs against the local IMAP endpoint and the runtime ini is asserted free of the inert `[elasticsearch]` section (120 s parse bound) |
+| `parsedmarc-e2e` VM test     | 🟢 `FULLY_FUNCTIONAL` | Dovecot 2.4 config-version pins + unit-rename handling; parsedmarc unit runs against the local IMAP endpoint and the runtime ini is asserted free of the inert `[elasticsearch]` section (120 s parse bound). TWO nodes since 2026-09-15: plaintext fixture + production-shaped IMAPS 993 variant with DEFAULT certificate verification (machine-trusted fixture CA, `ssl=True`, no skip-verification) |
 | `dmarc-eval` contract test   | 🟢 `FULLY_FUNCTIONAL` | Pure eval, arch-independent (also builds green for aarch64); forces the parsedmarc ini generation, the version floor guard, the strip-script content, and the `ExecStartPre` order (module step + strip, strip last) |
 
 ## Repository infrastructure
 
 | Feature                       | Status                    | Notes                                                                |
 | ----------------------------- | ------------------------- | -------------------------------------------------------------------- |
-| `nix flake check` gate        | 🟢 `FULLY_FUNCTIONAL`     | All checks green; x86_64 VM runs, aarch64 eval-only (documented) - `dmarc-eval` also verified to BUILD for aarch64 (2026-09-15) |
+| `nix flake check` gate        | 🟢 `FULLY_FUNCTIONAL`     | All checks green; x86_64 VM runs, aarch64 eval-only. Emulated aarch64 `stalwart-e2e` attempted 2026-09-15: guest builds+boots under qemu binfmt/TCG but boot alone exceeds the driver's shell timeout - documented-manual, not CI-worthy (flake trap comment) |
 | Formatter (dprint + alejandra) | 🟢 `FULLY_FUNCTIONAL`    | `nix fmt` via the flake `formatter` output; dprint covers json/yaml/markdown |
-| CI (GitHub Actions)           | 🟢 `FULLY_FUNCTIONAL`     | `.github/workflows/ci.yml` - fail-closed `nix flake check` with an expected-checks guard, alejandra format enforcement, and an aarch64 check-set shape assertion |
+| CI (GitHub Actions)           | 🟢 `FULLY_FUNCTIONAL`     | `.github/workflows/ci.yml` - fail-closed `nix flake check` with a STRICT lockstep guard (flake-declared checks must equal CI's expected list exactly; negative-tested), alejandra format enforcement, and an aarch64 check-set shape assertion |
 | Repo topics                   | 🟢 `FULLY_FUNCTIONAL`     | mail/nixos/nixos-module/stalwart/dmarc/email-server/nix-flake        |
 | Renovate (nixpkgs input)      | 🟢 `FULLY_FUNCTIONAL`     | `renovate.json` - nix manager approval-gated, SystemNix pairing note |
-| LICENSE                       | 🟢 `FULLY_FUNCTIONAL`     | MIT shipped (`Copyright (c) 2026 Lars Artmann`); flipping the choice is a one-file change                           |
+| LICENSE                       | 🟢 `FULLY_FUNCTIONAL`     | MIT, CONFIRMED by the user 2026-09-15 (`Copyright (c) 2026 Lars Artmann`) |
 | Verified-facts ledger         | 🟢 `FULLY_FUNCTIONAL`     | `README.md`; zero UNVERIFIED claims                                  |
 
 ## Integration (consumers of this flake)
 
 | Feature                              | Status       | Notes                                                     |
 | ------------------------------------ | ------------ | --------------------------------------------------------- |
-| SystemNix consumer wrapper           | 🟡 `PARTIALLY_FUNCTIONAL` | Flake input (pinned rev) + sops secrets + onFailure/registry/backup wiring + eval-contract test shipped and green in SystemNix; enabled nowhere yet (D1-gated live enablement) |
+| SystemNix consumer wrapper           | 🟡 `PARTIALLY_FUNCTIONAL` | Flake input (pinned to release tag `v0.2.0` since 2026-09-15, relay assertions restored) + sops secrets + onFailure/registry/backup wiring + eval-contract test shipped and green in SystemNix; enabled nowhere yet (D1-gated live enablement) |
 | VPS production host                  | ⚪ `PLANNED` | Gated on D1/D2 decisions (see ROADMAP open questions)     |
 | Terraform `stalwart-mail` DNS module | ⚪ `PLANNED` | Gated on D1; lives in the domains repo                    |
 | Mailbox migration + MX cutover       | ⚪ `PLANNED` | Gated on D1                                               |
