@@ -50,8 +50,9 @@
 
 | Feature                      | Status                | Notes                                                                                                        |
 | ---------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------ |
-| `stalwart-e2e` VM test       | 🟢 `FULLY_FUNCTIONAL` | Full path incl. provisioning API, 550 rejection, IMAPS fetch, DKIM, metrics, journal count, restart persistence, backup drill |
+| `stalwart-e2e` VM test       | 🟢 `FULLY_FUNCTIONAL` | Full path incl. provisioning API, 550 rejection, IMAPS fetch, DKIM, metrics, journal count, restart persistence, backup drill, alias + catch-all delivery, over-quota refusal-to-deliver, GTUBE Junk filing, negative-cache poisoning + low-TTL recovery |
 | `stalwart-relay-e2e` VM test | 🟢 `FULLY_FUNCTIONAL` | Two-node smarthost relay path (stalwart → Mailpit) + local-routing non-leak assertion                         |
+| `parsedmarc-e2e` VM test     | 🟢 `FULLY_FUNCTIONAL` | Dovecot 2.4 config-version pins + unit-rename handling; parsedmarc unit runs against the local IMAP endpoint |
 | `dmarc-eval` contract test   | 🟢 `FULLY_FUNCTIONAL` | Pure eval, arch-independent; forces the parsedmarc ini generation + version floor guard                       |
 
 ## Repository infrastructure
@@ -63,14 +64,14 @@
 | CI (GitHub Actions)           | 🟢 `FULLY_FUNCTIONAL`     | `.github/workflows/ci.yml` - fail-closed `nix flake check` with an expected-checks guard |
 | Repo topics                   | 🟢 `FULLY_FUNCTIONAL`     | mail/nixos/nixos-module/stalwart/dmarc/email-server/nix-flake        |
 | Renovate (nixpkgs input)      | 🟢 `FULLY_FUNCTIONAL`     | `renovate.json` - nix manager approval-gated, SystemNix pairing note |
-| LICENSE                       | ⚪ `PLANNED`              | License choice pending                                               |
+| LICENSE                       | 🟢 `FULLY_FUNCTIONAL`     | MIT shipped (`Copyright (c) 2026 Lars Artmann`); flipping the choice is a one-file change                           |
 | Verified-facts ledger         | 🟢 `FULLY_FUNCTIONAL`     | `README.md`; zero UNVERIFIED claims                                  |
 
 ## Integration (consumers of this flake)
 
 | Feature                              | Status       | Notes                                                     |
 | ------------------------------------ | ------------ | --------------------------------------------------------- |
-| SystemNix consumer wrapper           | ⚪ `PLANNED` | Unblocked (repo public); work lives in the SystemNix repo |
+| SystemNix consumer wrapper           | 🟡 `PARTIALLY_FUNCTIONAL` | Flake input (pinned rev) + sops secrets + onFailure/registry/backup wiring + eval-contract test shipped and green in SystemNix; enabled nowhere yet (D1-gated live enablement) |
 | VPS production host                  | ⚪ `PLANNED` | Gated on D1/D2 decisions (see ROADMAP open questions)     |
 | Terraform `stalwart-mail` DNS module | ⚪ `PLANNED` | Gated on D1; lives in the domains repo                    |
 | Mailbox migration + MX cutover       | ⚪ `PLANNED` | Gated on D1                                               |

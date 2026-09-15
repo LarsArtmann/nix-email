@@ -80,3 +80,30 @@ parsedmarc runs as a DynamicUser with the full nixpkgs hardening set
 @system-service). The wrapper adds `StateDirectory` so the report output
 directory is writable. Its only credentials are the rua IMAP password (sops
 template path string - see the ledger for the `_secret` string contract).
+
+## Attacker scenarios considered
+
+| Scenario | Outcome | Mechanism / evidence |
+| --- | --- | --- |
+| Internet host relays through this server (open relay) | Refused | Submission requires authenticated local principals; unknown local recipients are rejected before queueing (both VM tests). |
+| Probing the topology by mailing a not-yet-provisioned domain | Availability trap, not disclosure | The directory negatively caches `is_local_domain` misses for 1 h by default, misrouting later mail to the MX path (README ledger; the E2E carries a poisoning + low-TTL-recovery regression subtest). |
+| SSRF via relay targets | Refused for loopback | Upstream refuses loopback-resolving relay targets; the wrapper additionally rejects IP literals at eval (above). |
+| Anonymous admin API access, across restarts | 401 | Asserted in the E2E, including after `systemctl restart`. |
+| Spam into user mailboxes | Filtered | Stalwart spam filter enabled by the wrapper; the E2E asserts a GTUBE message files to Junk, not INBOX. |
+| Secrets leaking through the Nix store or module system | Prevented by construction | All secrets are files (LoadCredential / sops) referenced via `%{file:...}%`; the wrapper declares path options only. |
+| Oversized mail exhausting storage | Bounded per-principal | Stalwart per-account quota; the E2E asserts an over-quota message is accepted at SMTP but never delivered (quota subtest). |
+
+## Out of scope / consumer responsibilities
+
+- sops provisioning and key policy (SystemNix `sops` layer, `.sops.yaml`).
+- Reverse proxy / TLS termination for any published route (admin route,
+  metrics scraping).
+- Firewall aggregation conflicts: base nixpkgs modules can silently drop
+  `mkDefault` list definitions on `networking.firewall.allowedTCPPorts`
+  (root-caused 2026-09-15, README ledger); the wrapper uses a plain
+  definition there so consumer layers cannot be outranked.
+- Backup confidentiality/integrity of the mail store and the parsedmarc
+  output directory (SystemNix backup-coordination).
+- Monitoring/on-call: consumer onFailure units and Gatus checks (SystemNix
+  integration registry, `monitored = true`).
+- Inbound MX reachability (Hetzner :25 unblock request, README runbook).

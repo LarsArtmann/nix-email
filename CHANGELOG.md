@@ -62,6 +62,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   (550 RCPT refusal arrives with the timeout-receive variant, not `<-` /
   `<**`); lesson recorded in the README ledger
 
+## [0.1.0] - 2026-09-14
+
+### Added
+
 - NixOS flake exporting `nixosModules.default/.mail-server/.dmarc-monitor`,
   nixpkgs pinned to SystemNix's lock rev (`eaad089`, NixOS 26.11)
 - `services.mail-server` wrapper: RFC listener set (25/587/465/993 + loopback
