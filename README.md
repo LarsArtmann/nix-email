@@ -436,6 +436,18 @@ json/yaml/markdown.
   version, same CLI, same ini contract). `dmarc-eval` asserts the pin.
   Revert when nixpkgs ships an imapclient compatible with 3.14's
   imaplib.
+- mailsuite (parsedmarc's IMAP layer) AUTO-ACTIVATES STARTTLS whenever the
+  server advertises the capability (mailsuite/imap.py: `if not ssl and
+  b"STARTTLS" in self.capabilities()`). A dovecot that advertises STARTTLS
+  without usable certificate material therefore breaks plaintext-IMAP
+  consumers with `SSL: WRONG_VERSION_NUMBER` at connect - the VM's
+  localMail dovecot needed `ssl = "no"` (plaintext fixture, no cert
+  material; production rua mailboxes use real TLS). Found while bringing
+  `tests/parsedmarc-e2e.nix` green, 2026-09-15.
+- The upstream sample DMARC report (estadocuenta1...2940.xml.zip) parses
+  with org_name "XYZ Corporation" even though the FILENAME says
+  infonacot.gob.mx - parsedmarc reads the XML body, so assertions must use
+  the body's metadata. (This bit nobody once, exactly once - 2026-09-15.)
 - IMAP/IMAPS LOGIN resolves by principal NAME (VM-verified 2026-09-15 via
   curl-imaps probe): a principal named `catchall` with email
   `catchall@example.test` CANNOT log in as the email address, only as

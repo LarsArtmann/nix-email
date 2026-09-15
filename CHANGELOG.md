@@ -51,7 +51,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   (`directoryCacheTtlNegative = 5` in the test)
 - `parsedmarc-e2e` VM test fixes for the Dovecot 2.4 pin: explicit
   `dovecot_config_version`/`dovecot_storage_version` (nixpkgs localMail
-  omits them) and the renamed `dovecot.service` unit (was `dovecot2.service`)
+  omits them), the renamed `dovecot.service` unit (was `dovecot2.service`),
+  a plaintext dovecot fixture (mailsuite auto-activates advertised
+  STARTTLS; no cert material in the VM - WRONG_VERSION_NUMBER), and
+  corrected sample-report assertions (parsed org_name is "XYZ
+  Corporation"; `jq -e` without slurp)
 - `LICENSE` (MIT); `docs/THREAT_MODEL.md` extended with the attacker-scenario
   table and the out-of-scope/consumer-responsibilities list
 
