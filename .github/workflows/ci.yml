@@ -3,9 +3,10 @@
 # Fail-closed rules (go-paperless lesson: a gate must PROVE it measured):
 #   - No `|| true`, no `-no-fail`, no step continues past a failure
 #     (GitHub Actions run steps fail on non-zero exit by default).
-#   - Before the check runs, the checks output is enumerated and must
-#     contain every expected check - a flake that silently stops exporting
-#     checks fails here, not somewhere downstream.
+#   - Before the check runs, the flake's declared check set is compared
+#     against CI's expected-checks list and must match EXACTLY (lockstep
+#     guard) - a flake that silently stops exporting checks fails here, and
+#     so does a new check nobody registered in the expected list.
 name: CI
 
 on:
@@ -45,13 +46,25 @@ jobs:
       - name: Enforce alejandra formatting (fail-closed)
         run: nix fmt -- . --check
 
-      - name: Assert the expected checks exist (fail-closed guard)
+      - name: Assert CI expected-checks match the flake (lockstep, fail-closed)
         run: |
-          nix eval .#checks.x86_64-linux --json | tee /tmp/checks.json
-          for check in dmarc-eval stalwart-e2e stalwart-relay-e2e parsedmarc-e2e; do
-            jq -e "has(\"$check\")" /tmp/checks.json > /dev/null \
-              || { echo "FATAL: check '$check' is missing from .#checks - the gate would run less than it claims"; exit 1; }
-          done
+          # LOCKSTEP GUARD: the flake's declared check set (builtins.attrNames
+          # is sorted by definition) and CI's expected list must be EXACTLY
+          # equal. Catches BOTH drift directions: a check that vanished from
+          # the flake (the gate would silently run less than it claims) AND a
+          # check added to the flake but never registered here (its later
+          # disappearance would go unnoticed). Update the expected list IN
+          # THE SAME COMMIT that adds/removes a check in flake.nix.
+          # No pipes on gate commands (repo rule): nix eval writes a file,
+          # jq reads the file; any upstream failure fails the step directly.
+          nix eval .#checks.x86_64-linux --json --apply 'builtins.attrNames' > /tmp/actual-checks.json
+          expected='["dmarc-eval","parsedmarc-e2e","stalwart-e2e","stalwart-relay-e2e"]'
+          if ! jq -e --argjson expected "$expected" 'sort == ($expected | sort)' /tmp/actual-checks.json > /dev/null; then
+            echo "FATAL: flake checks and CI expected-checks list diverged."
+            echo "--- flake declares: $(cat /tmp/actual-checks.json)"
+            echo "--- CI expects:     $expected"
+            exit 1
+          fi
 
       - name: Assert the aarch64 check set exists (shape guard)
         run: |
