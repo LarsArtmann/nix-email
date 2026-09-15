@@ -510,10 +510,13 @@ in
           # Created HERE, not during provisioning: a live catch-all makes
           # EVERY local part deliverable, which would turn the
           # "unknown recipient rejected 5xx" assertion above into a 250.
+          # First address = the login identity (IMAP auth does an exact
+          # principal lookup); the bare "@example.test" entry is what makes
+          # it the catch-all.
           create_principal({
               "type": "individual",
               "name": "catchall",
-              "emails": ["@example.test"],
+              "emails": ["catchall@example.test", "@example.test"],
               "roles": ["user"],
               "secrets": ["${testHash}"],
           })
