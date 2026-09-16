@@ -31,9 +31,11 @@
   # The username==null relay emission shape (import-and-eval pattern from
   # dmarc-eval): no auth block on the generated route, and no credential
   # registered for it. The wrapper asserts username/secretFile pair up, so
-  # this is the only legal no-credential shape.
+  # this is the only legal no-credential shape. NOTE: eval-config.nix, NOT
+  # nixos/default.nix - the latter only accepts {configuration, system,
+  # specialArgs} in the pinned nixpkgs and rejects a modules argument.
   nullRelayConfig =
-    (import "${pkgs.path}/nixos" {
+    (import "${pkgs.path}/nixos/lib/eval-config.nix" {
       system = pkgs.stdenv.hostPlatform.system;
       modules = [
         ../modules/mail-server.nix
