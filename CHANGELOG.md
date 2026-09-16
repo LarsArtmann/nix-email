@@ -89,7 +89,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   the archive. Every open item re-verified against the tree
   (PR #1 MERGED 16:08 UTC; CI green on HEAD; `data.errors` assertion
   confirmed still absent; dmarc-eval assertions confirmed present) and
-  harvested: TODO_LIST rebuilt to 14 open rows (0.3.0 release now
+  harvested: TODO_LIST rebuilt to 17 open rows (0.3.0 release now
   UNBLOCKED, reload-precondition assertion, pre-push fmt hook,
   branch-protection policy decision, SystemNix row extended with cache
   hygiene, a 3-row Low hygiene tier), README gained a "Development"

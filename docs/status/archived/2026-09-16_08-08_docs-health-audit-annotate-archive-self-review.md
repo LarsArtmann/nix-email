@@ -38,7 +38,7 @@
 
 1. ~~The third nixpkgs filing (parsedmarc unit Restart policy) — draft should live in docs/ next time, not /tmp~~ done (filed as NixOS/nixpkgs#563777, 08-16 report §a/10; README ledger carries it)
 2. ~~mjs/imapclient upstream filing (drift re-check now done — the expensive half)~~ done (filed as mjs/imapclient#662, 08-16 report §a/11)
-3. ~~Everything else harvested: see TODO_LIST (29 rows: filings, live-probe, SASL variant, tags-trigger, branch protection, Renovate verification, TLS-journal line, lock-rev notes, the low bundle)~~ done (harvested + executed by sessions 4-8; re-harvested/rebuilt in the 2026-09-16 evening AUDIT to 14 open rows)
+3. ~~Everything else harvested: see TODO_LIST (29 rows: filings, live-probe, SASL variant, tags-trigger, branch protection, Renovate verification, TLS-journal line, lock-rev notes, the low bundle)~~ done (harvested + executed by sessions 4-8; re-harvested/rebuilt in the 2026-09-16 evening AUDIT to 17 open rows)
 4. All D1/D2/Q6-gated work (unchanged, ROADMAP)
 
 ## d) TOTALLY FUCKED UP (own errors this session, no excuses)
@@ -94,7 +94,7 @@ _The canonical open list is TODO_LIST.md (29 rows, verified 2026-09-16). Items b
 
 1. ~~**Push approval, now bigger:** this pass added the annotation/archive/docs batch to master's unpushed pile (plus the morning session's flake/test/CI work — ~7 local commits; SystemNix sits at ~47 with a parallel session's work). Push nix-email now? (SystemNix push needs the coordination call separately.)~~ done (nix-email fully pushed by evening; SystemNix remains the TODO_LIST row)
 2. ~~**Renovate or Dependabot for github-actions bumps?** Both are enabled (renovate.json `github-actions: enabled` + `.github/dependabot.yml` weekly-grouped). Double coverage means duplicate PRs; which one should own it (delete the other's actions scope)?~~ _(routed: TODO_LIST Renovate install-or-drop row)_
-3. ~~**TODO_LIST breadth taste:** the harvest rebuilt it to 29 rows, including 12 low-impact polish rows harvested from old reports' brainstorms. Keep the full breadth (nothing re-rotts in timestamped files), or prune the low tier into ROADMAP raw ideas for a tighter active list?~~ done (2026-09-16 evening AUDIT: rebuilt to 14 tight rows with a 3-row hygiene section; stale low rows either executed or routed)
+3. ~~**TODO_LIST breadth taste:** the harvest rebuilt it to 29 rows, including 12 low-impact polish rows harvested from old reports' brainstorms. Keep the full breadth (nothing re-rotts in timestamped files), or prune the low tier into ROADMAP raw ideas for a tighter active list?~~ done (2026-09-16 evening AUDIT: rebuilt to 17 tight rows with a 3-row hygiene section; stale low rows either executed or routed)
 
 ---
 

@@ -175,7 +175,7 @@ Small self-serve (each verified-needed by this session):
     d/1 failure class).~~ _(routed: TODO_LIST Medium row)_
 11. ~~Release 0.3.0 after PR #1 resolves: CHANGELOG cut, tag (CI now runs
     on tags), notes with lock rev/narHash pin (1h).~~ _(routed: TODO_LIST High row - PR #1 resolved, UNBLOCKED)_
-12. ~~TODO_LIST re-sweep once 1-4 land (rows resolve either way).~~ done (2026-09-16 evening AUDIT: rebuilt to 14 open rows)
+12. ~~TODO_LIST re-sweep once 1-4 land (rows resolve either way).~~ done (2026-09-16 evening AUDIT: rebuilt to 17 open rows)
 
 Watch items (passive, recurring):
 13. ~~nixpkgs#563651 / #563652 / #563777 / mjs#662 / mjs#663 responses
