@@ -23,9 +23,10 @@ left open on the nix-email side is done; the repo is green end to end.
 
 ## b) PARTIALLY DONE
 
-1. **CI on the docs push (43cd0b4)** — launched, verdict pending at report
-   time (docs-only diff; the VM checks should replay from cache). If it
-   redds for a NON-docs reason, that is a fresh finding, not drift.
+1. ~~**CI on the docs push (43cd0b4)** — launched, verdict pending at report
+   time~~ **RESOLVED post-write: run 35101548949 `success`** (`nix flake
+   check` job green; VM checks replayed from cache as expected for a
+   docs-only diff).
 2. **AGENTS.md anti-ghost discipline**: caught my own `reportEnabled`/
    `reportAddresses` wrapper-option ghost in FEATURES.md 30 s after writing
    it (no such options exist — it's raw `services.stalwart.settings`
@@ -89,7 +90,7 @@ left open on the nix-email side is done; the repo is green end to end.
 
 ## f) NEXT (bounded, roughly ordered)
 
-1. Watch the 43cd0b4 CI run to green (docs-only; expected cache replay).
+1. ~~Watch the 43cd0b4 CI run to green~~ DONE: 35101548949 success.
 2. User: merge or leave dependabot PR #1 (green, mergeable).
 3. Re-check the four filings for responses (nixpkgs #563651, #563652,
    #563777; mjs/imapclient #662) — TODO_LIST row exists.
@@ -126,5 +127,5 @@ left open on the nix-email side is done; the repo is green end to end.
 - Key evidence: report-ids JSON in the e2e transcript
   (`329837850705005775_1792150943`, total:1).
 - Pushes: bc7e954 (fixes+ledger) → CI 35092101106 success; 43cd0b4
-  (harvest+AGENTS) → CI pending at write time.
+  (harvest+AGENTS) → CI 35101548949 success.
 - PR #1: rebased by dependabot after my comment; run 35092306558 success.
