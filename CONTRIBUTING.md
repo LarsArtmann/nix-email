@@ -76,6 +76,15 @@ runs pipefail, so grep -q's early exit can EPIPE the producer (observed as
 curl exit 23 on a matching payload, 2026-09-15) - and `! producer | grep -q`
 can phantom-green. Dump the producer to a file, then grep the file.
 
+## Formatting gate (pre-push)
+
+CI fail-closes on `nix fmt -- . --check` (alejandra). A local `pre-push`
+hook in `.githooks/` (`core.hooksPath` already points there) runs the same
+check before every push, so an unformatted tree fails locally instead of
+going red on master (which happened twice on 2026-09-16, ~13 min public
+red). Bypassing with `git push --no-verify` is discouraged - CI still
+enforces it. If the hook fires, run `nix fmt -- .` and re-push.
+
 ## Architecture diagrams
 
 The D2 sources and rendered SVGs live in

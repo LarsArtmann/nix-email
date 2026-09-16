@@ -1,0 +1,11 @@
+#!/bin/sh
+# Fail the push when any .nix file is unformatted (alejandra, same check CI
+# enforces). Guards against the "unformatted push, public red CI" class
+# (see CONTRIBUTING.md and AGENTS.md fmt-before-yield rule).
+#
+# Bypass with `git push --no-verify` (discouraged; CI will still run the check).
+
+set -eu
+
+echo "pre-push: nix fmt -- . --check"
+nix fmt -- . --check
