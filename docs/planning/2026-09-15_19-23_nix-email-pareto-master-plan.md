@@ -160,20 +160,20 @@ D1D2-gated / auth-gated.
 |---|------|-------|--------|--------|-------|--------|--------|
 | L01 | D1: decide Workspace fork (user decision; enables 7 TODO rows + 3 ROADMAP themes) | P0 | C | 0min(user) | enablement | user-gated | ROADMAP Q1 |
 | L02 | D2: VPS placement/budget/backup target (user) | P0 | C | 0min(user) | enablement | user-gated | ROADMAP Q2 |
-| L03 | Cut v0.1.0: CHANGELOG dated section, tag, GitHub release, verify first real CI run | P0 | H | 20min | hygiene | unblocked | TODO High |
-| L04 | SystemNix: advance nix-email pin, restore relay-credential assertions, delete option-existence guard | P0 | H | 30min | confidence | unblocked | TODO High |
-| L05 | Research: fetch /compare as HTML (edition gating) + diff advertised features vs pinned 0.15.5 | P1 | H | 90min | enablement | unblocked | S1+S2 |
-| L06 | Overlap design reviews: native DMARC/TLS-RPT/ARF viz vs parsedmarc+viewer; OIDC in 0.15.5; sieve-for-Junk feasibility | P1 | H | 90min | enablement | unblocked | S5+S6+S7+S8 |
-| L07 | License: user names it; flip LICENSE file; note in README | P0 | M | 5min+5min | hygiene | user-gated | TODO Low / ROADMAP Q3 |
+| ~~L03~~ | ~~Cut v0.1.0: CHANGELOG dated section, tag, GitHub release, verify first real CI run~~ done — v0.1.0 tagged retroactively (f603169) + v0.2.0 (598db0f); both released; CI green on the release tree | ~~P0~~ | ~~H~~ | ~~20min~~ | ~~hygiene~~ | ~~unblocked~~ | ~~TODO High~~ |
+| ~~L04~~ | ~~SystemNix: advance nix-email pin, restore relay-credential assertions, delete option-existence guard~~ done — pin advanced to tag v0.2.0; relay-credential assertions restored; guard deleted | ~~P0~~ | ~~H~~ | ~~30min~~ | ~~confidence~~ | ~~unblocked~~ | ~~TODO High~~ |
+| ~~L05~~ | ~~Research: fetch /compare as HTML (edition gating) + diff advertised features vs pinned 0.15.5~~ done — executed (section 10 cross-table) | ~~P1~~ | ~~H~~ | ~~90min~~ | ~~enablement~~ | ~~unblocked~~ | ~~S1+S2~~ |
+| ~~L06~~ | ~~Overlap design reviews: native DMARC/TLS-RPT/ARF viz vs parsedmarc+viewer; OIDC in 0.15.5; sieve-for-Junk feasibility~~ done — executed (verdicts 06a-06e, section 10) | ~~P1~~ | ~~H~~ | ~~90min~~ | ~~enablement~~ | ~~unblocked~~ | ~~S5+S6+S7+S8~~ |
+| ~~L07~~ | ~~License: user names it; flip LICENSE file; note in README~~ done — MIT confirmed 2026-09-15 and shipped | ~~P0~~ | ~~M~~ | ~~5min+5min~~ | ~~hygiene~~ | ~~user-gated~~ | ~~TODO Low / ROADMAP Q3~~ |
 | L08 | Spam→Junk ownership call (recommendation on table: wrapper-owned sieve); user decides | P0 | H | 0min(user) | prod-mail | user-gated | ROADMAP Q6 |
-| L09 | Pin-advance runbook doc (bump procedure + revert-condition checklist, both locks) | P1 | M | 30min | confidence | unblocked | TODO Med |
-| L10 | Test strengthening A: parsedmarc CSV row-count; over-quota SECOND reschedule line; negative-cache cost doc | P1 | M | 60min | confidence | unblocked | TODO Low x3 |
-| L11 | parsedmarc-e2e TLS-capable localMail variant (cert fixture) | P1 | M | 60min | confidence | unblocked | TODO Med |
-| L12 | CI lockstep guard: expected-checks must fail when flake.nix declares a check CI doesn't list | P1 | M | 30min | hygiene | unblocked | TODO Low |
-| L13 | aarch64: one emulated stalwart-e2e run; decide if it earns CI time | P1 | L | 30min | hygiene | unblocked | TODO Med |
-| L14 | Docs consolidation: README runbook→SystemNix pointer; stateVersion note x3→1; pin-discipline note; VM debug script→tests/fixtures | P1 | L | 60min | hygiene | unblocked | TODO Low x4 |
-| L15 | File the two diagnosed nixpkgs issues upstream (host-less [elasticsearch]; imapclient/py3.14) | P1 | M | 45min | hygiene | auth-gated | TODO Low |
-| L16 | docs/status ANNOTATE pass (needs user to name files/time range) | P1 | L | 60min | hygiene | user-scoped | TODO Med |
+| ~~L09~~ | ~~Pin-advance runbook doc (bump procedure + revert-condition checklist, both locks)~~ done — README Pin-advance runbook shipped | ~~P1~~ | ~~M~~ | ~~30min~~ | ~~confidence~~ | ~~unblocked~~ | ~~TODO Med~~ |
+| ~~L10~~ | ~~Test strengthening A: parsedmarc CSV row-count; over-quota SECOND reschedule line; negative-cache cost doc~~ done — row-count + second-reschedule + 65s cost shipped in v0.2.0 | ~~P1~~ | ~~M~~ | ~~60min~~ | ~~confidence~~ | ~~unblocked~~ | ~~TODO Low x3~~ |
+| ~~L11~~ | ~~parsedmarc-e2e TLS-capable localMail variant (cert fixture)~~ done — TLS IMAPS node shipped in v0.2.0 | ~~P1~~ | ~~M~~ | ~~60min~~ | ~~confidence~~ | ~~unblocked~~ | ~~TODO Med~~ |
+| ~~L12~~ | ~~CI lockstep guard: expected-checks must fail when flake.nix declares a check CI doesn't list~~ done — strict lockstep guard shipped; both directions negative-tested 2026-09-16 | ~~P1~~ | ~~M~~ | ~~30min~~ | ~~hygiene~~ | ~~unblocked~~ | ~~TODO Low~~ |
+| ~~L13~~ | ~~aarch64: one emulated stalwart-e2e run; decide if it earns CI time~~ done — emulated run attempted; documented-manual verdict in the flake trap comment | ~~P1~~ | ~~L~~ | ~~30min~~ | ~~hygiene~~ | ~~unblocked~~ | ~~TODO Med~~ |
+| ~~L14~~ | ~~Docs consolidation: README runbook→SystemNix pointer; stateVersion note x3→1; pin-discipline note; VM debug script→tests/fixtures~~ done — runbook pointer + pin-discipline + debug-template shipped; stateVersion verified already-consolidated | ~~P1~~ | ~~L~~ | ~~60min~~ | ~~hygiene~~ | ~~unblocked~~ | ~~TODO Low x4~~ |
+| ~~L15~~ | ~~File the two diagnosed nixpkgs issues upstream (host-less [elasticsearch]; imapclient/py3.14)~~ done — filed: NixOS/nixpkgs#563651 + #563652 | ~~P1~~ | ~~M~~ | ~~45min~~ | ~~hygiene~~ | ~~auth-gated~~ | ~~TODO Low~~ |
+| ~~L16~~ | ~~docs/status ANNOTATE pass (needs user to name files/time range)~~ done — executed 2026-09-16 (scope: all 2026-0* files) | ~~P1~~ | ~~L~~ | ~~60min~~ | ~~hygiene~~ | ~~user-scoped~~ | ~~TODO Med~~ |
 | L17 | Terraform `stalwart-mail` DNS module (MX/SPF/DKIM/DMARC/MTA-STS/TLS-RPT) + canary-first rollout plan | P2 | C | 90min | prod-mail | D1D2-gated | ROADMAP T2 |
 | L18 | VPS host: NixOS via domains-repo cloud-init, rDNS/PTR, firewall review, port-25/465 request, log/disk policy | P2 | C | 90min | prod-mail | D1D2-gated | ROADMAP T1 |
 | L19 | Real TLS (ACME DNS-01/HTTP-01) + DKIM keygen→sops + admin bootstrap oneshot (POST /api/principal recipe) | P2 | C | 90min | prod-mail | D1D2-gated | ROADMAP T1 |
@@ -183,7 +183,7 @@ D1D2-gated / auth-gated.
 | L23 | Gatus external checks (starttls :25, tls :993, cert expiry) + RBL monitor for VPS IP + aggregate.json freshness (dedup vs backup.maxAgeHours) | P2 | M | 60min | confidence | D1D2-gated | ROADMAP T4 |
 | L24 | Downstream polish: parsedmarc PG sink experiment; Paperless off Gmail app passwords; smartd alert path decoupled from mail relay | P3 | M | 90min | prod-mail | post-migration | ROADMAP T4 |
 | L25 | Threat-model doc + Stalwart OIDC (Pocket ID) admin login — only if L06 verifies 0.15.5 support | P3 | M | 90min | hygiene | after L06 | ROADMAP T5 |
-| L26 | Micro-decisions batch (each: verify in 0.15.5 → decide wrapper option / non-goal note): autoconfig, PROXY protocol, DANE/MTA-STS inbound, encryption-at-rest, TOTP/app-pw, vandelay scope, FTS non-goal line, POP3, JMAP-WS, wrapper doctrine (feeds ROADMAP Q5), DNS-truth split-brain guard note | P3 | L | 90min | hygiene | unblocked | S9-S19 |
+| ~~L26~~ | ~~Micro-decisions batch (each: verify in 0.15.5 → decide wrapper option / non-goal note): autoconfig, PROXY protocol, DANE/MTA-STS inbound, encryption-at-rest, TOTP/app-pw, vandelay scope, FTS non-goal line, POP3, JMAP-WS, wrapper doctrine (feeds ROADMAP Q5), DNS-truth split-brain guard note~~ done — outcomes in section 10 (26a-26e) | ~~P3~~ | ~~L~~ | ~~90min~~ | ~~hygiene~~ | ~~unblocked~~ | ~~S9-S19~~ |
 | L27 | Repo hygiene residue: workaround-retirement re-check procedure on bumps; Resend keep-or-retire doc post-cutover; InboxClean JMAP spike scoping | P3 | L | 60min | hygiene | post-migration | ROADMAP T5 |
 
 Totals: 27 tasks, ~19h10m executable effort + 4 user decisions. ALL TODO_LIST
@@ -353,6 +353,11 @@ This snapshot deliberately does not edit TODO_LIST.md/ROADMAP.md. New
 candidates introduced here (S-series → L05/L06/L26, plus verdict outputs of
 06e) should be HARVESTed into the living docs after user approval — say the
 word and docs-health HARVEST runs against this file.
+
+HARVESTED 2026-09-16 (docs-health pass, user-approved): the 06e ROADMAP
+deltas applied (viewer DEFERRED, OIDC verified-present/when-D1, Terraform
+single-DNS-owner note, POP3 non-goal); remaining open L-tasks live in
+TODO_LIST/ROADMAP. Archived.
 
 ---
 

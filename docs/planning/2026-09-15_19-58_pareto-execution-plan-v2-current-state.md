@@ -89,24 +89,24 @@ authorization, PS=parallel-session coordination.
 | 01 | D1: Workspace fork decision; record in ROADMAP/TODO | P0 | C | user | enablement | USER | ROADMAP Q1 |
 | 02 | D2: VPS placement/budget/backup target | P0 | C | user | enablement | USER | ROADMAP Q2 |
 | 03 | SystemNix push unblock (click "used in tests") + push the 7 local commits | P0 | H | 10min | confidence | USER+U | 19:52 report §g-2 |
-| 04 | Cut v0.1.0: dated CHANGELOG section, annotated tag, GitHub release, watch first tagged CI run | P0 | H | 20min | hygiene | U | TODO High |
-| 05 | SystemNix pin-advance: bump rev past relay-landing, restore relay-credential assertions, delete wrapper guard, gate both repos | P0 | H | 30min | confidence | U (after 03) | TODO High |
+| ~~04~~ | ~~Cut v0.1.0: dated CHANGELOG section, annotated tag, GitHub release, watch first tagged CI run~~ done — v0.1.0 (retroactive, f603169) + v0.2.0 (598db0f) cut and released | ~~P0~~ | ~~H~~ | ~~20min~~ | ~~hygiene~~ | ~~U~~ | ~~TODO High~~ |
+| ~~05~~ | ~~SystemNix pin-advance: bump rev past relay-landing, restore relay-credential assertions, delete wrapper guard, gate both repos~~ done — pin advanced to tag v0.2.0; assertions restored; guard deleted | ~~P0~~ | ~~H~~ | ~~30min~~ | ~~confidence~~ | ~~U (after 03)~~ | ~~TODO High~~ |
 | 06 | Junk-filing call on REVISED options (a JMAP-automation / b webmail / c tag-only / d upstream request; rec c+d); record verdict in ROADMAP Q6 | P0 | H | user | prod-mail | USER | ROADMAP Q6 + ledger |
-| 07 | SystemNix CI-debt ownership split with the parallel session (who takes statix/secret-scan/pins) | P0 | M | 10min | coordination | PS | 19:52 §e-4 |
-| 08 | CI pipe-lint: fail CI on `\| grep -q` inside tests/*.nix testScripts (mechanize the exit-23 lesson) | P1 | M | 20min | confidence | U | 19:52 §f-4 |
+| ~~07~~ | ~~SystemNix CI-debt ownership split with the parallel session (who takes statix/secret-scan/pins)~~ **Won't implement — parallel sessions concluded - coordination moot.** | ~~P0~~ | ~~M~~ | ~~10min~~ | ~~coordination~~ | ~~PS~~ | ~~19:52 §e-4~~ |
+| ~~08~~ | ~~CI pipe-lint: fail CI on `\~~ done — CI pipe-lint step shipped (3f1854a, ba7645c) | ~~grep -q` inside tests/*.nix testScripts (mechanize the exit-23 lesson)~~ | ~~P1~~ | ~~M~~ | ~~20min~~ | ~~confidence~~ | ~~U~~ | ~~19:52 §f-4~~ |
 | 09 | Renovate activation check: did the app pick up the now-pushed repo; renovate.json approval gate works | P1 | L | 10min | hygiene | U | 19:19 §f-6 |
-| 10 | Pin-advance runbook doc (procedure + revert-condition checklist incl. imapclient>=4.x watch) | P1 | M | 30min | confidence | U | TODO Med |
-| 11 | Test strengthening A: CSV row-count; SECOND reschedule line; negative-cache 65s cost proof | P1 | M | 45min | confidence | U | TODO Low ×3 |
-| 12 | parsedmarc-e2e TLS localMail variant (cert fixture; mailsuite STARTTLS interplay) | P1 | M | 60min | confidence | U | TODO Med |
-| 13 | CI lockstep guard (flake-declared checks vs CI expected-list; negative test) | P1 | M | 30min | hygiene | U | TODO Low |
-| 14 | aarch64: one emulated stalwart-e2e run; CI-worthy or documented-manual verdict | P1 | L | 30min | hygiene | U | TODO Med |
-| 15 | Docs consolidation A: README runbook→SystemNix pointer; stateVersion note ×3→1; pin-discipline note | P1 | L | 45min | hygiene | U | TODO Low ×3 |
-| 16 | Docs consolidation B: VM debug script → tests/fixtures template; docs/status ANNOTATE pass (user-scoped) | P1 | L | 60min | hygiene | U+USER | TODO Low+Med |
-| 17 | Upstream nixpkgs filings ×2 (diagnoses verified vs master; drafts mechanical) | P1 | M | 45min | hygiene | AUTH | TODO Low |
+| ~~10~~ | ~~Pin-advance runbook doc (procedure + revert-condition checklist incl. imapclient>=4.x watch)~~ done — README Pin-advance runbook shipped | ~~P1~~ | ~~M~~ | ~~30min~~ | ~~confidence~~ | ~~U~~ | ~~TODO Med~~ |
+| ~~11~~ | ~~Test strengthening A: CSV row-count; SECOND reschedule line; negative-cache 65s cost proof~~ done — shipped in v0.2.0 | ~~P1~~ | ~~M~~ | ~~45min~~ | ~~confidence~~ | ~~U~~ | ~~TODO Low ×3~~ |
+| ~~12~~ | ~~parsedmarc-e2e TLS localMail variant (cert fixture; mailsuite STARTTLS interplay)~~ done — TLS node shipped in v0.2.0 | ~~P1~~ | ~~M~~ | ~~60min~~ | ~~confidence~~ | ~~U~~ | ~~TODO Med~~ |
+| ~~13~~ | ~~CI lockstep guard (flake-declared checks vs CI expected-list; negative test)~~ done — strict lockstep guard shipped; both directions negative-tested 2026-09-16 | ~~P1~~ | ~~M~~ | ~~30min~~ | ~~hygiene~~ | ~~U~~ | ~~TODO Low~~ |
+| ~~14~~ | ~~aarch64: one emulated stalwart-e2e run; CI-worthy or documented-manual verdict~~ done — emulated run attempted; documented-manual (flake trap comment) | ~~P1~~ | ~~L~~ | ~~30min~~ | ~~hygiene~~ | ~~U~~ | ~~TODO Med~~ |
+| ~~15~~ | ~~Docs consolidation A: README runbook→SystemNix pointer; stateVersion note ×3→1; pin-discipline note~~ done — runbook pointer + pin-discipline + consolidation shipped | ~~P1~~ | ~~L~~ | ~~45min~~ | ~~hygiene~~ | ~~U~~ | ~~TODO Low ×3~~ |
+| ~~16~~ | ~~Docs consolidation B: VM debug script → tests/fixtures template; docs/status ANNOTATE pass (user-scoped)~~ done — debug-template.py shipped; ANNOTATE executed 2026-09-16 | ~~P1~~ | ~~L~~ | ~~60min~~ | ~~hygiene~~ | ~~U+USER~~ | ~~TODO Low+Med~~ |
+| ~~17~~ | ~~Upstream nixpkgs filings ×2 (diagnoses verified vs master; drafts mechanical)~~ done — filed: NixOS/nixpkgs#563651 + #563652 | ~~P1~~ | ~~M~~ | ~~45min~~ | ~~hygiene~~ | ~~AUTH~~ | ~~TODO Low~~ |
 | 18 | Stalwart upstream request: declarative server-side Junk filing (the ledger entry is the evidence) — only if 06 = d | P1 | M | 30min | hygiene | after 06 | ROADMAP Q6d |
-| 19 | Edition-gating research: stalw.art compare + release-notes diff vs pinned 0.15.5 | P1 | H | 90min | enablement | U | master L05 |
-| 20 | Overlap reviews minus sieve: native report viz vs viewer; OIDC in 0.15.5 (sieve DONE — ledgered) | P1 | H | 75min | enablement | U | master L06 minus 06d |
-| 21 | Micro-decisions batch: autoconfig, PROXY, DANE/MTA-STS, encryption-at-rest, TOTP, POP3, JMAP-WS, FTS, wrapper doctrine, DNS-truth guard, README ops-detail level (Q4) | P1 | L | 90min | hygiene | U | master L26 + Q4 |
+| ~~19~~ | ~~Edition-gating research: stalw.art compare + release-notes diff vs pinned 0.15.5~~ done — executed in the master plan section 10 | ~~P1~~ | ~~H~~ | ~~90min~~ | ~~enablement~~ | ~~U~~ | ~~master L05~~ |
+| ~~20~~ | ~~Overlap reviews minus sieve: native report viz vs viewer; OIDC in 0.15.5 (sieve DONE — ledgered)~~ done — executed in the master plan section 10 | ~~P1~~ | ~~H~~ | ~~75min~~ | ~~enablement~~ | ~~U~~ | ~~master L06 minus 06d~~ |
+| ~~21~~ | ~~Micro-decisions batch: autoconfig, PROXY, DANE/MTA-STS, encryption-at-rest, TOTP, POP3, JMAP-WS, FTS, wrapper doctrine, DNS-truth guard, README ops-detail level (Q4)~~ done — micro-decisions executed (section 10, 26a-26e); Q4 runbook-trim stays ROADMAP open question 4 | ~~P1~~ | ~~L~~ | ~~90min~~ | ~~hygiene~~ | ~~U~~ | ~~master L26 + Q4~~ |
 | 22 | SystemNix CI debt A: flip file-and-image-renamer + BuildFlow pins (revs already on GitHub); push go-nix-helpers-vnfix worktree branch + flip | P1 | H | 35min | confidence | U (after 03/07) | 19:52 §b-3 |
 | 23 | SystemNix CI debt B: gitleaks allowlist for `rev=<40hex>` so the pre-commit hook works for humans again | P1 | M | 20min | hygiene | U | 19:52 §b-3 |
 | 24 | SystemNix CI debt C: statix sweep (~20 findings) + secret-scan `syn_` allowlist policy (user) + Go-deps-audit triage | P1 | M | 90min+user | hygiene | U+USER (after 07) | 19:52 §b-3 |
@@ -300,3 +300,14 @@ flowchart TD
 *Format note: `.md` with an embedded mermaid graph per the explicit instruction
 - overrides the pareto-planning skill's HTML default; not propagated into the
 skill.*
+
+## Status at annotation (2026-09-16, docs-health pass)
+
+Unblocked P0/P1 work is DONE (rows struck above) except: 03/22/23/24
+(SystemNix push + CI debt - TODO_LIST user-blocked row), 09 (Renovate
+verification - TODO_LIST row), 18 (Stalwart filing - TODO_LIST row,
+Q6d-conditional), plus the TLS-journal assertion (02-08 report f/17 -
+TODO_LIST row). 01/02/06 are
+the standing user decisions (ROADMAP open questions); P2/P3 stay gated
+(ROADMAP themes). Micro-task statuses follow their section-2 parents.
+Archived.

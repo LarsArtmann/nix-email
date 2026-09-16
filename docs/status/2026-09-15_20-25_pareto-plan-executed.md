@@ -40,9 +40,10 @@
 
 ## What deliberately did NOT happen
 
-- **Harvest** of the plan's §10 ROADMAP/TODO deltas (06e, viewer-deferred
+- ~~**Harvest** of the plan's §10 ROADMAP/TODO deltas (06e, viewer-deferred
   note, Q5 doctrine) — the plan itself gates this on explicit user
-  approval (§9). Say the word and docs-health HARVEST runs.
+  approval (§9). Say the word and docs-health HARVEST runs.~~ done (executed
+  2026-09-16 by the docs-health pass: deltas applied to ROADMAP)
 - L01/L02/L08 (D1, D2, spam→Junk) and L16 (ANNOTATE scoping) — user
   decisions; everything downstream of them (L17–L24, 27b/27c) stays parked.
 - No weakened assertions, no priority games, non-goals untouched.

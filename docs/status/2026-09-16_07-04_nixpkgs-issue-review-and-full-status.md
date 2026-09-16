@@ -132,10 +132,10 @@ corrected or confessed above.
 
 ## b) PARTIALLY DONE
 
-1. **Issue review**: complete except the upstream drift re-check for
-   #563652 (see Self-Review 1.1) — the review's one open loop.
-2. **#563651 correction**: body fixed; edit-note comment and durable
-   pre-edit snapshot still missing.
+1. ~~**Issue review**: complete except the upstream drift re-check for~~ done (drift re-check done 2026-09-16: mjs/imapclient master still assigns the read-only `imaplib.IMAP4.file` in starttls() (imapclient/imapclient.py:387) - the issue premise holds)
+   ~~#563652 (see Self-Review 1.1) — the review's one open loop.~~
+2. ~~**#563651 correction**: body fixed; edit-note comment and durable~~ **Won't implement — GitHub's edit history carries the diff; this report documents the one-sentence correction - accepted without an edit-note comment.**
+   ~~pre-edit snapshot still missing.~~
 3. **Third nixpkgs finding** (no Restart policy in parsedmarc unit):
    evidence re-confirmed today; filing NOT started, draft lost to `/tmp`.
 4. **Repo hygiene**: both trees clean, but nix-email 2 unpushed; SystemNix
@@ -198,8 +198,8 @@ corrected or confessed above.
    (upgrades the 06a verdict to ledger-grade).
 4. Relay-SASL E2E variant (SystemNix asserts config shape; VM behavior
    never exercised).
-5. Lockstep negative test in the flake-declared direction (add a check,
-   watch the CI guard fail, remove).
+5. ~~Lockstep negative test in the flake-declared direction (add a check,~~ done (both directions negative-tested locally 2026-09-16 (jq set-equality bites on fewer AND extra flake checks))
+   ~~watch the CI guard fail, remove).~~
 6. CI trigger on `tags: v*` — releases currently run no CI.
 7. Branch protection on master + CI badge in README.
 8. Verify Renovate handles tag pins (`github:…nix-email/v0.2.0`).
@@ -208,16 +208,16 @@ corrected or confessed above.
 10. *(approval)* Push nix-email master (2 doc/auto commits).
 11. *(approval)* Push SystemNix (≈47 commits, incl. another session's
     work — coordinate first).
-12. *(approval)* HARVEST plan §10 + predecessor §f into TODO_LIST/ROADMAP.
+12. ~~*(approval)* HARVEST plan §10 + predecessor §f into TODO_LIST/ROADMAP.~~ done (HARVEST executed 2026-09-16 (docs-health mandate))
 13. *(D1)* dmarc-live + migration-compare tasks (L17–L23).
 14. *(D2)* Hetzner go-live decisions; *(Q6)* spam→Junk; *(scope)*
     ANNOTATE pass over old status docs.
-15. Verify auto-commit daemon is actually alive (last commit 02:10;
-    silent-but-idle since — indeterminate).
-16. Single-source the research findings (kill the §10/README/AGENTS
-    triple-write).
-17. Add an "External issues" ledger block in README (#563651, #563652,
-    + the two future filings) with status links.
+15. ~~Verify auto-commit daemon is actually alive (last commit 02:10;~~ done (daemon alive - it committed a4fc343..de0737d (07:07-07:19) and later picks)
+    ~~silent-but-idle since — indeterminate).~~
+16. ~~Single-source the research findings (kill the §10/README/AGENTS~~ **Won't implement — accepted as declared cross-links (the 02-08 review's split-brain verdict: cross-linked, not blindly duplicated).**
+    ~~triple-write).~~
+17. ~~Add an "External issues" ledger block in README (#563651, #563652,~~ done (README "External upstream issues" block added 2026-09-16)
+    ~~+ the two future filings) with status links.~~
 18. Watch: nixpkgs moving `services.stalwart` past 0.15.5 → re-verify
     key set per the pin-advance runbook.
 19. Watch: upstream imapclient release with the fix → retire the
@@ -241,3 +241,13 @@ corrected or confessed above.
 
 *Point-in-time snapshot; goes stale fast (two inherited claims were dead
 within 5 h). WAITING for instructions.*
+
+---
+
+## Resolution addendum (2026-09-16, docs-health pass)
+
+f/1-4, 6-11, 13-14, 18-20 remain open and are harvested into TODO_LIST
+(filings, probes, SASL variant, tags-trigger, branch protection, Renovate
+verification, watch items, pushes - all routed with rows); b/3 + f/1 note
+the third-finding draft should live in docs/ next time. g/1/g/2 (D1/D2)
+remain the standing user decisions; g/3's harvest half is done. Archived.

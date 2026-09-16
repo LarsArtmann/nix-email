@@ -172,21 +172,21 @@ planned item; non-goals untouched; no assertion weakened.
 
 **Zero-minute user decisions:** 1. D1 record + unblock sweep · 2. D2
 record · 3. spam→Junk Q6 call (recommendation (c)+(d) on the table) ·
-4. ANNOTATE scope (files/time range) · 5. HARVEST approval for plan §10 ·
-6. push approval for local commits (nix-email docs + SystemNix pin).
+4. ~~ANNOTATE scope (files/time range)~~ done (2026-09-16: all `2026-0*` files) · 5. ~~HARVEST approval for plan §10~~ done (2026-09-16 docs-health pass) ·
+6. push approval for local commits (nix-email docs + SystemNix pin) _(routed: TODO_LIST user-blocked row - still open)_.
 
 **Unblocked repo work (small):** 7. live-probe native report ingestion in
 VM (ledger-grade 06a) · 8. file the mjs/imapclient upstream issue (root
-fix) · 9. relay-SASL E2E variant · 10. lockstep negative test, flake
-direction · 11. third nixpkgs finding: parsedmarc unit Restart policy ·
+fix) · 9. relay-SASL E2E variant _(routed: TODO_LIST row)_ · 10. ~~lockstep negative test, flake
+direction~~ done (2026-09-16 local jq negative test: fewer AND extra flake checks both fail the guard) · 11. third nixpkgs finding: parsedmarc unit Restart policy ·
 12. offer/implement the nixpkgs PR for #563651 (shape proposed in the
-issue) · 13. CI trigger on `tags: v*` · 14. branch protection requiring
-the CI check on master · 15. README CI badge · 16. verify Renovate updates
+issue) · 13. CI trigger on `tags: v*` _(routed: TODO_LIST row)_ · 14. branch protection requiring
+the CI check on master _(routed: TODO_LIST user-blocked row; verified unprotected 2026-09-16)_ · 15. ~~README CI badge~~ done (added 2026-09-16) · 16. verify Renovate updates
 TAG pins (v0.2.0 → next tag) with a dry run · 17. TLS-node: assert the
 successful TLS-handshake journal line (not just absence of failures) ·
-18. mention the lock rev in release notes (or attach it) · 19. add the
-two AGENTS.md gotchas to CONTRIBUTING's ledger rules pointer · 20. grep
-audit: no other `cmd | tail` in scripts/CI (rule enforcement by eyes).
+18. mention the lock rev in release notes (or attach it) _(routed: TODO_LIST row)_ · 19. ~~add the
+two AGENTS.md gotchas to CONTRIBUTING's ledger rules pointer~~ done (AGENTS Commands is the canonical home; CONTRIBUTING's docs map points there) · 20. ~~grep
+audit: no other `cmd | tail` in scripts/CI (rule enforcement by eyes).~~ done (2026-09-16: clean; the CI pipe-lint mechanizes it)
 
 **D1/D2-gated production spine (L17–L23 micro-tasks, from the plan):**
 21. Terraform `stalwart-mail` skeleton · 22. MX+SPF+DKIM records · 23.
@@ -230,3 +230,13 @@ Unblocked small work (f/7, 8, 9, 11, 12, 13, 16, 17, 18) harvested into
 TODO_LIST; the D1/D2-gated spine (f/21-43), post-migration polish (f/44-48),
 and watch items (f/49-50) live in ROADMAP themes / TODO_LIST rows. g/1 and
 g/2 (D1/D2) remain the standing user decisions. Archived.
+
+---
+
+## Resolution addendum (2026-09-16, docs-health pass)
+
+f/4, f/5, f/10, f/15, f/19, f/20 resolved inline; f/7, 8, 9, 11, 12, 13,
+16, 17, 18 harvested into TODO_LIST (still open there); the D1/D2-gated
+spine (f/21-43), post-migration polish (f/44-48), and watch items
+(f/49-50) live in ROADMAP themes / TODO_LIST rows; g/1 and g/2 (D1/D2)
+remain the standing user decisions. Archived.
