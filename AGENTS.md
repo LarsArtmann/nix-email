@@ -57,6 +57,11 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
 - `nix fmt .` (WITH the path): bare `nix fmt` forwards no paths, so
   alejandra 4.0.0 reads STDIN and dies with `unexpected end of file` -
   check-mode is `nix fmt -- . --check` (what CI enforces).
+- Run `nix fmt -- . --check` BEFORE yielding on any session that touched
+  `.nix` files: the auto-commit daemon pushes mid-session, so unformatted
+  edits reach CI and the fail-closed alejandra step goes red on a push you
+  never explicitly made (2026-09-16, two red runs, fix was pure
+  re-indentation).
 - After editing ONE check, build THAT check first
   (`nix build .#checks.x86_64-linux.<name> -L`), then the full gate - a
   full-gate run just to discover a single subtest's typo costs ~9 min.
