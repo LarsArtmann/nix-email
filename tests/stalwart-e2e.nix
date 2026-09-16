@@ -473,7 +473,12 @@ in
           # auth.dkim.sign expression emits. The endpoint writes
           # signature.<id>.* into the live config store (refusing to
           # overwrite an existing signature.<id>.private-key) - no
-          # settings-file change, no restart.
+          # settings-file change, no restart. But config.set() is
+          # store-only (manager/config.rs: no broadcast, no core rebuild),
+          # and the SMTP signer resolves from the startup-built signatures
+          # map (core.rs resolve_signature) - so an explicit /api/reload
+          # (GET; the handler only matches Method::GET) is required before
+          # submission will dual-sign.
           machine.succeed(
               "curl -fsS -u admin:test-admin-secret -X POST "
               "-H 'Content-Type: application/json' "
@@ -492,6 +497,14 @@ in
           machine.succeed(
               "jq -e '.data | type == \"string\" and length >= 40' /tmp/dkim-pub.json"
           )
+          # Swap in a core rebuilt from the now-updated config store; the
+          # response lists how many settings changed (expect signature.*
+          # keys > 0, i.e. the reload actually saw the new key).
+          machine.succeed(
+              "curl -fsS -u admin:test-admin-secret "
+              "http://127.0.0.1:8080/api/reload -o /tmp/dkim-reload.json"
+          )
+          machine.succeed("cat /tmp/dkim-reload.json >&2")
           machine.succeed(
               "swaks --timeout 120 --server 127.0.0.1:587 --tls --auth PLAIN "
               "--auth-user user1@example.test --auth-password testpass "
