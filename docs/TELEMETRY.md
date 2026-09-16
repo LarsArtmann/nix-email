@@ -5,7 +5,7 @@ fit together, and a recommended baseline that avoids the known footguns.
 
 > **Provenance & version caveat.** Every fact below was taken from the
 > official docs at https://stalw.art/docs/telemetry/ (all subpages) fetched
-> on **2026-09-15**. Those pages describe the *current upstream* object
+> on **2026-09-15**. Those pages describe the _current upstream_ object
 > model (WebUI `Settings › Telemetry` objects: `Tracer`, `Metrics`,
 > `WebHook`, `Alert`, `TracingStore`, `MetricsStore`, `DataRetention`,
 > `EventTracingLevel`). **This repo pins Stalwart 0.15.5** via nixpkgs
@@ -49,14 +49,14 @@ one noisy/interesting event without raising global verbosity.
 
 ## 2. Feature matrix (edition gating)
 
-| Subsystem | Object | Community | Enterprise |
-| --- | --- | --- | --- |
-| Tracing & logging (file, console, journal, OTel) | `Tracer` | ✅ | ✅ |
-| Metrics via OpenTelemetry (push) + Prometheus (pull) | `Metrics` singleton | ✅ | ✅ |
-| Webhooks | `WebHook` | ✅ | ✅ |
-| Alerts (threshold rules → event/email) | `Alert` | ❌ | ✅ |
-| Live telemetry (SSE streaming) | HTTP endpoints | ❌ | ✅ |
-| History (persisted spans + metric samples) | `TracingStore`/`MetricsStore` | ❌ | ✅ |
+| Subsystem                                            | Object                        | Community | Enterprise |
+| ---------------------------------------------------- | ----------------------------- | --------- | ---------- |
+| Tracing & logging (file, console, journal, OTel)     | `Tracer`                      | ✅        | ✅         |
+| Metrics via OpenTelemetry (push) + Prometheus (pull) | `Metrics` singleton           | ✅        | ✅         |
+| Webhooks                                             | `WebHook`                     | ✅        | ✅         |
+| Alerts (threshold rules → event/email)               | `Alert`                       | ❌        | ✅         |
+| Live telemetry (SSE streaming)                       | HTTP endpoints                | ❌        | ✅         |
+| History (persisted spans + metric samples)           | `TracingStore`/`MetricsStore` | ❌        | ✅         |
 
 Gating evidence: the Alerts, Live Telemetry, and History pages carry an
 explicit "Enterprise feature" banner; the tracing/metrics/webhooks pages do
@@ -68,7 +68,7 @@ in markdown fetch — banner text is the stronger evidence.)
 ### 3.1 Tracers
 
 - **Always-on baseline:** one `Journal` (Linux) or `Log` tracer at `info`.
-  Multiple tracers in parallel is the *designed* pattern — different
+  Multiple tracers in parallel is the _designed_ pattern — different
   consumers are supposed to get different slices of the stream.
 - **Pre-provision a debug tracer with `enable: false`.** During an incident,
   flip `enable` (and/or the level) instead of editing the live baseline —
@@ -94,15 +94,15 @@ in markdown fetch — banner text is the stronger evidence.)
 - **Prometheus (pull):** enable the `prometheus` field on the `Metrics`
   singleton, variant `Enabled`, which exposes **`/metrics/prometheus`**.
   **Always set `authUsername`/`authSecret`** — leaving both unset exposes
-  the endpoint *without authentication*. Point the Prometheus scrape job
+  the endpoint _without authentication_. Point the Prometheus scrape job
   at that path.
 - **OpenTelemetry (push):** variant `Http` or `Grpc`; `interval` default
   60000 ms, `timeout` default 10000 ms. Use when a collector already owns
   fan-out (Prometheus/Jaeger/Zipkin downstream).
 - Both exporters can run simultaneously against independent collectors.
 - **Noise control:** `metrics` is a set (each selected metric is a key
-  mapped to `true`) + `metricsPolicy`. Default is `exclude` — *selected
-  metrics are suppressed, everything else is emitted*. Use `include` to
+  mapped to `true`) + `metricsPolicy`. Default is `exclude` — _selected
+  metrics are suppressed, everything else is emitted_. Use `include` to
   emit only what you actually graph, instead of deleting/renaming metrics
   or filtering at the dashboard.
 
@@ -111,7 +111,7 @@ in markdown fetch — banner text is the stronger evidence.)
   "prometheus": {
     "@type": "Enabled",
     "authUsername": "prometheus",
-    "authSecret": {"@type": "Value", "secret": "password123"}
+    "authSecret": { "@type": "Value", "secret": "password123" }
   }
 }
 ```
@@ -166,12 +166,12 @@ over `Value`.)
 3. **Assuming webhook wildcards.** `events: {"delivery.*": true}` silently
    matches nothing — every event must be listed by exact ID.
 4. **Bearer tokens in `httpHeaders`.** The exporter has `httpAuth` for that;
-  headers are for custom headers.
+   headers are for custom headers.
 5. **Reaching for Live SSE when History is the right tool.** The live stream
    is ephemeral — if you need "what happened an hour ago", that's History
    (persisted, JMAP-queryable), not the SSE endpoint.
 6. **Quieting dashboards by muting metrics at the source** without intent —
-   remember `metricsPolicy: exclude` *suppresses the listed metrics*; the
+   remember `metricsPolicy: exclude` _suppresses the listed metrics_; the
    naming is a frequent source of inverted config.
 7. **Raising an event's level override (`EventTracingLevel`) and forgetting
    it** — it changes what every tracer below that level records.
@@ -185,6 +185,7 @@ auto-reconnect. No Stalwart config object exists for it — open the endpoint
 and the stream flows. **Enterprise-only.**
 
 **Traces endpoint: `/api/telemetry/traces/live`**
+
 - Continuous SSE stream; each event is one JSON object with the event's
   structured key-value pairs (the §7 catalogue).
 - Server-side filters (per request):
@@ -197,6 +198,7 @@ and the stream flows. **Enterprise-only.**
   large to process interactively.
 
 **Metrics endpoint: `/api/telemetry/metrics/live`**
+
 - `?metrics=server.memory,queue.count` — restrict to named metrics.
 - `?interval=30` — sampling interval in seconds.
 - Each line: one JSON object describing a single data point.
@@ -229,15 +231,15 @@ Hundreds of events across ~45 families. Counts from the Events page
 
 Representative events worth knowing for a mail server baseline:
 
-| Event | Meaning | Default level |
-| --- | --- | --- |
-| `auth.success` / `auth.error` / `auth.too-many-attempts` | auth outcome | INFO / ERROR / WARN |
-| `delivery.delivered` / `delivery.failed` | outbound delivery result | INFO |
-| `delivery.dsn-*` | DSN success/temp-fail/perm-fail notifications | INFO |
-| `dkim.*`, `spf.*`, `dmarc.*`, `arc.*` | sender-auth results | DEBUG (mostly) |
-| `security.*` (incl. brute-force ban) | security events | — |
-| `queue.*` | outbound queue lifecycle | — |
-| `delivery.raw-input` / `raw-output` | full SMTP transcripts | TRACE |
+| Event                                                    | Meaning                                       | Default level       |
+| -------------------------------------------------------- | --------------------------------------------- | ------------------- |
+| `auth.success` / `auth.error` / `auth.too-many-attempts` | auth outcome                                  | INFO / ERROR / WARN |
+| `delivery.delivered` / `delivery.failed`                 | outbound delivery result                      | INFO                |
+| `delivery.dsn-*`                                         | DSN success/temp-fail/perm-fail notifications | INFO                |
+| `dkim.*`, `spf.*`, `dmarc.*`, `arc.*`                    | sender-auth results                           | DEBUG (mostly)      |
+| `security.*` (incl. brute-force ban)                     | security events                               | —                   |
+| `queue.*`                                                | outbound queue lifecycle                      | —                   |
+| `delivery.raw-input` / `raw-output`                      | full SMTP transcripts                         | TRACE               |
 
 Full table with descriptions and default levels:
 https://stalw.art/docs/telemetry/events/
@@ -293,16 +295,16 @@ by the live-SSE per-key filters and present in webhook/trace payloads):
 
 ## Sources (fetched 2026-09-15)
 
-| Page | URL |
-| --- | --- |
-| Telemetry overview | https://stalw.art/docs/telemetry/ |
-| Events (catalogue + key types) | https://stalw.art/docs/telemetry/events/ |
-| Tracing & logging | https://stalw.art/docs/telemetry/tracing/ |
-| Tracing: OpenTelemetry | https://stalw.art/docs/telemetry/tracing/opentelemetry/ |
-| Metrics overview | https://stalw.art/docs/telemetry/metrics/ |
-| Metrics: OpenTelemetry | https://stalw.art/docs/telemetry/metrics/opentelemetry/ |
-| Metrics: Prometheus | https://stalw.art/docs/telemetry/metrics/prometheus/ |
-| Webhooks | https://stalw.art/docs/telemetry/webhooks/ |
-| Alerts (Enterprise) | https://stalw.art/docs/telemetry/alerts/ |
-| Live telemetry (Enterprise) | https://stalw.art/docs/telemetry/live/ |
-| History (Enterprise) | https://stalw.art/docs/telemetry/history/ |
+| Page                           | URL                                                     |
+| ------------------------------ | ------------------------------------------------------- |
+| Telemetry overview             | https://stalw.art/docs/telemetry/                       |
+| Events (catalogue + key types) | https://stalw.art/docs/telemetry/events/                |
+| Tracing & logging              | https://stalw.art/docs/telemetry/tracing/               |
+| Tracing: OpenTelemetry         | https://stalw.art/docs/telemetry/tracing/opentelemetry/ |
+| Metrics overview               | https://stalw.art/docs/telemetry/metrics/               |
+| Metrics: OpenTelemetry         | https://stalw.art/docs/telemetry/metrics/opentelemetry/ |
+| Metrics: Prometheus            | https://stalw.art/docs/telemetry/metrics/prometheus/    |
+| Webhooks                       | https://stalw.art/docs/telemetry/webhooks/              |
+| Alerts (Enterprise)            | https://stalw.art/docs/telemetry/alerts/                |
+| Live telemetry (Enterprise)    | https://stalw.art/docs/telemetry/live/                  |
+| History (Enterprise)           | https://stalw.art/docs/telemetry/history/               |

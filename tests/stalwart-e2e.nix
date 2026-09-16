@@ -366,6 +366,7 @@ in
           create_principal({"type": "domain", "name": "example.test"})
           create_account("user1@example.test")
           create_account("user2@example.test")
+          create_account("reports@example.test")
           # quota = 1 BYTE: over-quota delivery retries forever (reason
           # "Mailbox over quota." at delivery.rs:225; journal logs only
           # "Message rescheduled for delivery") - never ingested.
@@ -594,6 +595,51 @@ in
           machine.succeed("cat /tmp/swaks-junk.log >&2")
           machine.succeed("! grep -q '<\\*\\*' /tmp/swaks-junk.log")
           machine.succeed("imap-header-probe needle-junk-5f7c 'X-Spam-Status'")
+
+      with subtest("native ingestion: DMARC aggregate lands in the report store, not the INBOX"):
+          # Mechanism (v0.15.5 source): recipient matches
+          # report.analysis.addresses + forward=false -> inbound DATA goes to
+          # analyze_report (smtp/src/inbound/data.rs:332) INSTEAD of the
+          # mailbox; the parsed report is stored and readable via
+          # GET /api/queue/reports (the CLI `report list` endpoint).
+          # The zip keeps its report-shaped filename - the detector matches
+          # '!' / '.xml' in the ATTACHMENT NAME (analysis.rs).
+          machine.succeed(
+              "cp '${dmarcSample}' '/tmp/estadocuenta1.infonacot.gob.mx!example.com!1536853302!1536939702!2940.xml.zip'"
+          )
+          machine.succeed(
+              "swaks --timeout 120 --server 127.0.0.1:25 "
+              "--ehlo reporter.external.example "
+              "--from reporter@external.example --to reports@example.test "
+              "--header 'Subject: Report Domain: example.com' "
+              "--body 'report-consumed-needle-9d2f' "
+              "--attach-type application/zip "
+              "--attach '/tmp/estadocuenta1.infonacot.gob.mx!example.com!1536853302!1536939702!2940.xml.zip' "
+              "> /tmp/swaks-report.log 2>&1"
+          )
+          machine.succeed("cat /tmp/swaks-report.log >&2")
+          machine.succeed("! grep -q '<\\*\\*' /tmp/swaks-report.log")
+          # Parsed asynchronously (tokio::spawn in analyze_report): poll the
+          # store list until the report appears, then dump the detail for
+          # the transcript.
+          machine.wait_until_succeeds(
+              "curl -fsS -u admin:test-admin-secret "
+              "http://127.0.0.1:8080/api/queue/reports -o /tmp/report-ids.json "
+              "&& jq -e 'length >= 1' /tmp/report-ids.json",
+              timeout=60,
+          )
+          machine.succeed("cat /tmp/report-ids.json >&2")
+          machine.succeed(
+              "curl -fsS -u admin:test-admin-secret "
+              "http://127.0.0.1:8080/api/queue/reports/$(jq -r '.[0]' /tmp/report-ids.json) "
+              "-o /tmp/report-detail.json"
+          )
+          machine.succeed("cat /tmp/report-detail.json >&2")
+          # Consumed, never delivered: the analysis path returns before the
+          # delivery queue - non-delivery is deterministic.
+          machine.succeed(
+              "imap-absent-probe report-consumed-needle-9d2f reports@example.test testpass 30"
+          )
 
       with subtest("restart persistence: INBOX survives, admin stays locked"):
           machine.succeed("systemctl restart stalwart.service")
