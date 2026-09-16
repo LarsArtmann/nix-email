@@ -37,7 +37,12 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
   `<output>/nixos-test-driver` directly is a silent-looking "no such file").
   The driver's python runs
   on the HOST - anything touching VM ports must be a packaged script or a
-  machine.succeed("...") command, never host-side socket code.
+  machine.succeed("...") command, never host-side socket code. KEEP A GC
+  ROOT while debugging: `nix build -o /tmp/st-e2e-root
+  .#checks.x86_64-linux.stalwart-e2e` pins the test closure via the
+  out-link so a background GC cannot yank the driver mid-loop (drop it
+  with `rm /tmp/st-e2e-root`). CI-side gc-roots are pointless - runners
+  are ephemeral and flakehub-cache owns persistence there.
 - Gate commands never wear pipes (`cmd | tail` can print PASSED on a failing
   run); test assertions are transcribed from observed transcripts, not from
   expected output (the swaks `<**` vs `<-` lesson).
