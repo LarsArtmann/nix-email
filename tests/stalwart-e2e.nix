@@ -296,6 +296,7 @@ in
         pkgs.swaks
         pkgs.openssl
         pkgs.curl
+        pkgs.jq
         imapProbe
         imapHeaderProbe
         imapAbsentProbe

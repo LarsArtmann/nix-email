@@ -116,15 +116,24 @@ in
       };
 
       relay = {
-        # SASL-enforced smarthost: with smtpAuthFile set, Mailpit rejects
-        # every session that did not AUTH successfully (plain user:pass
-        # file, mailpit runtime-options docs).
+        # SASL-enforced smarthost: with the auth file set, Mailpit rejects
+        # every session that did not AUTH successfully.
+        # Freeform keys go through lib.cli.toCommandLineGNU VERBATIM - flag
+        # names must be the dashed spellings, quoted as attr keys. camelCase
+        # or underscored keys render unknown flags (smtpAuthFile produced
+        # "--smtpAuthFile", mailpit 1.31.0 exits 1 - usage-dump verified
+        # 2026-09-16). The auth file holds PLAIN user:pass lines; with no
+        # TLS on the test listener Mailpit refuses to START unless insecure
+        # AUTH is allowed ("authentication requires STARTTLS or TLS
+        # encryption", binary probe 2026-09-16). Stalwart reaches this hop
+        # with relay.tlsImplicit = false, so the pair below matches.
         environment.etc."mailpit-smtp-auth".text = "relayuser:relaypass";
         services.mailpit.instances.catchall = {
           smtp = "0.0.0.0:1025";
           listen = "0.0.0.0:8025";
           max = 0;
-          smtpAuthFile = "/etc/mailpit-smtp-auth";
+          "smtp-auth-file" = "/etc/mailpit-smtp-auth";
+          "smtp-auth-allow-insecure" = true;
         };
         networking.firewall.allowedTCPPorts = [
           1025
