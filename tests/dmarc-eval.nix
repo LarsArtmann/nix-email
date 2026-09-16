@@ -25,29 +25,28 @@
   # contract, not just the settings shape.
   secretFile = toString (pkgs.writeText "dmarc-password" "dummy");
 
-  eval =
-    nixpkgs.lib.nixosSystem {
-      inherit system;
-      modules = [
-        ../modules/dmarc-monitor.nix
-        {
-          services.dmarc-monitor = {
-            enable = true;
-            settings = {
-              imap = {
-                host = "mail.example.test";
-                user = "dmarc@example.test";
-                password._secret = secretFile;
-              };
-              # Passthrough proof beyond the wrapper's own general.output
-              # mkDefault: a consumer general.* key must survive mkMerge
-              # verbatim (the thin-wrapper settings contract).
-              general.offline = true;
+  eval = nixpkgs.lib.nixosSystem {
+    inherit system;
+    modules = [
+      ../modules/dmarc-monitor.nix
+      {
+        services.dmarc-monitor = {
+          enable = true;
+          settings = {
+            imap = {
+              host = "mail.example.test";
+              user = "dmarc@example.test";
+              password._secret = secretFile;
             };
+            # Passthrough proof beyond the wrapper's own general.output
+            # mkDefault: a consumer general.* key must survive mkMerge
+            # verbatim (the thin-wrapper settings contract).
+            general.offline = true;
           };
-        }
-      ];
-    };
+        };
+      }
+    ];
+  };
 
   cfg = eval.config;
 
