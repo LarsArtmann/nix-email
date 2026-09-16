@@ -30,23 +30,23 @@ Remaining warnings are exactly two documented deliberate non-fixes.
 
 ## a) FULLY DONE
 
-| # | Item | Verification (this session, fresh tool output) |
-|---|------|------------------------------------------------|
-| 1 | Root-cause diagnosis of the failed gate | `git show a4fc343` diff: `- self,` in outputs lambda |
-| 2 | flake.nix outputs signature fixed, deadnix-proof: `outputs = { nixpkgs, ... }:` | ellipsis accepts always-passed `self`; deadnix has nothing to strip |
-| 3 | `devShells.<system>.default` added (`mkShellNoCC`: alejandra + python3) | `nix develop --command echo` -> `DEVSHELL_OK`, exit 0 |
-| 4 | devShells shape corrected after first attempt was wrong (`.default` missing) | `nix flake show`: 0 "is not a derivation" warnings (was ~45) |
-| 5 | Formatting green | `nix fmt -- . --check` exit 0 (CI check-mode) |
-| 6 | Eval-contract check builds | `nix build .#checks.x86_64-linux.dmarc-eval -L` exit 0 |
-| 7 | Full BuildFlow gate green | `buildflow` -> "BuildFlow passed with warnings 24/32", 25 success / 0 failed, EXIT:0; `nix-flake-check ✔ 8.8s`, `nix-build ✔ 17.3s` |
-| 8 | Independent gate cross-check | `nix flake check` -> `FLAKE_CHECK_EXIT:0` |
-| 9 | `.buildflow.yml` created: skip_steps vulnix / pytest-test / mypy-check, rationale inline | `buildflow verify-config`: "Configuration is valid. 13 steps would run in 'full' mode"; final run shows "6 skipped via config" |
-| 10 | vulnix crash decoded: NVD retired legacy JSON feeds (HTTP 404 on `nvdcve-2.0-modified.json.gz`, vulnix 1.12.5 unmaintained) - BuildFlow's "unscannable store path ./result" hint is a MISDIAGNOSIS | full traceback captured in /tmp/gate.log lines 320-349 |
-| 11 | ruff F821 false positive silenced at the source: `# ruff: noqa: F821` in tests/fixtures/debug-template.py (start_all/machine are nixos-test-driver-injected) | `buildflow -s ruff-check` exit 0 (was 74 findings) |
-| 12 | statix W20 triaged with exact tool wording: it wants `services = { dovecot2 = ...; }` grouping over idiomatic `services.<name> = {...}` node-config blocks - style opinion, not correctness (literal duplicate keys cannot even evaluate) | `nix run nixpkgs#statix -- check tests/parsedmarc-e2e.nix` output captured |
-| 13 | "9 tools unavailable" identified: 8 JS/TS (jest, knip, madge, publint, svelte-check, vitest, vue-tsc, c8) + interrogate - expected noise for a Nix-only repo, exit-code-irrelevant | `buildflow --dry-run --verbose` list captured |
-| 14 | AGENTS.md updated: buildflow gate + devShell contract in Commands; outputs-signature trap, deliberate non-fixes, vulnix story in Working rules | committed by daemon (08:0x) |
-| 15 | deadnix behavior empirically bounded: report-only by default; `-e/--edit` to modify; `-L/--no-lambda-pattern-names` exists upstream "don't break nixpkgs callPackage" - i.e. this breakage class is known upstream | `/tmp/deadnix-self-test`: unused `self` flagged, exit 0, no edit; `--help` captured |
+| #  | Item                                                                                                                                                                                                                                      | Verification (this session, fresh tool output)                                                                                      |
+| -- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| 1  | Root-cause diagnosis of the failed gate                                                                                                                                                                                                   | `git show a4fc343` diff: `- self,` in outputs lambda                                                                                |
+| 2  | flake.nix outputs signature fixed, deadnix-proof: `outputs = { nixpkgs, ... }:`                                                                                                                                                           | ellipsis accepts always-passed `self`; deadnix has nothing to strip                                                                 |
+| 3  | `devShells.<system>.default` added (`mkShellNoCC`: alejandra + python3)                                                                                                                                                                   | `nix develop --command echo` -> `DEVSHELL_OK`, exit 0                                                                               |
+| 4  | devShells shape corrected after first attempt was wrong (`.default` missing)                                                                                                                                                              | `nix flake show`: 0 "is not a derivation" warnings (was ~45)                                                                        |
+| 5  | Formatting green                                                                                                                                                                                                                          | `nix fmt -- . --check` exit 0 (CI check-mode)                                                                                       |
+| 6  | Eval-contract check builds                                                                                                                                                                                                                | `nix build .#checks.x86_64-linux.dmarc-eval -L` exit 0                                                                              |
+| 7  | Full BuildFlow gate green                                                                                                                                                                                                                 | `buildflow` -> "BuildFlow passed with warnings 24/32", 25 success / 0 failed, EXIT:0; `nix-flake-check ✔ 8.8s`, `nix-build ✔ 17.3s` |
+| 8  | Independent gate cross-check                                                                                                                                                                                                              | `nix flake check` -> `FLAKE_CHECK_EXIT:0`                                                                                           |
+| 9  | `.buildflow.yml` created: skip_steps vulnix / pytest-test / mypy-check, rationale inline                                                                                                                                                  | `buildflow verify-config`: "Configuration is valid. 13 steps would run in 'full' mode"; final run shows "6 skipped via config"      |
+| 10 | vulnix crash decoded: NVD retired legacy JSON feeds (HTTP 404 on `nvdcve-2.0-modified.json.gz`, vulnix 1.12.5 unmaintained) - BuildFlow's "unscannable store path ./result" hint is a MISDIAGNOSIS                                        | full traceback captured in /tmp/gate.log lines 320-349                                                                              |
+| 11 | ruff F821 false positive silenced at the source: `# ruff: noqa: F821` in tests/fixtures/debug-template.py (start_all/machine are nixos-test-driver-injected)                                                                              | `buildflow -s ruff-check` exit 0 (was 74 findings)                                                                                  |
+| 12 | statix W20 triaged with exact tool wording: it wants `services = { dovecot2 = ...; }` grouping over idiomatic `services.<name> = {...}` node-config blocks - style opinion, not correctness (literal duplicate keys cannot even evaluate) | `nix run nixpkgs#statix -- check tests/parsedmarc-e2e.nix` output captured                                                          |
+| 13 | "9 tools unavailable" identified: 8 JS/TS (jest, knip, madge, publint, svelte-check, vitest, vue-tsc, c8) + interrogate - expected noise for a Nix-only repo, exit-code-irrelevant                                                        | `buildflow --dry-run --verbose` list captured                                                                                       |
+| 14 | AGENTS.md updated: buildflow gate + devShell contract in Commands; outputs-signature trap, deliberate non-fixes, vulnix story in Working rules                                                                                            | committed by daemon (08:0x)                                                                                                         |
+| 15 | deadnix behavior empirically bounded: report-only by default; `-e/--edit` to modify; `-L/--no-lambda-pattern-names` exists upstream "don't break nixpkgs callPackage" - i.e. this breakage class is known upstream                        | `/tmp/deadnix-self-test`: unused `self` flagged, exit 0, no edit; `--help` captured                                                 |
 
 ## b) PARTIALLY DONE
 
@@ -86,8 +86,7 @@ Remaining warnings are exactly two documented deliberate non-fixes.
    fixtures; statix W20 FP; summary line-count vs finding-count
    discrepancy (statix "60" in summary vs 4 actual findings).~~ _(routed: BuildFlow repo - fleet scope, deliberately out of this repo's TODO_LIST)_
 8. ~~The nixpkgs eval warning observed in gate1:
-   "The option `services.dovecot2.protocols' ... renamed to
-   `services.dovecot2.settings.protocols'" emitted from nixpkgs'
+   "The option `services.dovecot2.protocols' ... renamed to`services.dovecot2.settings.protocols'" emitted from nixpkgs'
    parsedmarc.nix during OUR check evaluation - not investigated whether
    we trigger it or nixpkgs-internal noise.~~ _(routed: TODO_LIST Low row)_
 9. ~~Renovate + Dependabot split-brain check: `renovate.json` exists AND
@@ -174,12 +173,13 @@ Remaining warnings are exactly two documented deliberate non-fixes.
 > [ctx] sourced from repo context rather than this session.
 
 **Gate correctness & verification**
+
 1. ~~One fresh uncached `nix flake check` (+ all three VM E2E checks) on
    the current tree - replace cache-replayed green with an observed one.~~ done (15-21 §a/3-4 + 18-03 §a/1: fresh full gate + fresh VM run, both EXIT:0)
 2. ~~Align AGENTS.md deadnix wording with reality (report-only default;
    BuildFlow edit-mode is the removal path) - 2-line fix.~~ done (2026-09-16 evening AUDIT)
 3. ~~Check CI run status for today's commits (parallel session's CI change
-   + this flake fix).~~ done (green through `0de8b3d`, incl. the PR #1 merge run)
+   - this flake fix).~~ done (green through `0de8b3d`, incl. the PR #1 merge run)
 4. ~~Investigate the nixpkgs `dovecot2.protocols` rename warning emitted
    during our check evals - ours to fix or documented noise?~~ _(routed: TODO_LIST Low row)_
 5. ~~Investigate which formatter rewrote `{ ... }` -> `{...}` in
@@ -199,93 +199,93 @@ Remaining warnings are exactly two documented deliberate non-fixes.
 11. ~~`buildflow upgrade` (binary predates HEAD ~60 h).~~ **Won't implement — machine-local.**
 12. ~~Vacuum the 2.71 GB BuildFlow results DB.~~ **Won't implement — machine-local.**
 13. ~~Inspect BuildFlow's deadnix invocation (does it pass `-e`? `-L`?)
-    and record it in AGENTS.md.~~ **Won't implement — AGENTS now states the verified part (report-only default, BuildFlow auto-fix removal); exact flag archaeology adds nothing.**
+and record it in AGENTS.md.~~ **Won't implement — AGENTS now states the verified part (report-only default, BuildFlow auto-fix removal); exact flag archaeology adds nothing.**
 14. ~~Test whether a statix config can scope-disable W20 for tests/ -
-    prefer config over prose documentation if it works.~~ **Won't implement — W20 stays a documented deliberate non-fix; config-scoping it adds maintenance for a style opinion.**
+prefer config over prose documentation if it works.~~ **Won't implement — W20 stays a documented deliberate non-fix; config-scoping it adds maintenance for a style opinion.**
 15. ~~`buildflow precommit install`? [dec] - hook-gated commits vs
-    daemon-only auto-gate.~~ **Won't implement — superseded by the pre-push fmt hook (TODO_LIST).**
+daemon-only auto-gate.~~ **Won't implement — superseded by the pre-push fmt hook (TODO_LIST).**
 16. ~~Baseline uncached step timings (`buildflow timings`) after the fix,
-    for future regression detection.~~ **Won't implement — YAGNI; VM-test wall cost is already measured per run in the e2e.**
+for future regression detection.~~ **Won't implement — YAGNI; VM-test wall cost is already measured per run in the e2e.**
 
 **Upstream / fleet (BuildFlow repo)**
 17. ~~[fleet] File: vulnix NVD-legacy-feed 404 crash + BuildFlow's
-    misdiagnosis message ("unscannable store path").~~ _(routed: BuildFlow repo - fleet scope)_
+misdiagnosis message ("unscannable store path").~~ _(routed: BuildFlow repo - fleet scope)_
 18. ~~[fleet] File: nix-checker hardcoded-hash / inline-hash FPs on
-    pinned test fixtures (fetchurl pins are intentional).~~ _(routed: BuildFlow repo - fleet scope)_
+pinned test fixtures (fetchurl pins are intentional).~~ _(routed: BuildFlow repo - fleet scope)_
 19. ~~[fleet] File: statix W20 FP on idiomatic NixOS `services.<name>`
-    node-config blocks.~~ _(routed: BuildFlow repo - fleet scope)_
+node-config blocks.~~ _(routed: BuildFlow repo - fleet scope)_
 20. ~~[fleet] File: summary counts diagnostic lines, not findings
-    (statix 60 vs 4).~~ _(routed: BuildFlow repo - fleet scope)_
+(statix 60 vs 4).~~ _(routed: BuildFlow repo - fleet scope)_
 21. ~~[fleet] Evaluate a maintained CVE-scanner replacement for vulnix
-    (NVD retired the legacy feeds; vulnix unmaintained).~~ _(routed: BuildFlow repo - fleet scope)_
+(NVD retired the legacy feeds; vulnix unmaintained).~~ _(routed: BuildFlow repo - fleet scope)_
 22. ~~[fleet] Consider exposing `buildflow config validate` as a cheap CI
-    step for fleet repos.~~ _(routed: BuildFlow repo - fleet scope)_
+step for fleet repos.~~ _(routed: BuildFlow repo - fleet scope)_
 
 **Flake / product**
 23. ~~CHANGELOG entry for this session (flake eval fix, devShells,
-    .buildflow.yml, AGENTS rules).~~ done (`2b7257e` + session-6 entries)
+.buildflow.yml, AGENTS rules).~~ done (`2b7257e` + session-6 entries)
 24. ~~README: document `nix develop` devShell + the buildflow gate next to
-    the existing runbook.~~ done (2026-09-16 evening AUDIT: README "Development" section)
+the existing runbook.~~ done (2026-09-16 evening AUDIT: README "Development" section)
 25. ~~Release decision [dec]: cut v0.2.1 (consumer-relevant for NEW
-    consumers; SystemNix's existing pin is unaffected) or batch.~~ done (superseded: batched into the 0.3.0 TODO row - unblocked when PR #1 merged)
+consumers; SystemNix's existing pin is unaffected) or batch.~~ done (superseded: batched into the 0.3.0 TODO row - unblocked when PR #1 merged)
 26. ~~ROADMAP [dec]: treefmt-nix standard stack vs minimal-alejandra
-    (nix-review checklist prefers the stack; compat doctrine prefers
-    minimal - genuine tradeoff, user decision).~~ _(routed: ROADMAP §5 raw idea)_
+(nix-review checklist prefers the stack; compat doctrine prefers
+minimal - genuine tradeoff, user decision).~~ _(routed: ROADMAP §5 raw idea)_
 27. ~~Confirm SystemNix's pin still evaluates against this flake (compat
-    doctrine spot-check; no bump expected).~~ _(routed: rides the SystemNix push TODO row; pin is tag v0.2.0, all changes since are additive)_
+doctrine spot-check; no bump expected).~~ _(routed: rides the SystemNix push TODO row; pin is tag v0.2.0, all changes since are additive)_
 28. ~~Ask SystemNix whether it wants upstream devShells or defines its own
-    (contract note in README).~~ _(routed: SystemNix coordination, TODO_LIST row)_
+(contract note in README).~~ _(routed: SystemNix coordination, TODO_LIST row)_
 29. ~~Audit that every flake output introduced since v0.2.0 is documented
-    (devShells is the only addition so far).~~ done (FEATURES carries the devShell row; no other outputs added)
+(devShells is the only addition so far).~~ done (FEATURES carries the devShell row; no other outputs added)
 30. ~~Consider `nix flake update` cadence policy (compat doctrine: only
-    together with SystemNix) - write it down [ctx].~~ done (documented: Pin-advance runbook + AGENTS conventions)
+together with SystemNix) - write it down [ctx].~~ done (documented: Pin-advance runbook + AGENTS conventions)
 
 **Docs**
 31. ~~HARVEST section (f) into TODO_LIST.md / ROADMAP.md (docs-health).~~ done (`e18758f` + evening AUDIT)
 32. ~~ANNOTATE this report as its items resolve.~~ done (this pass)
 33. ~~Mirror the "known lint noise" list into README only if consumers
-    inherit BuildFlow (probably not - confirm, then likely skip) [dec].~~ **Won't implement — consumers don't inherit BuildFlow (flake outputs carry none of it).**
+inherit BuildFlow (probably not - confirm, then likely skip) [dec].~~ **Won't implement — consumers don't inherit BuildFlow (flake outputs carry none of it).**
 34. ~~Keep `.buildflow.yml` rationale comments and AGENTS.md non-fix list
-    in sync on every future skip-set change.~~ done (standing rule, AGENTS Commands)
+in sync on every future skip-set change.~~ done (standing rule, AGENTS Commands)
 35. ~~Review docs/TELEMETRY.md staleness caveat (version-skew vs pinned
-    0.15.5) [ctx, pre-existing].~~ done (2026-09-16 evening AUDIT: provenance block self-caveats correctly; key-verification doctrine intact)
+0.15.5) [ctx, pre-existing].~~ done (2026-09-16 evening AUDIT: provenance block self-caveats correctly; key-verification doctrine intact)
 
 **Tests**
 36. ~~Fresh observed passes for stalwart-e2e, stalwart-relay-e2e,
-    parsedmarc-e2e (dup of #1 at check granularity; keep one).~~ done (15-21 + 18-03 fresh runs)
+parsedmarc-e2e (dup of #1 at check granularity; keep one).~~ done (15-21 + 18-03 fresh runs)
 37. ~~Consider extending dmarc-eval (or a tiny eval check) to assert the
-    devShells output exists - contract completeness vs YAGNI [dec].~~ **Won't implement — YAGNI; `nix flake show` catches shape breaks (it did during the incident).**
+devShells output exists - contract completeness vs YAGNI [dec].~~ **Won't implement — YAGNI; `nix flake show` catches shape breaks (it did during the incident).**
 38. ~~Mypy skip revisit trigger: first real Python module lands
-    (documented in .buildflow.yml - just honor it).~~ done (trigger documented in `.buildflow.yml`)
+(documented in .buildflow.yml - just honor it).~~ done (trigger documented in `.buildflow.yml`)
 39. ~~If more Python fixtures appear, move from in-file noqa to
-    ruff.toml per-file-ignores (threshold: 2+ files).~~ done (threshold documented; single fixture keeps the in-file noqa)
+ruff.toml per-file-ignores (threshold: 2+ files).~~ done (threshold documented; single fixture keeps the in-file noqa)
 
 **Process / hygiene**
 40. Single-writer or scoped-partition agreement for multi-session work
-    in this repo [dec].
+in this repo [dec].
 41. ~~Re-read `git log`/`git status` immediately before every write burst
-    while the daemon + parallel sessions are live (cheap, prevents
-    blocked edits).~~ done (standing practice; applied every session since)
+while the daemon + parallel sessions are live (cheap, prevents
+blocked edits).~~ done (standing practice; applied every session since)
 42. ~~Prefer `--format json` for future triage (grep-able, no ANSI).~~ **Won't implement — advisory preference; nothing to change in the repo.**
 43. ~~Decide the fate of `interrogate` (never install; permanently N/A
-    unless Python grows).~~ done (documented as expected noise in AGENTS Commands)
+unless Python grows).~~ done (documented as expected noise in AGENTS Commands)
 44. ~~Commit the still-uncommitted foreign whitespace edit in
-    tests/stalwart-relay-e2e.nix (or hand it back to its author) - it
-    has been dangling since morning.~~ done (tree clean; the edit landed in the day's commit stream)
+tests/stalwart-relay-e2e.nix (or hand it back to its author) - it
+has been dangling since morning.~~ done (tree clean; the edit landed in the day's commit stream)
 45. ~~Post-fix full buildflow re-run on a cold result cache to prove the
-    17.4 s green is reproducible, not an artifact of warm caches.~~ **Won't implement — superseded by the fresh uncached `nix flake check` + VM runs from sessions 6-8.**
+17.4 s green is reproducible, not an artifact of warm caches.~~ **Won't implement — superseded by the fresh uncached `nix flake check` + VM runs from sessions 6-8.**
 46. ~~Document the gate hierarchy in AGENTS.md Commands explicitly:
-    buildflow (wrapper) vs nix flake check (project gate) - which is
-    authoritative when they disagree [dec].~~ done (AGENTS Commands states both; README "Development" now carries the hierarchy too)
+buildflow (wrapper) vs nix flake check (project gate) - which is
+authoritative when they disagree [dec].~~ done (AGENTS Commands states both; README "Development" now carries the hierarchy too)
 47. ~~Spot-check that `nix fmt -- . --check` covers the new
-    tests/fixtures file set (it did this session; keep it in the loop).~~ done (observed again in every later gate run)
+tests/fixtures file set (it did this session; keep it in the loop).~~ done (observed again in every later gate run)
 48. ~~Consider adding `nom` (nix-output-monitor) or `nix flake show --json`
-    recipe to README debug section (small QoL) [ctx].~~ **Won't implement — QoL nicety, not worth the README surface.**
+recipe to README debug section (small QoL) [ctx].~~ **Won't implement — QoL nicety, not worth the README surface.**
 49. Schedule the periodic `git town` / repo-hygiene sweep this repo's
-    git-town.toml implies [ctx].
+git-town.toml implies [ctx].
 50. ~~Close the loop on this session: after HARVEST, delete resolved items
-    from TODO_LIST per its living-document rule (completed items are
-    DELETED, not ticked).~~ done (e18758f + evening AUDIT sweeps)
+from TODO_LIST per its living-document rule (completed items are
+DELETED, not ticked).~~ done (e18758f + evening AUDIT sweeps)
 
 ---
 

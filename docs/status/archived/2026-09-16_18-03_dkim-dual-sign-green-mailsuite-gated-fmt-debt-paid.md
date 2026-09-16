@@ -113,7 +113,7 @@ paid as tuition along the way.
    session-7's unformatted `tests/dmarc-eval.nix`; run `35116953872`
    (15:40) failed identically on **my explicit push** of the sweep
    (`2b7257e`) — I ran the full `nix flake check` gate but never the fmt
-   gate I had *myself verified into CI* the day before. Fix was pure
+   gate I had _myself verified into CI_ the day before. Fix was pure
    re-indentation (`24def0e`, dmarc-eval re-verified green after). The
    first miss was inherited; the second was unforced. Rule now in
    AGENTS.md.
@@ -158,6 +158,7 @@ paid as tuition along the way.
 ## f) Next things (impact-ordered; 30 honest items, not padded to 50)
 
 User decisions (minutes each, unblock everything below them):
+
 1. ~~Renovate: install app or drop `renovate.json`.~~ _(routed: TODO_LIST row)_
 2. ~~mailsuite: file / tweak / skip the staged draft.~~ _(routed: TODO_LIST row)_
 3. ~~Dependabot PR #1: merge or close.~~ done (MERGED 2026-09-16 16:08 UTC)
@@ -168,26 +169,26 @@ User decisions (minutes each, unblock everything below them):
 
 Small self-serve (each verified-needed by this session):
 8. ~~FEATURES.md: add offline + option-docs assertions to the `dmarc-eval`
-   row (5m).~~ done (2026-09-16 evening AUDIT)
+row (5m).~~ done (2026-09-16 evening AUDIT)
 9. ~~`stalwart-e2e`: direct `jq -e '.data.errors | length == 0'` on the
-   reload response (10m).~~ _(routed: TODO_LIST Medium row)_
+reload response (10m).~~ _(routed: TODO_LIST Medium row)_
 10. ~~Git `pre-push` hook running `nix fmt -- . --check` (15m; kills the
-    d/1 failure class).~~ _(routed: TODO_LIST Medium row)_
+d/1 failure class).~~ _(routed: TODO_LIST Medium row)_
 11. ~~Release 0.3.0 after PR #1 resolves: CHANGELOG cut, tag (CI now runs
-    on tags), notes with lock rev/narHash pin (1h).~~ _(routed: TODO_LIST High row - PR #1 resolved, UNBLOCKED)_
+on tags), notes with lock rev/narHash pin (1h).~~ _(routed: TODO_LIST High row - PR #1 resolved, UNBLOCKED)_
 12. ~~TODO_LIST re-sweep once 1-4 land (rows resolve either way).~~ done (2026-09-16 evening AUDIT: rebuilt to 17 open rows)
 
 Watch items (passive, recurring):
 13. ~~nixpkgs#563651 / #563652 / #563777 / mjs#662 / mjs#663 responses
-    (dotlambda's "upstream PR first" is answered by #663 — watch merge).~~ _(routed: TODO_LIST watch row)_
+(dotlambda's "upstream PR first" is answered by #663 — watch merge).~~ _(routed: TODO_LIST watch row)_
 14. ~~Stalwart >0.15.5 release watch (module README note requirement).~~ standing (Pin-advance runbook doctrine, README)
 15. ~~parsedmarc / mailsuite / imapclient minor bumps on nixpkgs moves
-    (always paired with SystemNix lock rev, compat doctrine).~~ standing (Pin-advance runbook, README)
+(always paired with SystemNix lock rev, compat doctrine).~~ standing (Pin-advance runbook, README)
 16. ~~mailsuite issue thread (once filed): PR offer stands in the draft.~~ _(rides the TODO_LIST file-or-skip row)_
 
 SystemNix side (parallel-session overlap, user-gated):
 17. ~~Push the ~75 commits, clear CI debt (statix sweep, `syn_` policy,
-    2 pin flips, gitleaks `rev=` allowlist) (2h).~~ _(routed: TODO_LIST SystemNix row)_
+2 pin flips, gitleaks `rev=` allowlist) (2h).~~ _(routed: TODO_LIST SystemNix row)_
 18. ~~Resend SASL smoke against smtp.resend.com:587 (30m, needs key).~~ _(routed: TODO_LIST row)_
 19. ~~Live dmarc-monitor validation against the D1 mailbox (1h).~~ _(routed: TODO_LIST D1-gated row)_
 20. ~~Migration compare: stalwart-vandelay vs imapsync (1h, D1-gated).~~ _(routed: TODO_LIST D1-gated row)_
@@ -195,16 +196,16 @@ SystemNix side (parallel-session overlap, user-gated):
 
 Hardening / quality (self-serve, low urgency):
 22. ~~ROADMAP Gatus external-view checks (starttls :25, tls :993, cert
-    expiry).~~ standing (already a ROADMAP §4 raw idea - no TODO row needed)
+expiry).~~ standing (already a ROADMAP §4 raw idea - no TODO row needed)
 23. ~~Consider strict required-check enforcement (no bypass) once the
-    daemon/commit flow is settled — see g/7.~~ _(routed: TODO_LIST branch-protection policy row)_
+daemon/commit flow is settled — see g/7.~~ _(routed: TODO_LIST branch-protection policy row)_
 24. ~~Stalwart upstream FR: declarative server-side Junk filing (30m, Q6).~~ _(routed: TODO_LIST row, Q6-gated)_
 25. ~~docs-health ANNOTATE pass on this report when it goes stale.~~ done (2026-09-16 evening pass - this file)
 26. ~~Add the reload-smoke ops step ("check `errors` in the response") to
-    the SystemNix runbook if the live host ever uses management-API
-    settings changes.~~ _(routed: ROADMAP §4 raw idea - conditional on a live host using management-API settings changes)_
+the SystemNix runbook if the live host ever uses management-API
+settings changes.~~ _(routed: ROADMAP §4 raw idea - conditional on a live host using management-API settings changes)_
 27. ~~aarch64: occasionally run the local gate with `--all-systems` (CI
-    shape guard already asserts the set exists).~~ _(routed: ROADMAP §5 aarch64 residue line)_
+shape guard already asserts the set exists).~~ _(routed: ROADMAP §5 aarch64 residue line)_
 
 ## g) Questions I can NOT figure out myself
 
@@ -221,9 +222,9 @@ Hardening / quality (self-serve, low urgency):
 
 ---
 
-*Point-in-time snapshot. Written 2026-09-16 18:03 CEST after CI green on
+_Point-in-time snapshot. Written 2026-09-16 18:03 CEST after CI green on
 `fae9e81`. Format: Markdown per explicit user instruction (skill default
-is HTML). WAITING FOR INSTRUCTIONS.*
+is HTML). WAITING FOR INSTRUCTIONS._
 
 ---
 

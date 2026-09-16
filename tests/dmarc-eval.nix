@@ -55,8 +55,7 @@
   # description survives the NixOS docs pipeline instead of breaking it
   # (unbalanced code fences etc. fail HERE, not in a manual build), and the
   # greps below prove the wrapper's own docs content actually rendered.
-  optionsCommonMark =
-    (pkgs.nixosOptionsDoc {inherit (eval) options;}).optionsCommonMark;
+  inherit ((pkgs.nixosOptionsDoc {inherit (eval) options;})) optionsCommonMark;
 
   rendered = builtins.toJSON {
     enabled = cfg.services.parsedmarc.enable;
