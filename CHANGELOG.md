@@ -7,6 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- CI pipe-lint step (fail-closed): bans `producer | grep/tail/head`
+  assertions inside `tests/*.nix` testScripts - under the test shell's
+  pipefail, `grep -q`'s early exit EPIPEs the producer (observed in CI as
+  curl exit 23 on a MATCHING payload) and the negated form can
+  phantom-green. The gawk 5.x `\b`-is-backspace trap (a never-firing false
+  green) was caught by a local negative test and fixed to a character-class
+  boundary (`.github/workflows/ci.yml`)
+- All remaining piped in-VM curl assertions converted to dump-to-file +
+  grep-the-file (the pipe-lint found its own offenders)
+- Flake `devShells.default` (alejandra + python3) for `nix develop` and
+  tool runners; the `outputs` signature fixed to an open pattern (a closed
+  pattern without `self` broke evaluation - Nix always passes `self`)
+- `.github/dependabot.yml`: weekly grouped github-actions bumps (Renovate
+  keeps the nix side, approval-gated); `.gitignore` python tooling
+  artifacts; d2 edge-label rewrap so labels parse as single strings
+- README: CI badge, `parsedmarc-e2e` listed in the verified-checks section
+  (was missing), POP3 + FTS-offload non-goal notes, and an "External
+  upstream issues" ledger block (#563651, #563652 with status)
+
+### Changed
+
+- docs-health AUDIT (2026-09-16): all 21 `2026-0*` historical snapshots
+  annotated inline (done-at hashes / verified-evidence / won't-implement
+  verdicts) and archived under `docs/{status,planning,reviews}/archived/`;
+  every open item re-verified against the tree and harvested into
+  TODO_LIST/ROADMAP; TODO_LIST rebuilt from the harvest
+
 ## [0.2.0] - 2026-09-15
 
 ### Added
@@ -133,9 +162,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   (~6 min) exceeds the test driver's shell-connect timeout and a full
   E2E would run over an hour; decision documented in the flake trap
   comment: manual-only, not CI-worthy
-
-### Changed
-
 - parsedmarc wrapper now sets `StateDirectory` + `ReadWritePaths`: the
   nixpkgs unit runs as a DynamicUser with no writable state, so the default
   `/var/lib/parsedmarc/reports` output could never have worked (found by

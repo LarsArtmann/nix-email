@@ -1,5 +1,7 @@
 # nix-email
 
+[![CI](https://github.com/LarsArtmann/nix-email/actions/workflows/ci.yml/badge.svg)](https://github.com/LarsArtmann/nix-email/actions/workflows/ci.yml)
+
 Declarative mail stack for LarsArtmann hosts: an opinionated
 [Stalwart](https://stalw.art) mail-server wrapper + a light parsedmarc
 DMARC/TLS-RPT monitor, packaged as a NixOS flake for consumption by
@@ -82,7 +84,7 @@ onFailure alerting, backups) is
 `docs/architecture-understanding/2026-09-15_09_23-nix-email-improved.svg`;
 the rendered current-state SVG sits next to it.
 
-## What is built and verified (2026-09-14)
+## What is built and verified
 
 | Piece                                          | State                                                                         |
 | ---------------------------------------------- | ----------------------------------------------------------------------------- |
@@ -112,6 +114,13 @@ user decisions in [ROADMAP.md](ROADMAP.md).
   generated `queue.route`/`queue.strategy.route`, local domains still
   deliver locally (and never leak to the relay), relay hostname resolved via
   dnsmasq (Stalwart's resolver ignores /etc/hosts).
+- `parsedmarc-e2e`: TWO-node VM - a Dovecot fixture mailbox seeded with the
+  upstream sample DMARC aggregate report, polled by the real parsedmarc 11
+  unit; JSON/CSV output asserted (row counts, org metadata), the runtime ini
+  asserted free of the inert `[elasticsearch]` section, and a second node
+  exercising the production-shaped IMAPS 993 path with DEFAULT certificate
+  verification (machine-trusted fixture CA, `ssl=True`, no
+  skip-verification).
 - `dmarc-eval`: eval-time contract - enables parsedmarc, heavy sinks off,
   `general.output` lands, `_secret` password survives the option types AND
   the real ini generation (the unit's config render is forced, so a wrong
@@ -562,4 +571,27 @@ json/yaml/markdown.
 Piler (archiving - maildir snapshots + paperless cover personal use),
 Mailcow/Mailu (Docker-first, heavy), Elasticsearch for parsedmarc (a search
 stack to read 16 domains' DMARC mail), a wrapper around
-`services.mailpit.instances` (single option, nothing to layer).
+`services.mailpit.instances` (single option, nothing to layer), direct-to-MX
+outbound (fresh-IP reputation; the Resend relay is the design). POP3 is
+compiled into Stalwart 0.15.5 but deliberately NOT in the wrapper's listener
+contract (25/465/587/993 only) - a consumer can add it via
+`services.stalwart.settings` if a legacy client ever needs it. Offloading
+Stalwart's internal full-text search to Meilisearch or friends: same
+doctrine as the Elasticsearch rejection (the built-in Community FTS already
+serves a single-user deployment).
+
+## External upstream issues
+
+Diagnosed here, filed upstream, watched on every nixpkgs bump (retirement
+conditions in the module comments and the Pin-advance runbook):
+
+- [NixOS/nixpkgs#563651](https://github.com/NixOS/nixpkgs/issues/563651) -
+  parsedmarc module materializes a host-less `[elasticsearch]` ini section
+  with `provision.elasticsearch = false` (parsedmarc 11 exits 255). Wrapper
+  workaround: guarded `ExecStartPre` strip. Filed 2026-09-15, re-verified
+  unfixed on nixpkgs master same day.
+- [NixOS/nixpkgs#563652](https://github.com/NixOS/nixpkgs/issues/563652) -
+  imapclient `starttls()` assigns the read-only `imaplib.IMAP4.file` on
+  python 3.14. Wrapper workaround: unit pinned to the py3.13 build. Root fix
+  belongs upstream at mjs/imapclient (still present on master as of
+  2026-09-16, `imapclient/imapclient.py:387`).

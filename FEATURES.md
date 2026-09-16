@@ -61,10 +61,10 @@
 | ----------------------------- | ------------------------- | -------------------------------------------------------------------- |
 | `nix flake check` gate        | 🟢 `FULLY_FUNCTIONAL`     | All checks green; x86_64 VM runs, aarch64 eval-only. Emulated aarch64 `stalwart-e2e` attempted 2026-09-15: guest builds+boots under qemu binfmt/TCG but boot alone exceeds the driver's shell timeout - documented-manual, not CI-worthy (flake trap comment) |
 | Formatter (dprint + alejandra) | 🟢 `FULLY_FUNCTIONAL`    | `nix fmt` via the flake `formatter` output; dprint covers json/yaml/markdown |
-| CI (GitHub Actions)           | 🟢 `FULLY_FUNCTIONAL`     | `.github/workflows/ci.yml` - fail-closed `nix flake check` with a STRICT lockstep guard (flake-declared checks must equal CI's expected list exactly; negative-tested), alejandra format enforcement, and an aarch64 check-set shape assertion |
+| CI (GitHub Actions)           | 🟢 `FULLY_FUNCTIONAL`     | `.github/workflows/ci.yml` - fail-closed `nix flake check` with a STRICT lockstep guard (flake-declared checks must equal CI's expected list exactly; both drift directions negative-tested), alejandra format enforcement, a pipe-lint step banning `producer \| grep/tail/head` in-VM assertions, and an aarch64 check-set shape assertion |
 | Repo topics                   | 🟢 `FULLY_FUNCTIONAL`     | mail/nixos/nixos-module/stalwart/dmarc/email-server/nix-flake        |
-| Renovate (nixpkgs input)      | 🟢 `FULLY_FUNCTIONAL`     | `renovate.json` - nix manager approval-gated, SystemNix pairing note |
-| LICENSE                       | 🟢 `FULLY_FUNCTIONAL`     | MIT, CONFIRMED by the user 2026-09-15 (`Copyright (c) 2026 Lars Artmann`) |
+| Renovate + Dependabot         | 🟢 `FULLY_FUNCTIONAL`     | `renovate.json` (nix manager approval-gated, SystemNix pairing note, actions enabled) + `.github/dependabot.yml` (weekly grouped github-actions bumps) |
+| Flake devShell                | 🟢 `FULLY_FUNCTIONAL`     | `devShells.default` (alejandra + python3) for `nix develop`; outputs signature open-pattern (a closed pattern broke eval once, fixed same morning) |
 | Verified-facts ledger         | 🟢 `FULLY_FUNCTIONAL`     | `README.md`; zero UNVERIFIED claims                                  |
 
 ## Integration (consumers of this flake)
