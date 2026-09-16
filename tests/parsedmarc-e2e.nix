@@ -383,7 +383,14 @@ in
           tls.succeed(
               "! grep -qiE 'CERTIFICATE_VERIFY_FAILED|SSL:.+(WRONG|FAILED)' /tmp/journal-tls.log"
           )
-          # DEBUG (transcript capture for the TLS-handshake assertion):
-          tls.succeed("journalctl -u dovecot -b 0 --no-pager -o cat >&2")
+          # POSITIVE handshake proof (not just failure absence), from the
+          # dovecot journal: IMAPS logins carry the ", TLS," marker
+          # (transcript-verified 2026-09-16: `imap-login: Logged in:
+          # user=<dmarc>, method=PLAIN, ..., TLS, session=...`; the plain
+          # machine's non-TLS logins log "secured" without TLS).
+          tls.succeed(
+              "journalctl -u dovecot -b 0 -o cat > /tmp/journal-dovecot.log"
+              "&& grep -E 'imap-login: Logged in: user=<dmarc>.* TLS, session=' /tmp/journal-dovecot.log"
+          )
     '';
   }

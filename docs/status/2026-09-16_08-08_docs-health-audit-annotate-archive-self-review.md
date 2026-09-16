@@ -1,0 +1,103 @@
+# Status: docs-health AUDIT — 21 snapshots annotated + archived, living docs rebuilt, one false count owned
+
+**Date:** 2026-09-16, 08:08 CEST (session ran ~07:2x → 08:08)
+**Directive:** "View ALL **/2026-0* files! Execute the docs-health SKILL! PROPERLY! ... TODO_LIST, CHANGELOG, AGENTS, README, ROADMAP, FEATURES must all be SUPERB! Archive FULLY done and UPDATED (inline strikethrough) .md files!"
+**Scope:** THIS session only — the full docs-health AUDIT (BUILD/HARVEST/VERIFY/ANNOTATE/ARCHIVE) over every `2026-0*` snapshot plus the six living docs.
+**Gate state at report time:** `nix flake check` → **FLAKECHECK_EXIT:0** (redirected log, no pipes; aarch64 omission warning = the known, deliberate eval-only posture). dprint check green over all touched markdown. Working tree: fully committed by the daemon in 3 batches (`24f9a93`, `9404897`, `4faa22d` + successors); master ahead of origin (push is user-gated).
+
+---
+
+## a) FULLY DONE (verified this session)
+
+| #  | Item                                                                                                                                                                                      | Evidence                                                                                                              |
+| -- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| 1  | **Skill + all 7 references loaded BEFORE acting**; dry-run-first honored on every new file shape (the scripts' own rule)                                                                   | skill files read first; dry-runs visible in transcripts                                                               |
+| 2  | **All 24 `2026-0*` files read in full** (16 status .md, 4 planning .md, 1 review .html, 4 architecture d2/svg) before any edit                                                            | this session, pre-work inventory                                                                                      |
+| 3  | **Every claim verified against the tree before annotating**: branch protection (gh api → 404 "not protected"), releases (both exist, v0.2.0 Latest), dependabot.yml + renovate.json contents, CI steps (pipe-lint EXISTS — shipped by the morning session as uncommitted-then-committed work; tags-trigger absent), CONTRIBUTING content, catch-all by-NAME login in the test (:492-498), quota absent from module docs, d2↔SVG label sync | fresh tool output per claim                                                                                            |
+| 4  | **Three open items CLOSED with local experiments**: lockstep guard negative-tested BOTH directions (jq set-equality: fewer AND extra flake checks both fail — closes 02-08 §e/2 / 07-04 §f/5); pipe-grep audit clean (closes 02-08 §f/20); mjs/imapclient master drift re-check — `starttls()` STILL assigns `self._imap.file` at `imapclient/imapclient.py:387` (closes 07-04 §b/1; #563652 premise holds) | /tmp jq runs; grep; `gh api` fetch-to-file                                              |
+| 5  | **README fixed**: `parsedmarc-e2e` added to the verified-checks list (was MISSING entirely — Critical), heading de-dated, POP3 + FTS non-goal notes, "External upstream issues" ledger block (#563651/#563652 + status), CI badge | README diff                                                                                                            |
+| 6  | **TODO_LIST.md rebuilt from the full harvest**: **29 task rows** (21 🔴 TODO, 9 🔵 BLOCKED... correction: 21 TODO + 8 BLOCKED-in-D1/user split — see d/5 for the count lesson), every row evidence-cited and verified open TODAY; the done ANNOTATE row deleted | TODO_LIST.md; `grep -oE` count = 20 task TODO + 9 task BLOCKED + legend                                              |
+| 7  | **CHANGELOG**: duplicate `### Changed` section inside [0.2.0] merged (a structural mangle the 17-05 session claimed fixed and wasn't); `[Unreleased]` added covering the post-v0.2.0 morning work (pipe-lint + gawk `\b` fix, file-based assertions, devShell + outputs-signature fix, dependabot, gitignore, d2 rewrap) and this pass | CHANGELOG.md; `grep -c Changed` = 3 (Unreleased/0.2.0/0.1.0)                                                          |
+| 8  | **FEATURES/ROADMAP/AGENTS synced**: Renovate+Dependabot row, pipe-lint in CI row, devShell row; §10 harvest deltas applied at last (viewer DEFERRED, OIDC verified-present/when-D1, Terraform single-DNS-owner guard, POP3/FTS non-goals); AGENTS doc-map license text corrected + archived/ noted | file diffs                                                                                                             |
+| 9  | **All 21 snapshots annotated INLINE** — ~450 per-item verdicts (`done at` hashes / verified evidence / Won't-implement / routed), 2 appendix-only-free; resolution addenda per file; 3 pre-existing stale partial annotations completed (17-05 g/3 license, 18-37 tier table, HTML review cells) | archived tree; per-file addenda                                                                                        |
+| 10 | **All 21 snapshots ARCHIVED** via `git mv` to `docs/{status,planning,reviews}/archived/`; completeness gate green (every archived .md carries strikethroughs, min 2; HTML carries 14 `<del>`)                                                            | git status rename list; per-file `grep -c '~~'`                                                                        |
+| 11 | **Marker integrity through formatting**: dprint fmt over 17 files; strikethrough count identical before/after (731); dprint check green                                                   | /tmp counts + `DPRINT_CHECK_OK`                                                                                        |
+| 12 | **3 links to moved paths fixed** (README ledger pointer, 2 TODO_LIST evidence cells) found by a post-archive link scan                                                                     | grep scan + fixes                                                                                                      |
+| 13 | **Gate + honest health report delivered inline** (Accuracy 5.75 → fixed; Fitness 7.75 → fixed; visible math, findings table, prior-baseline cited)                                        | prior assistant message                                                                                                |
+
+## b) PARTIALLY DONE
+
+| # | Item | Works now | Missing |
+| - | ---- | --------- | ------- |
+| 1 | **SVG currency verification** | current.svg label spot-checked (`X-Spam-Status (GTUBE/rules)` matches d2 line 48) | I did NOT re-run the full 36-label diff on improved.svg myself — the "content-verified current" annotation leans on the 17-59 session's diff plus my one-label probe. Inherited-evidence reliance, flagged not hidden |
+| 2 | **w-marker hygiene** | 6 of my mislabeled "Won't implement — routed/still open" markers hand-fixed to _(routed: …)_ open form (06-48 ×3, 10-41 ×2, 18-17 ×1) | A post-hoc lint still finds 5 w-markers referencing TODO_LIST; 2 predate this pass (coherent DUPLICATE closures), 3 are mine and read as "closed-as-routed, work lives elsewhere" — coherent, but a dedicated `routed` marker kind would have made the distinction mechanical |
+| 3 | **TELEMETRY.md / CONTRIBUTING.md** | Both exist, AGENTS references them; CONTRIBUTING content verified for specific claims during VERIFY | No full docs-health freshness pass ran on either (outside the six-docs mandate, never explicitly scoped) |
+| 4 | **Push state** | Everything committed locally | This session ADDED commits to the unpushed pile (docs + renames); push stays user-gated |
+
+## c) NOT STARTED (deliberate — out of a docs run's scope, now TODO_LIST rows)
+
+1. The third nixpkgs filing (parsedmarc unit Restart policy) — draft should live in docs/ next time, not /tmp
+2. mjs/imapclient upstream filing (drift re-check now done — the expensive half)
+3. Everything else harvested: see TODO_LIST (29 rows: filings, live-probe, SASL variant, tags-trigger, branch protection, Renovate verification, TLS-journal line, lock-rev notes, the low bundle)
+4. All D1/D2/Q6-gated work (unchanged, ROADMAP)
+
+## d) TOTALLY FUCKED UP (own errors this session, no excuses)
+
+1. **I shipped a FALSE COUNT in the closing health report — the exact documented sin.** I wrote "25 evidence-cited rows" in TODO_LIST; the file has **29** task rows (20 🔴 + 9 🔵 beyond the legend). The 04-42 report's §d/1 documents this precise failure ("24 verified rows" vs 31) and I re-performed it in the session annotating that report. Corrected here; the TODO_LIST itself was always right. Count discipline: `grep -oE` first, claim second — I did it for the strikethroughs (731) and skipped it for the row count.
+2. **I DELETED a shipped feature from FEATURES.md mid-edit.** My multiedit replaced the LICENSE row with the new devShell row instead of adding a row — the honest-inventory file briefly lost a shipped feature. Caught by my own re-read ~1 minute later and restored. Root cause: "new content for old anchor" instead of anchor-preserving append, in the one file where deletion = lying.
+3. **Bash backtick-injection of my own annotation text.** A `annotate-prose.py` spec contained `` `self._imap.file` `` inside double quotes → bash command-substituted it (error noise) → the marker landed without the code span. This repo's AGENTS "extract identifiers mechanically" rule exists because of exactly this class; my spec strings needed single quotes or a heredoc.
+4. **Six items falsely CLOSED as "Won't implement" while actually routed-open.** Marking routed-but-still-open TODO work with the w-kind struck it through as closed — the "documentation lies" class this skill exists to prevent, authored BY the health pass itself. Caught all six on re-read and converted to explicit _(routed: … still open)_ — but only because I re-read; a reader in between saw closed items.
+5. **My own pipeline-masked exit code — twice, in the first imapclient check.** `gh api … | grep -n … | head -5; echo EXIT:$?` printed head's exit (0) on a failed fetch; I noticed the emptiness and redid it file-based on the third attempt. The repo's #1 rule ("gate commands never wear pipes") applies to diagnostics too — the 19-52 report §d/5 says precisely this, and I re-performed it during the audit of that report.
+6. **Edit-staleness and precision churn**: 1 edit-tool staleness rejection (files mutated by my own script writes), then two rounds of failed python patch attempts on 18-17 item 11 and 10-41 items 31/42 (assertion mismatches, skip-logic bugs, guessing multi-line marker shapes) before clean exact-text replaces. ~4 wasted rounds on text I could have `sed -n`'d first.
+7. **A live writer raced the audit and I under-flagged it.** Between my first `git log` and the next, four morning-session commits landed (8f0ed04..de0737d) plus an uncommitted ci.yml diff that later vanished into ba7645c — the tree moved UNDER the audit. I noticed, left the foreign diff untouched (correct), and kept going, but never stopped to state the risk: a docs-health pass re-writing 21 files while another session commits is the two-writers pattern this repo's reports keep burning on.
+8. **Section-shape misfire on 02-08**: fired the prose annotator at a section whose items 1-6 live on ONE dot-separated line (atomic failure, no damage) — then wrote the manual fix with a wrong assumption, failed again, inspected, fixed. Also produced one garbage shell construct (`python3 -P` — not a flag) patched with an `||` fallback instead of written correctly the first time.
+9. **Minor**: the health-report classification flip-flopped before landing (CHANGELOG duplicate Critical→Med-High; broken-links Critical→Low "transient") — the final math matched the final table, but two reclassifications mid-computation is judgment after the fact, not count-then-score discipline.
+
+## e) WHAT WE SHOULD IMPROVE
+
+1. **Counts and claims only from a fresh command, EVERY time** — the 731 strikethrough count was computed; the 29-row count was recalled. The failure asymmetry is the lesson: the computed number was right, the recalled one was wrong, in the same message.
+2. **The annotate scripts need a `routed` marker kind** (open, lives in TODO_LIST/ROADMAP) distinct from `w` (won't implement). My 6 mislabels + the post-hoc lint ambiguity are the evidence; this is a docs-health skill upstream candidate (same family as the clause-level-strikethrough convention the 04-42 session proposed).
+3. **Spec strings for the annotate scripts belong in single quotes or heredocs** — any backticked content inside double quotes is a bash command-substitution injection into the historical record.
+4. **Diagnostics get the same redirect discipline as gates** (my exit-0-on-failure; also the 19-52 §d/5 precedent). Rule already in AGENTS; my fingers haven't learned it.
+5. **Read the exact bytes (`sed -n`) before EVERY manual multi-line patch** — 4 of my 6 wasted rounds were guessable-away by a 2-second view. The tool's staleness guard caught the class; my process invited it.
+6. **Pause and state parallel-writer risk when the tree moves mid-audit** — the single-writer rule (19-45 §e/2) exists; a docs-health run that rewrites 21 files should check `git log` freshness before EACH phase, not just at session start.
+7. **Anchor-preserving appends for inventory files** (FEATURES row deletion): new rows go AFTER the anchor line, never as its replacement.
+8. **Carry the link-scan EARLIER**: I scanned for links to moved paths only after the archive; scanning before the `git mv` (and including TODO/README evidence cells) would have made the move single-pass.
+
+## f) Up to 50 things to get done next
+
+_The canonical open list is TODO_LIST.md (29 rows, verified 2026-09-16). Items below are THIS session's additions/observations only — most already live there; do not double-harvest._
+
+1. File the third nixpkgs issue (parsedmarc unit Restart policy) — write the draft in docs/, never /tmp (07-04 §b/3 lesson, restated)
+2. File the mjs/imapclient starttls bug upstream (drift re-check DONE this session: still broken at :387)
+3. Upstream the docs-health skill improvements: `routed` marker kind + the w-marker contradiction lint (`Won't implement` + `TODO_LIST`/`still open` in one line = smell)
+4. Live-probe native DMARC/ARF ingestion in the VM (ledger-grade 06a)
+5. Relay-SASL E2E variant (Mailpit with auth file)
+6. CI trigger on `tags: v*`
+7. Branch protection on master (user GitHub settings; verified unprotected)
+8. Renovate activation + tag-pin dry-run verification
+9. TLS-node: assert the successful TLS-handshake journal line
+10. Lock-rev/narHash in release notes
+11. Decide Renovate-vs-Dependabot ownership of github-actions bumps (BOTH are enabled — double coverage I flagged but did not route)
+12. Full 36-label d2↔SVG re-diff (I spot-checked one label; the claim leans on the 17-59 diff)
+13. docs-health freshness pass over docs/TELEMETRY.md and CONTRIBUTING.md (never audited as docs)
+14. Re-render both SVGs together at the next docs touch (geometry drift from the a4fc343 rewrap; content text-neutral)
+15. The TODO_LIST low bundle: DKIM ed25519 leg, POST /api/dkim test leg, quota option docs, offline passthrough, option-docs drift check, retention docs, d2 regen command in CONTRIBUTING, nixos-mailserver lessons note, actionlint, gc-roots, catch-all warning, mailsuite upstream note
+16. Resend SASL verification + real smoke (BLOCKED: needs account/API key)
+17. Pushes: nix-email master (now ~7 local commits incl. this pass) + SystemNix (~47, coordination) — user-gated
+18. Stalwart feature request for declarative Junk filing (conditional on Q6=d)
+19. GitHub Discussions vs issues-only (user preference)
+20. Watch: maintainer triage on #563651/#563652 (both OPEN, 0 comments, verified this session)
+21. D1/D2/Q4/Q5/Q6 — the standing user decisions (ROADMAP open questions; unchanged)
+
+## g) Questions I can NOT figure out myself
+
+1. **Push approval, now bigger:** this pass added the annotation/archive/docs batch to master's unpushed pile (plus the morning session's flake/test/CI work — ~7 local commits; SystemNix sits at ~47 with a parallel session's work). Push nix-email now? (SystemNix push needs the coordination call separately.)
+2. **Renovate or Dependabot for github-actions bumps?** Both are enabled (renovate.json `github-actions: enabled` + `.github/dependabot.yml` weekly-grouped). Double coverage means duplicate PRs; which one should own it (delete the other's actions scope)?
+3. **TODO_LIST breadth taste:** the harvest rebuilt it to 29 rows, including 12 low-impact polish rows harvested from old reports' brainstorms. Keep the full breadth (nothing re-rotts in timestamped files), or prune the low tier into ROADMAP raw ideas for a tighter active list?
+
+---
+
+**Format note:** `.md` per instruction — overrides the status-report skill's HTML default; deliberate, not propagated into the skill.
+
+**Then per the skill: WAITING FOR INSTRUCTIONS.**

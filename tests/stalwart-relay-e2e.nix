@@ -33,7 +33,7 @@
   # registered for it. The wrapper asserts username/secretFile pair up, so
   # this is the only legal no-credential shape.
   nullRelayConfig =
-    (pkgs.lib.nixosSystem {
+    (import "${pkgs.path}/nixos" {
       system = pkgs.stdenv.hostPlatform.system;
       modules = [
         ../modules/mail-server.nix
