@@ -12,7 +12,7 @@
   system,
 }: let
   pkgs = nixpkgs.legacyPackages.${system};
-  lib = nixpkgs.lib;
+  inherit (nixpkgs) lib;
 
   parsedmarcVersion = pkgs.parsedmarc.version;
 
@@ -74,7 +74,7 @@ in
   assert execStartPreCount >= 2 || throw "dmarc-eval: ExecStartPre must hold the module's ini step plus the wrapper's strip script (>= 2 entries, strip last) - got ${toString execStartPreCount}, which makes lib.last an invalid ordering proof.";
     builtins.derivation {
       name = "dmarc-eval";
-      system = system;
+      inherit system;
       PATH = "${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin";
       passAsFile = ["rendered" "stripScript"];
       inherit rendered stripScript;

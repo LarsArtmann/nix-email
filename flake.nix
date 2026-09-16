@@ -11,7 +11,6 @@
   };
 
   outputs = {
-    self,
     nixpkgs,
   }: let
     systems = [

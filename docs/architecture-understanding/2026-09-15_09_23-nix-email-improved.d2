@@ -38,6 +38,7 @@ systemnix.caddy -> prometheus: /metrics/prometheus scrape route
 stalwart.relay_route -> resend: non-local delivery (reputation offload)
 stalwart.acme -> dns_provider: dns-01 challenges, zone records
 dns_provider -> stalwart.listeners: resolves this host's own records
-systemnix.gatus -> stalwart.listeners: probes; on failure
+systemnix.gatus -> stalwart.listeners: probes
+on failure
 systemnix.alerting -> discord: page on onFailure
 systemnix.backup -> restic: nightly store + report-sink snapshots
