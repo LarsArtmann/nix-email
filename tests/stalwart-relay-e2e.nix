@@ -25,7 +25,7 @@ in
     name = "stalwart-relay-e2e";
 
     nodes = {
-      smtp = { ...}: {
+      smtp = {...}: {
         imports = [../modules/mail-server.nix];
 
         services.mail-server = {

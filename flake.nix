@@ -10,9 +10,12 @@
     nixpkgs.url = "github:NixOS/nixpkgs/eaad089433ca2bb662274377d33df3d0e51ef28b";
   };
 
-  outputs = {
-    nixpkgs,
-  }: let
+  # NOTE: no bare `self` in the pattern - Nix ALWAYS passes `self` to
+  # outputs, so the signature must stay open (ellipsis) or keep self used.
+  # A closed pattern without self ("flake lint nit" from commit a4fc343)
+  # broke evaluation: "function 'outputs' called with unexpected argument
+  # 'self'" - and deadnix would re-remove an unused self on every --fix.
+  outputs = {nixpkgs, ...}: let
     systems = [
       "x86_64-linux"
       "aarch64-linux"
@@ -59,6 +62,21 @@
       in
         checks
     );
+
+    # Tool environment for `nix develop` (and the BuildFlow tool runners,
+    # which execute ruff/mypy/pytest/dprint inside this shell). Minimal on
+    # purpose: this repo's real gate is `nix flake check` (VM tests), not a
+    # devshell toolchain.
+    devShells = forAllSystems (system: let
+      pkgs = nixpkgs.legacyPackages.${system};
+    in {
+      default = pkgs.mkShellNoCC {
+        packages = [
+          pkgs.alejandra
+          pkgs.python3
+        ];
+      };
+    });
 
     # `nix fmt` - the one .nix formatter for this repo (dprint covers
     # json/yaml/markdown only).
