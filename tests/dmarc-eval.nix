@@ -25,8 +25,8 @@
   # contract, not just the settings shape.
   secretFile = toString (pkgs.writeText "dmarc-password" "dummy");
 
-  cfg =
-    (nixpkgs.lib.nixosSystem {
+  eval =
+    nixpkgs.lib.nixosSystem {
       inherit system;
       modules = [
         ../modules/dmarc-monitor.nix
@@ -47,7 +47,17 @@
           };
         }
       ];
-    }).config;
+    };
+
+  cfg = eval.config;
+
+  # Options-docs rendering drift check (never built before 2026-09-16):
+  # forcing the full CommonMark options render proves every wrapper option
+  # description survives the NixOS docs pipeline instead of breaking it
+  # (unbalanced code fences etc. fail HERE, not in a manual build), and the
+  # greps below prove the wrapper's own docs content actually rendered.
+  optionsCommonMark =
+    (pkgs.nixosOptionsDoc {inherit (eval) options;}).optionsCommonMark;
 
   rendered = builtins.toJSON {
     enabled = cfg.services.parsedmarc.enable;
@@ -80,8 +90,8 @@ in
       name = "dmarc-eval";
       inherit system;
       PATH = "${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin";
-      passAsFile = ["rendered" "stripScript"];
-      inherit rendered stripScript;
+      passAsFile = ["rendered" "stripScript" "optionsCommonMark"];
+      inherit rendered stripScript optionsCommonMark;
       builder = "/bin/sh";
       args = [
         "-c"
@@ -96,6 +106,9 @@ in
           grep -q 'python3.13-parsedmarc' "$renderedPath"
           grep -q '"\\[elasticsearch\\]"' "$stripScriptPath"
           grep -q 'keep' "$stripScriptPath"
+          grep -q 'dmarc-monitor' "$optionsCommonMarkPath"
+          grep -q 'RETENTION' "$optionsCommonMarkPath"
+          grep -q 'parsedmarc.ini' "$optionsCommonMarkPath"
           touch "$out"
         ''
       ];
