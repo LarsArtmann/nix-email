@@ -103,66 +103,67 @@ in
 
       virtualisation.memorySize = 2048;
 
-      services.dovecot2 = {
-        # nixpkgs' localMail provision ships no auth config: on this pin
-        # (dovecot 2.4) enablePAM defaults FALSE, so the auth service
-        # crash-loops with "No passdbs specified ... PLAIN mechanism needs
-        # one" and IMAP login is impossible (observed in this test,
-        # 2026-09-15). enablePAM adds the passdb/userdb blocks + PAM
-        # service; the dmarc system user authenticates via PAM unix auth.
-        enablePAM = true;
-        settings = {
-          # Dovecot 2.4 on this nixpkgs pin REQUIRES explicit version pins
-          # (base-module assertions), but nixpkgs' parsedmarc localMail
-          # provision enables dovecot2 without setting them - any localMail
-          # consumer hits the assertion (upstream gap, verified in the
-          # pinned module source). The VM's storage is ephemeral, so pin
-          # both to the shipped package version (the auto-update variant).
-          dovecot_config_version = config.services.dovecot2.package.version;
-          dovecot_storage_version = config.services.dovecot2.package.version;
-          # 2.4 needs explicit storage; must match postfix's home_mailbox
-          # below so the IMAP INBOX is exactly the Maildir postfix writes.
-          mail_driver = "maildir";
-          mail_path = "~/Maildir";
-          # VM fixture: no TLS material, so dovecot would advertise
-          # STARTTLS it cannot complete - mailsuite auto-activates STARTTLS
-          # whenever the capability is advertised (mailsuite/imap.py) and
-          # the handshake dies with WRONG_VERSION_NUMBER. plaintext IMAP
-          # inside the VM loop; production rua mailboxes use real TLS
-          # (the `tls` node below exercises that path).
-          ssl = "no";
+      services = {
+        dovecot2 = {
+          # nixpkgs' localMail provision ships no auth config: on this pin
+          # (dovecot 2.4) enablePAM defaults FALSE, so the auth service
+          # crash-loops with "No passdbs specified ... PLAIN mechanism needs
+          # one" and IMAP login is impossible (observed in this test,
+          # 2026-09-15). enablePAM adds the passdb/userdb blocks + PAM
+          # service; the dmarc system user authenticates via PAM unix auth.
+          enablePAM = true;
+          settings = {
+            # Dovecot 2.4 on this nixpkgs pin REQUIRES explicit version pins
+            # (base-module assertions), but nixpkgs' parsedmarc localMail
+            # provision enables dovecot2 without setting them - any localMail
+            # consumer hits the assertion (upstream gap, verified in the
+            # pinned module source). The VM's storage is ephemeral, so pin
+            # both to the shipped package version (the auto-update variant).
+            dovecot_config_version = config.services.dovecot2.package.version;
+            dovecot_storage_version = config.services.dovecot2.package.version;
+            # 2.4 needs explicit storage; must match postfix's home_mailbox
+            # below so the IMAP INBOX is exactly the Maildir postfix writes.
+            mail_driver = "maildir";
+            mail_path = "~/Maildir";
+            # VM fixture: no TLS material, so dovecot would advertise
+            # STARTTLS it cannot complete - mailsuite auto-activates STARTTLS
+            # whenever the capability is advertised (mailsuite/imap.py) and
+            # the handshake dies with WRONG_VERSION_NUMBER. plaintext IMAP
+            # inside the VM loop; production rua mailboxes use real TLS
+            # (the `tls` node below exercises that path).
+            ssl = "no";
+          };
         };
-      };
 
-      # Deliver INTO the Maildir dovecot serves (postfix local(8) default
-      # is the mbox in /var/mail, which dovecot's maildir INBOX would
-      # never see - observed as "empty INBOX forever" in testing).
-
-      services.dmarc-monitor = {
-        enable = true;
-        # parsedmarc 11 does DNS at PARSE time (reverse-DNS map, geolocation)
-        # against Cloudflare/Google by default (constants.py
-        # RECOMMENDED_DNS_NAMESERVERS = 1.1.1.1, 8.8.8.8) - in the DNS-less
-        # VM every lookup stalls and parsing never completes. offline=true
-        # skips all online enrichment ([general] offline, cli.py:778).
-        settings.general.offline = true;
-      };
-
-      # The nixpkgs parsedmarc module's localMail provision: dovecot + postfix
-      # + dmarc system user + runtime-randomized IMAP password, and the
-      # [imap]/[mailbox] settings (localhost:143, ssl=false, watch=true)
-      # merged into services.parsedmarc.settings. The wrapper's own
-      # contributions stay in force: general.output=/var/lib/parsedmarc/reports,
-      # heavy sinks off, StateDirectory/ReadWritePaths on the unit.
-      services.parsedmarc.provision = {
-        geoIp = false;
-        localMail = {
+        dmarc-monitor = {
           enable = true;
-          hostname = "localhost";
+          # parsedmarc 11 does DNS at PARSE time (reverse-DNS map, geolocation)
+          # against Cloudflare/Google by default (constants.py
+          # RECOMMENDED_DNS_NAMESERVERS = 1.1.1.1, 8.8.8.8) - in the DNS-less
+          # VM every lookup stalls and parsing never completes. offline=true
+          # skips all online enrichment ([general] offline, cli.py:778).
+          settings.general.offline = true;
         };
-      };
 
-      services.postfix.settings.main.home_mailbox = "Maildir/";
+        # The nixpkgs parsedmarc module's localMail provision: dovecot + postfix
+        # + dmarc system user + runtime-randomized IMAP password, and the
+        # [imap]/[mailbox] settings (localhost:143, ssl=false, watch=true)
+        # merged into services.parsedmarc.settings. The wrapper's own
+        # contributions stay in force: general.output=/var/lib/parsedmarc/reports,
+        # heavy sinks off, StateDirectory/ReadWritePaths on the unit.
+        parsedmarc.provision = {
+          geoIp = false;
+          localMail = {
+            enable = true;
+            hostname = "localhost";
+          };
+        };
+
+        # Deliver INTO the Maildir dovecot serves (postfix local(8) default
+        # is the mbox in /var/mail, which dovecot's maildir INBOX would
+        # never see - observed as "empty INBOX forever" in testing).
+        postfix.settings.main.home_mailbox = "Maildir/";
+      };
 
       environment.systemPackages = [
         sendEmail
@@ -188,45 +189,47 @@ in
       # verification context accepts the chain.
       security.pki.certificateFiles = ["${imapTestCert}/cert.pem"];
 
-      services.dovecot2 = {
-        enablePAM = true;
-        settings = {
-          # Same 2.4 version-pin requirement as the plaintext node.
-          dovecot_config_version = config.services.dovecot2.package.version;
-          dovecot_storage_version = config.services.dovecot2.package.version;
-          mail_driver = "maildir";
-          mail_path = "~/Maildir";
-          ssl = "required";
-          # Dovecot 2.4 cert key names (the NixOS module's own rename
-          # assertion names them; 2.3 was ssl_cert/ssl_key). NO "<" prefix:
-          # that is dovecot's read-value-from-file syntax - the module inlines
-          # the file contents into dovecot.conf and doveconf then dies parsing
-          # the first PEM line as a path (observed in this test, 2026-09-15).
-          ssl_server_cert_file = "${imapTestCert}/cert.pem";
-          ssl_server_key_file = "${imapTestCert}/key.pem";
+      services = {
+        dovecot2 = {
+          enablePAM = true;
+          settings = {
+            # Same 2.4 version-pin requirement as the plaintext node.
+            dovecot_config_version = config.services.dovecot2.package.version;
+            dovecot_storage_version = config.services.dovecot2.package.version;
+            mail_driver = "maildir";
+            mail_path = "~/Maildir";
+            ssl = "required";
+            # Dovecot 2.4 cert key names (the NixOS module's own rename
+            # assertion names them; 2.3 was ssl_cert/ssl_key). NO "<" prefix:
+            # that is dovecot's read-value-from-file syntax - the module inlines
+            # the file contents into dovecot.conf and doveconf then dies parsing
+            # the first PEM line as a path (observed in this test, 2026-09-15).
+            ssl_server_cert_file = "${imapTestCert}/cert.pem";
+            ssl_server_key_file = "${imapTestCert}/key.pem";
+          };
         };
-      };
 
-      services.dmarc-monitor = {
-        enable = true;
-        settings.general.offline = true;
-      };
-
-      services.parsedmarc.provision = {
-        geoIp = false;
-        localMail = {
+        dmarc-monitor = {
           enable = true;
-          hostname = "localhost";
+          settings.general.offline = true;
         };
-      };
 
-      # Force the TLS path over the provision's plaintext defaults.
-      services.parsedmarc.settings.imap = {
-        port = lib.mkForce 993;
-        ssl = lib.mkForce true;
-      };
+        parsedmarc.provision = {
+          geoIp = false;
+          localMail = {
+            enable = true;
+            hostname = "localhost";
+          };
+        };
 
-      services.postfix.settings.main.home_mailbox = "Maildir/";
+        # Force the TLS path over the provision's plaintext defaults.
+        parsedmarc.settings.imap = {
+          port = lib.mkForce 993;
+          ssl = lib.mkForce true;
+        };
+
+        postfix.settings.main.home_mailbox = "Maildir/";
+      };
 
       # Boot-race resilience (fixture-level): parsedmarc connects to IMAPS
       # at start; if it wins the race against dovecot's 993 listener it exits

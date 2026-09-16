@@ -66,44 +66,48 @@ in
       smtp = {...}: {
         imports = [../modules/mail-server.nix];
 
-        services.mail-server = {
-          enable = true;
-          hostname = "mail.example.test";
-          relay = {
-            address = "relay";
-            port = 1025;
-            # SASL smarthost (Mailpit enforces AUTH via --smtp-auth-file,
-            # see the relay node): exercises the username + secretFile
-            # emission path with the %{file:...}% credential macro - the
-            # same mechanism SystemNix's contract test asserts with sops.
-            username = "relayuser";
-            secretFile = "/etc/relay-secret";
-            tlsImplicit = false;
+        services = {
+          mail-server = {
+            enable = true;
+            hostname = "mail.example.test";
+            relay = {
+              address = "relay";
+              port = 1025;
+              # SASL smarthost (Mailpit enforces AUTH via --smtp-auth-file,
+              # see the relay node): exercises the username + secretFile
+              # emission path with the %{file:...}% credential macro - the
+              # same mechanism SystemNix's contract test asserts with sops.
+              username = "relayuser";
+              secretFile = "/etc/relay-secret";
+              tlsImplicit = false;
+            };
+          };
+
+          stalwart.settings.authentication.fallback-admin = {
+            user = "admin";
+            secret = "test-admin-secret";
+          };
+
+          # Bridge DNS for the relay hostname: stalwart's system resolver reads
+          # /etc/resolv.conf only; dnsmasq answers from /etc/hosts (where the
+          # test driver injects the node names) - networking.nameservers below
+          # points the resolver at this dnsmasq.
+          dnsmasq = {
+            enable = true;
+            settings = {
+              listen-address = "127.0.0.1";
+              bind-interfaces = true;
+              # resolv.conf points at dnsmasq itself - never read it back
+              no-resolv = true;
+              server = ["192.0.2.1"];
+            };
           };
         };
 
         # Test-only credential file (real hosts: sops-rendered path).
         environment.etc."relay-secret".text = "relaypass";
 
-        services.stalwart.settings.authentication.fallback-admin = {
-          user = "admin";
-          secret = "test-admin-secret";
-        };
-
-        # Bridge DNS for the relay hostname: stalwart's system resolver reads
-        # /etc/resolv.conf only; dnsmasq answers from /etc/hosts (where the
-        # test driver injects the node names).
         networking.nameservers = ["127.0.0.1"];
-        services.dnsmasq = {
-          enable = true;
-          settings = {
-            listen-address = "127.0.0.1";
-            bind-interfaces = true;
-            # resolv.conf points at dnsmasq itself - never read it back
-            no-resolv = true;
-            server = ["192.0.2.1"];
-          };
-        };
 
         environment.systemPackages = [
           pkgs.swaks
