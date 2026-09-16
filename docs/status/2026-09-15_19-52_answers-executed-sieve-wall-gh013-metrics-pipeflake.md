@@ -64,8 +64,8 @@ file-based and the gate rerun is in flight.
 
 ## b) PARTIALLY DONE
 
-1. **Final gate for the pipe-flake fix:** launched 19:50, verdict in the
-   addendum (the previous green ran on the pre-fix tree).
+1. ~~**Final gate for the pipe-flake fix:** launched 19:50, verdict in the~~ done (verdict in the file's own gate addendum: exit 0, zero failures)
+   ~~addendum (the previous green ran on the pre-fix tree).~~
 2. **SystemNix push:** blocked by GH013 push protection - commit `63fd5a83`
    (parallel session's) carries a literal `sgp_0123…` fixture at
    `scripts/audit-push-protection-literals.sh:48` (the repo's own rule
@@ -83,10 +83,10 @@ file-based and the gate rerun is in flight.
 ## c) NOT STARTED
 
 1. Junk-filing implementation (decision re-posed; recommendation delivered).
-2. v0.1.0 tag + GitHub release (unblocked: CI green, MIT confirmed).
-3. SystemNix `nix-email` pin advance (relay option now on origin/master).
-4. Upstream nixpkgs filings (+ now plausibly a Stalwart feature request for
-   declarative server-side filing, per the ledger entry).
+2. ~~v0.1.0 tag + GitHub release (unblocked: CI green, MIT confirmed).~~ done (cut + released (v0.1.0 retroactive, v0.2.0))
+3. ~~SystemNix `nix-email` pin advance (relay option now on origin/master).~~ done (pin advanced to tag v0.2.0)
+4. ~~Upstream nixpkgs filings (+ now plausibly a Stalwart feature request for~~ done (nixpkgs pair filed; the Stalwart feature request is a TODO_LIST row conditional on Q6d)
+   ~~declarative server-side filing, per the ledger entry).~~
 5. All D1-gated work (unchanged).
 
 ## d) TOTALLY FUCKED UP
@@ -141,29 +141,29 @@ file-based and the gate rerun is in flight.
 
 ## f) Up to 50 things we should get done next
 
-1. **Answer §g-1** (Junk filing options a-d; recommendation c+d).
+1. ~~**Answer §g-1** (Junk filing options a-d; recommendation c+d).~~ **Won't implement — re-posed as ROADMAP Q6 options a-d (recommendation c+d delivered).**
 2. **Unblock the SystemNix push** (§g-2 URL) → push the 7 commits → CI will
    still be red on statix/secret-scan (inventoried in §b-3).
 3. **Decide SystemNix CI-debt ownership** (§g-2): statix sweep, `syn_`
    allowlist policy, two mechanical pin flips, go-nix-helpers-vnfix branch
    push, gitleaks `rev=` allowlist so the hook works for humans again.
-4. **CI lint: forbid `| grep -q` in `tests/*.nix` testScripts** (mechanize
-   today's lesson; cheap grep-based check in ci.yml).
-5. **v0.1.0 tag + GitHub release** (§g-3).
-6. **SystemNix pin advance** past the relay-landing rev: restore the
-   relay-credential assertions, delete the wrapper guard, gate both repos.
-7. **Upstream filings:** the two nixpkgs issues (diagnoses current vs
-   master), plus consider a Stalwart issue/request for declarative
-   server-side Junk filing (the ledger entry is the evidence base).
-8. parsedmarc-e2e TLS localMail variant; CSV row-count assertion;
-   two-reschedule over-quota assertion; pin-advance runbook; CI lockstep
-   audit test; aarch64 emulated VM run (all TODO_LIST).
-9. **docs-health ANNOTATE pass** over today's five status reports - several
-   numbered items are resolved and need inline `done at` markers.
-10. Check whether Renovate activated now that nix-email is pushed
-    (renovate.json predates the first push; approval-gated).
-11. Coordination: agree SystemNix/nix-email ownership split with the
-    parallel session before the next editing window (§e-4).
+4. ~~**CI lint: forbid `| grep -q` in `tests/*.nix` testScripts** (mechanize~~ done (CI pipe-lint step shipped (3f1854a, ba7645c) - the exit-23 class is mechanically banned)
+   ~~today's lesson; cheap grep-based check in ci.yml).~~
+5. ~~**v0.1.0 tag + GitHub release** (§g-3).~~ done (cut + released (both tags))
+6. ~~**SystemNix pin advance** past the relay-landing rev: restore the~~ done (done (pin v0.2.0))
+   ~~relay-credential assertions, delete the wrapper guard, gate both repos.~~
+7. ~~**Upstream filings:** the two nixpkgs issues (diagnoses current vs~~ done (nixpkgs pair filed + linked; Stalwart request routed (TODO_LIST, Q6d-conditional))
+   ~~master), plus consider a Stalwart issue/request for declarative~~
+   ~~server-side Junk filing (the ledger entry is the evidence base).~~
+8. ~~parsedmarc-e2e TLS localMail variant; CSV row-count assertion;~~ done (all shipped (TLS node, row-count, two-reschedule, runbook, lockstep, aarch64-attempted))
+   ~~two-reschedule over-quota assertion; pin-advance runbook; CI lockstep~~
+   ~~audit test; aarch64 emulated VM run (all TODO_LIST).~~
+9. ~~**docs-health ANNOTATE pass** over today's five status reports - several~~ done (docs-health pass docs-health pass 2026-09-16 (this pass))
+   ~~numbered items are resolved and need inline `done at` markers.~~
+10. ~~Check whether Renovate activated now that nix-email is pushed~~ done (dependabot.yml shipped for github-actions (a4fc343))
+    ~~(renovate.json predates the first push; approval-gated).~~
+11. ~~Coordination: agree SystemNix/nix-email ownership split with the~~ **Won't implement — parallel sessions concluded; single-writer since.**
+    ~~parallel session before the next editing window (§e-4).~~
 
 ## g) Questions I cannot figure out myself
 
@@ -177,8 +177,8 @@ file-based and the gate rerun is in flight.
    (or have the parallel session rebase their unpushed `63fd5a83`) - and do
    you want ME to continue into the remaining SystemNix CI debt (statix
    sweep etc.), or is the parallel session owning it?
-3. **v0.1.0:** cut the tag + GitHub release now (CI green, MIT confirmed,
-   CHANGELOG ready)?
+3. ~~**v0.1.0:** cut the tag + GitHub release now (CI green, MIT confirmed,~~ done (cut: v0.1.0 + v0.2.0, both released)
+   ~~CHANGELOG ready)?~~
 
 ---
 
@@ -193,3 +193,11 @@ propagated into the skills.
 **Gate addendum (19:50 run, file-based assertions):** `nix flake check` →
 `FLAKECHECK_EXIT:0`, "all checks passed!", zero test failures - the
 pipe-to-file conversion is verified green on the exact end-state tree.
+
+---
+
+## Resolution addendum (2026-09-16, docs-health pass)
+
+All items resolved inline. Still open, routed: g/1 (spam→Junk - ROADMAP
+Q6), g/2 + f/2/f/3 (SystemNix push unblock + CI debt - TODO_LIST
+user-blocked row). Archived.

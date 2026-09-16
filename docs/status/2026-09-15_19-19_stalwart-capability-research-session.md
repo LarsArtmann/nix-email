@@ -140,45 +140,45 @@
 
 | # | Task | Impact | Effort | Category |
 |---|------|--------|--------|----------|
-| 1 | Fetch `/compare` as HTML; resolve Community/Enterprise gating for: DKIM auto-rotation, automated DNS, report viz, OIDC, LLM classifier, masked emails, SCIM, declarative IaC, read replicas | High | S | Documentation |
-| 2 | Diff advertised features vs pinned 0.15.5 (stalwart GitHub release notes 0.15.5 → current); record which exist in the shipped binary | High | M | Research |
-| 3 | For any candidate feature: verify 0.15.5 config keys against the pinned binary (local debug loop, README ledger pattern) before wrapper options | High | M | Research |
-| 4 | Decide the home for unverified vendor findings (g/Q1) and encode this session's overlap table there | Med | S | Documentation |
-| 5 | Design review: does Stalwart-native DMARC/TLS-RPT/ARF ingestion+viz obsolete the parsedmarc module, complement it (rua fan-out), or lose (file sink, no deps)? D1-adjacent | High | M | Design |
-| 6 | Same review for ROADMAP's "tiny DMARC viewer": native viz vs JSON/CSV viewer, on 0.15.5 Community specifically | Med | M | Design |
-| 7 | Verify OIDC in 0.15.5 Community for the Pocket-ID admin-UI idea (ROADMAP theme 5) | Med | S | Research |
-| 8 | Verify Sieve paths in 0.15.5 for spam→Junk filing (open question 6's option (a)) incl. ManageSieve/user-script contexts | Med | S | Research |
-| 9 | Check autoconfig/autodiscover serving in 0.15.5; wrapper option or non-goal | Low | S | Research |
-| 10 | Check PROXY protocol in 0.15.5 (Caddy fronting in SystemNix) | Low | S | Research |
-| 11 | Check DANE/MTA-STS enforcement knobs in 0.15.5 as inbound hardening candidates | Med | S | Research |
-| 12 | Check per-mailbox S/MIME/OpenPGP encryption-at-rest availability in 0.15.5 Community | Low | S | Research |
-| 13 | Check TOTP / app passwords / API keys availability in 0.15.5 (self-service story) | Low | S | Research |
-| 14 | Investigate stalwart-vandelay beyond migration (ROADMAP names it only for R6) | Low | S | Research |
-| 15 | FTS offload (Meilisearch) relevance check — likely non-goal for consistency with the rejected-ES doctrine; write the one-liner | Low | S | Documentation |
-| 16 | POP3 enable-or-non-goal decision (nothing in the repo currently says) | Low | S | Design |
-| 17 | JMAP WebSocket transport: client support survey, enable-or-note | Low | S | Research |
-| 18 | Wrapper doctrine note: which Stalwart features get module options vs pass-through `settings` (feeds open question 5) | Med | M | Design |
-| 19 | DNS-truth split-brain guard: if Stalwart automated DNS is ever enabled, it collides with Terraform/domains-repo ownership (ROADMAP theme 2) — write the conflict note now | Med | S | Documentation |
-| 20 | Personal fetch playbook: redirects-retried, failures-narrated, tables-as-HTML (e/1-e/3) — internalize for future sessions | Med | S | Process |
+| ~~1~~ | ~~Fetch `/compare` as HTML; resolve Community/Enterprise gating for: DKIM auto-rotation, automated DNS, report viz, OIDC, LLM classifier, masked emails, SCIM, declarative IaC, read replicas~~ done — superseded by the better method: v0.15.5 git-tag source grep + /compare HTML (master plan 10, 05c cross-table) | ~~High~~ | ~~S~~ | ~~Documentation~~ |
+| ~~2~~ | ~~Diff advertised features vs pinned 0.15.5 (stalwart GitHub release notes 0.15.5 → current); record which exist in the shipped binary~~ done — executed via source-tag grep + release-notes diff (master plan 10) | ~~High~~ | ~~M~~ | ~~Research~~ |
+| ~~3~~ | ~~For any candidate feature: verify 0.15.5 config keys against the pinned binary (local debug loop, README ledger pattern) before wrapper options~~ done — executed for the audited candidates; ledger entry carries the runtime-confirmation caveat; live-probe stays a TODO_LIST row | ~~High~~ | ~~M~~ | ~~Research~~ |
+| ~~4~~ | ~~Decide the home for unverified vendor findings (g/Q1) and encode this session's overlap table there~~ done — home found: plan 10 + ledger-with-method-label | ~~Med~~ | ~~S~~ | ~~Documentation~~ |
+| ~~5~~ | ~~Design review: does Stalwart-native DMARC/TLS-RPT/ARF ingestion+viz obsolete the parsedmarc module, complement it (rua fan-out), or lose (file sink, no deps)? D1-adjacent~~ done — 06a verdict: KEEP BOTH (native ingestion is a free complement) | ~~High~~ | ~~M~~ | ~~Design~~ |
+| ~~6~~ | ~~Same review for ROADMAP's "tiny DMARC viewer": native viz vs JSON/CSV viewer, on 0.15.5 Community specifically~~ done — 06b verdict: DEFER (park until D1 webadmin inspection) | ~~Med~~ | ~~M~~ | ~~Design~~ |
+| ~~7~~ | ~~Verify OIDC in 0.15.5 Community for the Pocket-ID admin-UI idea (ROADMAP theme 5)~~ done — 06c: present in 0.15.5 source (openid.rs/oidc.rs) | ~~Med~~ | ~~S~~ | ~~Research~~ |
+| ~~8~~ | ~~Verify Sieve paths in 0.15.5 for spam→Junk filing (open question 6's option (a)) incl. ManageSieve/user-script contexts~~ done — 06d: source-verified wall - settings sieve cannot fileinto (README ledger) | ~~Med~~ | ~~S~~ | ~~Research~~ |
+| ~~9~~ | ~~Check autoconfig/autodiscover serving in 0.15.5; wrapper option or non-goal~~ done — 26a: present; consumer reverse-proxy concern | ~~Low~~ | ~~S~~ | ~~Research~~ |
+| ~~10~~ | ~~Check PROXY protocol in 0.15.5 (Caddy fronting in SystemNix)~~ done — 26: NOT in 0.15.5 - revisit on the 0.16 module | ~~Low~~ | ~~S~~ | ~~Research~~ |
+| ~~11~~ | ~~Check DANE/MTA-STS enforcement knobs in 0.15.5 as inbound hardening candidates~~ done — 26a: MTA-STS/DANE present; TLSA feeds the Terraform module (ROADMAP theme 2) | ~~Med~~ | ~~S~~ | ~~Research~~ |
+| ~~12~~ | ~~Check per-mailbox S/MIME/OpenPGP encryption-at-rest availability in 0.15.5 Community~~ done — 26: present; non-goal for single-user | ~~Low~~ | ~~S~~ | ~~Research~~ |
+| ~~13~~ | ~~Check TOTP / app passwords / API keys availability in 0.15.5 (self-service story)~~ done — 26: TOTP present (app-password labels are 0.16.0) | ~~Low~~ | ~~S~~ | ~~Research~~ |
+| ~~14~~ | ~~Investigate stalwart-vandelay beyond migration (ROADMAP names it only for R6)~~ **Won't implement — D1/R6-gated - stays parked with the migration compare (TODO_LIST BLOCKED).** | ~~Low~~ | ~~S~~ | ~~Research~~ |
+| ~~15~~ | ~~FTS offload (Meilisearch) relevance check — likely non-goal for consistency with the rejected-ES doctrine; write the one-liner~~ done — README non-goals FTS line added 2026-09-16 | ~~Low~~ | ~~S~~ | ~~Documentation~~ |
+| ~~16~~ | ~~POP3 enable-or-non-goal decision (nothing in the repo currently says)~~ done — 26c: POP3 non-goal; README note added 2026-09-16 | ~~Low~~ | ~~S~~ | ~~Design~~ |
+| ~~17~~ | ~~JMAP WebSocket transport: client support survey, enable-or-note~~ done — 26c: present on the HTTP listener; nothing to do | ~~Low~~ | ~~S~~ | ~~Research~~ |
+| ~~18~~ | ~~Wrapper doctrine note: which Stalwart features get module options vs pass-through `settings` (feeds open question 5)~~ done — 26d doctrine written (feeds ROADMAP Q5) | ~~Med~~ | ~~M~~ | ~~Design~~ |
+| ~~19~~ | ~~DNS-truth split-brain guard: if Stalwart automated DNS is ever enabled, it collides with Terraform/domains-repo ownership (ROADMAP theme 2) — write the conflict note now~~ done — 26e: no risk on 0.15.5 (feature absent); guard note in ROADMAP theme 2 | ~~Med~~ | ~~S~~ | ~~Documentation~~ |
+| ~~20~~ | ~~Personal fetch playbook: redirects-retried, failures-narrated, tables-as-HTML (e/1-e/3) — internalize for future sessions~~ done — adopted - later sessions used the playbook | ~~Med~~ | ~~S~~ | ~~Process~~ |
 
 ### Noticed in passing (ALREADY tracked in TODO_LIST.md — do not re-harvest)
 
-21. Cut `v0.1.0` tag + GitHub release (TODO High, unblocked)
-22. SystemNix pin-advance past relay-landing rev; restore relay assertions; delete guard (TODO High, unblocked)
-23. Pin-advance runbook doc (TODO Med)
-24. aarch64 emulated stalwart-e2e run (TODO Med)
-25. parsedmarc-e2e TLS-capable localMail variant (TODO Med)
-26. docs-health ANNOTATE pass over docs/status/ (TODO Med; needs user scoping)
-27. LICENSE decision — REOPENED, target unknown (TODO Low, blocked on user)
-28. File the two diagnosed nixpkgs upstream issues (TODO Low; needs authorization)
-29. CI lockstep guard flake↔expected-checks (TODO Low)
-30. parsedmarc-e2e CSV row-count assertion (TODO Low)
-31. stalwart-e2e second reschedule-line assertion (TODO Low)
-32. Negative-cache subtest cost documentation (TODO Low)
-33. README runbook → SystemNix wrapper pointer (TODO Low)
-34. stateVersion unit-name coupling: consolidate 3 restatements (TODO Low)
-35. Pin discipline note: hard rev vs `?ref=master` (TODO Low)
-36. Preserve VM debug script as tests/fixtures template (TODO Low)
+21. ~~Cut `v0.1.0` tag + GitHub release (TODO High, unblocked)~~ done (v0.1.0 tagged retroactively (f603169) + v0.2.0 (598db0f), both released)
+22. ~~SystemNix pin-advance past relay-landing rev; restore relay assertions; delete guard (TODO High, unblocked)~~ done (pin at tag v0.2.0, assertions restored, guard deleted)
+23. ~~Pin-advance runbook doc (TODO Med)~~ done (README Pin-advance runbook shipped)
+24. ~~aarch64 emulated stalwart-e2e run (TODO Med)~~ done (attempted; decided documented-manual (flake trap comment))
+25. ~~parsedmarc-e2e TLS-capable localMail variant (TODO Med)~~ done (TLS IMAPS node shipped in v0.2.0)
+26. ~~docs-health ANNOTATE pass over docs/status/ (TODO Med; needs user scoping)~~ done (docs-health pass docs-health pass 2026-09-16 (this pass - scope: all 2026-0* files))
+27. ~~LICENSE decision — REOPENED, target unknown (TODO Low, blocked on user)~~ done (MIT confirmed 2026-09-15)
+28. ~~File the two diagnosed nixpkgs upstream issues (TODO Low; needs authorization)~~ done (filed (#563651, #563652))
+29. ~~CI lockstep guard flake↔expected-checks (TODO Low)~~ done (strict lockstep guard shipped)
+30. ~~parsedmarc-e2e CSV row-count assertion (TODO Low)~~ done (row-count assertion shipped)
+31. ~~stalwart-e2e second reschedule-line assertion (TODO Low)~~ done (second reschedule line shipped)
+32. ~~Negative-cache subtest cost documentation (TODO Low)~~ done (65s cost measured + documented)
+33. ~~README runbook → SystemNix wrapper pointer (TODO Low)~~ done (runbook pointer shipped)
+34. ~~stateVersion unit-name coupling: consolidate 3 restatements (TODO Low)~~ done (verified already-consolidated (2026-09-15))
+35. ~~Pin discipline note: hard rev vs `?ref=master` (TODO Low)~~ done (README pin-discipline rationale shipped)
+36. ~~Preserve VM debug script as tests/fixtures template (TODO Low)~~ done (tests/fixtures/debug-template.py shipped)
 37. Rotate SystemNix placeholder secrets (TODO, D1-gated)
 
 ### Noticed in passing (ALREADY tracked in ROADMAP.md — do not re-harvest)
@@ -190,34 +190,44 @@
 42. parsedmarc PostgreSQL sink experiment
 43. InboxClean JMAP/IMAP spike (post-migration)
 44. RBL monitoring for the VPS IP
-45. Threat-model doc
+45. ~~Threat-model doc~~ done (docs/THREAT_MODEL.md shipped in v0.2.0)
 46. Retire the two in-repo nixpkgs workarounds on upstream fixes (re-check per bump)
-47. aarch64: decide if emulated VM run earns CI time
+47. ~~aarch64: decide if emulated VM run earns CI time~~ done (decided 2026-09-15: manual-only, not CI-worthy (flake trap comment))
 48. Spam→Junk ownership final call (open question 6; recommendation (a) on table)
-49. OIDC (Pocket ID) for admin UI if supported (feeds f/7)
-50. Housekeeping: the 10:41 status report `docs/status/2026-09-15_10-41_parsedmarc-e2e-buildout-rootcause-found.md` was untracked in the session-start git snapshot — confirm the auto-commit daemon picked it up (one `git status`)
+49. ~~OIDC (Pocket ID) for admin UI if supported (feeds f/7)~~ done (06c verified present; wiring deferred to D1-time (ROADMAP theme 5))
+50. ~~Housekeeping: the 10:41 status report `docs/status/2026-09-15_10-41_parsedmarc-e2e-buildout-rootcause-found.md` was untracked in the session-start git snapshot — confirm the auto-commit daemon picked it up (one `git status`)~~ done (daemon picked it up (committed; tree clean))
 
 ## g) Questions I cannot answer myself
 
-1. **Home for unverified findings (blocks f/4):** when vendor research surfaces
-   capabilities too promising to lose but not yet verified against the 0.15.5
-   pin, where do they live — ROADMAP raw-ideas block, a `docs/planning/`
-   research note, or nowhere until a concrete task needs them? The ledger's
-   zero-UNVERIFIED doctrine (correctly) refuses them, so today they evaporate.
-2. **Research now vs park (blocks f/1-f/3, f/5-f/19):** is the
-   Stalwart-native-vs-build-it evaluation worth doing as a bounded research
-   task *before* D1/D2 land (it could shrink the gated VPS/Terraform/viewer
-   themes substantially), or is everything parked until the decisions — making
-   this session's findings explicitly dormant?
-3. **Verification bar for exploratory Q&A (shapes all future sessions):** for
-   "what can X do" questions, do you want claims checked against the pinned
-   binary/docs before I state them (slower, ledger-grade), or is
-   vendor-site-grade sourcing with explicit caveates acceptable for
-   exploration, with verification deferred to wiring time? This session
-   assumed the latter; confirm or correct.
+1. ~~**Home for unverified findings (blocks f/4):** when vendor research surfaces~~ done (answered by the master plan section 8 (this doc + ledger-with-method))
+   ~~capabilities too promising to lose but not yet verified against the 0.15.5~~
+   ~~pin, where do they live — ROADMAP raw-ideas block, a `docs/planning/`~~
+   ~~research note, or nowhere until a concrete task needs them? The ledger's~~
+   ~~zero-UNVERIFIED doctrine (correctly) refuses them, so today they evaporate.~~
+2. ~~**Research now vs park (blocks f/1-f/3, f/5-f/19):** is the~~ done (answered: research executed FIRST (master plan L05/L06, section 10))
+   ~~Stalwart-native-vs-build-it evaluation worth doing as a bounded research~~
+   ~~task *before* D1/D2 land (it could shrink the gated VPS/Terraform/viewer~~
+   ~~themes substantially), or is everything parked until the decisions — making~~
+   ~~this session's findings explicitly dormant?~~
+3. ~~**Verification bar for exploratory Q&A (shapes all future sessions):** for~~ done (answered: two-tier bar codified in master plan sections 5+8)
+   ~~"what can X do" questions, do you want claims checked against the pinned~~
+   ~~binary/docs before I state them (slower, ledger-grade), or is~~
+   ~~vendor-site-grade sourcing with explicit caveates acceptable for~~
+   ~~exploration, with verification deferred to wiring time? This session~~
+   ~~assumed the latter; confirm or correct.~~
 
 ---
 
 *Point-in-time snapshot (docs-health ANNOTATE, never rewrite). Written by
 Crush 2026-09-15 19:19. No code was changed this session; the auto-commit
 daemon owns committing this file.*
+
+---
+
+## Resolution addendum (2026-09-16, docs-health pass)
+
+New-material rows 1-20 all resolved (mostly by the master plan section 10
+audit). Still open, correctly parked: row 14 (vandelay-beyond - D1/R6),
+the TODO_LIST-tracked rows 37 (secret rotation, D1) and 26 (ANNOTATE -
+resolved by this pass), and the ROADMAP-tracked decision rows 38-48 subset
+(D1/D2/Q6-gated). Archived.

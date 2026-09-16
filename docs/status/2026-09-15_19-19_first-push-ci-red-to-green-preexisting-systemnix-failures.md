@@ -57,29 +57,29 @@ again while the public repo currently advertises MIT.
 
 ## b) PARTIALLY DONE
 
-1. **SystemNix CI triage:** root cause identified for "Nix flake check",
-   but the "Secret history scan" and "Go deps audit" failures were seen in
-   the list and NOT opened - two of four workflows unexamined.
-2. **SystemNix tree has new foreign commits** (`63fd5a83`, `84c47e67`, 8
-   files - not mine, likely a parallel session/user): local master is 2
-   ahead of origin. Left untouched deliberately (not my change to push or
-   revert).
-3. **The queued docs-only nix-email run** (35000478603) was not waited out
-   (docs-only diff on a green workflow; expectation, not verdict).
+1. ~~**SystemNix CI triage:** root cause identified for "Nix flake check",~~ **Won't implement — remaining SystemNix workflows triaged in the 19-52 report (inventory); the debt lives in a TODO_LIST user-blocked row.**
+   ~~but the "Secret history scan" and "Go deps audit" failures were seen in~~
+   ~~the list and NOT opened - two of four workflows unexamined.~~
+2. ~~**SystemNix tree has new foreign commits** (`63fd5a83`, `84c47e67`, 8~~ **Won't implement — foreign commits left untouched per the never-revert rule; later pushes superseded.**
+   ~~files - not mine, likely a parallel session/user): local master is 2~~
+   ~~ahead of origin. Left untouched deliberately (not my change to push or~~
+   ~~revert).~~
+3. ~~**The queued docs-only nix-email run** (35000478603) was not waited out~~ done (subsequent runs all green (34999737899 and later))
+   ~~(docs-only diff on a green workflow; expectation, not verdict).~~
 
 ## c) NOT STARTED
 
-1. **SystemNix pin advance** - the session's top-unblocked TODO row
-   (upstream `relay` option is now on origin/master): bump input rev,
-   restore relay-credential assertions, delete the wrapper guard, gate both
-   repos. ~30 min, fully specified.
-2. **v0.1.0 tag + GitHub release** (unblocked by the push).
+1. ~~**SystemNix pin advance** - the session's top-unblocked TODO row~~ done (pin advanced to tag v0.2.0)
+   ~~(upstream `relay` option is now on origin/master): bump input rev,~~
+   ~~restore relay-credential assertions, delete the wrapper guard, gate both~~
+   ~~repos. ~30 min, fully specified.~~
+2. ~~**v0.1.0 tag + GitHub release** (unblocked by the push).~~ done (v0.1.0 (retroactive) + v0.2.0 tagged and released)
 3. **Junk-filing implementation** (recommendation delivered: wrapper-owned
    in nix-email; awaiting the user's confirm).
-4. **LICENSE flip** (MIT rejected; target license unknown - the pushed repo
-   currently advertises MIT).
-5. **Upstream nixpkgs filings** (authorization still pending; diagnoses
-   current vs master).
+4. ~~**LICENSE flip** (MIT rejected; target license unknown - the pushed repo~~ done (MIT CONFIRMED 2026-09-15; LICENSE stands)
+   ~~currently advertises MIT).~~
+5. ~~**Upstream nixpkgs filings** (authorization still pending; diagnoses~~ done (filed (#563651, #563652))
+   ~~current vs master).~~
 6. All D1-gated work (unchanged).
 
 ## d) TOTALLY FUCKED UP
@@ -125,39 +125,39 @@ again while the public repo currently advertises MIT.
 
 Routed in TODO_LIST/ROADMAP unless noted; the live short list:
 
-1. **SystemNix pin advance** (top row, now unblocked; procedure in the row).
-2. **v0.1.0 tag + GitHub release** (CHANGELOG is ready; go-release
-   discipline).
-3. **LICENSE decision + flip** (§g-1; public MIT badge makes it urgent).
-4. **Junk filing: confirm wrapper-owned** (§g-2) → sieve + GTUBE subtest
-   upgrade.
-5. **SystemNix `branching-flow` local-input fix** (§g-3; prepared-source
-   pattern) + triage its "Secret history scan"/"Go deps audit" failures.
-6. Check whether Renovate activates now that the repo is pushed
-   (renovate.json predates the first push; approval-gated by config).
-7. Upstream nixpkgs filings (both diagnoses current vs master).
-8. CI: script the pinned-action SHA resolution check (pre-push or in-CI).
-9. aarch64 `stalwart-e2e` emulated run; parsedmarc-e2e TLS variant; CSV
-   row-count; two-reschedule quota assertion; pin-advance runbook; CI
-   lockstep audit test (all TODO_LIST).
-10. Confirm the queued docs-only CI run (35000478603) went green.
-11. docs-health ANNOTATE pass over the three 2026-09-15 status reports
-    (their numbered items are now partially resolved - inline markers due).
+1. ~~**SystemNix pin advance** (top row, now unblocked; procedure in the row).~~ done (done (pin v0.2.0))
+2. ~~**v0.1.0 tag + GitHub release** (CHANGELOG is ready; go-release~~ done (cut + released (both tags))
+   ~~discipline).~~
+3. ~~**LICENSE decision + flip** (§g-1; public MIT badge makes it urgent).~~ done (MIT confirmed + shipped)
+4. ~~**Junk filing: confirm wrapper-owned** (§g-2) → sieve + GTUBE subtest~~ **Won't implement — wrapper-owned proven impossible (sieve wall); ROADMAP Q6 options a-d, rec c+d.**
+   ~~upgrade.~~
+5. ~~**SystemNix `branching-flow` local-input fix** (§g-3; prepared-source~~ done (both local-path pins fixed (19-52 session, narHash unchanged); push + remaining CI debt are a TODO_LIST user-blocked row)
+   ~~pattern) + triage its "Secret history scan"/"Go deps audit" failures.~~
+6. ~~Check whether Renovate activates now that the repo is pushed~~ done (dependabot.yml shipped for github-actions (a4fc343); renovate.json actions-enabled too)
+   ~~(renovate.json predates the first push; approval-gated by config).~~
+7. ~~Upstream nixpkgs filings (both diagnoses current vs master).~~ done (filed (both))
+8. ~~CI: script the pinned-action SHA resolution check (pre-push or in-CI).~~ **Won't implement — superseded - dependabot weekly grouped bumps + fail-closed CI make the SHA class self-healing.**
+9. ~~aarch64 `stalwart-e2e` emulated run; parsedmarc-e2e TLS variant; CSV~~ done (all shipped (attempted/decided, TLS node, row-count, two-reschedule, runbook, lockstep))
+   ~~row-count; two-reschedule quota assertion; pin-advance runbook; CI~~
+   ~~lockstep audit test (all TODO_LIST).~~
+10. ~~Confirm the queued docs-only CI run (35000478603) went green.~~ done (green on all later runs)
+11. ~~docs-health ANNOTATE pass over the three 2026-09-15 status reports~~ done (docs-health pass docs-health pass 2026-09-16 (this pass))
+    ~~(their numbered items are now partially resolved - inline markers due).~~
 12. Nothing else new; everything else already lives in TODO_LIST (16 rows) /
     ROADMAP.
 
 ## g) Questions I cannot figure out myself
 
-1. **Which license?** You rejected MIT, but `LICENSE` on origin currently
-   says MIT (GitHub renders the badge). Name the target (Apache-2.0?
-   BSD-2/3-Clause? unlicensed-for-now?) and I flip the file and re-push.
+1. ~~**Which license?** You rejected MIT, but `LICENSE` on origin currently~~ done (MIT CONFIRMED - the badge is correct)
+   ~~says MIT (GitHub renders the badge). Name the target (Apache-2.0?~~
+   ~~BSD-2/3-Clause? unlicensed-for-now?) and I flip the file and re-push.~~
 2. **Junk filing - confirm wrapper-owned in nix-email?** My recommendation
    is yes (E2E-testable here, consistent for every consumer); alternatives
    are SystemNix-owned sieve or documented tag-only.
-3. **SystemNix CI:** the `branching-flow` `git+file:///home/...` pin can
-   never work on CI. Fix it in a SystemNix session now (prepared-source
-   pattern per the nix-private-go-repos skill), or leave it for a dedicated
-   SystemNix session while its CI stays red?
+3. ~~**SystemNix CI:** the `branching-flow` `git+file:///home/...` pin can~~ **Won't implement — SystemNix CI debt routed to TODO_LIST (user-blocked row).**
+   ~~never work on CI. Fix it in a SystemNix session now (prepared-source~~
+   ~~pattern per the nix-private-go-repos skill), or leave it for a dedicated~~
+   ~~SystemNix session while its CI stays red?~~
 
 ---
 
@@ -166,3 +166,11 @@ status-report/brutal-self-review HTML canonical outputs; intentional, not
 propagated into the skills.
 
 **Then per the skill: WAITING FOR INSTRUCTIONS.**
+
+---
+
+## Resolution addendum (2026-09-16, docs-health pass)
+
+All items resolved inline; the standing opens are g/2 (spam→Junk - ROADMAP
+Q6) and the SystemNix push/CI-debt block (TODO_LIST user-blocked row).
+Archived.

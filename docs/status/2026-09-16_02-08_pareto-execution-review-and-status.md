@@ -49,9 +49,9 @@ UNTRACKED (see e) — the auto-commit daemon has not run in ~6 h.
    (`smtp/src/reporting/`, CLI `report.rs`) — no live probe (mail a report
    into the VM's Stalwart, query the report store) was run. The ledger
    entry says so explicitly.
-3. **Plan §10 harvest is proposal-only** — ROADMAP/TODO deltas (viewer
-   deferral, OIDC "when D1", Q5 doctrine, DNS-owner guard) await the
-   approval the plan itself gates on (§9).
+3. ~~**Plan §10 harvest is proposal-only** — ROADMAP/TODO deltas (viewer~~ done (harvest approval given (2026-09-16 docs-health mandate): viewer-DEFERRED, OIDC-when-D1, and DNS-owner deltas applied to ROADMAP)
+   ~~deferral, OIDC "when D1", Q5 doctrine, DNS-owner guard) await the~~
+   ~~approval the plan itself gates on (§9).~~
 4. **Local-only commits.** nix-email remote is 3 doc/auto commits behind
    local (post-tag housekeeping); SystemNix's pin-advance commits are
    local too (no push was part of the task; no push order given).
@@ -59,10 +59,10 @@ UNTRACKED (see e) — the auto-commit daemon has not run in ~6 h.
    the tags themselves triggered nothing. The green run covers the same
    TREE (master = release commit), so coverage is equivalent, but "CI ran
    on the tag" (plan 03e's letter) did not literally happen.
-6. **L13 "record runtime"** recorded boot-phase numbers only (the run died
-   at the driver shell timeout, ~6 min in); a full-run time does not exist.
-   The decision doesn't need it, but the plan asked for a number I could
-   only bound (>1 h by extrapolation).
+6. ~~**L13 "record runtime"** recorded boot-phase numbers only (the run died~~ **Won't implement — decision made on the bound - boot-phase evidence sufficed (flake trap comment); a full-run time is not needed for manual-only.**
+   ~~at the driver shell timeout, ~6 min in); a full-run time does not exist.~~
+   ~~The decision doesn't need it, but the plan asked for a number I could~~
+   ~~only bound (>1 h by extrapolation).~~
 
 ## c) NOT STARTED (all gated — physically impossible without user input)
 
@@ -218,6 +218,15 @@ cadence (runbook step exists — keep it alive) · 50. triage replies on
    Everything in f/21–f/48 hangs on this one word.
 2. **D2:** If yes — which Hetzner project/location, budget ceiling
    (CX22-class?), and backup target (evo-x2 pool vs StorageBox)?
-3. **May I HARVEST plan §10 (+ this report's f-list) into
-   TODO_LIST/ROADMAP and push the local commits** (nix-email doc commits +
-   SystemNix pin-advance)? Both are deliberately parked pending your word.
+3. ~~**May I HARVEST plan §10 (+ this report's f-list) into~~ done (HARVEST half executed 2026-09-16; the pushes remain user-gated (TODO_LIST row))
+   ~~TODO_LIST/ROADMAP and push the local commits** (nix-email doc commits +~~
+   ~~SystemNix pin-advance)? Both are deliberately parked pending your word.~~
+
+---
+
+## Resolution addendum (2026-09-16, docs-health pass)
+
+Unblocked small work (f/7, 8, 9, 11, 12, 13, 16, 17, 18) harvested into
+TODO_LIST; the D1/D2-gated spine (f/21-43), post-migration polish (f/44-48),
+and watch items (f/49-50) live in ROADMAP themes / TODO_LIST rows. g/1 and
+g/2 (D1/D2) remain the standing user decisions. Archived.

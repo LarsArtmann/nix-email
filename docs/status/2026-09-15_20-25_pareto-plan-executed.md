@@ -8,7 +8,7 @@
 
 | Plan task | Outcome |
 |---|---|
-| L03 release | `[Unreleased]` folded into `[0.2.0] - 2026-09-15`; **v0.1.0 tagged retroactively** at `f603169` (last 2026-09-14 commit = the state the `[0.1.0]` section describes), **v0.2.0** at the release commit `598db0f`; both tags pushed; GitHub releases created for both |
+| L03 release | `[Unreleased]` folded into `[0.2.0] - 2026-09-15`; **v0.1.0 tagged retroactively** at `f603169` (last 2026-09-14 commit = the state the `[0.1.0]` section describes), **v0.2.0** at the release commit `598db0f`; both tags pushed; GitHub releases created for both. _(nuanced by the 02-08 review: the tags triggered no CI - the workflow fires on branch pushes only; the green run covered the same tree)_ |
 | L04 SystemNix pin-advance | input bumped `1f8bb52` → **tag `v0.2.0`**, lock updated; relay-credential assertions RESTORED in `tests/test-nix-email.nix` (credential wiring + generated `queue.route` + strategy else-branch — all green against the real pinned input); option-existence guard deleted from the wrapper; contract check green |
 | L05 research | `/compare` fetched as HTML (cell marks preserved), release notes v0.15.5→v0.16.22 diffed, **v0.15.5 git-tag source grepped** — cross-table in plan §10 |
 | L06 overlap reviews | verdicts 06a–06e in plan §10: keep-both (native report ingestion is a free complement), viewer DEFERRED, OIDC verified present in 0.15.5 source, sieve-for-Junk unchanged (ledger wall), ROADMAP deltas proposed (harvest-gated) |
@@ -53,5 +53,19 @@
   pushed, releases published; full `nix flake check` green locally; CI run
   on the push in flight at writing time.
 - SystemNix: pin at tag `v0.2.0` (rev `598db0f`), contract test green,
-  full `nix flake check` in flight at writing time.
+  full `nix flake check` in flight at writing time. _(later verdict: it
+  FAILED at a pre-existing deadnix-check owned by parallel-session files -
+  the pin-advance scope itself stayed green; see the 02-08 report b/1)_
 - TODO_LIST swept down to the 4 user-gated rows.
+
+---
+
+## Resolution addendum (2026-09-16, docs-health pass)
+
+The plan-task table above is a done-record (all rows have outcomes); the
+two _(nuanced ...)_ notes import the 02-08 review's corrections. The
+"deliberately did NOT happen" block is resolved: the harvest approval was
+given and executed (2026-09-16 docs-health pass - viewer/OIDC/DNS-owner
+deltas applied to ROADMAP, Q5 doctrine applied); L01/L02/L08 remain the
+standing user decisions (ROADMAP open questions 1, 2, 6); L16 was this
+pass's scope. Archived.
