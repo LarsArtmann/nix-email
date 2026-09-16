@@ -13,7 +13,9 @@
 #   6.  Authenticated submission on 587 (STARTTLS + AUTH PLAIN)
 #   7.  Delivery: message lands in the recipient's INBOX, fetched via IMAPS
 #   8.  DKIM signing: the declarative `signature.<id>` block signs the
-#       submission (header asserted on the stored message)
+#       submission (header asserted on the stored message); then the
+#       webadmin keygen flow (POST /api/dkim, ed25519) adds the second
+#       default-sign id live - one message, two DKIM-Signature headers
 #   9.  Metrics: /metrics/prometheus answers 200 on the HTTP listener
 #   10. Journal hygiene: exactly the 2 known-benign "Configuration build
 #       error" lines (resolver/pyzor in the DNS-less VM) - nothing else
