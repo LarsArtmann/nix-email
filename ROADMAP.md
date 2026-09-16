@@ -38,7 +38,11 @@ every zone).
 Raw ideas:
 
 - `stalwart-mail` Terraform module: MX, SPF (`v=spf1 mx -all`), DKIM TXT,
-  DMARC with `rua`, MTA-STS, `_smtp._tls` TLS-RPT
+  DMARC with `rua`, MTA-STS, `_smtp._tls` TLS-RPT, plus TLSA records if
+  DANE inbound is wanted (source-verified present on 0.15.5)
+- ONE DNS owner rule: Terraform is sole DNS truth; if a 0.16+ migration
+  ever brings Stalwart's automated DNS management, leave Stalwart's
+  updater unconfigured (split-brain guard, master plan §10 26e)
 - Canary-domain-first rollout; TTL lowering + dual-MX window + rollback steps
   before touching the other domains
 - rDNS automation via the Hetzner API (or a documented manual step)
@@ -59,6 +63,10 @@ Raw ideas:
 - Gatus external-view checks (starttls :25, tls :993, cert expiry) and
   Prometheus scrape of `/metrics/prometheus` via reverse proxy or tunnel
 - Tiny DMARC viewer over the JSON/CSV output (the monitoring report's gap #3)
+  - DEFERRED (2026-09-15 verdict, master plan §10 06b): Stalwart 0.15.5
+    already stores analyzed reports natively with a CLI readout; build
+    nothing until the live webadmin is inspected (D1) AND parsedmarc JSON
+    proves insufficient
 - Optional PostgreSQL sink for parsedmarc (psycopg override experiment)
 - Paperless mail accounts off Gmail app passwords onto own IMAP; smartd
   remote-alert path decoupled from the mail relay (circular-dependency risk);
@@ -72,7 +80,9 @@ Raw ideas:
 ### 5. Repo excellence
 
 - CI, nix formatter, Renovate (nixpkgs input must stay paired with SystemNix)
-- Threat-model doc; Stalwart OIDC (Pocket ID) for the admin UI if supported
+- Threat-model doc; Stalwart OIDC (Pocket ID) for the admin UI - verified
+  present in the 0.15.5 source (`common/src/auth/oauth/{openid,oidc}.rs`,
+  master plan §10 06c); settings-passthrough wiring when the D1 host exists
 - Post-cutover: retire-or-keep decision documentation for the Resend-only path
 - Retire the two in-repo nixpkgs workarounds once upstream fixes land (host-less
   `[elasticsearch]` emission; imapclient on python 3.14) - re-check on every
@@ -94,6 +104,12 @@ Things deliberately NOT pursued (see README "Non-goals" for the full rationale):
   domains' DMARC mail; JSON/CSV files are the zero-dependency output.
 - **A mailpit wrapper:** `services.mailpit.instances` is a single option;
   wrapping adds nothing.
+- **POP3 in the wrapper's listener contract:** compiled into Stalwart 0.15.5
+  but deliberately excluded (25/465/587/993 only); consumers can add it via
+  `services.stalwart.settings` if a legacy client appears.
+- **FTS offload (Meilisearch etc.):** same doctrine as the Elasticsearch
+  rejection - the built-in Community full-text search already serves a
+  single-user deployment.
 - **Direct-to-MX outbound from the VPS:** fresh-IP reputation trap; Resend
   relay is the design.
 

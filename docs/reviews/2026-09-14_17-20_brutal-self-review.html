@@ -1036,10 +1036,10 @@
             <tr><td>mail-server module (listeners, TLS default, assertion)</td><td><span class="badge badge-fixed">Built</span></td><td>VM E2E green</td></tr>
             <tr><td>dmarc-monitor module (sinks off, [imap] correct)</td><td><span class="badge badge-fixed">Built</span></td><td>eval contract green</td></tr>
             <tr><td>Verified-facts ledger + runbook</td><td><span class="badge badge-high">Fixed live</span></td><td>2 claims corrected 17:15</td></tr>
-            <tr><td>Outbound relay, metrics, DKIM, backups, migration</td><td><span class="badge badge-fixed"><del>Not built</del> recipes verified</span></td><td>keys verified in README ledger 2026-09-14; module options + two-node relay test in TODO_LIST</td></tr>
-            <tr><td>VPS host, Terraform module, SystemNix consumer, Gatus</td><td><span class="badge badge-critical">Not built</span></td><td>status report (c)</td></tr>
+            <tr><td>Outbound relay, metrics, DKIM, backups, migration</td><td><span class="badge badge-fixed"><del>Not built</del> recipes verified, then BUILT</span></td><td><del>module options + two-node relay test in TODO_LIST</del> shipped in v0.2.0: relay option, metrics.enable, DKIM subtest, backup drill (<code>598db0f</code>); migration stays D1-gated (ROADMAP)</td></tr>
+            <tr><td>VPS host, Terraform module, <del>SystemNix consumer</del>, Gatus</td><td><span class="badge badge-critical">Not built <small>(SystemNix consumer BUILT 2026-09-15: sops + eval-contract test, pinned v0.2.0)</small></span></td><td>status report (c); remaining three D1/D2-gated (ROADMAP)</td></tr>
             <tr><td>Delivery-level E2E (account → mailbox → IMAP)</td><td><span class="badge badge-fixed"><del>Not built</del> Built</span></td><td>fbe9ca9, 2026-09-14</td></tr>
-            <tr><td>CI, formatter, LICENSE, docs-health files</td><td><span class="badge badge-high"><del>Not built</del> Partial</span></td><td>docs-health files built 2026-09-15; dprint landed (21cab2c); CI + LICENSE open in TODO_LIST</td></tr>
+            <tr><td>CI, formatter, LICENSE, docs-health files</td><td><span class="badge badge-high"><del>Not built</del> <del>Partial</del> Built</span></td><td><del>CI + LICENSE open in TODO_LIST</del> all shipped in v0.2.0: CI green on GitHub, alejandra + dprint CI-enforced, LICENSE MIT confirmed (<code>598db0f</code>)</td></tr>
           </tbody>
         </table>
 
@@ -1055,7 +1055,7 @@
           <div class="migration-num">2</div>
           <div class="migration-content">
             <h4><del>Research spike AS CODE: Stalwart operational surface</del></h4>
-            <p>Mostly done 2026-09-14 (R3/R4/R5): relay keys live-spiked, metrics + backup source-verified, ledger updated; the in-VM Mailpit round-trip remains open (TODO_LIST two-node test). <ins>Mailpit as mock submission upstream in the VM test; verify relay keys, metrics endpoint, DKIM signing; graduate each verified key into module defaults + ledger.</ins></p>
+            <p>Mostly done 2026-09-14 (R3/R4/R5): relay keys live-spiked, metrics + backup source-verified, ledger updated; <del>the in-VM Mailpit round-trip remains open (TODO_LIST two-node test)</del> two-node stalwart-relay-e2e shipped in v0.2.0 (<code>598db0f</code>). <ins>Mailpit as mock submission upstream in the VM test; verify relay keys, metrics endpoint, DKIM signing; graduate each verified key into module defaults + ledger.</ins></p>
           </div>
         </div>
         <div class="migration-step">
@@ -1088,7 +1088,7 @@
         </div>
 
         <footer class="footer">
-          Generated 2026-09-14 17:20 CEST &middot; The two README memory-claims were corrected live during this review &middot; Ghost systems: none (all built code is test-wired); split brain found: 1 (ledger), fixed &middot; Annotated 2026-09-15 (docs-health): improvement steps 1&ndash;4 and 6 resolved, step 5 (migration tooling) still open &mdash; gated on D1
+          Generated 2026-09-14 17:20 CEST &middot; The two README memory-claims were corrected live during this review &middot; Ghost systems: none (all built code is test-wired); split brain found: 1 (ledger), fixed &middot; Annotated 2026-09-15 (docs-health): improvement steps 1&ndash;4 and 6 resolved, step 5 (migration tooling) still open &mdash; gated on D1 &middot; Re-annotated 2026-09-16: built/not-built table refreshed against v0.2.0 (relay/metrics/DKIM/backup/CI/LICENSE/consumer all shipped); archived
         </footer>
       </main>
     </div>

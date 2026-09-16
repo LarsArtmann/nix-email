@@ -106,9 +106,10 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
   LEDGER (fact + method + date; do not re-derive config keys from memory).
 - `FEATURES.md` - honest feature inventory by status.
 - `TODO_LIST.md` - open bounded work. `ROADMAP.md` - long-term themes,
-  non-goals, and the open user decisions (D1/D2 license) that gate them.
+  non-goals, and the open user decisions (D1/D2, spam→Junk) that gate them.
 - `CHANGELOG.md` - what changed. `docs/{status,planning,reviews}/` -
-  point-in-time session snapshots (historical; annotated as work resolves).
+  point-in-time session snapshots; `archived/` subdirectories hold the
+  snapshots whose items are fully resolved or routed into the living docs.
 - `docs/TELEMETRY.md` - Stalwart telemetry best-practices guide (from
   stalw.art docs fetched 2026-09-15; carries an upstream-object-model vs
   pinned-0.15.5 version-skew caveat - verify keys against the binary

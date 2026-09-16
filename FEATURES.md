@@ -64,6 +64,7 @@
 | CI (GitHub Actions)           | 🟢 `FULLY_FUNCTIONAL`     | `.github/workflows/ci.yml` - fail-closed `nix flake check` with a STRICT lockstep guard (flake-declared checks must equal CI's expected list exactly; both drift directions negative-tested), alejandra format enforcement, a pipe-lint step banning `producer \| grep/tail/head` in-VM assertions, and an aarch64 check-set shape assertion |
 | Repo topics                   | 🟢 `FULLY_FUNCTIONAL`     | mail/nixos/nixos-module/stalwart/dmarc/email-server/nix-flake        |
 | Renovate + Dependabot         | 🟢 `FULLY_FUNCTIONAL`     | `renovate.json` (nix manager approval-gated, SystemNix pairing note, actions enabled) + `.github/dependabot.yml` (weekly grouped github-actions bumps) |
+| LICENSE                       | 🟢 `FULLY_FUNCTIONAL`     | MIT, CONFIRMED by the user 2026-09-15 (`Copyright (c) 2026 Lars Artmann`) |
 | Flake devShell                | 🟢 `FULLY_FUNCTIONAL`     | `devShells.default` (alejandra + python3) for `nix develop`; outputs signature open-pattern (a closed pattern broke eval once, fixed same morning) |
 | Verified-facts ledger         | 🟢 `FULLY_FUNCTIONAL`     | `README.md`; zero UNVERIFIED claims                                  |
 
