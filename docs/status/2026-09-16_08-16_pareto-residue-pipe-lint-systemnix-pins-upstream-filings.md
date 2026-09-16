@@ -98,33 +98,34 @@ run 35060437773 exercised). Disclosed above in full.
 
 ## b) PARTIALLY DONE
 
-1. **f.3 native-ingestion VM subtest (subtest 19)**: fully WRITTEN (sample
+1. ~~**f.3 native-ingestion VM subtest (subtest 19)**: fully
+   WRITTEN (sample
    fetchurl with report-shaped filename — the detector matches '!'/'.xml' in
    attachment names; settings block; `reports@example.test` provisioning;
-   swaks attach; store polling + INBOX-absence proof) but **NEVER RUN**.
-2. **f.4 relay-SASL variant**: test converted (Mailpit `smtpAuthFile` enforces
+   swaks attach; store polling + INBOX-absence proof) but **NEVER RUN**.~~ done (`bc7e954` after four fixes + the endpoint correction; green in 15-21 §a/3)
+2. ~~**f.4 relay-SASL variant**: test converted (Mailpit `smtpAuthFile` enforces
    AUTH; wrapper `username`/`secretFile`; null-emission shape pinned by inline
    eval asserts forced from the testScript); first run died at eval
    (`pkgs.lib.nixosSystem` missing) — fixed via `import "${pkgs.path}/nixos"`;
-   **re-run NOT done**.
-3. **SystemNix push (03b/24e)**: GH013 STILL blocks (dry-run passes, real
+   **re-run NOT done**.~~ done (three fixes incl. eval-config + mailpit dashed flags; GREEN in 15-21 §a/1, `bc7e954`)
+3. ~~**SystemNix push (03b/24e)**: GH013 STILL blocks (dry-run passes, real
    push declined — server-side check; same Sourcegraph literal in `63fd5a83`).
    ~52 commits local-only; all my SystemNix work is committed but invisible
-   to CI until the user clicks the unblock URL.
-4. **Dependabot PR #1**: still open; its latest CI run now FAILS (35062650429,
-   post-rebase) — untriaged.
-5. **This session's CHANGELOG entries + plan-§10 HARVEST**: pending.
+   to CI until the user clicks the unblock URL.~~ _(routed: TODO_LIST SystemNix row - still user-gated)_
+4. ~~**Dependabot PR #1**: still open; its latest CI run now FAILS (35062650429,
+   post-rebase) — untriaged.~~ done (root-caused in 12-54 §a/3 as master's eval bug; rebased green 15-21 §a/6; MERGED 2026-09-16 16:08 UTC)
+5. ~~**This session's CHANGELOG entries + plan-§10 HARVEST**: pending.~~ done (CHANGELOG under 15-21/16-33/18-03 sessions; HARVEST `43cd0b4` + `e18758f` + evening AUDIT)
 
 ## c) NOT STARTED (all user-gated or deferred by scope)
 
-- D1 (Workspace fork), D2 (VPS/budget), Q6 (junk-filing a–d, rec c+d),
-  ANNOTATE scope — unchanged, user-gated.
+- ~~D1 (Workspace fork), D2 (VPS/budget), Q6 (junk-filing a–d, rec c+d),
+  ANNOTATE scope — unchanged, user-gated.~~ ANNOTATE scope: done (2026-09-16 evening pass annotated + archived all `2026-0*` files); D1/D2/Q6 remain standing user decisions (ROADMAP)
 - P2 production spine (Terraform/VPS/migration) — D1/D2-gated.
-- Single-sourcing the plan§10/README/AGENTS triple-write; maintainer-response
+- ~~Single-sourcing the plan§10/README/AGENTS triple-write; maintainer-response
   watch loop on the four upstream issues; SystemNix worktree cache/qcow2
   cleanup; secret-scan `syn_` policy (user); 07a ownership split (both
   parallel sessions were idle-waiting during this session — coordination
-  happened de-facto by lane separation, never formally written into AGENTS).
+  happened de-facto by lane separation, never formally written into AGENTS).~~ watch loop: done (routed to the TODO_LIST filings row, re-checked 2026-09-16); cache cleanup: folded into the SystemNix TODO row; `syn_` policy: in the SystemNix row; triple-write single-sourcing: **Won't implement — the deliberate-non-fix duplication is documented as intentional (two mirrored homes, AGENTS + .buildflow.yml)**; ownership split: left as de-facto lane separation
 
 ## d) TOTALLY FUCKED UP (all caught in-session; none shipped broken)
 
@@ -154,42 +155,48 @@ run 35060437773 exercised). Disclosed above in full.
 
 ## f) Next things (impact-sorted; 1–4 verification, 5–10 repo work, 11+ gated)
 
-1. Run + finalize the native-ingestion subtest (stalwart-e2e; transcript →
-   tighten assertions → full check).
-2. Re-run relay-SASL e2e; green or fix (Mailpit auth-file format is the
-   likeliest surprise).
-3. Full `nix flake check` (all four checks) once 1–2 land; push; watch CI.
-4. Triage dependabot PR #1's failing run; merge or rebase-drop.
-5. CHANGELOG entries for this session (pipe-lint, pins+keys, linters,
-   filings, TLS assertion, branch protection, tag trigger).
-6. HARVEST plan §10 + this report into TODO_LIST/ROADMAP.
-7. Re-check #563651/#563652/#563777/#662 for maintainer responses.
-8. Write the deploy-key recipe into SystemNix AGENTS.md.
-9. SystemNix worktree hygiene TODO (.cache/*, nixos.qcow2).
-10. README ops-detail decision (ROADMAP Q4) + the triple-write single-sourcing.
-11. *(user click)* GH013 unblock URL → push SystemNix (~52 commits) → watch
-    the workflows run on a clean tree for the first time in days.
-12. *(user)* Q6 junk-filing verdict (c+d recommended) → if (d), draft the
-    Stalwart upstream feature request.
-13. *(user)* D1/D2 → unlocks the P2 spine (Terraform → VPS → migration).
-14. *(user)* ANNOTATE scope for docs/status.
-15. *(user)* secret-scan `syn_` policy decision on SystemNix CI.
+1. ~~Run + finalize the native-ingestion subtest (stalwart-e2e; transcript →
+   tighten assertions → full check).~~ done (`bc7e954`, 15-21 §a/3)
+2. ~~Re-run relay-SASL e2e; green or fix (Mailpit auth-file format is the
+   likeliest surprise).~~ done (15-21 §a/1: dashed freeform flags were exactly the surprise)
+3. ~~Full `nix flake check` (all four checks) once 1–2 land; push; watch CI.~~ done (15-21 §a/4-5: EXIT:0, `bc7e954`, run 35092101106 success)
+4. ~~Triage dependabot PR #1's failing run; merge or rebase-drop.~~ done (12-54 §a/3 root cause; rebased green; MERGED 2026-09-16 16:08 UTC)
+5. ~~CHANGELOG entries for this session (pipe-lint, pins+keys, linters,
+   filings, TLS assertion, branch protection, tag trigger).~~ done (CHANGELOG [Unreleased], 15-21 §a/9 + `2b7257e`)
+6. ~~HARVEST plan §10 + this report into TODO_LIST/ROADMAP.~~ done (`43cd0b4` + evening AUDIT)
+7. ~~Re-check #563651/#563652/#563777/#662 for maintainer responses.~~ done (16-33 §a/1; watch continues in the TODO_LIST row)
+8. ~~Write the deploy-key recipe into SystemNix AGENTS.md.~~ done (12-54 §a/5)
+9. ~~SystemNix worktree hygiene TODO (.cache/*, nixos.qcow2).~~ _(routed: folded into the TODO_LIST SystemNix row)_
+10. ~~README ops-detail decision (ROADMAP Q4) + the triple-write single-sourcing.~~ Q4 stays a standing user decision; single-sourcing **Won't implement — documented as intentional two-home mirroring (AGENTS + .buildflow.yml)**
+11. ~~*(user click)* GH013 unblock URL → push SystemNix (~52 commits) → watch
+    the workflows run on a clean tree for the first time in days.~~ _(routed: TODO_LIST SystemNix row - still user-gated)_
+12. ~~*(user)* Q6 junk-filing verdict (c+d recommended) → if (d), draft the
+    Stalwart upstream feature request.~~ standing user decision (ROADMAP Q6; the FR is a TODO_LIST row gated on it)
+13. ~~*(user)* D1/D2 → unlocks the P2 spine (Terraform → VPS → migration).~~ standing user decisions (ROADMAP)
+14. ~~*(user)* ANNOTATE scope for docs/status.~~ done (2026-09-16 evening pass: all `2026-0*` files annotated + archived)
+15. ~~*(user)* secret-scan `syn_` policy decision on SystemNix CI.~~ _(routed: inside the TODO_LIST SystemNix row)_
 
 ## g) Questions I can NOT figure out myself
 
-1. **GH013**: the SystemNix push has been blocked for ~12h on the same
+1. ~~**GH013**: the SystemNix push has been blocked for ~12h on the same
    push-protection literal (a parallel session's `63fd5a83` fixture).
    https://github.com/LarsArtmann/SystemNix/security/secret-scanning/unblock-secret/3JNEaUWN2z6QQokKh8kJ5JbjOXh
    — click it and choose "used in tests"? ~52 commits (mine + two parallel
-   sessions') are invisible to CI until then.
-2. **Q6 junk-filing** (ROADMAP): a JMAP-automation / b webmail / c tag-only
+   sessions') are invisible to CI until then.~~ _(routed: TODO_LIST SystemNix row - still user-gated)_
+2. ~~**Q6 junk-filing** (ROADMAP): a JMAP-automation / b webmail / c tag-only
    end-state / d upstream feature request — recommendation on the table is
    **c+d** (source-verified: settings sieve cannot fileinto on 0.15.5).
-   This decides whether I draft the Stalwart upstream filing (18a).
-3. **D1/D2**: still gate the entire production spine (Terraform, VPS,
+   This decides whether I draft the Stalwart upstream filing (18a).~~ standing user decision (ROADMAP Q6; TODO_LIST row pre-staged for the (d) branch)
+3. ~~**D1/D2**: still gate the entire production spine (Terraform, VPS,
    migration, cutover). Even a one-line "D1 = stay on evo-x2 for monitoring"
-   unblocks task 25+ scoping.
+   unblocks task 25+ scoping.~~ standing user decisions (ROADMAP)
 
 ---
 
-*Point-in-time snapshot. WAITING for instructions.*
+## Resolution addendum (2026-09-16, docs-health pass)
+
+All actionable items resolved inline by sessions 5-8 (`bc7e954`,
+`43cd0b4`, `e18758f`, `2b7257e`, `891fa44`) or this pass. Remaining open:
+SystemNix push + `syn_` policy + cache hygiene (one TODO_LIST row), the
+Q4/Q6/D1/D2 user decisions (ROADMAP), and the filings watch (TODO_LIST
+row). Archived.

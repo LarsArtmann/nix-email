@@ -116,8 +116,8 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
   "unused" self as a lint nit and the whole flake died ("function 'outputs'
   called with unexpected argument 'self'"; every tool cascaded red). A
   named-but-unused `self` is not an option either - deadnix flags it every
-  run and BuildFlow's edit-mode auto-fix strips it (deadnix alone is
-  report-only by default; the removal path is BuildFlow's `-e` mode).
+  run and BuildFlow's deadnix auto-fix strips it (deadnix alone is
+  report-only by default; the removal path is BuildFlow's edit mode).
   The ellipsis is the only shape that survives both.
 - Known lint noise - deliberate non-fixes, do NOT "repair":
   tests/parsedmarc-e2e.nix:39 fetchurl sha256 pin is intentional

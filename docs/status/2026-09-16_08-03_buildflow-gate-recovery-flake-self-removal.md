@@ -50,54 +50,54 @@ Remaining warnings are exactly two documented deliberate non-fixes.
 
 ## b) PARTIALLY DONE
 
-1. **CHANGELOG.md** - my session's changes (flake eval fix, devShells
+1. ~~**CHANGELOG.md** - my session's changes (flake eval fix, devShells
    output, `.buildflow.yml`, AGENTS.md rules) are NOT in `[Unreleased]`;
-   it only carries the parallel session's CI pipe-lint item.
-2. **TODO_LIST.md routing** - TODO_LIST was freshly swept this morning
+   it only carries the parallel session's CI pipe-lint item.~~ done (`e18758f`, `2b7257e`: session-6/7/8 entries landed)
+2. ~~**TODO_LIST.md routing** - TODO_LIST was freshly swept this morning
    (full docs-health AUDIT) but contains none of this session's findings;
-   section (f) below is the HARVEST input. Not routed (user ordered WAIT).
-3. **README.md** - the new devShell + `nix develop` tool-environment
-   contract is not reflected in the runbook/README.
-4. **Fresh (uncached) VM E2E confirmation** - all greens today were
+   section (f) below is the HARVEST input. Not routed (user ordered WAIT).~~ done (`e18758f` sweep + the 2026-09-16 evening AUDIT pass)
+3. ~~**README.md** - the new devShell + `nix develop` tool-environment
+   contract is not reflected in the runbook/README.~~ done (2026-09-16 evening AUDIT: README "Development" section added - devShell, gate hierarchy, no-pipes rule)
+4. ~~**Fresh (uncached) VM E2E confirmation** - all greens today were
    store/cache replays (nix-build 17.3 s, flake-check 8.8 s). Sound,
    because my changes touch no test derivation, but no fresh pass was
    OBSERVED this session for stalwart-e2e / stalwart-relay-e2e /
-   parsedmarc-e2e.
-5. **deadnix claim precision** - verified deadnix FLAGS unused `self`;
+   parsedmarc-e2e.~~ done (fresh runs observed later on 2026-09-16: 15-21 report §a/3-4 full flake check EXIT:0; 18-03 report §a/1 full VM run 362.78 s EXIT:0)
+5. ~~**deadnix claim precision** - verified deadnix FLAGS unused `self`;
    did not verify BuildFlow's exact deadnix invocation flags. AGENTS.md
    wording "deadnix --fix re-removes it every run" cites a flag that does
-   not exist (mechanism holds only via BuildFlow's edit-mode auto-fix).
-6. **BuildFlow binary freshness** - doctor warns the binary predates HEAD
-   by ~60 h (advisory, all steps executed fine); upgrade deferred.
+   not exist (mechanism holds only via BuildFlow's edit-mode auto-fix).~~ done (2026-09-16 evening AUDIT: AGENTS.md reworded - report-only default, BuildFlow deadnix auto-fix is the removal path)
+6. ~~**BuildFlow binary freshness** - doctor warns the binary predates HEAD
+   by ~60 h (advisory, all steps executed fine); upgrade deferred.~~ **Won't implement — machine-local tooling state, not repo content; advisory warning only.**
 
 ## c) NOT STARTED
 
-1. `buildflow upgrade` (stale binary).
-2. BuildFlow results DB vacuum (doctor: 2.71 GB;
-   `sqlite3 ~/.cache/buildflow/buildflow.db VACUUM`).
-3. One fresh uncached full `nix flake check` on the current tree.
-4. HARVEST of section (f) into TODO_LIST.md / ROADMAP.md.
-5. CI status check: whether CI ran green on today's commits (the parallel
-   session added a CI pipe-lint step; my flake fix landed after).
-6. BuildFlow pre-commit hook: none installed - the auto-commit daemon is
-   the only automated gate.
-7. Upstream filings (all fleet-value BuildFlow tasks, none filed):
+1. ~~`buildflow upgrade` (stale binary).~~ **Won't implement — machine-local; not repo work.**
+2. ~~BuildFlow results DB vacuum (doctor: 2.71 GB;
+   `sqlite3 ~/.cache/buildflow/buildflow.db VACUUM`).~~ **Won't implement — machine-local.**
+3. ~~One fresh uncached full `nix flake check` on the current tree.~~ done (15-21 report §a/4: full gate EXIT:0 on fresh store builds)
+4. ~~HARVEST of section (f) into TODO_LIST.md / ROADMAP.md.~~ done (`e18758f` + `43cd0b4` + the 2026-09-16 evening AUDIT pass)
+5. ~~CI status check: whether CI ran green on today's commits (the parallel
+   session added a CI pipe-lint step; my flake fix landed after).~~ done (master green through `0de8b3d`, incl. runs 35117320385/35118323763 and the PR #1 merge window)
+6. ~~BuildFlow pre-commit hook: none installed - the auto-commit daemon is
+   the only automated gate.~~ **Won't implement — superseded by the git pre-push fmt hook (TODO_LIST row); a full-gate precommit is too slow for daemon commits.**
+7. ~~Upstream filings (all fleet-value BuildFlow tasks, none filed):
    vulnix NVD-404 + misdiagnosis message; nix-checker FP on pinned
    fixtures; statix W20 FP; summary line-count vs finding-count
-   discrepancy (statix "60" in summary vs 4 actual findings).
-8. The nixpkgs eval warning observed in gate1:
+   discrepancy (statix "60" in summary vs 4 actual findings).~~ _(routed: BuildFlow repo - fleet scope, deliberately out of this repo's TODO_LIST)_
+8. ~~The nixpkgs eval warning observed in gate1:
    "The option `services.dovecot2.protocols' ... renamed to
    `services.dovecot2.settings.protocols'" emitted from nixpkgs'
    parsedmarc.nix during OUR check evaluation - not investigated whether
-   we trigger it or nixpkgs-internal noise.
-9. Renovate + Dependabot split-brain check: `renovate.json` exists AND
+   we trigger it or nixpkgs-internal noise.~~ _(routed: TODO_LIST Low row)_
+9. ~~Renovate + Dependabot split-brain check: `renovate.json` exists AND
    `.github/dependabot.yml` was added this morning (github-actions
-   ecosystem) - uncoordinated dependency automation.
-10. Which tool rewrote `{ ... }` to `{...}` in tests/stalwart-relay-e2e.nix
+   ecosystem) - uncoordinated dependency automation.~~ _(routed: TODO_LIST Renovate install-or-drop row; renovate.json still enables github-actions per the 2026-09-16 evening re-read)_
+10. ~~Which tool rewrote `{ ... }` to `{...}` in tests/stalwart-relay-e2e.nix
     (dprint is documented as json/yaml/markdown-only; the foreign edit
     suggests something else owns .nix style) - unexplained formatter
-    overlap.
-11. docs-health ANNOTATE pass over this report once its items resolve.
+    overlap.~~ _(routed: TODO_LIST Low row)_
+11. ~~docs-health ANNOTATE pass over this report once its items resolve.~~ done (this pass, 2026-09-16 evening)
 
 ## d) TOTALLY FUCKED UP
 
@@ -174,137 +174,137 @@ Remaining warnings are exactly two documented deliberate non-fixes.
 > [ctx] sourced from repo context rather than this session.
 
 **Gate correctness & verification**
-1. One fresh uncached `nix flake check` (+ all three VM E2E checks) on
-   the current tree - replace cache-replayed green with an observed one.
-2. Align AGENTS.md deadnix wording with reality (report-only default;
-   BuildFlow edit-mode is the removal path) - 2-line fix.
-3. Check CI run status for today's commits (parallel session's CI change
-   + this flake fix).
-4. Investigate the nixpkgs `dovecot2.protocols` rename warning emitted
-   during our check evals - ours to fix or documented noise?
-5. Investigate which formatter rewrote `{ ... }` -> `{...}` in
+1. ~~One fresh uncached `nix flake check` (+ all three VM E2E checks) on
+   the current tree - replace cache-replayed green with an observed one.~~ done (15-21 §a/3-4 + 18-03 §a/1: fresh full gate + fresh VM run, both EXIT:0)
+2. ~~Align AGENTS.md deadnix wording with reality (report-only default;
+   BuildFlow edit-mode is the removal path) - 2-line fix.~~ done (2026-09-16 evening AUDIT)
+3. ~~Check CI run status for today's commits (parallel session's CI change
+   + this flake fix).~~ done (green through `0de8b3d`, incl. the PR #1 merge run)
+4. ~~Investigate the nixpkgs `dovecot2.protocols` rename warning emitted
+   during our check evals - ours to fix or documented noise?~~ _(routed: TODO_LIST Low row)_
+5. ~~Investigate which formatter rewrote `{ ... }` -> `{...}` in
    tests/stalwart-relay-e2e.nix (documented dprint scope says it should
-   not own .nix).
-6. Resolve the renovate.json + dependabot.yml overlap (split brain).
-7. Add a repo rule: "Verification:" commit-message lines must cite a
-   command + exit that actually ran (guards against a4fc343 recurrence).
-8. Decide [dec] `--fail-on` policy: keep default (error) or move to
-   `--strict` (warning) once the two documented FPs are handled upstream.
-9. Verify `.buildflow.yml` passes `buildflow verify-config` in CI, not
-   just locally.
-10. Keep the root `result` symlink out of scanner paths (cosmetic;
-    documented that gates are unaffected).
+   not own .nix).~~ _(routed: TODO_LIST Low row)_
+6. ~~Resolve the renovate.json + dependabot.yml overlap (split brain).~~ _(routed: TODO_LIST Renovate install-or-drop row)_
+7. ~~Add a repo rule: "Verification:" commit-message lines must cite a
+   command + exit that actually ran (guards against a4fc343 recurrence).~~ **Won't implement — no enforcement mechanism without precommit hooks (rejected above); the discipline lives in AGENTS's gate-before-commit rules.**
+8. ~~Decide [dec] `--fail-on` policy: keep default (error) or move to
+   `--strict` (warning) once the two documented FPs are handled upstream.~~ **Won't implement — error-threshold default is the working policy; revisit only if the FPs get fixed upstream.**
+9. ~~Verify `.buildflow.yml` passes `buildflow verify-config` in CI, not
+   just locally.~~ **Won't implement — CI runs `nix flake check`, not buildflow; the config is validated locally (verify-config EXIT:0).**
+10. ~~Keep the root `result` symlink out of scanner paths (cosmetic;
+    documented that gates are unaffected).~~ **Won't implement — cosmetic; documented.**
 
 **BuildFlow environment**
-11. `buildflow upgrade` (binary predates HEAD ~60 h).
-12. Vacuum the 2.71 GB BuildFlow results DB.
-13. Inspect BuildFlow's deadnix invocation (does it pass `-e`? `-L`?)
-    and record it in AGENTS.md.
-14. Test whether a statix config can scope-disable W20 for tests/ -
-    prefer config over prose documentation if it works.
-15. `buildflow precommit install`? [dec] - hook-gated commits vs
-    daemon-only auto-gate.
-16. Baseline uncached step timings (`buildflow timings`) after the fix,
-    for future regression detection.
+11. ~~`buildflow upgrade` (binary predates HEAD ~60 h).~~ **Won't implement — machine-local.**
+12. ~~Vacuum the 2.71 GB BuildFlow results DB.~~ **Won't implement — machine-local.**
+13. ~~Inspect BuildFlow's deadnix invocation (does it pass `-e`? `-L`?)
+    and record it in AGENTS.md.~~ **Won't implement — AGENTS now states the verified part (report-only default, BuildFlow auto-fix removal); exact flag archaeology adds nothing.**
+14. ~~Test whether a statix config can scope-disable W20 for tests/ -
+    prefer config over prose documentation if it works.~~ **Won't implement — W20 stays a documented deliberate non-fix; config-scoping it adds maintenance for a style opinion.**
+15. ~~`buildflow precommit install`? [dec] - hook-gated commits vs
+    daemon-only auto-gate.~~ **Won't implement — superseded by the pre-push fmt hook (TODO_LIST).**
+16. ~~Baseline uncached step timings (`buildflow timings`) after the fix,
+    for future regression detection.~~ **Won't implement — YAGNI; VM-test wall cost is already measured per run in the e2e.**
 
 **Upstream / fleet (BuildFlow repo)**
-17. [fleet] File: vulnix NVD-legacy-feed 404 crash + BuildFlow's
-    misdiagnosis message ("unscannable store path").
-18. [fleet] File: nix-checker hardcoded-hash / inline-hash FPs on
-    pinned test fixtures (fetchurl pins are intentional).
-19. [fleet] File: statix W20 FP on idiomatic NixOS `services.<name>`
-    node-config blocks.
-20. [fleet] File: summary counts diagnostic lines, not findings
-    (statix 60 vs 4).
-21. [fleet] Evaluate a maintained CVE-scanner replacement for vulnix
-    (NVD retired the legacy feeds; vulnix unmaintained).
-22. [fleet] Consider exposing `buildflow config validate` as a cheap CI
-    step for fleet repos.
+17. ~~[fleet] File: vulnix NVD-legacy-feed 404 crash + BuildFlow's
+    misdiagnosis message ("unscannable store path").~~ _(routed: BuildFlow repo - fleet scope)_
+18. ~~[fleet] File: nix-checker hardcoded-hash / inline-hash FPs on
+    pinned test fixtures (fetchurl pins are intentional).~~ _(routed: BuildFlow repo - fleet scope)_
+19. ~~[fleet] File: statix W20 FP on idiomatic NixOS `services.<name>`
+    node-config blocks.~~ _(routed: BuildFlow repo - fleet scope)_
+20. ~~[fleet] File: summary counts diagnostic lines, not findings
+    (statix 60 vs 4).~~ _(routed: BuildFlow repo - fleet scope)_
+21. ~~[fleet] Evaluate a maintained CVE-scanner replacement for vulnix
+    (NVD retired the legacy feeds; vulnix unmaintained).~~ _(routed: BuildFlow repo - fleet scope)_
+22. ~~[fleet] Consider exposing `buildflow config validate` as a cheap CI
+    step for fleet repos.~~ _(routed: BuildFlow repo - fleet scope)_
 
 **Flake / product**
-23. CHANGELOG entry for this session (flake eval fix, devShells,
-    .buildflow.yml, AGENTS rules).
-24. README: document `nix develop` devShell + the buildflow gate next to
-    the existing runbook.
-25. Release decision [dec]: cut v0.2.1 (consumer-relevant for NEW
-    consumers; SystemNix's existing pin is unaffected) or batch.
-26. ROADMAP [dec]: treefmt-nix standard stack vs minimal-alejandra
+23. ~~CHANGELOG entry for this session (flake eval fix, devShells,
+    .buildflow.yml, AGENTS rules).~~ done (`2b7257e` + session-6 entries)
+24. ~~README: document `nix develop` devShell + the buildflow gate next to
+    the existing runbook.~~ done (2026-09-16 evening AUDIT: README "Development" section)
+25. ~~Release decision [dec]: cut v0.2.1 (consumer-relevant for NEW
+    consumers; SystemNix's existing pin is unaffected) or batch.~~ done (superseded: batched into the 0.3.0 TODO row - unblocked when PR #1 merged)
+26. ~~ROADMAP [dec]: treefmt-nix standard stack vs minimal-alejandra
     (nix-review checklist prefers the stack; compat doctrine prefers
-    minimal - genuine tradeoff, user decision).
-27. Confirm SystemNix's pin still evaluates against this flake (compat
-    doctrine spot-check; no bump expected).
-28. Ask SystemNix whether it wants upstream devShells or defines its own
-    (contract note in README).
-29. Audit that every flake output introduced since v0.2.0 is documented
-    (devShells is the only addition so far).
-30. Consider `nix flake update` cadence policy (compat doctrine: only
-    together with SystemNix) - write it down [ctx].
+    minimal - genuine tradeoff, user decision).~~ _(routed: ROADMAP §5 raw idea)_
+27. ~~Confirm SystemNix's pin still evaluates against this flake (compat
+    doctrine spot-check; no bump expected).~~ _(routed: rides the SystemNix push TODO row; pin is tag v0.2.0, all changes since are additive)_
+28. ~~Ask SystemNix whether it wants upstream devShells or defines its own
+    (contract note in README).~~ _(routed: SystemNix coordination, TODO_LIST row)_
+29. ~~Audit that every flake output introduced since v0.2.0 is documented
+    (devShells is the only addition so far).~~ done (FEATURES carries the devShell row; no other outputs added)
+30. ~~Consider `nix flake update` cadence policy (compat doctrine: only
+    together with SystemNix) - write it down [ctx].~~ done (documented: Pin-advance runbook + AGENTS conventions)
 
 **Docs**
-31. HARVEST section (f) into TODO_LIST.md / ROADMAP.md (docs-health).
-32. ANNOTATE this report as its items resolve.
-33. Mirror the "known lint noise" list into README only if consumers
-    inherit BuildFlow (probably not - confirm, then likely skip) [dec].
-34. Keep `.buildflow.yml` rationale comments and AGENTS.md non-fix list
-    in sync on every future skip-set change.
-35. Review docs/TELEMETRY.md staleness caveat (version-skew vs pinned
-    0.15.5) [ctx, pre-existing].
+31. ~~HARVEST section (f) into TODO_LIST.md / ROADMAP.md (docs-health).~~ done (`e18758f` + evening AUDIT)
+32. ~~ANNOTATE this report as its items resolve.~~ done (this pass)
+33. ~~Mirror the "known lint noise" list into README only if consumers
+    inherit BuildFlow (probably not - confirm, then likely skip) [dec].~~ **Won't implement — consumers don't inherit BuildFlow (flake outputs carry none of it).**
+34. ~~Keep `.buildflow.yml` rationale comments and AGENTS.md non-fix list
+    in sync on every future skip-set change.~~ done (standing rule, AGENTS Commands)
+35. ~~Review docs/TELEMETRY.md staleness caveat (version-skew vs pinned
+    0.15.5) [ctx, pre-existing].~~ done (2026-09-16 evening AUDIT: provenance block self-caveats correctly; key-verification doctrine intact)
 
 **Tests**
-36. Fresh observed passes for stalwart-e2e, stalwart-relay-e2e,
-    parsedmarc-e2e (dup of #1 at check granularity; keep one).
-37. Consider extending dmarc-eval (or a tiny eval check) to assert the
-    devShells output exists - contract completeness vs YAGNI [dec].
-38. Mypy skip revisit trigger: first real Python module lands
-    (documented in .buildflow.yml - just honor it).
-39. If more Python fixtures appear, move from in-file noqa to
-    ruff.toml per-file-ignores (threshold: 2+ files).
+36. ~~Fresh observed passes for stalwart-e2e, stalwart-relay-e2e,
+    parsedmarc-e2e (dup of #1 at check granularity; keep one).~~ done (15-21 + 18-03 fresh runs)
+37. ~~Consider extending dmarc-eval (or a tiny eval check) to assert the
+    devShells output exists - contract completeness vs YAGNI [dec].~~ **Won't implement — YAGNI; `nix flake show` catches shape breaks (it did during the incident).**
+38. ~~Mypy skip revisit trigger: first real Python module lands
+    (documented in .buildflow.yml - just honor it).~~ done (trigger documented in `.buildflow.yml`)
+39. ~~If more Python fixtures appear, move from in-file noqa to
+    ruff.toml per-file-ignores (threshold: 2+ files).~~ done (threshold documented; single fixture keeps the in-file noqa)
 
 **Process / hygiene**
 40. Single-writer or scoped-partition agreement for multi-session work
     in this repo [dec].
-41. Re-read `git log`/`git status` immediately before every write burst
+41. ~~Re-read `git log`/`git status` immediately before every write burst
     while the daemon + parallel sessions are live (cheap, prevents
-    blocked edits).
-42. Prefer `--format json` for future triage (grep-able, no ANSI).
-43. Decide the fate of `interrogate` (never install; permanently N/A
-    unless Python grows).
-44. Commit the still-uncommitted foreign whitespace edit in
+    blocked edits).~~ done (standing practice; applied every session since)
+42. ~~Prefer `--format json` for future triage (grep-able, no ANSI).~~ **Won't implement — advisory preference; nothing to change in the repo.**
+43. ~~Decide the fate of `interrogate` (never install; permanently N/A
+    unless Python grows).~~ done (documented as expected noise in AGENTS Commands)
+44. ~~Commit the still-uncommitted foreign whitespace edit in
     tests/stalwart-relay-e2e.nix (or hand it back to its author) - it
-    has been dangling since morning.
-45. Post-fix full buildflow re-run on a cold result cache to prove the
-    17.4 s green is reproducible, not an artifact of warm caches.
-46. Document the gate hierarchy in AGENTS.md Commands explicitly:
+    has been dangling since morning.~~ done (tree clean; the edit landed in the day's commit stream)
+45. ~~Post-fix full buildflow re-run on a cold result cache to prove the
+    17.4 s green is reproducible, not an artifact of warm caches.~~ **Won't implement — superseded by the fresh uncached `nix flake check` + VM runs from sessions 6-8.**
+46. ~~Document the gate hierarchy in AGENTS.md Commands explicitly:
     buildflow (wrapper) vs nix flake check (project gate) - which is
-    authoritative when they disagree [dec].
-47. Spot-check that `nix fmt -- . --check` covers the new
-    tests/fixtures file set (it did this session; keep it in the loop).
-48. Consider adding `nom` (nix-output-monitor) or `nix flake show --json`
-    recipe to README debug section (small QoL) [ctx].
+    authoritative when they disagree [dec].~~ done (AGENTS Commands states both; README "Development" now carries the hierarchy too)
+47. ~~Spot-check that `nix fmt -- . --check` covers the new
+    tests/fixtures file set (it did this session; keep it in the loop).~~ done (observed again in every later gate run)
+48. ~~Consider adding `nom` (nix-output-monitor) or `nix flake show --json`
+    recipe to README debug section (small QoL) [ctx].~~ **Won't implement — QoL nicety, not worth the README surface.**
 49. Schedule the periodic `git town` / repo-hygiene sweep this repo's
     git-town.toml implies [ctx].
-50. Close the loop on this session: after HARVEST, delete resolved items
+50. ~~Close the loop on this session: after HARVEST, delete resolved items
     from TODO_LIST per its living-document rule (completed items are
-    DELETED, not ticked).
+    DELETED, not ticked).~~ done (e18758f + evening AUDIT sweeps)
 
 ---
 
 ## g) Questions I cannot figure out myself
 
-1. **Is the parallel session still active, and who owns the tree?**
+1. ~~**Is the parallel session still active, and who owns the tree?**
    Mid-session I observed foreign commits (ba7645c CI fix, a 45-file
    docs-health audit) and a dangling uncommitted edit to
    tests/stalwart-relay-e2e.nix that is not mine. I cannot know whether
    another agent is running right now. Should I take exclusive ownership
-   (and commit/dispose of the dangling edit), or coordinate around it?
-2. **Commit gating policy:** should I install the BuildFlow pre-commit
+   (and commit/dispose of the dangling edit), or coordinate around it?~~ done (moot by evening: tree clean, everything pushed, the dangling edit long since landed)
+2. ~~**Commit gating policy:** should I install the BuildFlow pre-commit
    hook (`buildflow precommit install`) so "lint nit" commits physically
    cannot skip the gate, or do you deliberately keep the auto-commit
-   daemon as the only automated gate?
-3. **Release cadence:** the flake-eval fix + devShells output are
+   daemon as the only automated gate?~~ _(routed: TODO_LIST branch-protection policy row - same bypass-vs-strict decision)_
+3. ~~**Release cadence:** the flake-eval fix + devShells output are
    consumer-visible for new consumers (SystemNix's existing v0.2.0 pin
    is unaffected). Cut v0.2.1 now, or batch with the next
-   consumer-visible change?
+   consumer-visible change?~~ done (superseded: batched - the 0.3.0 TODO row now covers it, unblocked when PR #1 merged)
 
 ---
 
@@ -324,3 +324,15 @@ Remaining warnings are exactly two documented deliberate non-fixes.
 
 _Time: 2026-09-16 08:03 CEST. This file is a historical snapshot; living
 facts live in README.md's verified-facts ledger and AGENTS.md._
+
+---
+
+## Resolution addendum (2026-09-16, docs-health pass)
+
+All sections resolved inline. a/§f items 40 (single-writer agreement) and
+49 (git-town sweep cadence) stay open as user process decisions. Fleet
+items (f/17-22) live in the BuildFlow repo, not here. HARVEST landed:
+f/4, f/5 → TODO_LIST Low rows; f/6 → the Renovate install-or-drop row;
+f/15 → superseded by the pre-push fmt hook row; f/26 → ROADMAP §5;
+f/25/f/28/f/27 → the 0.3.0 release row / SystemNix coordination row.
+Archived.

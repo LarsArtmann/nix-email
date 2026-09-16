@@ -29,16 +29,16 @@
 
 | # | Item                               | Works now                                                                                                                             | Missing                                                                                                                                                                                                                                                                       |
 | - | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1 | **SVG currency verification**      | current.svg label spot-checked (`X-Spam-Status (GTUBE/rules)` matches d2 line 48)                                                     | I did NOT re-run the full 36-label diff on improved.svg myself — the "content-verified current" annotation leans on the 17-59 session's diff plus my one-label probe. Inherited-evidence reliance, flagged not hidden                                                         |
-| 2 | **w-marker hygiene**               | 6 of my mislabeled "Won't implement — routed/still open" markers hand-fixed to _(routed: …)_ open form (06-48 ×3, 10-41 ×2, 18-17 ×1) | A post-hoc lint still finds 5 w-markers referencing TODO_LIST; 2 predate this pass (coherent DUPLICATE closures), 3 are mine and read as "closed-as-routed, work lives elsewhere" — coherent, but a dedicated `routed` marker kind would have made the distinction mechanical |
-| 3 | **TELEMETRY.md / CONTRIBUTING.md** | Both exist, AGENTS references them; CONTRIBUTING content verified for specific claims during VERIFY                                   | No full docs-health freshness pass ran on either (outside the six-docs mandate, never explicitly scoped)                                                                                                                                                                      |
-| 4 | **Push state**                     | Everything committed locally                                                                                                          | This session ADDED commits to the unpushed pile (docs + renames); push stays user-gated                                                                                                                                                                                       |
+| 1 | ~~**SVG currency verification**~~ _(routed: TODO_LIST Low row - full 36-label re-diff + re-render still open)_      | ~~current.svg label spot-checked (`X-Spam-Status (GTUBE/rules)` matches d2 line 48)~~                                                     | ~~I did NOT re-run the full 36-label diff on improved.svg myself — the "content-verified current" annotation leans on the 17-59 session's diff plus my one-label probe. Inherited-evidence reliance, flagged not hidden~~                                                         |
+| 2 | ~~**w-marker hygiene**~~ done (2026-09-16 evening pass re-reviewed the 5 w-markers: coherent as written; a dedicated `routed` marker kind remains a skill-repo upstream idea)               | ~~6 of my mislabeled "Won't implement — routed/still open" markers hand-fixed to _(routed: …)_ open form (06-48 ×3, 10-41 ×2, 18-17 ×1)~~ | ~~A post-hoc lint still finds 5 w-markers referencing TODO_LIST; 2 predate this pass (coherent DUPLICATE closures), 3 are mine and read as "closed-as-routed, work lives elsewhere" — coherent, but a dedicated `routed` marker kind would have made the distinction mechanical~~ |
+| 3 | ~~**TELEMETRY.md / CONTRIBUTING.md**~~ done (2026-09-16 evening AUDIT light pass: TELEMETRY's provenance caveat self-caveats correctly; CONTRIBUTING sections verified incl. the d2 regen command) | ~~Both exist, AGENTS references them; CONTRIBUTING content verified for specific claims during VERIFY~~                                   | ~~No full docs-health freshness pass ran on either (outside the six-docs mandate, never explicitly scoped)~~                                                                                                                                                                      |
+| 4 | ~~**Push state**~~ done (fully pushed by 2026-09-16 evening; 0 commits ahead of origin)                                    | ~~Everything committed locally~~                                                                                                          | ~~This session ADDED commits to the unpushed pile (docs + renames); push stays user-gated~~                                                                                                                                                                                       |
 
 ## c) NOT STARTED (deliberate — out of a docs run's scope, now TODO_LIST rows)
 
-1. The third nixpkgs filing (parsedmarc unit Restart policy) — draft should live in docs/ next time, not /tmp
-2. mjs/imapclient upstream filing (drift re-check now done — the expensive half)
-3. Everything else harvested: see TODO_LIST (29 rows: filings, live-probe, SASL variant, tags-trigger, branch protection, Renovate verification, TLS-journal line, lock-rev notes, the low bundle)
+1. ~~The third nixpkgs filing (parsedmarc unit Restart policy) — draft should live in docs/ next time, not /tmp~~ done (filed as NixOS/nixpkgs#563777, 08-16 report §a/10; README ledger carries it)
+2. ~~mjs/imapclient upstream filing (drift re-check now done — the expensive half)~~ done (filed as mjs/imapclient#662, 08-16 report §a/11)
+3. ~~Everything else harvested: see TODO_LIST (29 rows: filings, live-probe, SASL variant, tags-trigger, branch protection, Renovate verification, TLS-journal line, lock-rev notes, the low bundle)~~ done (harvested + executed by sessions 4-8; re-harvested/rebuilt in the 2026-09-16 evening AUDIT to 14 open rows)
 4. All D1/D2/Q6-gated work (unchanged, ROADMAP)
 
 ## d) TOTALLY FUCKED UP (own errors this session, no excuses)
@@ -68,36 +68,47 @@
 
 _The canonical open list is TODO_LIST.md (29 rows, verified 2026-09-16). Items below are THIS session's additions/observations only — most already live there; do not double-harvest._
 
-1. File the third nixpkgs issue (parsedmarc unit Restart policy) — write the draft in docs/, never /tmp (07-04 §b/3 lesson, restated)
-2. File the mjs/imapclient starttls bug upstream (drift re-check DONE this session: still broken at :387)
-3. Upstream the docs-health skill improvements: `routed` marker kind + the w-marker contradiction lint (`Won't implement` + `TODO_LIST`/`still open` in one line = smell)
-4. Live-probe native DMARC/ARF ingestion in the VM (ledger-grade 06a)
-5. Relay-SASL E2E variant (Mailpit with auth file)
-6. CI trigger on `tags: v*`
-7. Branch protection on master (user GitHub settings; verified unprotected)
-8. Renovate activation + tag-pin dry-run verification
-9. TLS-node: assert the successful TLS-handshake journal line
-10. Lock-rev/narHash in release notes
-11. Decide Renovate-vs-Dependabot ownership of github-actions bumps (BOTH are enabled — double coverage I flagged but did not route)
-12. Full 36-label d2↔SVG re-diff (I spot-checked one label; the claim leans on the 17-59 diff)
-13. docs-health freshness pass over docs/TELEMETRY.md and CONTRIBUTING.md (never audited as docs)
-14. Re-render both SVGs together at the next docs touch (geometry drift from the a4fc343 rewrap; content text-neutral)
-15. The TODO_LIST low bundle: DKIM ed25519 leg, POST /api/dkim test leg, quota option docs, offline passthrough, option-docs drift check, retention docs, d2 regen command in CONTRIBUTING, nixos-mailserver lessons note, actionlint, gc-roots, catch-all warning, mailsuite upstream note
-16. Resend SASL verification + real smoke (BLOCKED: needs account/API key)
-17. Pushes: nix-email master (now ~7 local commits incl. this pass) + SystemNix (~47, coordination) — user-gated
-18. Stalwart feature request for declarative Junk filing (conditional on Q6=d)
-19. GitHub Discussions vs issues-only (user preference)
-20. Watch: maintainer triage on #563651/#563652 (both OPEN, 0 comments, verified this session)
+1. ~~File the third nixpkgs issue (parsedmarc unit Restart policy) — write the draft in docs/, never /tmp (07-04 §b/3 lesson, restated)~~ done (filed as nixpkgs#563777, 08-16 §a/10)
+2. ~~File the mjs/imapclient starttls bug upstream (drift re-check DONE this session: still broken at :387)~~ done (filed as mjs/imapclient#662, 08-16 §a/11; #663 PR now open upstream - watch)
+3. ~~Upstream the docs-health skill improvements: `routed` marker kind + the w-marker contradiction lint (`Won't implement` + `TODO_LIST`/`still open` in one line = smell)~~ _(routed: skill-repo upstream idea - out of this repo's scope)_
+4. ~~Live-probe native DMARC/ARF ingestion in the VM (ledger-grade 06a)~~ done (`bc7e954`, 15-21 §a/3: consumed-not-delivered + report store readout, EXIT:0)
+5. ~~Relay-SASL E2E variant (Mailpit with auth file)~~ done (`bc7e954`, 15-21 §a/1 + README SASL truth)
+6. ~~CI trigger on `tags: v*`~~ done (08-16 §a/4; CHANGELOG)
+7. ~~Branch protection on master (user GitHub settings; verified unprotected)~~ done (08-16 §a/4: required `nix flake check`, linear history)
+8. ~~Renovate activation + tag-pin dry-run verification~~ done (16-33 §a/10 verdict: the app NEVER ran; install-or-drop is a user-blocked TODO row)
+9. ~~TLS-node: assert the successful TLS-handshake journal line~~ done (08-16 §a/14, transcript-derived)
+10. ~~Lock-rev/narHash in release notes~~ done (16-33 §a/8, both releases edited)
+11. ~~Decide Renovate-vs-Dependabot ownership of github-actions bumps (BOTH are enabled — double coverage I flagged but did not route)~~ _(routed: TODO_LIST Renovate install-or-drop row - the decision subsumes the actions scope)_
+12. ~~Full 36-label d2↔SVG re-diff (I spot-checked one label; the claim leans on the 17-59 diff)~~ _(routed: TODO_LIST Low row)_
+13. ~~docs-health freshness pass over docs/TELEMETRY.md and CONTRIBUTING.md (never audited as docs)~~ done (2026-09-16 evening AUDIT light pass - both verified current)
+14. ~~Re-render both SVGs together at the next docs touch (geometry drift from the a4fc343 rewrap; content text-neutral)~~ _(routed: TODO_LIST Low row - this docs touch did not re-render; render+diff stays one bounded task)_
+15. ~~The TODO_LIST low bundle: DKIM ed25519 leg, POST /api/dkim test leg, quota option docs, offline passthrough, option-docs drift check, retention docs, d2 regen command in CONTRIBUTING, nixos-mailserver lessons note, actionlint, gc-roots, catch-all warning, mailsuite upstream note~~ done (16-33 §a/2-11 + 18-03 §a: every bundle item closed; the DKIM leg went red→green in `891fa44`)
+16. ~~Resend SASL verification + real smoke (BLOCKED: needs account/API key)~~ _(routed: TODO_LIST user-blocked row)_
+17. ~~Pushes: nix-email master (now ~7 local commits incl. this pass) + SystemNix (~47, coordination) — user-gated~~ done for nix-email (fully pushed, 0 ahead); SystemNix stays _(routed: TODO_LIST row)_
+18. ~~Stalwart feature request for declarative Junk filing (conditional on Q6=d)~~ _(routed: TODO_LIST row, Q6-gated)_
+19. ~~GitHub Discussions vs issues-only (user preference)~~ _(routed: TODO_LIST user-blocked row)_
+20. ~~Watch: maintainer triage on #563651/#563652 (both OPEN, 0 comments, verified this session)~~ _(routed: TODO_LIST watch row - since updated: #563652 answered by dotlambda, #663 open)_
 21. D1/D2/Q4/Q5/Q6 — the standing user decisions (ROADMAP open questions; unchanged)
 
 ## g) Questions I can NOT figure out myself
 
-1. **Push approval, now bigger:** this pass added the annotation/archive/docs batch to master's unpushed pile (plus the morning session's flake/test/CI work — ~7 local commits; SystemNix sits at ~47 with a parallel session's work). Push nix-email now? (SystemNix push needs the coordination call separately.)
-2. **Renovate or Dependabot for github-actions bumps?** Both are enabled (renovate.json `github-actions: enabled` + `.github/dependabot.yml` weekly-grouped). Double coverage means duplicate PRs; which one should own it (delete the other's actions scope)?
-3. **TODO_LIST breadth taste:** the harvest rebuilt it to 29 rows, including 12 low-impact polish rows harvested from old reports' brainstorms. Keep the full breadth (nothing re-rotts in timestamped files), or prune the low tier into ROADMAP raw ideas for a tighter active list?
+1. ~~**Push approval, now bigger:** this pass added the annotation/archive/docs batch to master's unpushed pile (plus the morning session's flake/test/CI work — ~7 local commits; SystemNix sits at ~47 with a parallel session's work). Push nix-email now? (SystemNix push needs the coordination call separately.)~~ done (nix-email fully pushed by evening; SystemNix remains the TODO_LIST row)
+2. ~~**Renovate or Dependabot for github-actions bumps?** Both are enabled (renovate.json `github-actions: enabled` + `.github/dependabot.yml` weekly-grouped). Double coverage means duplicate PRs; which one should own it (delete the other's actions scope)?~~ _(routed: TODO_LIST Renovate install-or-drop row)_
+3. ~~**TODO_LIST breadth taste:** the harvest rebuilt it to 29 rows, including 12 low-impact polish rows harvested from old reports' brainstorms. Keep the full breadth (nothing re-rotts in timestamped files), or prune the low tier into ROADMAP raw ideas for a tighter active list?~~ done (2026-09-16 evening AUDIT: rebuilt to 14 tight rows with a 3-row hygiene section; stale low rows either executed or routed)
 
 ---
 
 **Format note:** `.md` per instruction — overrides the status-report skill's HTML default; deliberate, not propagated into the skill.
 
 **Then per the skill: WAITING FOR INSTRUCTIONS.**
+
+---
+
+## Resolution addendum (2026-09-16, docs-health pass)
+
+Every section resolved inline. §c/4 and §f/21 (D1/D2/Q4/Q5/Q6) stay open
+as the standing user decisions in ROADMAP. Routed-open items live in
+TODO_LIST rows (SVG re-diff, Renovate decision, SystemNix push, watch
+row, 0.3.0 release) or ROADMAP (skill upstream idea noted out-of-scope).
+The two nixpkgs/imapclient filings this pass queued both shipped same-day
+(#563777, #662). Archived.
