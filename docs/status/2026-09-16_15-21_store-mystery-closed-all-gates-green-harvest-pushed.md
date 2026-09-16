@@ -35,16 +35,16 @@ left open on the nix-email side is done; the repo is green end to end.
 
 ## c) NOT STARTED (user-gated or deliberately deferred)
 
-- **PR #1 merge** — green and mergeable; left for the user (dependency
+- ~~**PR #1 merge** — green and mergeable; left for the user (dependency
   bumps are a product decision; §f/7 of the 12:54 report said "merge or
-  leave for user").
-- **GH013 unblock → SystemNix push (~75+ commits)** — user click gates it;
-  the deploy-key recipe in SystemNix AGENTS.md then proves itself.
-- **Q6 junk-filing verdict, D1/D2 license one-liners, `syn_` secret-scan
+  leave for user").~~ done (MERGED by the user 2026-09-16 16:08 UTC)
+- ~~**GH013 unblock → SystemNix push (~75+ commits)** — user click gates it;
+  the deploy-key recipe in SystemNix AGENTS.md then proves itself.~~ _(routed: TODO_LIST SystemNix row - still user-gated)_
+- ~~**Q6 junk-filing verdict, D1/D2 license one-liners, `syn_` secret-scan
   policy, ANNOTATE scope for docs/status** — standing user queue, untouched
-  (correctly).
-- **Re-check the four filings for maintainer responses** — routed to
-  TODO_LIST (10 m, next session).
+  (correctly).~~ ANNOTATE scope: done (2026-09-16 evening pass); Q6/D1/D2 remain standing (ROADMAP); `syn_` rides the SystemNix TODO row
+- ~~**Re-check the four filings for maintainer responses** — routed to
+  TODO_LIST (10 m, next session).~~ done (16-33 §a/1)
 
 ## d) TOTALLY FUCKED UP (honest failures this session)
 
@@ -91,34 +91,34 @@ left open on the nix-email side is done; the repo is green end to end.
 ## f) NEXT (bounded, roughly ordered)
 
 1. ~~Watch the 43cd0b4 CI run to green~~ DONE: 35101548949 success.
-2. User: merge or leave dependabot PR #1 (green, mergeable).
-3. Re-check the four filings for responses (nixpkgs #563651, #563652,
-   #563777; mjs/imapclient #662) — TODO_LIST row exists.
-4. User: GH013 unblock click → SystemNix push (~75+ commits) → watch the
-   clean-tree CI, deploy-key recipe in anger.
-5. User: Q6 junk-filing verdict (per-account sieve accepted vs draft the
-   Stalwart upstream feature request).
-6. User: D1/D2 license one-liners → unblocks the ROADMAP P2 spine.
-7. User: ANNOTATE scope verdict for docs/status (this file included).
-8. User: `syn_` secret-scan policy for SystemNix.
-9. TODO_LIST residue, impact order: Renovate tag-pin activation check;
+2. ~~User: merge or leave dependabot PR #1 (green, mergeable).~~ done (MERGED 2026-09-16 16:08 UTC)
+3. ~~Re-check the four filings for responses (nixpkgs #563651, #563652,
+   #563777; mjs/imapclient #662) — TODO_LIST row exists.~~ done (16-33 §a/1; the watch row continues)
+4. ~~User: GH013 unblock click → SystemNix push (~75+ commits) → watch the
+   clean-tree CI, deploy-key recipe in anger.~~ _(routed: TODO_LIST SystemNix row)_
+5. ~~User: Q6 junk-filing verdict (per-account sieve accepted vs draft the
+   Stalwart upstream feature request).~~ standing user decision (ROADMAP Q6)
+6. ~~User: D1/D2 license one-liners → unblocks the ROADMAP P2 spine.~~ standing user decisions (ROADMAP)
+7. ~~User: ANNOTATE scope verdict for docs/status (this file included).~~ done (2026-09-16 evening pass - this file annotated + archived)
+8. ~~User: `syn_` secret-scan policy for SystemNix.~~ _(routed: inside the TODO_LIST SystemNix row)_
+9. ~~TODO_LIST residue, impact order: Renovate tag-pin activation check;
    lock-rev/narHash in release notes; DKIM API-keygen + ed25519 legs;
    dmarc-eval offline/docs assertions; retention option docs; CONTRIBUTING
    d2 regen; actionlint CI step; --gc-roots; nixos-mailserver lessons note;
-   mailsuite auto-STARTTLS upstream note; catch-all warning row.
-10. Resend SASL smoke (needs API key) — last relay-gap item.
-11. Release 0.3.0 cut once PR #1 merges (CHANGELOG [Unreleased] is thick).
+   mailsuite auto-STARTTLS upstream note; catch-all warning row.~~ done (ALL closed by sessions 7-8: 16-33 §a/2-11 + 18-03 §a/1-6; DKIM red→green `891fa44`)
+10. ~~Resend SASL smoke (needs API key) — last relay-gap item.~~ _(routed: TODO_LIST user-blocked row)_
+11. ~~Release 0.3.0 cut once PR #1 merges (CHANGELOG [Unreleased] is thick).~~ _(routed: TODO_LIST High row - PR #1 merged, now UNBLOCKED)_
 
 ## g) QUESTIONS (cannot resolve myself)
 
-1. **Merge dependabot PR #1?** It is green and mergeable (run 35092306558,
+1. ~~**Merge dependabot PR #1?** It is green and mergeable (run 35092306558,
    `nix flake check` passed on the rebased branch). I left it open —
-   dependency bumps felt like your call. Say the word and I merge.
-2. **GH013 unblock click** (standing): SystemNix is ~75+ commits ahead and
-   holding; the URL is in the 12:54 report §g/1.
-3. **ANNOTATE scope** (standing): may I inline-annotate done-items in
+   dependency bumps felt like your call. Say the word and I merge.~~ done (user merged it 2026-09-16 16:08 UTC)
+2. ~~**GH013 unblock click** (standing): SystemNix is ~75+ commits ahead and
+   holding; the URL is in the 12:54 report §g/1.~~ _(routed: TODO_LIST SystemNix row)_
+3. ~~**ANNOTATE scope** (standing): may I inline-annotate done-items in
    recent reports (12:54 + this one), or does the original scope question
-   still gate all annotation?
+   still gate all annotation?~~ done (2026-09-16 evening pass: full scope - all seven 2026-09-16 reports annotated + archived)
 
 ## Session artifacts
 
@@ -129,3 +129,12 @@ left open on the nix-email side is done; the repo is green end to end.
 - Pushes: bc7e954 (fixes+ledger) → CI 35092101106 success; 43cd0b4
   (harvest+AGENTS) → CI 35101548949 success.
 - PR #1: rebased by dependabot after my comment; run 35092306558 success.
+
+---
+
+## Resolution addendum (2026-09-16, docs-health pass)
+
+§a's harvest table rows were all executed by sessions 7-8 (see the 16:33
+and 18:03 reports); §c/§f/§g resolved inline above. Remaining open:
+SystemNix push row, Resend smoke row, the 0.3.0 release row (now
+unblocked), and the standing ROADMAP decisions (Q6, D1, D2). Archived.

@@ -43,9 +43,9 @@ STILL OPEN — four real bugs found and fixed, one mystery remaining.
 
 ## b) PARTIALLY DONE
 
-1. **stalwart-e2e native-ingestion subtest — 4 fixes in, 1 mystery open.**
-   Progression of the session (5 full VM runs + 3 debug-VM runs + host
-   probes):
+1. ~~**stalwart-e2e native-ingestion subtest — 4 fixes in, 1 mystery open.**~~
+   ~~Progression of the session (5 full VM runs + 3 debug-VM runs + host
+   probes):~~ done (mystery SOLVED in 15-21 §a/1: `/api/queue/reports` is the OUTBOUND queue - incoming reports live at `/api/reports/dmarc`; green in `bc7e954`)
    - Run 1: Stalwart crash-looped at boot → `["report.analysis"]`
      fully-quoted TOML header rejected by Stalwart's parser (binary a/b
      probe: bare `[report.analysis]` parses). Fixed: real-attr nesting.
@@ -81,25 +81,25 @@ STILL OPEN — four real bugs found and fixed, one mystery remaining.
      filter/mismatch between write key and list read) and whether
      "with warnings" (DmarcReportWithWarnings, analysis.rs:396) changes the
      stored format or skips the write.
-2. **Host stalwart binary spike** (attempted local debug loop for the same
+2. ~~**Host stalwart binary spike** (attempted local debug loop for the same
    question): server boots, config parses (report.analysis warnings seen),
    but listeners never bind (main thread futex-wait after external-resource
    downloads) — abandoned as environment-specific (VM boots fine); store
-   dir + config kept at /tmp/st-spike for a later attempt if wanted.
-3. **Push/CI**: origin was advanced by a parallel session through 1bea3b4
+   dir + config kept at /tmp/st-spike for a later attempt if wanted.~~ **Won't implement — dead end confirmed; AGENTS.md now carries the host-spike DEAD END verdict (debug-VM loop is the premier tool).**
+3. ~~**Push/CI**: origin was advanced by a parallel session through 1bea3b4
    (includes relay fixes); my latest commit 43ab2f1 (attach @-fix, poll
    fix, README entries) is UNPUSHED — deliberately: stalwart-e2e is red
-   locally, pushing would redden CI (branch protection requires the check).
+   locally, pushing would redden CI (branch protection requires the check).~~ done (pushed as `bc7e954` once green, 15-21 §a/5; CI success)
 
 ## c) NOT STARTED (from the session plan)
 
-- Full `nix flake check` (all four checks, unpiped) — blocked on (b).1.
-- `git push origin master` + CI watch + `@dependabot rebase` on PR #1.
-- CHANGELOG entries for both sessions' work.
-- HARVEST of plan §10 + 08:16 report + this report into TODO_LIST/ROADMAP
-  (docs-health skill to be loaded first).
-- Consider removing the debug `cat ... >&2` dumps from the native-ingestion
-  subtest once green.
+- ~~Full `nix flake check` (all four checks, unpiped) — blocked on (b).1.~~ done (15-21 §a/4: EXIT:0)
+- ~~`git push origin master` + CI watch + `@dependabot rebase` on PR #1.~~ done (15-21 §a/5-6; PR #1 later MERGED 2026-09-16 16:08 UTC)
+- ~~CHANGELOG entries for both sessions' work.~~ done (15-21 §a/9 + `2b7257e`)
+- ~~HARVEST of plan §10 + 08:16 report + this report into TODO_LIST/ROADMAP
+  (docs-health skill to be loaded first).~~ done (`43cd0b4` + `e18758f` + the evening AUDIT)
+- ~~Consider removing the debug `cat ... >&2` dumps from the native-ingestion
+  subtest once green.~~ **Won't implement — the transcript cats earned their keep across four debugging sessions (12:54/15:21/16:33/18:03); they cost nothing at runtime and pay in debuggability.**
 
 ## d) TOTALLY FUCKED UP (honest failures this session)
 
@@ -141,52 +141,52 @@ STILL OPEN — four real bugs found and fixed, one mystery remaining.
 
 ## f) NEXT (bounded, roughly ordered)
 
-1. Read `crates/http/src/management/report.rs` list handler; compare with
+1. ~~Read `crates/http/src/management/report.rs` list handler; compare with
    `ValueClass::Report(ReportClass::Dmarc{id,expires})` write key
-   (analysis.rs:272-335, store/src/write/key.rs).
-2. Check whether `DmarcReportWithWarnings` path stores a different
-   class/skips write (analysis.rs:396 area).
-3. If key mismatch is real → likely upstream 0.15.5 bug or a needed
+   (analysis.rs:272-335, store/src/write/key.rs).~~ done (15-21 §a/1: handler + openapi.yml read - the endpoints differ, the write path was never broken)
+2. ~~Check whether `DmarcReportWithWarnings` path stores a different
+   class/skips write (analysis.rs:396 area).~~ done (15-21 §a/1: it stores like any other; the `store` default "30d" holds)
+3. ~~If key mismatch is real → likely upstream 0.15.5 bug or a needed
    settings knob (e.g. explicit `report.analysis.store = "30d"`); try the
-   explicit setting in the VM test first.
-4. Re-run stalwart-e2e; on green: strip debug dumps, re-run again.
-5. Full `nix flake check` (unpiped, log to file, EXIT recorded).
-6. Push master, watch CI to green (branch protection on).
-7. `@dependabot rebase` PR #1; verify its CI goes green; merge or leave
-   for user.
-8. CHANGELOG entries: pipe-lint + gawk lesson, pins + deploy keys,
+   explicit setting in the VM test first.~~ **NOT-DO/DUPLICATE — there is no key mismatch; the poll URL was wrong. Ledger entry carries the endpoint truth.**
+4. ~~Re-run stalwart-e2e; on green: strip debug dumps, re-run again.~~ done (green `bc7e954`; dumps deliberately KEPT - see c/5)
+5. ~~Full `nix flake check` (unpiped, log to file, EXIT recorded).~~ done (15-21 §a/4)
+6. ~~Push master, watch CI to green (branch protection on).~~ done (15-21 §a/5, run 35092101106 success)
+7. ~~`@dependabot rebase` PR #1; verify its CI goes green; merge or leave
+   for user.~~ done (15-21 §a/6; user merged it 16:08 UTC)
+8. ~~CHANGELOG entries: pipe-lint + gawk lesson, pins + deploy keys,
    gitleaks allowlists, statix/deadnix sweep, #563777/#662 filings, TLS
-   assertion, branch protection, tag trigger, THIS session's four traps.
-9. HARVEST: plan §10 + 08:16 report + this file → TODO_LIST.md/ROADMAP.md
-   (docs-health skill first).
-10. Re-check maintainer responses on the 4 filings (next session).
-11. Write the python-sink swaks forensics recipe next to the debug-VM loop
-    in AGENTS.md.
-12. Consider asserting the benign-journal line count change ("DMARC report
+   assertion, branch protection, tag trigger, THIS session's four traps.~~ done (CHANGELOG [Unreleased] via 15-21 §a/9 + `2b7257e`)
+9. ~~HARVEST: plan §10 + 08:16 report + this file → TODO_LIST.md/ROADMAP.md
+   (docs-health skill first).~~ done (`43cd0b4` + `e18758f` + evening AUDIT)
+10. ~~Re-check maintainer responses on the 4 filings (next session).~~ done (16-33 §a/1)
+11. ~~Write the python-sink swaks forensics recipe next to the debug-VM loop
+    in AGENTS.md.~~ done (15-21 §a/10)
+12. ~~Consider asserting the benign-journal line count change ("DMARC report
     received with warnings" adds a line — the journal subtest asserts
-    EXACTLY 2 config-build errors; verify it does not conflict).
-13. Ledger entry for the host-boot-hang spike finding (if it recurs, it is
-    a real trap; one occurrence = note only).
-14. SystemNix: after GH013 unblock → push ~75 commits, watch CI, then the
-    deploy-key recipe proves itself in anger.
-15. User-gated queue: GH013 click, Q6 junk-filing verdict, D1/D2 license
-    one-liners, ANNOTATE scope, `syn_` secret-scan policy.
-16. (If key-mystery turns out to be an upstream bug) file it via
-    verify-before-filing + github-voice, cross-link from README ledger.
+    EXACTLY 2 config-build errors; verify it does not conflict).~~ done (resolved during the DKIM work: journal-hygiene expectation now 1, `891fa44`)
+13. ~~Ledger entry for the host-boot-hang spike finding (if it recurs, it is
+    a real trap; one occurrence = note only).~~ **NOT-DO — one occurrence only; the AGENTS DEAD END note covers it per its own condition.**
+14. ~~SystemNix: after GH013 unblock → push ~75 commits, watch CI, then the
+    deploy-key recipe proves itself in anger.~~ _(routed: TODO_LIST SystemNix row - still user-gated)_
+15. ~~User-gated queue: GH013 click, Q6 junk-filing verdict, D1/D2 license
+    one-liners, ANNOTATE scope, `syn_` secret-scan policy.~~ ANNOTATE scope: done (evening pass); the rest are standing user decisions / routed rows
+16. ~~(If key-mystery turns out to be an upstream bug) file it via
+    verify-before-filing + github-voice, cross-link from README ledger.~~ **NOT-DO — it was our endpoint error, not an upstream bug.**
 
 ## g) QUESTIONS (cannot resolve myself)
 
-1. **GH013**: will you click the unblock (SystemNix push, ~75 commits
+1. ~~**GH013**: will you click the unblock (SystemNix push, ~75 commits
    behind origin now)?
-   https://github.com/LarsArtmann/SystemNix/security/secret-scanning/unblock-secret/3JNEaUWN2z6QQokKh8kJ5JbjOXh
-2. **Native-ingestion budget**: keep debugging to the bottom of the
+   https://github.com/LarsArtmann/SystemNix/security/secret-scanning/unblock-secret/3JNEaUWN2z6QQokKh8kJ5JbjOXh~~ _(routed: TODO_LIST SystemNix row)_
+2. ~~**Native-ingestion budget**: keep debugging to the bottom of the
    store-write/read mismatch (I estimate 1-3 h more), or park the subtest
    (revert it out of stalwart-e2e, keep the ledger findings) until
    upstream clarifies? It is the LAST red item; everything else in the
-   repo is green-path.
-3. **Q6 verdict** (standing from earlier): junk-filing — accept
+   repo is green-path.~~ done (solved within the hour: wrong endpoint, 15-21 §a/1 - no budget call needed)
+3. ~~**Q6 verdict** (standing from earlier): junk-filing — accept
    per-account sieve (webmail/JMAP) as the answer, or draft the Stalwart
-   feature request from the README ledger first?
+   feature request from the README ledger first?~~ standing user decision (ROADMAP Q6)
 
 ## Session artifacts
 
@@ -198,3 +198,13 @@ STILL OPEN — four real bugs found and fixed, one mystery remaining.
   xm95az1g70qfiib35ynq78i6lgalhmia-vm-test-run-stalwart-e2e.drv.
 
 **WAITING FOR INSTRUCTIONS.**
+
+---
+
+## Resolution addendum (2026-09-16, docs-health pass)
+
+The open mystery this report carried was solved the same day (wrong
+endpoint, `bc7e954`); every actionable §f item resolved by sessions 6-8.
+Kept deliberately: the debug `cat >&2` transcript dumps (four sessions of
+evidence they pay for themselves). Remaining open: SystemNix push row and
+the standing user decisions. Archived.

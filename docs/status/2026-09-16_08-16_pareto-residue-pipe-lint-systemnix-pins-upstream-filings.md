@@ -193,6 +193,10 @@ run 35060437773 exercised). Disclosed above in full.
 
 ---
 
+*Point-in-time snapshot. WAITING for instructions.*
+
+---
+
 ## Resolution addendum (2026-09-16, docs-health pass)
 
 All actionable items resolved inline by sessions 5-8 (`bc7e954`,
