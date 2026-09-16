@@ -36,20 +36,20 @@
 
 | # | Item                       | Works now                                                                                 | Missing                                                                                                                                                                                                                                                       |
 | - | -------------------------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1 | mkDefault→`[]` trap        | Symptom isolated empirically; priority window (101-499) bounded; documented in 3 places   | **Root cause never identified** — I time-boxed the archaeology after ~8 probe rounds; the culprit module/line in base nixpkgs is still unknown                                                                                                                |
+| ~~1~~ | ~~mkDefault→`[]` trap~~ done — root cause found 2026-09-15 (10-20 session): podman network-socket.nix:95 + udp-over-tcp.nix:276 unconditional [] defs at priority 100, filterOverrides' keeps lowest tier only - README ledger + AGENTS carry it | ~~Symptom isolated empirically; priority window (101-499) bounded; documented in 3 places~~ | ~~**Root cause never identified** — I time-boxed the archaeology after ~8 probe rounds; the culprit module/line in base nixpkgs is still unknown~~ |
 | 2 | Annotation completeness    | All action-item sections (b/c/e/f/g) resolved in all 5 files                              | Sections (a) DONE and (d) FUCKED-UP left untouched (defensible: they are records, not tasks) — but the pure process-lessons inside (e) sections (e.g. 17-05 e/1-7) are also unmarked; "open/closed" genuinely doesn't apply, yet a scanner reads them as open |
 | 3 | Partial-resolution markers | Clause-level strikes used for half-done items (e.g. 17-05 f/2 "verify done, wiring open") | Convention is my own invention (skill grammar covers whole-line verdicts only); not documented anywhere why some lines are half-struck                                                                                                                        |
-| 4 | TODO_LIST freshness        | 31 verified-open rows at build time                                                       | No per-row "verified on <date>" stamp — staleness of the verification itself is undetectable until the next audit                                                                                                                                             |
+| ~~4~~ | ~~TODO_LIST freshness~~ done — verified-date stamps shipped - TODO_LIST rows carry verified 2026-09-15/16 evidence | ~~31 verified-open rows at build time~~ | ~~No per-row "verified on <date>" stamp — staleness of the verification itself is undetectable until the next audit~~ |
 | 5 | Push state                 | Repo was fully synced at session start (verified)                                         | The 7 session commits are daemon-committed, local-only (no-push rule) — plus TODO_LIST.md still dirty when this report was written                                                                                                                            |
 
 ## c) NOT STARTED (deliberate — out of a docs run's scope, now TODO_LIST rows)
 
-1. **CI GitHub Action** (`nix flake check`, fail-closed) — the single highest-value unblocked item; I recommended it, did not build it
-2. **Two-node relay VM test** (stalwart + Mailpit) — closes R3's loopback-guard gap
-3. **SystemNix consumer wrapper** — unblocked since the repo went public; lives in the SystemNix repo
-4. **All test backlog**: DKIM signing, restart-persistence+401, metrics 200/401, backup/restore drill, parsedmarc E2E, quota/alias/junk, cache regression, journal details
-5. **Module options**: `relay.*`, `certificate` tier, `metrics.enable`, `cache.ttl.negative`, httpBind warning assertion
-6. **LICENSE** (blocked on the choice), **nix formatter**, **aarch64 posture**, **threat-model doc**, **d2 diagram**, **CONTRIBUTING**, **Renovate**, **git-town**, **repo topics**
+1. ~~**CI GitHub Action** (`nix flake check`, fail-closed) — the single highest-value unblocked item; I recommended it, did not build it~~ done (CI shipped in v0.2.0)
+2. ~~**Two-node relay VM test** (stalwart + Mailpit) — closes R3's loopback-guard gap~~ done (stalwart-relay-e2e shipped in v0.2.0)
+3. ~~**SystemNix consumer wrapper** — unblocked since the repo went public; lives in the SystemNix repo~~ done (SystemNix consumer wrapper shipped (pins v0.2.0))
+4. ~~**All test backlog**: DKIM signing, restart-persistence+401, metrics 200/401, backup/restore drill, parsedmarc E2E, quota/alias/junk, cache regression, journal details~~ done (all shipped in v0.2.0 (Junk-delivery proven impossible on 0.15.5 - sieve wall, ROADMAP Q6))
+5. ~~**Module options**: `relay.*`, `certificate` tier, `metrics.enable`, `cache.ttl.negative`, httpBind warning assertion~~ done (all shipped in v0.2.0 (relay, certificate tier, metrics, cache TTL, httpBind warning))
+6. ~~**LICENSE** (blocked on the choice), **nix formatter**, **aarch64 posture**, **threat-model doc**, **d2 diagram**, **CONTRIBUTING**, **Renovate**, **git-town**, **repo topics**~~ done (all shipped in v0.2.0 (LICENSE MIT, formatter, aarch64 decision, threat model, d2, CONTRIBUTING, Renovate, git-town, topics))
 7. Everything D1/D2-gated: VPS tier, Terraform `stalwart-mail`, migration, DMARC ladder, Gatus external checks
 
 ## d) TOTALLY FUCKED UP
@@ -81,46 +81,55 @@ _The canonical open list is now `TODO_LIST.md` (31 rows) — do not treat this s
 
 1. D1: retire Google Workspace for the Stalwart VPS vs monitoring-only (gates 20+ rows)
 2. D2: VPS placement/size/backup target (gates the VPS tier)
-3. License choice (MIT recommended) — gates the LICENSE row + GitHub license metadata
+3. ~~License choice (MIT recommended) — gates the LICENSE row + GitHub license metadata~~ done (MIT confirmed 2026-09-15 and shipped)
 
 **Highest-value unblocked work (all TODO_LIST rows)**
-4. CI GitHub Action, fail-closed, asserts checks actually ran
-5. Two-node relay VM test (stalwart + Mailpit node)
-6. SystemNix consumer wrapper (input + ports.nix + sops + Gatus + onFailure)
-7. `services.mail-server.relay.*` wrapper option from the verified ledger recipe
-8. DKIM signing VM test (declarative `signature.<id>`)
-9. Restart-persistence VM test (message survives restart; anonymous 401 survives)
-10. Metrics VM assertion (`/metrics/prometheus` 200/401)
-11. Backup/restore VM drill (`--export`, wipe, `--import`)
-12. `directory."internal".cache.ttl.negative` wrapper option
-13. `certificate` tier option (self-signed | acme | manual)
-14. `metrics.enable` wrapper option + httpBind non-loopback warning
-15. Nix formatter (alejandra/nixfmt) + one pass over `modules/`, `tests/`, `flake.nix`
-16. aarch64 posture: qemu run once or document x86_64-only loudly
-17. Threat-model doc (loopback guard boundary, admin exposure, secret inventory)
-18. GitHub repo topics (mail, nixos, stalwart, dmarc) — 5 min
-19. parsedmarc E2E VM test (dovecot + seeded report → JSON/CSV)
-20. dmarc-eval pin-move guard; parsedmarc hardening mkDefaults
-21. CONTRIBUTING ledger rules; d2 diagram; Renovate; git-town.toml
-22. Quota/alias/Junk subtests; journal details assertion; cache regression test
+4. ~~CI GitHub Action, fail-closed, asserts checks actually ran~~ done (CI shipped in v0.2.0)
+5. ~~Two-node relay VM test (stalwart + Mailpit node)~~ done (stalwart-relay-e2e shipped in v0.2.0)
+6. ~~SystemNix consumer wrapper (input + ports.nix + sops + Gatus + onFailure)~~ done (SystemNix consumer wrapper shipped (pins v0.2.0))
+7. ~~`services.mail-server.relay.*` wrapper option from the verified ledger recipe~~ done (relay option shipped in v0.2.0)
+8. ~~DKIM signing VM test (declarative `signature.<id>`)~~ done (DKIM subtest shipped in v0.2.0)
+9. ~~Restart-persistence VM test (message survives restart; anonymous 401 survives)~~ done (restart-persistence subtest shipped in v0.2.0)
+10. ~~Metrics VM assertion (`/metrics/prometheus` 200/401)~~ done (metrics assertion shipped in v0.2.0)
+11. ~~Backup/restore VM drill (`--export`, wipe, `--import`)~~ done (backup drill shipped in v0.2.0)
+12. ~~`directory."internal".cache.ttl.negative` wrapper option~~ done (directoryCacheTtlNegative shipped in v0.2.0)
+13. ~~`certificate` tier option (self-signed | acme | manual)~~ done (certificate tier shipped in v0.2.0)
+14. ~~`metrics.enable` wrapper option + httpBind non-loopback warning~~ done (metrics.enable + httpBind warning shipped in v0.2.0)
+15. ~~Nix formatter (alejandra/nixfmt) + one pass over `modules/`, `tests/`, `flake.nix`~~ done (formatter shipped (alejandra + dprint, CI-enforced))
+16. ~~aarch64 posture: qemu run once or document x86_64-only loudly~~ done (aarch64 posture decided 2026-09-15 (emulated run attempted; documented-manual))
+17. ~~Threat-model doc (loopback guard boundary, admin exposure, secret inventory)~~ done (docs/THREAT_MODEL.md shipped in v0.2.0)
+18. ~~GitHub repo topics (mail, nixos, stalwart, dmarc) — 5 min~~ done (7 topics set on GitHub)
+19. ~~parsedmarc E2E VM test (dovecot + seeded report → JSON/CSV)~~ done (parsedmarc-e2e shipped in v0.2.0)
+20. ~~dmarc-eval pin-move guard; parsedmarc hardening mkDefaults~~ done (parsedmarc >= 11 floor guard shipped in v0.2.0)
+21. ~~CONTRIBUTING ledger rules; d2 diagram; Renovate; git-town.toml~~ done (CONTRIBUTING, d2, Renovate, git-town all shipped in v0.2.0)
+22. ~~Quota/alias/Junk subtests; journal details assertion; cache regression test~~ done (quota/alias shipped; Junk NOT-DO (sieve wall); journal hygiene + cache regression shipped)
 23. dmarc-monitor live validation (BLOCKED on D1 mailbox decision)
 24. R6 vandelay-vs-imapsync compare (BLOCKED on live mailboxes)
 
 **Session-born new items (not yet in TODO_LIST — promote at next HARVEST)**
-25. Root-cause the `mkDefault`-list-dropped-on-`networking.firewall.allowedTCPPorts` behavior in nixpkgs 26.11 base modules (or file/check for an upstream issue) — currently only the symptom is banked
-26. Add `verified <date>` stamps to TODO_LIST rows (schema tweak)
-27. Document the clause-level strikethrough convention in the docs-health annotate scripts' vocabulary (upstream skill improvement candidate)
-28. Commit-per-green-checkpoint practice for this repo's sessions (counter the daemon's heuristic history)
-29. Decide push cadence for the 7 pending local commits (see g/3)
+25. ~~Root-cause the `mkDefault`-list-dropped-on-`networking.firewall.allowedTCPPorts` behavior in nixpkgs 26.11 base modules (or file/check for an upstream issue) — currently only the symptom is banked~~ done (ROOT-CAUSED 2026-09-15 - see b/1 resolution above)
+26. ~~Add `verified <date>` stamps to TODO_LIST rows (schema tweak)~~ done (verified stamps shipped)
+27. ~~Document the clause-level strikethrough convention in the docs-health annotate scripts' vocabulary (upstream skill improvement candidate)~~ **Won't implement — skill-repo improvement candidate, outside this repo (the convention is documented in each annotated file's appendix instead).**
+28. ~~Commit-per-green-checkpoint practice for this repo's sessions (counter the daemon's heuristic history)~~ **Won't implement — practice item, not repo work - daemon policy is user-level.**
+29. ~~Decide push cadence for the 7 pending local commits (see g/3)~~ done (pushed 2026-09-15; CI green)
 
 ## g) Questions I cannot answer myself
 
 1. **D1 — the Workspace fork.** Retire Google Workspace mailboxes for the Stalwart VPS, or keep Workspace and run only the parsedmarc/monitoring half? Everything VPS/Terraform/migration hangs on this; three sessions have now asked.
-2. **LICENSE — which one?** The repo is public with no license (`gh repo view` confirms `license: null`). MIT is my recommendation (the AGPL Stalwart is wrapped, not relicensed); the choice is yours.
-3. **Push or review first?** This session's 7 commits (living docs, annotations, the firewall fix) are daemon-committed and local-only per the no-push rule. Push `master` to origin now, or do you want to review the diff (notably `modules/mail-server.nix` — the one product-behavior change of the session) first?
+2. ~~**LICENSE — which one?** The repo is public with no license (`gh repo view` confirms `license: null`). MIT is my recommendation (the AGPL Stalwart is wrapped, not relicensed); the choice is yours.~~ done (RESOLVED 2026-09-15: MIT confirmed by the user and shipped (LICENSE))
+3. ~~**Push or review first?** This session's 7 commits (living docs, annotations, the firewall fix) are daemon-committed and local-only per the no-push rule. Push `master` to origin now, or do you want to review the diff (notably `modules/mail-server.nix` — the one product-behavior change of the session) first?~~ done (RESOLVED: pushed 2026-09-15; CI green (runs 34999737899+))
 
 ---
 
 **Awaiting instructions.**
 
 _Point-in-time snapshot written 2026-09-15 04:42 CEST. Section (f) is partially HARVEST input; TODO_LIST.md is the canonical backlog — reconcile items 25-29 there at the next docs-health run rather than treating this file as the source._
+
+## Resolution addendum (2026-09-16, docs-health pass)
+
+The 2026-09-16 docs-health AUDIT did exactly what the footer asked: items
+25-29 reconciled into TODO_LIST/ROADMAP (25 root-cause → resolved in-tree;
+26 stamps → shipped; 27/28 closed out-of-scope; 29 → resolved). Every
+executable item carries an inline verdict; the untouched ones (f/1, f/2,
+f/23, f/24, g/1) are D1/D2-gated and tracked in TODO_LIST (BLOCKED rows) +
+ROADMAP open questions. Archived.

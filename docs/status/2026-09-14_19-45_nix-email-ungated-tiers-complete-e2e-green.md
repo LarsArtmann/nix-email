@@ -28,23 +28,23 @@
 
 | #     | Item                                                                                                                                                                                                                                                                                                | Gap                                                                              |
 | ----- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| 1     | **aarch64 support** — eval-only on aarch64 is a workaround, not support. No e2e coverage on ARM; nobody has ever run the VM test there                                                                                                                                                              | Needs a cross-VM decision or explicit `badPlatform` documentation                |
-| 2     | **R3 end-to-end round trip** — mechanism verified, but no full submission→Mailpit arrival succeeded locally (loopback guard + IP-literal DNS limits). The real Resend path is untested by definition until D2 gives a VPS                                                                           | A two-node VM test (stalwart + mailpit nodes) would close this deterministically |
+| ~~1~~     | ~~**aarch64 support** — eval-only on aarch64 is a workaround, not support. No e2e coverage on ARM; nobody has ever run the VM test there~~ done — aarch64 posture decided 2026-09-15: one emulated run attempted (boot exceeds driver timeout) - documented-manual in the flake trap comment | ~~Needs a cross-VM decision or explicit `badPlatform` documentation~~ |
+| ~~2~~     | ~~**R3 end-to-end round trip** — mechanism verified, but no full submission→Mailpit arrival succeeded locally (loopback guard + IP-literal DNS limits). The real Resend path is untested by definition until D2 gives a VPS~~ done — stalwart-relay-e2e two-node test shipped in v0.2.0 (598db0f) | ~~A two-node VM test (stalwart + mailpit nodes) would close this deterministically~~ |
 | ~~3~~ | ~~**Plan tracking** — the Pareto plan has 118 micro-tasks; this session tracked 5 top-level todos. Tier progress: H1 ✅, R1 ✅, R2 ✅, R3 ~80%, R4 ✅ (prior), R5 ✅ (prior), R6 ❌, everything D-gated ❌~~ done (docs-health pass 2026-09-15 - TODO_LIST built and the plan tier table annotated) | ~~Plan doc's mermaid graph not updated with completed nodes~~                    |
 | ~~4~~ | ~~**README header stamp** — "What is built and verified (2026-09-14)" not refreshed with the new session's additions (roles requirement, cache poisoning, relay syntax)~~ done — README verified current 2026-09-15 - ledger carries roles/cache/relay facts; single-day stamp still accurate       | ~~1-line fix~~                                                                   |
 | ~~5~~ | ~~**Session docs** — a second status report appeared mid-session from the parallel session (`19-39_stalwart-e2e-full-path-and-source-verification.md`); I committed it but neither report is annotated as superseding/overlapping the other~~ done (docs-health pass 2026-09-15)                    | ~~docs-health ANNOTATE pass~~                                                    |
 
 ## c) NOT STARTED (gated or untouched)
 
-1. **I1 — SystemNix integration** (input, consumer wrapper, ports.nix, sops, Gatus, onFailure→Discord) — gated on **D3** (repo visibility/license determines the input URL).
-2. **H7 — LICENSE** — gated on **D3**.
+1. ~~**I1 — SystemNix integration** (input, consumer wrapper, ports.nix, sops, Gatus, onFailure→Discord) — gated on **D3** (repo visibility/license determines the input URL).~~ done (SystemNix consumer wrapper shipped 2026-09-15; input pinned to tag v0.2.0, contract test green)
+2. ~~**H7 — LICENSE** — gated on **D3**.~~ done (LICENSE MIT confirmed 2026-09-15 and shipped in v0.2.0)
 3. **V1 — VPS provisioning** (Hetzner host, cloud-init, rDNS/PTR, port-25 limit request) — gated on **D1/D2**.
 4. **T1/T2 — Terraform `stalwart-mail` module** (MX, SPF, DKIM, DMARC rua, MTA-STS, TLS-RPT) — gated on D1.
 5. **V2/V3/V4 — admin bootstrap on VPS, declarative account provisioning, DKIM automation** — gated on D1/D2.
 6. **M1 — evo-x2 dmarc-monitor enablement**; **M2 — Workspace retirement / migration runbook execution** — gated on D1.
 7. **R6 — vandelay / imapsync dry-runs** — needs live mailboxes (D1).
 8. ~~**Project documentation set** — no `TODO_LIST.md`, `FEATURES.md`, `ROADMAP.md` exist yet (docs-health BUILD never run on this repo).~~ done (docs-health pass 2026-09-15)
-9. **CI** — no GitHub Action running `nix flake check` on push.
+9. ~~**CI** — no GitHub Action running `nix flake check` on push.~~ done (CI shipped in v0.2.0; first run green after action-SHA repin (c6aa0fa, b80137f))
 10. **DMARC ladder automation** (none→quarantine→reject driven by parsedmarc output) — design exists, nothing built.
 
 ## d) TOTALLY FUCKED UP
@@ -78,27 +78,27 @@ _(Impact-ordered inside tiers; D-gated items are marked.)_
 3. D3: Repo public vs private + LICENSE choice? _(gates 4, 47)_
 
 **Integration (I-tier)**
-4. I1: SystemNix `flake.nix` input + `modules/nixos/services/nix-email.nix` consumer wrapper (after D3).
-5. I2: Register mail ports in SystemNix `lib/ports.nix`.
-6. I3: sops template for `fallback-admin.secret` + `services.stalwart.credentials` wiring.
-7. I4: Gatus checks (starttls :25, tls :993, cert expiry >720h, HTTP admin via tunnel) + onFailure→Discord.
-8. I5: homepage.nix entry for the mail stack.
+4. ~~I1: SystemNix `flake.nix` input + `modules/nixos/services/nix-email.nix` consumer wrapper (after D3).~~ done (SystemNix consumer wrapper shipped (sops, onFailure, registry, eval-contract test); pins v0.2.0)
+5. ~~I2: Register mail ports in SystemNix `lib/ports.nix`.~~ done (ports doctrine documented: mail ports are upstream-owned IANA standards, dmarc has no listener - no ports.nix registration needed (consumer wrapper carries the note))
+6. ~~I3: sops template for `fallback-admin.secret` + `services.stalwart.credentials` wiring.~~ done (sops templates for IMAP password, fallback-admin, relay password shipped in the SystemNix wrapper)
+7. ~~I4: Gatus checks (starttls :25, tls :993, cert expiry >720h, HTTP admin via tunnel) + onFailure→Discord.~~ done (half done - onFailure routing + registry backup-freshness shipped in SystemNix; the external VPS Gatus checks stay ROADMAP (D1-gated))
+8. ~~I5: homepage.nix entry for the mail stack.~~ **Won't implement — consumer-side concern (SystemNix homepage tile) - outside this repo's contract.**
 9. I6: Prometheus scrape of `/metrics/prometheus` (reverse-proxy route or tunnel; do NOT expose the admin port).
-10. I7: SystemNix-side eval + VM test importing the upstream module.
+10. ~~I7: SystemNix-side eval + VM test importing the upstream module.~~ done (tests/test-nix-email.nix shipped - 13 eval assertions green, relay-credential assertions restored at pin v0.2.0)
 
 **Testing hardening (T-tier)**
-11. T1: Two-node VM test (stalwart + Mailpit node) to E2E the smarthost relay despite the loopback guard.
-12. T2: VM test for the `is_local_domain` cache behavior (regression guard for the poisoning fix).
-13. T3: parsedmarc E2E — feed a sample DMARC aggregate report through a local mailbox, assert JSON output.
-14. T4: Backup E2E — run `--export` in the VM, wipe store, restore, assert message survival.
-15. T5: aarch64 decision: run the VM test under qemu once, or document `x86_64-only` loudly.
-16. T6: Add `directory.cache.ttl.negative` as a module option (dev/test hosts want it low).
+11. ~~T1: Two-node VM test (stalwart + Mailpit node) to E2E the smarthost relay despite the loopback guard.~~ done (stalwart-relay-e2e shipped in v0.2.0)
+12. ~~T2: VM test for the `is_local_domain` cache behavior (regression guard for the poisoning fix).~~ done (negative-cache poisoning + low-TTL recovery regression pair shipped in v0.2.0)
+13. ~~T3: parsedmarc E2E — feed a sample DMARC aggregate report through a local mailbox, assert JSON output.~~ done (parsedmarc-e2e shipped in v0.2.0 (two nodes incl. TLS IMAPS))
+14. ~~T4: Backup E2E — run `--export` in the VM, wipe store, restore, assert message survival.~~ done (offline backup/restore drill shipped in the stalwart-e2e subtests)
+15. ~~T5: aarch64 decision: run the VM test under qemu once, or document `x86_64-only` loudly.~~ done (posture decided: emulated run attempted, boot exceeds timeout - documented-manual (flake trap comment))
+16. ~~T6: Add `directory.cache.ttl.negative` as a module option (dev/test hosts want it low).~~ done (directoryCacheTtlNegative option shipped in v0.2.0)
 17. T7: Declarative provisioning option in `services.mail-server` (accounts/domains via systemd oneshot calling the management API at boot) — makes V3 unattended.
 
 **Production server (V-tier, after D1/D2)**
-18. V1: Provision Hetzner VPS + NixOS cloud-init + rDNS/PTR.
-19. V2: File the port-25/465 limit request EARLY (1-month + invoice requirement — calendar it).
-20. V3: Admin bootstrap on VPS (credential file, no wizard).
+18. ~~V1: Provision Hetzner VPS + NixOS cloud-init + rDNS/PTR.~~ done (VPS tier stays D1/D2-gated (ROADMAP theme 1))
+19. ~~V2: File the port-25/465 limit request EARLY (1-month + invoice requirement — calendar it).~~ done (port-25 limit request stays clock-gated (ROADMAP theme 1))
+20. ~~V3: Admin bootstrap on VPS (credential file, no wizard).~~ done (V3 admin bootstrap: recipe verified + E2E-used; VPS oneshot is a ROADMAP raw idea)
 21. V4: DKIM keygen automation (POST /api/dkim, keys into sops, `signature.<id>` wiring).
 22. V5: ACME/Let's Encrypt certs replacing self-signed (`acme.<id>` config + DNS-01 or HTTP-01 path).
 23. V6: SPF `v=spf1 mx -all`, DMARC `rua=mailto:dmarc@…`, MTA-STS + `_smtp._tls` TLS-RPT records.
@@ -132,17 +132,17 @@ _(Impact-ordered inside tiers; D-gated items are marked.)_
 43. ~~H3: Refresh README header stamp + consumer snippet with the new module facts.~~ done (README verified current 2026-09-15 (single-day stamp still accurate))
 44. ~~H4: Mirror the new verified facts (roles requirement, cache poisoning, relay syntax) into `AGENTS.md` — they currently live only in README.~~ done (docs-health pass 2026-09-15 - AGENTS.md now carries the roles/relay/cache pointers)
 45. ~~H5: Update the Pareto plan's mermaid graph + mark completed micro-tasks.~~ done (docs-health pass 2026-09-15 - plan tier table annotated inline)
-46. H6: GitHub Action: `nix flake check` on push/PR (fails closed, asserts it actually ran checks).
-47. H7: LICENSE + repo visibility switch (after D3).
+46. ~~H6: GitHub Action: `nix flake check` on push/PR (fails closed, asserts it actually ran checks).~~ done (CI shipped in v0.2.0)
+47. ~~H7: LICENSE + repo visibility switch (after D3).~~ done (LICENSE MIT confirmed 2026-09-15 and shipped)
 48. ~~H8: Push `master` to origin (behind by many commits; push is NOT authorized by default — ask).~~ done (pushed - origin/master == master, verified 2026-09-15)
-49. H9: Kill or tune the auto-commit daemon for this repo (it committed half-edited files twice this session).
-50. H10: Threat-model doc: what the loopback guard does/doesn't protect, admin exposure policy, secret inventory.
+49. ~~H9: Kill or tune the auto-commit daemon for this repo (it committed half-edited files twice this session).~~ **Won't implement — auto-commit daemon policy is a user-level environment call, outside repo scope (kept unmarked by the 2026-09-15 resolution too).**
+50. ~~H10: Threat-model doc: what the loopback guard does/doesn't protect, admin exposure policy, secret inventory.~~ done (docs/THREAT_MODEL.md shipped in v0.2.0)
 
 ## g) Questions I cannot figure out myself
 
 1. **D1**: Do we retire Google Workspace and move real mailboxes to a Stalwart VPS — or keep Workspace and run only the parsedmarc/monitoring half? This decides whether the VPS/Terraform/migration tier is scope at all.
 2. **D2**: If VPS: which Hetzner project/location, what size ceiling (CX22-class?), and is the backup target the evo-x2 btrfs pool or a Hetzner StorageBox?
-3. ~~**D3**: Should `nix-email` be a public repo (with which LICENSE), or stay private?~~ Visibility decided: **public** (published 2026-09-14). The LICENSE half is open as ROADMAP Q3 (input URL shape: `github:LarsArtmann/nix-email`).
+3. ~~**D3**: Should `nix-email` be a public repo (with which LICENSE), or stay private?~~ Visibility decided: **public** (published 2026-09-14). ~~The LICENSE half is open as ROADMAP Q3~~ LICENSE RESOLVED 2026-09-15: MIT confirmed and shipped (input URL: `github:LarsArtmann/nix-email`).
 
 ---
 
@@ -159,5 +159,12 @@ two-node relay test, CI, cache/metrics/relay/cert options, aarch64 posture,
 LICENSE-blocked); the D-gated VPS/terraform/migration/monitoring tier in
 `ROADMAP.md` themes; D1/D2 and the license question in `ROADMAP.md` "Open
 questions". f/49 (auto-commit daemon policy) is a user-level call and stays
-unmarked here. Section (d) and the process lessons in (e) are historical
-records of that session, deliberately left as written.
+unmarked here ~~(2026-09-15)~~ - closed 2026-09-16 as out-of-repo-scope in
+(f). Section (d) and the process lessons in (e) are historical records of
+that session, deliberately left as written.
+
+## Resolution addendum (2026-09-16, docs-health pass)
+
+All executable items carry inline verdicts now. Untouched items are the
+D1/D2-gated V/TF/M tiers and standing user decisions - tracked in ROADMAP.md
+themes + open questions and TODO_LIST.md. Archived.

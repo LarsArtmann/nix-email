@@ -28,7 +28,7 @@
 
 ## b) PARTIALLY DONE
 
-1. **E2E behavioral coverage**: full inbound+local path done; outbound relay (Resend), DKIM signing, spam classification, quota, aliases, Junk handling all documented NOT-covered (need DNS/keys — partly go-live items, partly VM-testable with effort).
+1. ~~**E2E behavioral coverage**: full inbound+local path done; outbound relay (Resend), DKIM signing, spam classification, quota, aliases, Junk handling all documented NOT-covered (need DNS/keys — partly go-live items, partly VM-testable with effort).~~ done (outbound relay + DKIM + quota + alias/catch-all + spam-tagging E2E'd in v0.2.0; Junk-filing proven impossible on 0.15.5 (sieve wall - ROADMAP open question 6))
 2. **Parallel-session coordination**: concurrent edits from another session (README UNVERIFIED rewrites, flake arch-gating, test reorder) raced mine twice; both times resolved by re-reading and merging (their reorder was sound but shipped a Python NameError — `def` after first call — which I fixed). Final state verified green, but mid-session I authored edits against stale file contents twice (see d).
 3. **Security hardening of public repo**: audit complete, fixes proposed (~~genericize `mail.larsartmann.cloud` example~~ done 2026-09-15, trim runbook ops detail) — ~~awaiting user call~~ trim decision open, ROADMAP Q4.
 4. ~~**Push state**: repo created and initial push done at session start; the 9 commits from the research/test work are local-only (by the no-push rule — needs explicit go-ahead).~~ done (pushed - origin/master == master, verified 2026-09-15)
@@ -36,7 +36,7 @@
 ## c) NOT STARTED (known, deliberate)
 
 1. VPS host module / cloud-init go-live (Hetzner CX22, rDNS, NixOS).
-2. SystemNix consumer wrapper (sops, ports.nix, Gatus, onFailure, backup-coordination).
+2. ~~SystemNix consumer wrapper (sops, ports.nix, Gatus, onFailure, backup-coordination).~~ done (SystemNix consumer wrapper shipped - sops, onFailure, registry backup-freshness, eval-contract test; pins tag v0.2.0)
 3. DNS cutover terraform (`domains` repo `stalwart-mail` module: MX/SPF/DKIM/DMARC/MTA-STS/TLS-RPT).
 4. Hetzner :25 unblock request (1-month + first-invoice gate — externally clock-gated, nothing to do yet).
 5. imapsync mailbox migration + Workspace rollback window.
@@ -76,23 +76,23 @@
 1. ~~Push the 9 local commits to origin (after user go-ahead).~~ done (pushed - origin/master == master, verified 2026-09-15)
 2. ~~Genericize `example = "mail.larsartmann.cloud"` in `modules/mail-server.nix:42` to `mail.example.com`.~~ done (docs-health pass 2026-09-15 - genericized to mail.example.com)
 3. Trim/move operational runbook detail (migration window, DR key design, backup topology) out of the public README.
-4. Create TODO_LIST.md + FEATURES.md (this report's (f) as seed).
+4. ~~Create TODO_LIST.md + FEATURES.md (this report's (f) as seed).~~ done (docs-health pass docs-health pass 2026-09-15)
 5. ~~Add `.gitignore` entry for `docs/status/*.html` artifacts if HTML reports ever land (currently .md only).~~ **Won't implement — HTML reports are committed deliberately (docs/reviews); no artifact class to ignore.**
 6. ~~Clean /tmp debris (stalwart-src, tarball, nms clone) — or leave to reboot, but note it.~~ done (/tmp debris (stalwart tarball, src, nms clone) trashed 2026-09-15)
-7. Add flake check GitHub Action (nix flake check on x86_64-linux) mirroring the local gate.
-8. Repo topics/description polish on GitHub (mail, nixos, stalwart, dmarc).
+7. ~~Add flake check GitHub Action (nix flake check on x86_64-linux) mirroring the local gate.~~ done (CI shipped in v0.2.0 (598db0f); first GitHub run green after action-SHA repin (c6aa0fa, b80137f))
+8. ~~Repo topics/description polish on GitHub (mail, nixos, stalwart, dmarc).~~ done (7 topics set on GitHub (verified via gh))
 
 **Tests — highest value first (9–20)**
-9. Outbound relay test: in-VM dummy SMTP sink + `queue.route."sink"` + assert the sink receives the message.
-10. DKIM signing test: declarative `signature.<id>` with a test RSA key, assert `DKIM-Signature` header on submission.
+9. ~~Outbound relay test: in-VM dummy SMTP sink + `queue.route."sink"` + assert the sink receives the message.~~ done (stalwart-relay-e2e two-node test shipped in v0.2.0)
+10. ~~DKIM signing test: declarative `signature.<id>` with a test RSA key, assert `DKIM-Signature` header on submission.~~ done (DKIM signing subtest shipped in v0.2.0)
 11. DKIM keygen via `POST /api/dkim`, then sign — mirrors the webadmin flow end-to-end.
 12. ~~Assert anonymous admin API stays 401 across restarts (auth survives RocksDB state).~~ **Won't implement — DUPLICATE - covered by the TODO_LIST restart-persistence row (401 across restart).**
-13. Test `metrics.prometheus.enable = true` → `/metrics/prometheus` returns 200 (and 401 with auth set).
-14. Quota test (nixos-mailserver pattern): 1KB quota account, second mail bounces.
-15. Alias/catch-all principal test (emails[] with extra alias).
-16. Junk-folder delivery probe variant (spam-flagged message lands in Junk, not INBOX).
+13. ~~Test `metrics.prometheus.enable = true` → `/metrics/prometheus` returns 200 (and 401 with auth set).~~ done (metrics.enable + /metrics/prometheus format assertion shipped in v0.2.0)
+14. ~~Quota test (nixos-mailserver pattern): 1KB quota account, second mail bounces.~~ done (over-quota subtest shipped in v0.2.0 - behavior differs from the guess: ACCEPTED at SMTP, never delivered, retried forever (README ledger))
+15. ~~Alias/catch-all principal test (emails[] with extra alias).~~ done (alias + catch-all delivery subtests shipped in v0.2.0)
+16. ~~Junk-folder delivery probe variant (spam-flagged message lands in Junk, not INBOX).~~ **Won't implement — 0.15.5 never auto-files to Junk - settings sieve cannot fileinto (source-verified wall, README ledger); GTUBE subtest proves tag-only; revised options in ROADMAP Q6.**
 17. ~~Restart-persistence test: deliver, `systemctl restart stalwart`, message still in INBOX (state survives).~~ **Won't implement — DUPLICATE - covered by the TODO_LIST restart-persistence row.**
-18. Details-level journal assertion with curated benign-filter (resolver.type, pyzor, ASN "Resource error", "No TLS certificates available" during cert-gen window).
+18. ~~Details-level journal assertion with curated benign-filter (resolver.type, pyzor, ASN "Resource error", "No TLS certificates available" during cert-gen window).~~ done (journal-hygiene subtest ships the curated benign list (exactly the 2 known config-build errors))
 19. Add dmarc-eval assertion that wrapper output survives `nixosOption` docs rendering (option docstring drift check).
 20. Drive the E2E with `--gc-roots` in CI to avoid store GC between check and debug.
 
@@ -100,17 +100,17 @@
 21. ~~Consider `openFirewall` split: module currently opens ALL listener ports incl. 8080? (verify — httpBind is loopback so `parsePorts` may still add 8080 to firewall; if so, gate it).~~ done (docs-health pass 2026-09-15 - verified real (parsePorts opens 8080) and fixed: wrapper opens exactly 25/465/587/993, openFirewall off)
 22. Add `domains` list option (auto-create domain principals at first boot via systemd oneshot + fallback-admin) — kills the provision-before-probe hazard operationally.
 23. Same oneshot could declaratively sync accounts from a list (idempotent POST /api/principal via `wantedBy`).
-24. Wrapper option for relay (`services.mail-server.relay = { address, port, username, secretFile; }`) generating the verified `queue.route` + `queue.strategy.route` TOML — turns the ledger entry into product.
-25. `certificate` option tier: `self-signed | acme | manual` mirroring nms's x509 design with mutual-exclusion assertions.
-26. `metrics.enable` wrapper option wiring `metrics.prometheus.*` + Gatus-friendly bind guidance.
-27. Assertion: warn if `httpBind` is non-loopback (README says reverse-proxy only).
-28. `stateVersion` docs: add migration note hook for the eventual 0.16 nixpkgs move (module-incompatible per ledger).
+24. ~~Wrapper option for relay (`services.mail-server.relay = { address, port, username, secretFile; }`) generating the verified `queue.route` + `queue.strategy.route` TOML — turns the ledger entry into product.~~ done (services.mail-server.relay shipped in v0.2.0)
+25. ~~`certificate` option tier: `self-signed | acme | manual` mirroring nms's x509 design with mutual-exclusion assertions.~~ done (certificate tier shipped in v0.2.0)
+26. ~~`metrics.enable` wrapper option wiring `metrics.prometheus.*` + Gatus-friendly bind guidance.~~ done (metrics.enable shipped in v0.2.0)
+27. ~~Assertion: warn if `httpBind` is non-loopback (README says reverse-proxy only).~~ done (httpBind non-loopback warning shipped in v0.2.0)
+28. ~~`stateVersion` docs: add migration note hook for the eventual 0.16 nixpkgs move (module-incompatible per ledger).~~ done (stateVersion coupling consolidated (pin-advance runbook + module comments; verified 2026-09-15))
 
 **Go-live prep (29–40)**
 29. VPS NixOS host skeleton in SystemNix consuming this flake (DiscordSync pattern).
 30. sops secrets: fallback-admin secret + relay secret via `services.stalwart.credentials`.
 31. Backup oneshot/timer: `stalwart --export` to /backup + pull to evo-x2 pool (backup-coordination).
-32. Restore drill: `--import` into a scratch VM from an export (validates the backup claim).
+32. ~~Restore drill: `--import` into a scratch VM from an export (validates the backup claim).~~ done (offline backup/restore drill shipped in v0.2.0 (export, wipe, import, message survives))
 33. Gatus checks from README into the consumer (smtp-mx, imaps, cert-expiry).
 34. Prometheus scrape path for /metrics/prometheus (reverse-proxied, basic-auth'd).
 35. DKIM keys + DNS TXT via terraform module; selector rotation plan.
@@ -123,16 +123,16 @@
 **dmarc-monitor (41–45)**
 41. Live IMAP exercise against a real mailbox (needs creds/host decision).
 42. Add `[reports]`/output retention option docs (disk growth policy for JSON/CSV).
-43. Gatus/onFailure wiring example in README (consumer side).
-44. Eval-contract test for `general.output` + `_secret` across BOTH nixpkgs pin moves (guard on versionOlder).
-45. Consider `systemd` hardening overrides for parsedmarc service (ProtectSystem etc.) as mkDefault suggestions.
+43. ~~Gatus/onFailure wiring example in README (consumer side).~~ done (README SystemNix integration section + Gatus YAML document the consumer-side wiring)
+44. ~~Eval-contract test for `general.output` + `_secret` across BOTH nixpkgs pin moves (guard on versionOlder).~~ done (parsedmarc >= 11 version floor guard shipped in v0.2.0)
+45. ~~Consider `systemd` hardening overrides for parsedmarc service (ProtectSystem etc.) as mkDefault suggestions.~~ done (systemd hardening shipped 2026-09-15 (ProtectSystem=strict etc.) and exercised green by parsedmarc-e2e)
 
 **Docs & meta (46–50)**
 46. ~~README: replace "What is built and verified (2026-09-14)" date-stamp convention with per-section dates (stalwart vs dmarc diverge soon).~~ **Won't implement — single-session project so far; revisit when sections diverge.**
-47. CONTRIBUTING note: verified-facts ledger rules (how to add a bullet: source-path citation or VM observation date).
+47. ~~CONTRIBUTING note: verified-facts ledger rules (how to add a bullet: source-path citation or VM observation date).~~ done (CONTRIBUTING.md shipped in v0.2.0)
 48. ~~Link the two 2026-09-14 status reports from README or drop them from docs/rot tracking.~~ done (AGENTS.md Documentation map links the docs/ trees)
 49. Record the nixos-mailserver lessons section in README (currently only in session history) — 3 lines max.
-50. Add `flake-check-all-systems` note (aarch64 intentionally omitted per flake gating; document why in README).
+50. ~~Add `flake-check-all-systems` note (aarch64 intentionally omitted per flake gating; document why in README).~~ done (README Platform support documents the x86_64-only VM gating + aarch64 posture)
 
 ## g) Questions I cannot answer myself
 
@@ -153,3 +153,12 @@ in `ROADMAP.md` "Open questions". Smaller backlog ideas not yet promoted
 should be promoted to TODO_LIST when picked up. Section (d) and the process
 lessons in (e) are historical records of that session, deliberately left as
 written.
+
+## Resolution addendum (2026-09-16, docs-health pass)
+
+f/43 resolved 2026-09-15 (README consumer section). f/28 verified resolved
+(consolidated, 2026-09-15). The rest of the formerly-unmarked backlog
+(f/11 DKIM API-keygen test leg, f/19 option-docs drift check, f/20 CI
+gc-roots, f/42 retention docs, f/49 nixos-mailserver lessons note) is now
+harvested into TODO_LIST.md; the gated go-live tier lives in ROADMAP.md.
+Archived.

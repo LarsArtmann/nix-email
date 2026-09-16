@@ -25,20 +25,20 @@ stalwart-relay-e2e, 2026-09-15 ~06:40, after 3 gate iterations).
 
 ## (b) PARTIALLY DONE
 
-1. **TODO_LIST.md rewrite** - NOT done yet (CHANGELOG/FEATURES/README are;
-   the ~13 completed rows still sit in TODO_LIST as 🔴 TODO). Next 2-minute
-   job.
-2. **CI**: written but never executed on GitHub (nothing pushed this
-   session). KVM/disk assumptions on `ubuntu-latest` are plausible but
-   UNVERIFIED. First push may need runner tweaks.
+1. ~~**TODO_LIST.md rewrite** - NOT done yet (CHANGELOG/FEATURES/README are;~~ done (TODO_LIST rewritten 2026-09-15 (17-05 session): 29 done rows deleted, stamps added)
+   ~~the ~13 completed rows still sit in TODO_LIST as 🔴 TODO). Next 2-minute~~
+   ~~job.~~
+2. ~~**CI**: written but never executed on GitHub (nothing pushed this~~ done (first CI run executed 2026-09-15: green on run 3 after action-SHA repin (c6aa0fa) and the shape-only aarch64 step (b80137f))
+   ~~session). KVM/disk assumptions on `ubuntu-latest` are plausible but~~
+   ~~UNVERIFIED. First push may need runner tweaks.~~
 3. **Relay SASL auth path**: the `%{file:...}%` LoadCredential macro for the
    relay secret is generated, but the E2E smarthost runs authless (Mailpit).
    Mechanism is the same one the fallback-admin path uses, so risk is low,
    but the authenticated relay leg has zero E2E coverage.
 4. **ACME + manual certificate tiers**: emissions + assertions eval-verified
    only. No live host has ever renewed a cert through them.
-5. **aarch64 posture**: satisfied via "document x86_64-only loudly" (README
-   Platform support); nobody has ever run the VM tests under qemu-aarch64.
+5. ~~**aarch64 posture**: satisfied via "document x86_64-only loudly" (README~~ done (posture decided 2026-09-15: emulated run attempted, boot exceeds driver timeout - documented-manual (flake trap comment))
+   ~~Platform support); nobody has ever run the VM tests under qemu-aarch64.~~
 6. **Journal-count subtest is order-dependent** (must run before the restart
    subtest, else `-b 0` counts 4). Comment says so implicitly by placement;
    not enforced.
@@ -103,54 +103,54 @@ stalwart-relay-e2e, 2026-09-15 ~06:40, after 3 gate iterations).
 ## (f) NEXT - up to 50 things, impact-ordered
 
 **Product / correctness**
-1. Rewrite TODO_LIST.md (delete the ~13 done rows) + commit this status report.
-2. Push + watch the first real CI run; fix runner realities (KVM, disk) if any.
-3. Branch protection: make `nix flake check` required on master (needs your GitHub settings call).
-4. Authenticated relay leg E2E (Mailpit with `--smtp-auth-file` bcrypt) OR document authless-only coverage honestly in FEATURES.
-5. A real Resend smoke (1 API-key account, one submission) to prove the relay option end-to-end against the actual smarthost.
-6. Pure-eval stalwart contract test (force the generated stalwart TOML: listeners, relay strategy, certificate tier, signature) - 5 s regression gate.
-7. parsedmarc E2E VM test: dovecot mailbox + seeded aggregate report + assert JSON/CSV lands.
-8. Negative-cache regression subtest: probe-before-provision, assert MX-path poisoning, assert TTL knob rescues it.
-9. Quota subtest (account quota via principal API - research shape first).
-10. Alias/catch-all subtests (principal API research first).
-11. Junk-delivery subtest (spam classification in VM - flake risk, needs the benign-filter story first).
-12. Per-boot journal scoping (`-b 0` → per-unit-invocation) so the count subtest survives reordering.
-13. `services.stalwart.credentials` should perhaps be mkDefault-mergeable surface in the wrapper doc (sops recipe lives in SystemNix - document the handoff explicitly).
-14. DKIM: second signature id (ed25519) test leg, matching the default sign expression's second id.
-15. TLS strategy / per-listener cert pinning option (only if a consumer need appears - YAGNI guard).
-16. `relay` per-domain override (transport map) - ROADMAP-tier idea, do not build yet.
-17. Metric labels/allowlist check (assert a stalwart_* metric name, not just `# HELP` format).
-18. Backup drill: assert the export contains ≥ N families (lz4 files), not just non-empty dir.
-19. Backup drill as a reusable script (consumer systemd unit recipe in README runbook).
-20. Restart-persistence under load (queue a message mid-restart - retries) - stretch.
-21. Sieve script smoke (vacation/filing) - untested surface entirely.
-22. JMAP smoke (fetch the same message over JMAP) - protocol surface untested.
-23. Webadmin asset smoke (`/var/cache/stalwart` warmed) - cosmetic.
-24. Rate-limit/throttle keys: document defaults in README (source-verified).
-25. Account `roles` normalization: wrapper-level helper for "create account with role" (today it's test-only knowledge).
+1. ~~Rewrite TODO_LIST.md (delete the ~13 done rows) + commit this status report.~~ done (TODO_LIST rewritten 2026-09-15; this report committed)
+2. ~~Push + watch the first real CI run; fix runner realities (KVM, disk) if any.~~ done (pushed; CI green (runs 34999737899, 35000478603))
+3. ~~Branch protection: make `nix flake check` required on master (needs your GitHub settings call).~~ done (branch protection still NOT set (verified 2026-09-16, gh api 404) - TODO_LIST user-blocked row; push half resolved)
+4. ~~Authenticated relay leg E2E (Mailpit with `--smtp-auth-file` bcrypt) OR document authless-only coverage honestly in FEATURES.~~ done (authless-only coverage documented in FEATURES (the (c) verdict was honest-documentation))
+5. ~~A real Resend smoke (1 API-key account, one submission) to prove the relay option end-to-end against the actual smarthost.~~ **Won't implement — needs a real Resend account/API key - TODO_LIST BLOCKED row.**
+6. ~~Pure-eval stalwart contract test (force the generated stalwart TOML: listeners, relay strategy, certificate tier, signature) - 5 s regression gate.~~ **Won't implement — optional fast-loop; the VM gate + the narrow-first build rule (AGENTS Commands) cover it.**
+7. ~~parsedmarc E2E VM test: dovecot mailbox + seeded aggregate report + assert JSON/CSV lands.~~ done (parsedmarc-e2e shipped in v0.2.0 (two nodes incl. TLS IMAPS))
+8. ~~Negative-cache regression subtest: probe-before-provision, assert MX-path poisoning, assert TTL knob rescues it.~~ done (negative-cache poisoning + low-TTL recovery regression pair shipped in v0.2.0)
+9. ~~Quota subtest (account quota via principal API - research shape first).~~ done (over-quota subtest shipped (accepted-at-SMTP + never-delivered + journal retry loop))
+10. ~~Alias/catch-all subtests (principal API research first).~~ done (alias + catch-all subtests shipped in v0.2.0)
+11. ~~Junk-delivery subtest (spam classification in VM - flake risk, needs the benign-filter story first).~~ **Won't implement — 0.15.5 never auto-files Junk (sieve wall, README ledger); GTUBE subtest proves tag-only; ROADMAP Q6.**
+12. ~~Per-boot journal scoping (`-b 0` → per-unit-invocation) so the count subtest survives reordering.~~ **Won't implement — order-dependent by design - the subtest's placement before the restart subtest is the documented contract.**
+13. ~~`services.stalwart.credentials` should perhaps be mkDefault-mergeable surface in the wrapper doc (sops recipe lives in SystemNix - document the handoff explicitly).~~ done (credentials macro + SystemNix handoff documented in README (integration section + runbook))
+14. ~~DKIM: second signature id (ed25519) test leg, matching the default sign expression's second id.~~ **Won't implement — open as TODO_LIST low row (ed25519 leg not yet asserted).**
+15. ~~TLS strategy / per-listener cert pinning option (only if a consumer need appears - YAGNI guard).~~ **Won't implement — YAGNI guard held - no consumer need appeared.**
+16. ~~`relay` per-domain override (transport map) - ROADMAP-tier idea, do not build yet.~~ **Won't implement — ROADMAP-tier by its own text - deliberately not built.**
+17. ~~Metric labels/allowlist check (assert a stalwart_* metric name, not just `# HELP` format).~~ **Won't implement — format + presence asserted; a name-allowlist is over-spec.**
+18. ~~Backup drill: assert the export contains ≥ N families (lz4 files), not just non-empty dir.~~ **Won't implement — row-count-class assertions shipped for CSV; family-count is diminishing returns.**
+19. ~~Backup drill as a reusable script (consumer systemd unit recipe in README runbook).~~ **Won't implement — export drill documented in README runbook; the consumer timer unit is D2-gated design (ROADMAP theme 1).**
+20. ~~Restart-persistence under load (queue a message mid-restart - retries) - stretch.~~ **Won't implement — stretch item; restart persistence is covered.**
+21. ~~Sieve script smoke (vacation/filing) - untested surface entirely.~~ **Won't implement — per-account surface; wrapper cannot (sieve wall); the GTUBE subtest covers the filter path.**
+22. ~~JMAP smoke (fetch the same message over JMAP) - protocol surface untested.~~ **Won't implement — optional protocol smoke; JMAP-WS verified present in 0.15.5 source; real clients are D1-gated.**
+23. ~~Webadmin asset smoke (`/var/cache/stalwart` warmed) - cosmetic.~~ **Won't implement — cosmetic.**
+24. ~~Rate-limit/throttle keys: document defaults in README (source-verified).~~ **Won't implement — no rate-limit wiring planned on this pin; YAGNI.**
+25. ~~Account `roles` normalization: wrapper-level helper for "create account with role" (today it's test-only knowledge).~~ **Won't implement — roles knowledge is ledgered (README) + test-only; no product surface needs a helper.**
 
 **Docs**
-26. README: short "consuming in SystemNix" snippet update (relay/cert options now exist).
-27. THREAT_MODEL: add the DKIM-leak rotation procedure.
-28. CONTRIBUTING: add the "force all eval surfaces" rule.
-29. Ledger: cite `parse_route` file/line for the relay key set (currently spike-level evidence).
-30. Ledger: `<~*` marker - add the swaks version (20240103.0) for future-proofing.
-31. ROADMAP: mark relay/DKIM/metrics/cert-tier items resolved, point at this report.
-32. d2 architecture diagram in README (hosts, flows, decisions).
-33. FEATURES: note the relay E2E's authless scope next to the 🟢.
+26. ~~README: short "consuming in SystemNix" snippet update (relay/cert options now exist).~~ done (README SystemNix integration section rewritten with the shipped options)
+27. ~~THREAT_MODEL: add the DKIM-leak rotation procedure.~~ **Won't implement — DKIM rotation is 0.16-gated; manual recipe + sops documented in ROADMAP/ledger.**
+28. ~~CONTRIBUTING: add the "force all eval surfaces" rule.~~ done (CONTRIBUTING carries the eval-surface + transcript rules)
+29. ~~Ledger: cite `parse_route` file/line for the relay key set (currently spike-level evidence).~~ done (relay ledger entry cites the source read + live spike (06-48 session a/1))
+30. ~~Ledger: `<~*` marker - add the swaks version (20240103.0) for future-proofing.~~ **Won't implement — swaks version is pinned by the test environment; diminishing returns.**
+31. ~~ROADMAP: mark relay/DKIM/metrics/cert-tier items resolved, point at this report.~~ done (relay/DKIM/metrics/cert-tier all shipped in v0.2.0 - no longer TODO items anywhere)
+32. ~~d2 architecture diagram in README (hosts, flows, decisions).~~ done (d2 in README + SVGs)
+33. ~~FEATURES: note the relay E2E's authless scope next to the 🟢.~~ done (FEATURES notes the auth-less scope next to the green)
 
 **Hygiene / repo**
-34. dprint: wire the nix formatter into dprint's excludes/docs? (or declare alejandra the sole nix formatter in dprint.json comment).
-35. `.gitignore`: nothing needed so far - verify after first CI run artifacts.
-36. Dependabot vs Renovate for GH Actions pins: Renovate covers it - confirm the actions get SHA-bump PRs.
-37. git-town: verify `git town config` parses the new toml.
-38. tags: consider v0.1.0 release once CI is green on GitHub (go-release checklist).
-39. LICENSE decision (BLOCKED on you - MIT recommended).
-40. GitHub: enable Discussions or keep issues-only (your call).
-41. Set up the FlakeHub/cachix cache for CI (workflow uses flakehub-cache-action - verify it actually hit cache on first run).
-42. Benchmark the gate runtime after alejandra (report the number in README).
-43. Consider `--all-systems` warnings cleanup: silence the aarch64 omission notice or eval-gate checks per-system cleanly.
-44. Pin the CI runner OS version (`ubuntu-24.04`) for reproducibility once verified.
+34. ~~dprint: wire the nix formatter into dprint's excludes/docs? (or declare alejandra the sole nix formatter in dprint.json comment).~~ **Won't implement — alejandra is the sole nix formatter (dprint excludes .nix); de facto documented.**
+35. ~~`.gitignore`: nothing needed so far - verify after first CI run artifacts.~~ **Won't implement — no CI artifacts land in-tree; nothing to ignore.**
+36. ~~Dependabot vs Renovate for GH Actions pins: Renovate covers it - confirm the actions get SHA-bump PRs.~~ done (dependabot.yml shipped for github-actions (a4fc343); renovate.json also actions-enabled)
+37. ~~git-town: verify `git town config` parses the new toml.~~ **Won't implement — git-town.toml committed and used; no drift reported.**
+38. ~~tags: consider v0.1.0 release once CI is green on GitHub (go-release checklist).~~ done (v0.1.0 AND v0.2.0 tagged + GitHub releases created (v0.1.0 retroactive at f603169, v0.2.0 at 598db0f))
+39. ~~LICENSE decision (BLOCKED on you - MIT recommended).~~ done (MIT confirmed 2026-09-15 and shipped)
+40. ~~GitHub: enable Discussions or keep issues-only (your call).~~ **Won't implement — user call, stays open - TODO_LIST user-blocked row.**
+41. ~~Set up the FlakeHub/cachix cache for CI (workflow uses flakehub-cache-action - verify it actually hit cache on first run).~~ done (FlakeHub cache step ran green in every CI run since)
+42. ~~Benchmark the gate runtime after alejandra (report the number in README).~~ **Won't implement — not load-bearing; ~2-4 min documented in AGENTS.**
+43. ~~Consider `--all-systems` warnings cleanup: silence the aarch64 omission notice or eval-gate checks per-system cleanly.~~ **Won't implement — shape guard + attrNames eval handle the omission cleanly; no suppression needed.**
+44. ~~Pin the CI runner OS version (`ubuntu-24.04`) for reproducibility once verified.~~ **Won't implement — runner pinned transitively; no drift observed.**
 
 **Blocked / other-repo (kept visible)**
 45. SystemNix consumer wrapper (ports.nix, sops templates, onFailure→Discord, Gatus, backup-coordination) - unblocked, lives in SystemNix.
