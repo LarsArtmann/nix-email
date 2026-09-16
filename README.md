@@ -339,7 +339,14 @@ json/yaml/markdown.
   `<~*` marker (its timeout-receive variant) - assert the marker set you
   OBSERVED in the transcript, never the one you expected; tests need
   `--timeout 120` because RCPT policy checks (SPF/DNSBL) stall ~30 s per
-  lookup in a DNS-less VM.
+  lookup in a DNS-less VM. Also (host-verified 2026-09-16, swaks
+  20240103.0): `--attach <path>` attaches the path STRING as literal data
+  with NO filename= header - reading a file requires the @-prefix
+  (`--attach @/path/file.zip`), which also sets filename= from the
+  basename. A silently-literal attach is why the native-ingestion subtest
+  first ran empty: Stalwart's report detector matches '!' / '.xml' in the
+  attachment NAME, and a nameless string part matches nothing - no error
+  anywhere, the message is just consumed and dropped.
 - Two "Configuration build error" journal lines at startup in the DNS-less
   VM are BENIGN (details only visible via `journalctl -o verbose`):
   `resolver.type: no nameservers found in config` (nixpkgs module default

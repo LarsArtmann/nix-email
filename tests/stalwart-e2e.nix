@@ -610,7 +610,10 @@ in
           # mailbox; the parsed report is stored and readable via
           # GET /api/queue/reports (the CLI `report list` endpoint).
           # The zip keeps its report-shaped filename - the detector matches
-          # '!' / '.xml' in the ATTACHMENT NAME (analysis.rs).
+          # '!' / '.xml' in the ATTACHMENT NAME (analysis.rs). swaks --attach
+          # needs the @-prefix to read a FILE: a bare path is attached as
+          # LITERAL STRING data with no filename= header (host-verified
+          # 2026-09-16) - the analysis then silently finds no report part.
           machine.succeed(
               "cp '${dmarcSample}' '/tmp/estadocuenta1.infonacot.gob.mx!example.com!1536853302!1536939702!2940.xml.zip'"
           )
@@ -621,7 +624,7 @@ in
               "--header 'Subject: Report Domain: example.com' "
               "--body 'report-consumed-needle-9d2f' "
               "--attach-type application/zip "
-              "--attach '/tmp/estadocuenta1.infonacot.gob.mx!example.com!1536853302!1536939702!2940.xml.zip' "
+              "--attach '@/tmp/estadocuenta1.infonacot.gob.mx!example.com!1536853302!1536939702!2940.xml.zip' "
               "> /tmp/swaks-report.log 2>&1"
           )
           machine.succeed("cat /tmp/swaks-report.log >&2")
