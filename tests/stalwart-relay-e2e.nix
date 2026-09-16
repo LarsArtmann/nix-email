@@ -138,7 +138,7 @@ in
 
       # Force the username==null emission eval asserts from the let block
       # (referencing the result guarantees evaluation).
-      machine.log("null-relay route address: ${nullRelayAsserts}")
+      smtp.log("null-relay route address: ${nullRelayAsserts}")
 
       smtp.wait_for_unit("stalwart.service", timeout=180)
       smtp.wait_for_open_port(587, timeout=60)

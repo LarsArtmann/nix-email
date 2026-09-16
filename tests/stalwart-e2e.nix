@@ -281,7 +281,13 @@ in
       # report.analysis.forward = false (the v0.15.5 default true merely
       # forwards; keys verified at
       # crates/common/src/config/smtp/report.rs:86,90).
-      services.stalwart.settings."report.analysis" = {
+      # NOTE: nested via REAL attrs (settings.report.analysis), NOT the
+      # dotted-string key "report.analysis" - the latter renders as a
+      # fully-quoted table header ["report.analysis"], which Stalwart's
+      # TOML parser rejects ("Unexpected end of line"; binary probe
+      # 2026-09-16, /tmp/st-probe). Bare-dotted and mixed headers
+      # ([metrics.prometheus], [signature."rsa-example.test"]) parse fine.
+      services.stalwart.settings.report.analysis = {
         addresses = ["reports@example.test"];
         forward = false;
       };
