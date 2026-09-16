@@ -229,7 +229,7 @@ in
   pkgs.testers.runNixOSTest {
     name = "stalwart-e2e";
 
-    nodes.machine = { ...}: {
+    nodes.machine = {...}: {
       imports = [../modules/mail-server.nix];
 
       services.mail-server = {

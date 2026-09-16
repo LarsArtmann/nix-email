@@ -58,8 +58,11 @@ jobs:
           # eating / early close). Comment lines (nix or embedded python) are
           # exempt so the doctrine can be stated in comments.
           # No pipes on gate commands: a single awk prints offenders and sets
-          # the exit status; any hit fails the step.
-          awk 'match($0, /\|[[:space:]]*!?[[:space:]]*(grep|tail|head)\b/) && $0 !~ /^[[:space:]]*#/ {printf "offender: %s:%d: %s\n", FILENAME, FNR, $0; bad=1} END {exit bad}' tests/*.nix
+          # the exit status; any hit fails the step. NOTE: the word boundary
+          # is ([^[:alnum:]]|$), NOT \b - gawk 5.x regex constants treat \b as
+          # backspace, which makes the lint a never-firing false green
+          # (caught by the 2026-09-16 local negative test).
+          awk 'match($0, /\|[[:space:]]*!?[[:space:]]*(grep|tail|head)([^[:alnum:]]|$)/) && $0 !~ /^[[:space:]]*#/ {printf "offender: %s:%d: %s\n", FILENAME, FNR, $0; bad=1} END {exit bad}' tests/*.nix
 
       - name: Assert CI expected-checks match the flake (lockstep, fail-closed)
         run: |
