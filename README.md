@@ -107,13 +107,17 @@ user decisions in [ROADMAP.md](ROADMAP.md).
   INBOX fetched back over IMAPS, DKIM signing of the submission
   (`DKIM-Signature` asserted on the stored message), Prometheus metrics
   endpoint, journal-hygiene count (exactly the 2 known-benign config errors),
-  restart persistence, offline backup/restore drill (`--export`, wipe,
-  `--import`, message survives), no panics.
-- `stalwart-relay-e2e`: TWO-node VM - Stalwart with `relay` -> Mailpit
-  smarthost node. Non-local submission lands in Mailpit through the
-  generated `queue.route`/`queue.strategy.route`, local domains still
-  deliver locally (and never leak to the relay), relay hostname resolved via
-  dnsmasq (Stalwart's resolver ignores /etc/hosts).
+  native DMARC report ingestion (real aggregate mailed to a
+  `report.analysis.addresses` recipient with `forward=false`: consumed by
+  the analyzer, NOT delivered, `total:1` readable at `/api/reports/dmarc`
+  with the detail parsing), restart persistence, offline backup/restore
+  drill (`--export`, wipe, `--import`, message survives), no panics.
+- `stalwart-relay-e2e`: TWO-node VM - Stalwart with `relay` (SASL
+  credentials) -> Mailpit smarthost node enforcing AUTH. Non-local
+  submission lands in Mailpit through the generated
+  `queue.route`/`queue.strategy.route`, local domains still deliver locally
+  (and never leak to the relay), relay hostname resolved via dnsmasq
+  (Stalwart's resolver ignores /etc/hosts).
 - `parsedmarc-e2e`: TWO-node VM - a Dovecot fixture mailbox seeded with the
   upstream sample DMARC aggregate report, polled by the real parsedmarc 11
   unit; JSON/CSV output asserted (row counts, org metadata), the runtime ini

@@ -8,11 +8,14 @@
 > Long-term vision and user decisions live in ROADMAP.md.
 > Items are ranked by impact. Status is verified, not assumed.
 >
-> Last verification sweep: **2026-09-16** (full docs-health AUDIT: all 21
-> historical snapshots annotated and archived; every open item from every
-> report re-verified against the tree and routed here or to ROADMAP. The
-> 2026-09-15 sweep's ANNOTATE row is done - scope was "all `2026-0*` files").
-> The D1/D2/Q6 user decisions gate everything in ROADMAP, not here.
+> Last verification sweep: **2026-09-16 (post-noon)** - native-ingestion
+> live probe GREEN in the VM (store write+read verified; endpoint trap
+> ledgered), relay-SASL E2E green, tag trigger + branch protection + TLS
+> positive assertion verified shipped (rows removed), filing rows collapsed
+> into one re-check row, master push debt cleared (bc7e954). Previous full
+> AUDIT: 2026-09-16 morning (all 21 historical snapshots annotated and
+> archived). The D1/D2/Q6 user decisions gate everything in ROADMAP, not
+> here.
 
 ## Status legend
 
@@ -27,19 +30,13 @@
 
 | Task                                                                                                                                                                                  | Status    | Impact | Effort | Evidence                                                                                                                            |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- | ------ | ------ | ----------------------------------------------------------------------------------------------------------------------------------- |
-| File third nixpkgs issue: parsedmarc unit ships NO Restart policy (a poller daemon dies on one lost boot race; fixture carries Restart=on-failure as a local workaround)              | 🔴 `TODO` | High   | 30m    | re-confirmed 2026-09-16 grep of the pinned unit (report `2026-09-16_07-04` §5.3); draft died in /tmp once - write it in docs/ first |
-| File the root bug upstream at mjs/imapclient: `starttls()` assigns read-only `imaplib.IMAP4.file` (fix = `_file`); also closes #563652's drift re-check                               | 🔴 `TODO` | High   | 30m    | verified still-broken on master 2026-09-16 via `gh api` (`imapclient/imapclient.py:387`, `starttls` at :361)                        |
-| Live-probe native DMARC/ARF report ingestion in the stalwart-e2e VM (mail a report in, query the report store) - upgrades the 06a keep-both verdict from source-grade to ledger-grade | 🔴 `TODO` | High   | 30m    | `docs/planning/archived/2026-09-15_19-23` §10 06a: "no live probe was run"; README ledger entry carries the same caveat             |
+| Re-check the four upstream filings for maintainer responses: nixpkgs #563651, #563652, #563777 + mjs/imapclient #662 (all OPEN, zero responses at 2026-09-16 ~12:00; #563777 and #662 filed by session 4 - the former "file it" rows are done) | 🔴 `TODO` | Med    | 10m    | `gh issue view` state check 2026-09-16 (12:54 report §f/10)                                                                         |
 
 ## Medium Impact
 
 | Task                                                                                                                 | Status              | Impact | Effort | Evidence                                                                                                                                  |
 | -------------------------------------------------------------------------------------------------------------------- | ------------------- | ------ | ------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| Relay-SASL E2E variant (Mailpit with `--smtp-auth-file`): the SASL relay path is eval-asserted + auth-less E2E only  | 🔴 `TODO`           | Med    | 45m    | `tests/stalwart-relay-e2e.nix` (authless variant); FEATURES row notes the scope                                                           |
-| CI trigger on tag pushes (`on: push: tags: v*`) - releases currently run no CI at all                                | 🔴 `TODO`           | Med    | 10m    | `.github/workflows/ci.yml:12-16` triggers on branch pushes only (verified 2026-09-16)                                                     |
-| Branch protection on master requiring the CI check (user GitHub-settings action; badge already in README)            | 🔵 `BLOCKED` (user) | Med    | 10m    | `gh api .../branches/master/protection` → 404 "Branch not protected" (verified 2026-09-16)                                                |
 | Verify Renovate activates on the pushed repo and handles TAG pins (SystemNix pins `v0.2.0`), incl. the approval gate | 🔴 `TODO`           | Med    | 20m    | `renovate.json` (nix approval-gated, actions enabled); Dependabot now covers github-actions weekly (`.github/dependabot.yml`, 2026-09-16) |
-| TLS-node: assert the SUCCESSFUL TLS-handshake journal line, not just absence of failures                             | 🔴 `TODO`           | Med    | 20m    | `tests/parsedmarc-e2e.nix` TLS subtest asserts outcome only (02-08 report §f/17)                                                          |
 | Lock-rev/narHash mention in release notes (or attached as release asset evidence)                                    | 🔴 `TODO`           | Med    | 10m    | `gh release list` shows both releases without rev pins (02-08 report §f/18)                                                               |
 
 ## Low Impact
@@ -71,8 +68,7 @@
 
 | Task                                                                                                                                                                                   | Status                                                    | Impact | Effort | Evidence                                                                                                       |
 | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- | ------ | ------ | -------------------------------------------------------------------------------------------------------------- |
-| Resend SASL shape verification + one real Resend smoke (username/API-key-as-password against smtp.resend.com:587) - proves `relay.secretFile` against the actual smarthost             | 🔵 `BLOCKED` (needs a Resend account/API key)             | High   | 30m    | 06-48 report §g/1: refused to guess-config the flagship use; eval + auth-less E2E cover everything short of it |
-| Push nix-email master (2 unpushed commits + the working-tree ci.yml pipe-lint `\b`-fix awaiting its commit)                                                                            | 🔵 `BLOCKED` (push approval)                              | Med    | 5m     | `git status -sb` → ahead 2 + `M .github/workflows/ci.yml` (verified 2026-09-16)                                |
+| Resend SASL shape verification + one real Resend smoke (username/API-key-as-password against smtp.resend.com:587) - proves `relay.secretFile` against the actual smarthost             | 🔵 `BLOCKED` (needs a Resend account/API key)             | High   | 30m    | 06-48 report §g/1: refused to guess-config the flagship use; eval + SASL E2E cover everything short of it      |
 | SystemNix: push the unpushed commits (pin-advance + a parallel session's work) and clear the CI debt (statix sweep, secret-scan `syn_` policy, 2 pin flips, gitleaks `rev=` allowlist) | 🔵 `BLOCKED` (push approval + cross-session coordination) | Med    | 2h     | 07-04 report §b/4: ≈47 commits ahead of origin; CI red for pre-existing reasons                                |
 | Stalwart upstream feature request: declarative server-side Junk filing (only if ROADMAP Q6 lands on option d)                                                                          | 🔵 `BLOCKED` (ROADMAP Q6 verdict)                         | Low    | 30m    | 19-52 report §f/7; the sieve-wall ledger entry is the evidence base                                            |
 | GitHub: enable Discussions or keep issues-only                                                                                                                                         | 🔵 `BLOCKED` (user preference)                            | Low    | 5m     | 06-48 report §f/40                                                                                             |
