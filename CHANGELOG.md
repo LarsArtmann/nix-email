@@ -27,6 +27,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - README: CI badge, `parsedmarc-e2e` listed in the verified-checks section
   (was missing), POP3 + FTS-offload non-goal notes, and an "External
   upstream issues" ledger block (#563651, #563652 with status)
+- CI: tag-push trigger (`on.push.tags: ["v*"]` - releases now run CI) and
+  branch protection on master (`nix flake check` required, linear history)
+  (`.github/workflows/ci.yml`)
+- `parsedmarc-e2e`: POSITIVE TLS-handshake assertion (dovecot journal
+  `imap-login: Logged in: ... TLS, session=` line, transcript-derived),
+  replacing absence-of-failure checking (`tests/parsedmarc-e2e.nix`)
+- Upstream filings (2026-09-16): NixOS/nixpkgs#563777 (parsedmarc unit has
+  no Restart policy), mjs/imapclient#662 (`starttls()` assigns read-only
+  `IMAP4.file` on Python 3.14; supersedes the earlier "file it" TODOs);
+  cross-link comment on nixpkgs#563652; README external-issues ledger
+  extended with both
 
 ### Changed
 
