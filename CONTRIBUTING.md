@@ -76,6 +76,20 @@ runs pipefail, so grep -q's early exit can EPIPE the producer (observed as
 curl exit 23 on a matching payload, 2026-09-15) - and `! producer | grep -q`
 can phantom-green. Dump the producer to a file, then grep the file.
 
+## Architecture diagrams
+
+The D2 sources and rendered SVGs live in
+`docs/architecture-understanding/`. After editing a `.d2` file, regenerate
+its SVG (elk layout is what the committed renders use):
+
+```sh
+nix run nixpkgs#d2 -- --layout=elk docs/architecture-understanding/<file>.d2 \
+  docs/architecture-understanding/<file>.svg
+```
+
+Commit the `.d2` and the `.svg` together - the SVG is the artifact readers
+open, the D2 is the source of truth.
+
 ## Docs map
 
 - `README.md` - architecture, module docs, go-live runbook, ledger.

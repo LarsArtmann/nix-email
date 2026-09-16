@@ -51,6 +51,15 @@ in {
         Directory parsedmarc writes aggregate/forensic/smtp_tls JSON+CSV
         files to. Back this up (backup-coordination on the consumer host);
         a small viewer over these files is the intended read path.
+
+        RETENTION (disk-growth policy): parsedmarc 11 itself has NO
+        retention/pruning option - the JSON/CSV sink grows monotonically
+        (roughly one file set per report received, per rua mailbox poll).
+        Size it before enablement and prune on the consumer host (a
+        systemd-timer `find <dir> -mtime +N -delete`, or backup rotation
+        if the backup tool owns expiry). A busy domain's rua traffic is
+        small (KBs/day), but an unbounded forever-directory on a mail
+        host is still a disk-fill risk.
       '';
     };
 

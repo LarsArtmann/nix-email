@@ -155,6 +155,27 @@ the wrapper opens exactly 25/465/587/993 (nixpkgs' `openFirewall` is off -
 it would also open the loopback admin port on every interface); consumer
 port lists merge additively.
 
+### Per-account semantics (API-provisioned accounts, VM-verified 2026-09-15)
+
+- **Quota** is an integer byte count on any individual principal
+  (`POST /api/principal` with `"quota": <bytes>`); there is no wrapper
+  option because it is per-account data, not host config. An over-quota
+  message is ACCEPTED at RCPT but NEVER delivered - the delivery queue
+  retries forever (internal reason "Mailbox over quota."; the journal
+  signature at default verbosity is `Message rescheduled for delivery`,
+  not the reason text). Monitoring/alerting on queue depth is the
+  operator-visible signal; asserting the behavior means asserting
+  delivery-absence over IMAP, never SMTP refusal.
+- **Catch-all** is a principal carrying the literal address `"@<domain>"`
+  (AddressMapping retries the lookup with `@<domain>`): it makes EVERY
+  local part deliverable, which silently disables unknown-recipient 5xx
+  rejection for that domain. Catch-all and strict rejection cannot
+  coexist on one domain - that is a product-shape decision per domain,
+  not a config bug. Provisioning order also matters: any SMTP probe
+  touching a domain BEFORE it is provisioned poisons the directory
+  negative cache (1 h TTL, see ledger) and routes it to MX instead of
+  local.
+
 ### Outbound relay (`services.mail-server.relay`)
 
 null (default) = direct-to-MX. When set, non-local mail transits the
