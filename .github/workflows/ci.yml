@@ -44,6 +44,19 @@ jobs:
         run: |
           find . -name '*.nix' -print0 | xargs -0 -n1 nix-instantiate --parse > /dev/null
 
+      - name: Lint GitHub Actions workflows (actionlint, fail-closed)
+        run: |
+          # actionlint catches expression typos (workflow-expression
+          # contexts, shell quoting inside run:, matrix shape errors) that
+          # YAML parsing cannot. CAUTION (self-bitten 2026-09-16): never
+          # write a literal dollar-brace-brace expression in this file's
+          # comments - actionlint parses those even in comments and fails
+          # on the empty/placeholder form. Registry-pinned nixpkgs on
+          # purpose: unlike the flake's locked nixpkgs, the registry tracks
+          # current actionlint rules - for a linter, newer rules are the
+          # point.
+          nix run nixpkgs#actionlint
+
       - name: Enforce alejandra formatting (fail-closed)
         run: nix fmt -- . --check
 

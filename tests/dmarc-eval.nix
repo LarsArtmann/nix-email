@@ -39,6 +39,10 @@
                 user = "dmarc@example.test";
                 password._secret = secretFile;
               };
+              # Passthrough proof beyond the wrapper's own general.output
+              # mkDefault: a consumer general.* key must survive mkMerge
+              # verbatim (the thin-wrapper settings contract).
+              general.offline = true;
             };
           };
         }
@@ -87,6 +91,7 @@ in
           grep -q '"elasticsearch":false' "$renderedPath"
           grep -q '"geoIp":false' "$renderedPath"
           grep -q '"_secret":"/nix/store' "$renderedPath"
+          grep -q '"offline":true' "$renderedPath"
           grep -q '"stateDirectory":"parsedmarc"' "$renderedPath"
           grep -q 'python3.13-parsedmarc' "$renderedPath"
           grep -q '"\\[elasticsearch\\]"' "$stripScriptPath"
