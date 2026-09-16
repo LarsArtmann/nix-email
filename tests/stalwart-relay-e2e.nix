@@ -17,9 +17,45 @@
 # which IGNORES /etc/hosts - so the smtp node runs dnsmasq on 127.0.0.1 (with
 # networking.nameservers pointing at it). dnsmasq serves the test driver's
 # /etc/hosts entries, bridging "relay" to the Mailpit node's IP.
+#
+# SASL: Mailpit runs with --smtp-auth-file (it then REQUIRES successful
+# AUTH), and the wrapper sets relay.username + relay.secretFile - every
+# relayed needle below is behavioral proof the SASL credentials worked
+# (wrong creds = 535 = queue retry = the needle never shows up in Mailpit).
+# The username==null emission shape is pinned by the eval assertions in the
+# let block (this VM runs the SASL shape).
 {pkgs}: let
   testHash = "$6$StalwartTestSalt$gagC41V16GV6khfXMiraIyZLKuYDgSyRzVfM0TaSFNMRqkLewQ5d/b9Ns0uc1Rr4DWD15BxHHzh2XaC4ZAS97.";
   relayNeedle = "relay-needle-9f2c1b";
+
+  # The username==null relay emission shape (import-and-eval pattern from
+  # dmarc-eval): no auth block on the generated route, and no credential
+  # registered for it. The wrapper asserts username/secretFile pair up, so
+  # this is the only legal no-credential shape.
+  nullRelayConfig =
+    (pkgs.lib.nixosSystem {
+      system = pkgs.stdenv.hostPlatform.system;
+      modules = [
+        ../modules/mail-server.nix
+        {
+          services.mail-server = {
+            enable = true;
+            hostname = "mail.example.test";
+            relay = {
+              address = "relay.example.test";
+              port = 587;
+              tlsImplicit = true;
+            };
+          };
+          system.stateVersion = "26.05";
+        }
+      ];
+    }).config;
+
+  nullRelayAsserts = assert nullRelayConfig.services.stalwart.settings.queue.route ? "smarthost";
+  assert !(nullRelayConfig.services.stalwart.settings.queue.route."smarthost" ? auth);
+  assert !(nullRelayConfig.services.stalwart.credentials ? mail-server-relay);
+    nullRelayConfig.services.stalwart.settings.queue.route."smarthost".address;
 in
   pkgs.testers.runNixOSTest {
     name = "stalwart-relay-e2e";
@@ -34,13 +70,18 @@ in
           relay = {
             address = "relay";
             port = 1025;
-            # Unauthenticated smarthost (Mailpit): exercises the username ==
-            # null emission path. Resend on a real host sets username +
-            # secretFile; the %{file:...}% macro mechanism is the same one
-            # the fallback-admin path already exercises.
+            # SASL smarthost (Mailpit enforces AUTH via --smtp-auth-file,
+            # see the relay node): exercises the username + secretFile
+            # emission path with the %{file:...}% credential macro - the
+            # same mechanism SystemNix's contract test asserts with sops.
+            username = "relayuser";
+            secretFile = "/etc/relay-secret";
             tlsImplicit = false;
           };
         };
+
+        # Test-only credential file (real hosts: sops-rendered path).
+        environment.etc."relay-secret".text = "relaypass";
 
         services.stalwart.settings.authentication.fallback-admin = {
           user = "admin";
@@ -73,10 +114,15 @@ in
       };
 
       relay = {
+        # SASL-enforced smarthost: with smtpAuthFile set, Mailpit rejects
+        # every session that did not AUTH successfully (plain user:pass
+        # file, mailpit runtime-options docs).
+        environment.etc."mailpit-smtp-auth".text = "relayuser:relaypass";
         services.mailpit.instances.catchall = {
           smtp = "0.0.0.0:1025";
           listen = "0.0.0.0:8025";
           max = 0;
+          smtpAuthFile = "/etc/mailpit-smtp-auth";
         };
         networking.firewall.allowedTCPPorts = [
           1025
@@ -87,6 +133,10 @@ in
 
     testScript = ''
       start_all()
+
+      # Force the username==null emission eval asserts from the let block
+      # (referencing the result guarantees evaluation).
+      machine.log("null-relay route address: ${nullRelayAsserts}")
 
       smtp.wait_for_unit("stalwart.service", timeout=180)
       smtp.wait_for_open_port(587, timeout=60)
@@ -130,7 +180,11 @@ in
               "\"secrets\": [\"${testHash}\"]}'"
           )
 
-      with subtest("relay path: non-local submission lands in Mailpit"):
+      with subtest("relay path: SASL-authed non-local submission lands in Mailpit"):
+          # Mailpit rejects unauthenticated sessions (smtpAuthFile), so the
+          # needle below is proof the wrapper's SASL credentials survived
+          # the whole path: secretFile -> systemd credential -> %{file:...}%
+          # macro -> queue.route."smarthost".auth -> SMTP AUTH.
           smtp.succeed(
               "swaks --timeout 120 --server 127.0.0.1:587 --tls --auth PLAIN "
               "--auth-user user1@example.test --auth-password testpass "
