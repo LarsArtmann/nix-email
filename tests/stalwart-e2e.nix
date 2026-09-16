@@ -607,8 +607,14 @@ in
           # Mechanism (v0.15.5 source): recipient matches
           # report.analysis.addresses + forward=false -> inbound DATA goes to
           # analyze_report (smtp/src/inbound/data.rs:332) INSTEAD of the
-          # mailbox; the parsed report is stored and readable via
-          # GET /api/queue/reports (the CLI `report list` endpoint).
+          # mailbox; the parsed report is stored (analysis.rs write gated on
+          # report.analysis.store, default "30d") and readable via
+          # GET /api/reports/dmarc. ENDPOINT TRAP (OpenAPI-verified
+          # 2026-09-16): /api/queue/reports is the OUTBOUND report queue
+          # (OutgoingReportList - reports Stalwart sends), permanently empty
+          # here; incoming reports live under /api/reports/{dmarc,tls,arf}.
+          # Polling the queue endpoint returns total:0 forever - one VM run
+          # burned on that mismatch.
           # The zip keeps its report-shaped filename - the detector matches
           # '!' / '.xml' in the ATTACHMENT NAME (analysis.rs). swaks --attach
           # needs the @-prefix to read a FILE: a bare path is attached as
@@ -631,21 +637,21 @@ in
           machine.succeed("! grep -q '<\\*\\*' /tmp/swaks-report.log")
           # Parsed asynchronously (tokio::spawn in analyze_report): poll the
           # store list until the report appears, then dump the detail for
-          # the transcript. Response shape (management API):
-          # {"data":{"items":[{...,"id":...}],"total":N}} - assert on
-          # .data.total, NEVER bare `length` (the wrapper object's length
-          # is 1 even with zero items - a vacuous pass burned one VM run
-          # 2026-09-16).
+          # the transcript. Response shape (management/report.rs): items are
+          # "<id>_<expires>" STRINGS, not objects - the detail URL takes the
+          # item verbatim. Assert on .data.total, NEVER bare `length` (the
+          # wrapper object's length is 1 even with zero items - a vacuous
+          # pass burned one VM run 2026-09-16).
           machine.wait_until_succeeds(
               "curl -fsS -u admin:test-admin-secret "
-              "http://127.0.0.1:8080/api/queue/reports -o /tmp/report-ids.json "
+              "http://127.0.0.1:8080/api/reports/dmarc -o /tmp/report-ids.json "
               "&& jq -e '.data.total >= 1' /tmp/report-ids.json",
               timeout=120,
           )
           machine.succeed("cat /tmp/report-ids.json >&2")
           machine.succeed(
               "curl -fsS -u admin:test-admin-secret "
-              "http://127.0.0.1:8080/api/queue/reports/$(jq -r '.data.items[0].id' /tmp/report-ids.json) "
+              "http://127.0.0.1:8080/api/reports/dmarc/$(jq -r '.data.items[0]' /tmp/report-ids.json) "
               "-o /tmp/report-detail.json"
           )
           machine.succeed("cat /tmp/report-detail.json >&2")
