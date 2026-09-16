@@ -12,6 +12,7 @@ name: CI
 on:
   push:
     branches: [master, main]
+    tags: ['v*']
   pull_request:
     branches: [master, main]
   workflow_dispatch:
@@ -45,6 +46,20 @@ jobs:
 
       - name: Enforce alejandra formatting (fail-closed)
         run: nix fmt -- . --check
+
+      - name: Ban piped grep/tail/head assertions in tests (fail-closed)
+        run: |
+          # PIPE LINT (the exit-23 lesson, mechanized): in-VM assertions must
+          # be dump-to-file + grep-the-file, never `producer | grep -q`.
+          # Under the test shell's pipefail, grep -q's early exit EPIPEs the
+          # producer (observed ONCE in CI as curl exit 23 on a MATCHING
+          # payload, 2026-09-15); the negated form `! p | grep -q` can
+          # phantom-green. `| tail`/`| head` are the same class (exit-code
+          # eating / early close). Comment lines (nix or embedded python) are
+          # exempt so the doctrine can be stated in comments.
+          # No pipes on gate commands: a single awk prints offenders and sets
+          # the exit status; any hit fails the step.
+          awk 'match($0, /\|[[:space:]]*!?[[:space:]]*(grep|tail|head)\b/) && $0 !~ /^[[:space:]]*#/ {printf "offender: %s:%d: %s\n", FILENAME, FNR, $0; bad=1} END {exit bad}' tests/*.nix
 
       - name: Assert CI expected-checks match the flake (lockstep, fail-closed)
         run: |

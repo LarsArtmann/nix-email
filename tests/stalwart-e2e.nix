@@ -464,7 +464,8 @@ in
           # nameservers, and the spam-filter.pyzor.host lookup. Any NEW config
           # error (e.g. a malformed generated key) must fail this count.
           machine.succeed(
-              "test \"$(journalctl -u stalwart -b 0 -o cat | grep -c 'Configuration build error')\" -eq 2"
+              "journalctl -u stalwart -b 0 -o cat > /tmp/journal-config.log"
+              "&& test \"$(grep -c 'Configuration build error' /tmp/journal-config.log)\" -eq 2"
           )
 
       with subtest("alias: second emails entry delivers to the same account"):
@@ -585,9 +586,10 @@ in
           # exact binary + config from the unit so the export reads the same
           # RocksDB the service wrote.
           machine.succeed("systemctl stop stalwart.service")
+          machine.succeed("systemctl cat stalwart.service > /tmp/stalwart-unit.txt")
           exec_line = machine.succeed(
-              "systemctl cat stalwart.service | grep -oP 'ExecStart=\\K.*' | tail -1"
-          ).strip()
+              "grep -oP 'ExecStart=\\K.*' /tmp/stalwart-unit.txt"
+          ).strip().splitlines()[-1]
           m = re.search(r"(/nix/store/[^ ]+/bin/[^ ]+) --config=(\S+)", exec_line)
           assert m, "could not parse ExecStart line: " + exec_line
           sw_bin, sw_cfg = m.group(1), m.group(2)
