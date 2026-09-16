@@ -53,24 +53,24 @@ tree was launched at 18:16; verdict recorded below.
 
 ## b) PARTIALLY DONE
 
-1. **Final gate for the exact end-state tree:** launched 18:16 (the tree
-   changed after the 17:59 green: style-only Nix fix + CI/docs). Style-only
-   diffs cannot change behavior, but the repo's rule is that green claims
-   name the tree they ran on - the verdict lands in this file's addendum /
-   the session log, not by inference.
-2. **aarch64:** eval-verified and CI-evaluated; the ARM VM run of
-   `stalwart-e2e` is still TODO_LIST.
-3. **Upstream nixpkgs filings:** diagnosis current vs master; drafts not
-   written (filing authorization pending).
+1. ~~**Final gate for the exact end-state tree:** launched 18:16 (the tree~~ done (verdict in the file's own gate addendum: FLAKECHECK_EXIT:0)
+   ~~changed after the 17:59 green: style-only Nix fix + CI/docs). Style-only~~
+   ~~diffs cannot change behavior, but the repo's rule is that green claims~~
+   ~~name the tree they ran on - the verdict lands in this file's addendum /~~
+   ~~the session log, not by inference.~~
+2. ~~**aarch64:** eval-verified and CI-evaluated; the ARM VM run of~~ done (posture decided (documented-manual))
+   ~~`stalwart-e2e` is still TODO_LIST.~~
+3. ~~**Upstream nixpkgs filings:** diagnosis current vs master; drafts not~~ done (filed 2026-09-15 (#563651, #563652))
+   ~~written (filing authorization pending).~~
 
 ## c) NOT STARTED (gated - correctly untouched)
 
-1. Push of either repo (nix-email master 46+ ahead; SystemNix 2 ahead).
-2. SystemNix pin advance + relay-assertion restore + guard delete.
-3. Upstream issue filing; Junk-filing implementation (ROADMAP Q6);
-   v0.1.0 tag/release; MIT confirmation.
-4. All D1-gated work (live dmarc validation, migration compare, secret
-   rotation + sops-key-audit, VPS/DNS themes).
+1. ~~Push of either repo (nix-email master 46+ ahead; SystemNix 2 ahead).~~ done (pushed 2026-09-15)
+2. ~~SystemNix pin advance + relay-assertion restore + guard delete.~~ done (pin advanced to v0.2.0)
+3. ~~Upstream issue filing; Junk-filing implementation (ROADMAP Q6);~~ done (filed + MIT confirmed + Q6 re-posed)
+   ~~v0.1.0 tag/release; MIT confirmation.~~
+4. ~~All D1-gated work (live dmarc validation, migration compare, secret~~ **Won't implement — D1-gated block - stays in ROADMAP/TODO_LIST.**
+   ~~rotation + sops-key-audit, VPS/DNS themes).~~
 
 ## d) TOTALLY FUCKED UP (all NEW - the 17:59 §d stands, this adds to it)
 
@@ -125,39 +125,40 @@ tree was launched at 18:16; verdict recorded below.
 Already routed this session - `TODO_LIST.md` (16 rows) and `ROADMAP.md` are
 current; do not re-harvest. The concrete short list:
 
-1. Answer §g - it gates 8+ TODO rows by itself.
-2. Push both repos once authorized; watch CI's first real run (now with the
-   format gate + aarch64 eval step - expect them to be exercised for the
-   first time).
-3. SystemNix pin advance + relay assertions restore + guard delete + both
-   gates (TODO_LIST high-impact).
-4. v0.1.0 tag + GitHub release after the push.
-5. File the two nixpkgs issues (diagnoses verified vs master 2026-09-15).
-6. Junk-filing decision → possible wrapper sieve + GTUBE subtest upgrade.
-7. aarch64 `stalwart-e2e` emulated run once.
-8. parsedmarc-e2e TLS localMail variant; CSV row-count assertion;
-   two-reschedule over-quota assertion (new row).
-9. Pin-advance runbook note; CI lockstep audit test; negative-cache 65 s
-   cost proof; README runbook SystemNix pointer; stateVersion consolidation;
-   pin-discipline note; debug-script fixture template; docs-health ANNOTATE
-   pass (all TODO_LIST).
-10. Re-render both architecture SVGs together at the next docs touch (e-6).
+1. ~~Answer §g - it gates 8+ TODO rows by itself.~~ done (answers received + executed (file addendum))
+2. ~~Push both repos once authorized; watch CI's first real run (now with the~~ done (pushed; CI green after the SHA + aarch64 fixes (in-file addendum))
+   ~~format gate + aarch64 eval step - expect them to be exercised for the~~
+   ~~first time).~~
+3. ~~SystemNix pin advance + relay assertions restore + guard delete + both~~ done (done (pin v0.2.0))
+   ~~gates (TODO_LIST high-impact).~~
+4. ~~v0.1.0 tag + GitHub release after the push.~~ done (cut + released (v0.1.0 retroactive, v0.2.0))
+5. ~~File the two nixpkgs issues (diagnoses verified vs master 2026-09-15).~~ done (filed (both))
+6. ~~Junk-filing decision → possible wrapper sieve + GTUBE subtest upgrade.~~ **Won't implement — re-posed - wrapper-owned impossible (sieve wall); ROADMAP Q6.**
+7. ~~aarch64 `stalwart-e2e` emulated run once.~~ done (attempted; documented-manual)
+8. ~~parsedmarc-e2e TLS localMail variant; CSV row-count assertion;~~ done (TLS node + row-count + two-reschedule all shipped)
+   ~~two-reschedule over-quota assertion (new row).~~
+9. ~~Pin-advance runbook note; CI lockstep audit test; negative-cache 65 s~~ done (all shipped (runbook, lockstep, 65s proof, pointer, fixture); ANNOTATE = the 2026-09-16 pass)
+   ~~cost proof; README runbook SystemNix pointer; stateVersion consolidation;~~
+   ~~pin-discipline note; debug-script fixture template; docs-health ANNOTATE~~
+   ~~pass (all TODO_LIST).~~
+10. ~~Re-render both architecture SVGs together at the next docs touch (e-6).~~ **Won't implement — SVGs content-verified current 2026-09-16 (the 09-16 rewrap was text-neutral).**
 11. Consider `actionlint` in CI alongside the YAML parse (found nothing
     broken today; would catch expression typos the YAML parse cannot).
-12. Consider teaching the auto-commit daemon to run `nix fmt -- . --check`
-    (it "formats" by reputation only - that assumption failed d-2).
+    _(routed: TODO_LIST low row - still open)_
+12. ~~Consider teaching the auto-commit daemon to run `nix fmt -- . --check`~~ **Won't implement — user-level daemon config, outside repo scope.**
+    ~~(it "formats" by reputation only - that assumption failed d-2).~~
 
 ## g) Questions I cannot figure out myself
 
-1. **Push authorization:** nix-email `master` is 46+ commits ahead of origin,
-   SystemNix 2 ahead. Push both? Plain, or split (docs first, then code) so
-   CI's first run is readable?
+1. ~~**Push authorization:** nix-email `master` is 46+ commits ahead of origin,~~ done (both plain - executed)
+   ~~SystemNix 2 ahead. Push both? Plain, or split (docs first, then code) so~~
+   ~~CI's first run is readable?~~
 2. **Junk-filing ownership** (ROADMAP open question 6): 0.15.5 tags
    `X-Spam-Status` but never files to Junk. (a) this wrapper ships a
    declarative sieve (GTUBE subtest then asserts real Junk filing),
    (b) SystemNix owns the sieve, or (c) tag-only is the documented end state?
-3. **MIT confirmed?** LICENSE shipped MIT under the earlier mandate; one
-   word flips the TODO_LIST row to done (or names the license you want).
+3. ~~**MIT confirmed?** LICENSE shipped MIT under the earlier mandate; one~~ done (MIT CONFIRMED 2026-09-15)
+   ~~word flips the TODO_LIST row to done (or names the license you want).~~
 
 ---
 
@@ -207,3 +208,10 @@ Execution after the answers, in order:
    can never resolve on CI ("Secret history scan" also failing, unchecked).
    Fixing that is SystemNix-territory work (the nix-private-go-repos
    prepared-source pattern), deliberately not started here.
+
+---
+
+## Resolution addendum (2026-09-16, docs-health pass)
+
+All items resolved inline except g/2 (spam→Junk - ROADMAP Q6) and f/11
+(actionlint - TODO_LIST low row, still open). Archived.

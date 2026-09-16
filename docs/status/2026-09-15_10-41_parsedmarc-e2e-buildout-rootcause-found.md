@@ -150,8 +150,8 @@ with the debug driver but NOT yet fixed.
     ~~`-` prefixes re-verified with StateDirectory interplay~~
 30. ~~Decide: should the wrapper (not the test) own the elasticsearch-section~~ done (wrapper owns it (guarded, only while ES is off))
     ~~neutralization? If yes: option or unconditional? Document the choice~~
-31. ~~dmarc-eval: assert `settings.general.offline` passthrough works (it is~~ **Won't implement — covered by the settings passthrough contract; not separately asserted (TODO_LIST low row if wanted).**
-    ~~the wrapper's settings contract)~~
+31. dmarc-e2e: assert `settings.general.offline` passthrough works (it is
+   the wrapper's settings contract). _(routed: TODO_LIST low row - still open)_
 32. ~~Stalwart-e2e: add a clean-message-never-files-to-Junk counter-assertion~~ done (implicit: clean-message INBOX assertions in the delivery subtests)
     ~~(avoid the filter eating normal mail silently)~~
 33. ~~Stalwart-e2e: assert the GTUBE message is also REMOVED from INBOX~~ **Won't implement — premise disproven - 0.15.5 delivers GTUBE mail to INBOX (tag-only); see the sieve-wall ledger entry.**
@@ -171,7 +171,8 @@ with the debug driver but NOT yet fixed.
     ~~TODO_LIST during the rewrite~~
 41. ~~Verify the improved-state d2 SVG renders in a browser (syntax is green,~~ **Won't implement — d2 exit code + content grep verified (2026-09-16); browser render is cosmetic.**
     ~~visual sanity not checked by d2 exit code)~~
-42. ~~Add the SVGs' regeneration command to CONTRIBUTING.md (d2 --layout=elk)~~ **Won't implement — routed to TODO_LIST low row.**
+42. Add the SVGs' regeneration command to CONTRIBUTING.md (d2 --layout=elk).
+   _(routed: TODO_LIST low row - still open)_
 43. ~~Decide whether README should embed mermaid instead of d2 (GitHub renders~~ **Won't implement — README embeds the d2 source + links SVGs; mermaid conversion adds nothing.**
     ~~mermaid natively; d2 needs the file) — user decision, low priority~~
 44. ~~Roadmap: the report-viewer over JSON/CSV (diagram's dashed box) stays~~ done (ROADMAP carries the viewer with the DEFERRED verdict (master plan 06b))

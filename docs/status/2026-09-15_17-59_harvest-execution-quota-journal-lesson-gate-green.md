@@ -81,30 +81,30 @@ exit 0, all 4 checks, unmasked.** Nothing pushed (not authorized).
 
 ## b) PARTIALLY DONE
 
-1. **The §f sweep itself:** 8 items done, but 3 consciously deferred: the CI
-   lockstep audit test (TODO_LIST), the upstream issue DRAFTS (diagnosis
-   complete; drafting gated on filing authorization), and the docs-health
-   ANNOTATE pass over `docs/status/` (needs user scoping per the skill).
-2. **aarch64:** the EVAL contract builds for aarch64 and CI evaluates the
-   check set, but the stalwart VM tests have still never run on ARM
-   (TODO_LIST row kept, sharpened).
-3. **The debug-VM tooling:** worked end-to-end (see §d-3 for the fumble), and
-   the AGENTS VM-debug-loop command was amended with the correct binary path
-   (`<output>/bin/nixos-test-driver`) — but the good debug script still lives
-   in `/tmp` only (TODO_LIST row: preserve as a fixtures template).
+1. ~~**The §f sweep itself:** 8 items done, but 3 consciously deferred: the CI~~ **Won't implement — all three deferred items landed later: lockstep guard (v0.2.0), filings (done), ANNOTATE (2026-09-16 pass).**
+   ~~lockstep audit test (TODO_LIST), the upstream issue DRAFTS (diagnosis~~
+   ~~complete; drafting gated on filing authorization), and the docs-health~~
+   ~~ANNOTATE pass over `docs/status/` (needs user scoping per the skill).~~
+2. ~~**aarch64:** the EVAL contract builds for aarch64 and CI evaluates the~~ done (posture decided 2026-09-15 (emulated run attempted; documented-manual))
+   ~~check set, but the stalwart VM tests have still never run on ARM~~
+   ~~(TODO_LIST row kept, sharpened).~~
+3. ~~**The debug-VM tooling:** worked end-to-end (see §d-3 for the fumble), and~~ done (preserved as tests/fixtures/debug-template.py)
+   ~~the AGENTS VM-debug-loop command was amended with the correct binary path~~
+   ~~(`<output>/bin/nixos-test-driver`) — but the good debug script still lives~~
+   ~~in `/tmp` only (TODO_LIST row: preserve as a fixtures template).~~
 
 ## c) NOT STARTED (all gated - correctly untouched)
 
-1. Push of either repo (not authorized; nix-email 46 commits ahead now).
-2. SystemNix pin advance + relay-assertion restore + guard delete (blocked on
-   that push).
-3. Upstream nixpkgs issue FILING (authorization; diagnosis is current).
+1. ~~Push of either repo (not authorized; nix-email 46 commits ahead now).~~ done (pushed 2026-09-15)
+2. ~~SystemNix pin advance + relay-assertion restore + guard delete (blocked on~~ done (done (evening session: pin v0.2.0))
+   ~~that push).~~
+3. ~~Upstream nixpkgs issue FILING (authorization; diagnosis is current).~~ done (filed (#563651, #563652))
 4. Junk-filing ownership implementation (product decision; now ROADMAP open
    question 6 with the three options spelled out).
-5. v0.1.0 tag + GitHub release (TODO_LIST row, blocked on push).
+5. ~~v0.1.0 tag + GitHub release (TODO_LIST row, blocked on push).~~ done (cut: v0.1.0 retroactive + v0.2.0, both released)
 6. All D1-gated work: live dmarc validation, migration compare, secret
    rotation + sops-key-audit check, VPS/DNS themes.
-7. MIT LICENSE confirmation (user).
+7. ~~MIT LICENSE confirmation (user).~~ done (MIT CONFIRMED 2026-09-15)
 
 ## d) TOTALLY FUCKED UP
 
@@ -157,48 +157,48 @@ The 17:05 §f was fully harvested THIS session — most items now live in
 `TODO_LIST.md` / `ROADMAP.md` (do not re-harvest this file into duplicates;
 dedupe against those first). The genuinely NEW items this session produced:
 
-1. Answer §g (3 questions) — gates 8+ TODO_LIST rows by itself.
-2. Push both repos once authorized → run CI's first real pass on 46 commits.
-3. After push: advance the SystemNix pin, restore relay assertions, delete
-   the wrapper guard, gate both repos (TODO_LIST high-impact row).
-4. After push: cut `v0.1.0` tag + GitHub release (TODO_LIST row).
-5. File the two nixpkgs issues once authorized (diagnosis verified vs master
-   2026-09-15; cite imapclient 4.0.1's partial fix + the starttls() gap).
-6. Junk-filing decision → if wrapper-owned: declarative sieve + GTUBE subtest
-   upgrade (ROADMAP open question 6).
-7. Run `stalwart-e2e` once under qemu-aarch64 (TODO_LIST; eval build already
-   green — the VM run is the remaining unknown).
-8. parsedmarc-e2e TLS-capable localMail variant (TODO_LIST).
-9. Pin-advance runbook note incl. imapclient revert-condition checklist
-   (TODO_LIST).
-10. CI lockstep audit test: flake asserts CI's expected-checks list matches
-    `attrNames checks` (TODO_LIST).
-11. parsedmarc CSV row-count assertion; negative-cache 65 s cost proof;
-    README runbook SystemNix pointer; stateVersion-coupling consolidation;
-    pin-discipline note; debug-script fixture template; docs-health ANNOTATE
-    pass (all TODO_LIST rows).
-12. CONTRIBUTING: consider mirroring the transcript-first rule (e-1).
-13. Ledger: note that `nix flake check` reports "omitted incompatible
-    systems: aarch64-linux" — the CI aarch64 EVAL step covers exactly that
-    gap; keep them paired if the flake ever grows more systems.
-14. Consider making the over-quota subtest ALSO assert the retry keeps
-    rescheduling (two `Message rescheduled` lines after a sleep) — today one
-    line proves "retried at least once", not "forever" (the IMAP-absent probe
-    carries the rest).
-15. The 17:05 report's remaining §f items that are ROADMAP fuel (viewer,
-    Gatus freshness, DMARC ladder, etc.) — see ROADMAP; nothing new to add.
+1. ~~Answer §g (3 questions) — gates 8+ TODO_LIST rows by itself.~~ done (MIT confirmed; pushes executed; Q6 re-posed (ROADMAP))
+2. ~~Push both repos once authorized → run CI's first real pass on 46 commits.~~ done (pushed; CI green)
+3. ~~After push: advance the SystemNix pin, restore relay assertions, delete~~ done (done (pin v0.2.0 + assertions + guard))
+   ~~the wrapper guard, gate both repos (TODO_LIST high-impact row).~~
+4. ~~After push: cut `v0.1.0` tag + GitHub release (TODO_LIST row).~~ done (cut + released (both tags))
+5. ~~File the two nixpkgs issues once authorized (diagnosis verified vs master~~ done (filed (both))
+   ~~2026-09-15; cite imapclient 4.0.1's partial fix + the starttls() gap).~~
+6. ~~Junk-filing decision → if wrapper-owned: declarative sieve + GTUBE subtest~~ **Won't implement — re-posed - wrapper-owned impossible (sieve wall); ROADMAP Q6 options a-d, rec c+d.**
+   ~~upgrade (ROADMAP open question 6).~~
+7. ~~Run `stalwart-e2e` once under qemu-aarch64 (TODO_LIST; eval build already~~ done (attempted; decided documented-manual)
+   ~~green — the VM run is the remaining unknown).~~
+8. ~~parsedmarc-e2e TLS-capable localMail variant (TODO_LIST).~~ done (TLS node shipped in v0.2.0)
+9. ~~Pin-advance runbook note incl. imapclient revert-condition checklist~~ done (README Pin-advance runbook shipped)
+   ~~(TODO_LIST).~~
+10. ~~CI lockstep audit test: flake asserts CI's expected-checks list matches~~ done (strict lockstep guard shipped (both directions negative-tested 2026-09-16))
+    ~~`attrNames checks` (TODO_LIST).~~
+11. ~~parsedmarc CSV row-count assertion; negative-cache 65 s cost proof;~~ done (row-count + 65s proof + runbook pointer + fixture shipped; stateVersion verified already-consolidated; pin-discipline note shipped; ANNOTATE = this 2026-09-16 pass)
+    ~~README runbook SystemNix pointer; stateVersion-coupling consolidation;~~
+    ~~pin-discipline note; debug-script fixture template; docs-health ANNOTATE~~
+    ~~pass (all TODO_LIST rows).~~
+12. ~~CONTRIBUTING: consider mirroring the transcript-first rule (e-1).~~ done (CONTRIBUTING transcript-first rule shipped (18-17 session))
+13. ~~Ledger: note that `nix flake check` reports "omitted incompatible~~ **Won't implement — pairing documented in the CI aarch64 step comment; no ledger bullet needed.**
+    ~~systems: aarch64-linux" — the CI aarch64 EVAL step covers exactly that~~
+    ~~gap; keep them paired if the flake ever grows more systems.~~
+14. ~~Consider making the over-quota subtest ALSO assert the retry keeps~~ done (shipped (SECOND reschedule line proves the loop))
+    ~~rescheduling (two `Message rescheduled` lines after a sleep) — today one~~
+    ~~line proves "retried at least once", not "forever" (the IMAP-absent probe~~
+    ~~carries the rest).~~
+15. ~~The 17:05 report's remaining §f items that are ROADMAP fuel (viewer,~~ done (ROADMAP carries them (viewer DEFERRED, freshness dedup noted))
+    ~~Gatus freshness, DMARC ladder, etc.) — see ROADMAP; nothing new to add.~~
 
 ## g) Questions I cannot figure out myself
 
-1. **Push authorization** (unchanged from 17:05, now more urgent): nix-email
-   `master` is 46 commits ahead of origin; SystemNix 2 ahead. Push both?
-   Plain or split (docs-then-code) for CI's first run?
+1. ~~**Push authorization** (unchanged from 17:05, now more urgent): nix-email~~ done (pushes executed (plain))
+   ~~`master` is 46 commits ahead of origin; SystemNix 2 ahead. Push both?~~
+   ~~Plain or split (docs-then-code) for CI's first run?~~
 2. **Junk-filing ownership** (now ROADMAP open question 6): 0.15.5 tags
    `X-Spam-Status` but never files to Junk. (a) wrapper-owned declarative
    sieve (GTUBE subtest upgrades to assert real Junk filing), (b) consumer-
    side sieve in SystemNix, or (c) tag-only as the documented end state?
-3. **MIT confirmed?** LICENSE shipped MIT under the earlier mandate; one word
-   flips the TODO_LIST row to done (or names the license you actually want).
+3. ~~**MIT confirmed?** LICENSE shipped MIT under the earlier mandate; one word~~ done (MIT CONFIRMED 2026-09-15)
+   ~~flips the TODO_LIST row to done (or names the license you actually want).~~
 
 ---
 
@@ -207,3 +207,11 @@ HTML dashboard; you explicitly requested `.md`, so this file is Markdown — the
 override is intentional and not propagated back into the skill.
 
 **Then per the skill: WAITING FOR INSTRUCTIONS.**
+
+---
+
+## Resolution addendum (2026-09-16, docs-health pass)
+
+All items resolved inline except the standing user decisions: g/2
+(spam→Junk - ROADMAP Q6) and the D1/D2-gated block (c/6, ROADMAP themes).
+Archived.
