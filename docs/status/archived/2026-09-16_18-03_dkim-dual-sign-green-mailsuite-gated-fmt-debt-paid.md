@@ -79,32 +79,32 @@ paid as tuition along the way.
 
 ## b) PARTIALLY DONE
 
-1. **mailsuite filing** — draft fully ready and voice-checked, not filed
-   (user decision). Deliberate, not neglect.
-2. **CI green streak** — green at yield, but the session owns a 13-minute
-   red window on master (15:40→15:53, see d/1).
-3. **FEATURES.md `dmarc-eval` row** (line 57) still lists the old
+1. ~~**mailsuite filing** — draft fully ready and voice-checked, not filed
+   (user decision). Deliberate, not neglect.~~ _(routed: TODO_LIST file-or-skip row - still user-gated)_
+2. ~~**CI green streak** — green at yield, but the session owns a 13-minute
+   red window on master (15:40→15:53, see d/1).~~ done (green at yield stands; the fmt debt is paid and the pre-push hook is a TODO_LIST row)
+3. ~~**FEATURES.md `dmarc-eval` row** (line 57) still lists the old
    assertion set — the new `general.offline` passthrough and
    `nixosOptionsDoc` rendering assertions are not reflected. The sweep
    updated the DKIM rows but missed this one (caught while writing this
-   report; 5-minute fix).
-4. **Stale in-context AGENTS.md** — the conversation-start copy did not
+   report; 5-minute fix).~~ done (2026-09-16 evening AUDIT: row updated; assertions verified present at `tests/dmarc-eval.nix:44,58-59,103,108-109`)
+4. ~~**Stale in-context AGENTS.md** — the conversation-start copy did not
    mention BuildFlow or the `nix fmt .` invocation quirk; both were on
    disk (parallel sessions). I worked parts of the session from stale
-   memory-of-file instead of re-reading the disk state.
+   memory-of-file instead of re-reading the disk state.~~ done (lesson internalized as §e/5; the disk state was and remains current)
 
 ## c) NOT STARTED (user-gated — not self-serve)
 
-- Renovate GitHub-app install-or-drop (verdict delivered: app never ran).
-- mailsuite issue file-or-skip (draft ready).
-- Dependabot PR #1 merge decision (MERGEABLE/CLEAN since session 6).
-- GH013 / GitHub Discussions enable-or-keep-issues-only.
-- D1 (rua mailbox / live enablement), D2, Q6 verdicts — gate ROADMAP work.
-- Release 0.3.0 cut (waits on PR #1 resolution).
-- SystemNix ~75-commit push + CI-debt clearing (parallel-session overlap).
-- Resend SASL smoke test (needs account/API key).
-- Stalwart upstream Junk-filing FR (gated on Q6).
-- Filings watch (#563651/#563652/#563777/#662/#663) — passive, recurring.
+- ~~Renovate GitHub-app install-or-drop (verdict delivered: app never ran).~~ _(routed: TODO_LIST install-or-drop row)_
+- ~~mailsuite issue file-or-skip (draft ready).~~ _(routed: TODO_LIST row)_
+- ~~Dependabot PR #1 merge decision (MERGEABLE/CLEAN since session 6).~~ done (user MERGED it 2026-09-16 16:08 UTC - `20fd3a9`)
+- ~~GH013 / GitHub Discussions enable-or-keep-issues-only.~~ GH013: _(routed: SystemNix row)_; Discussions: _(routed: TODO_LIST row)_
+- ~~D1 (rua mailbox / live enablement), D2, Q6 verdicts — gate ROADMAP work.~~ standing user decisions (ROADMAP)
+- ~~Release 0.3.0 cut (waits on PR #1 resolution).~~ _(routed: TODO_LIST High row - gate CLEARED, PR #1 merged)_
+- ~~SystemNix ~75-commit push + CI-debt clearing (parallel-session overlap).~~ _(routed: TODO_LIST SystemNix row)_
+- ~~Resend SASL smoke test (needs account/API key).~~ _(routed: TODO_LIST row)_
+- ~~Stalwart upstream Junk-filing FR (gated on Q6).~~ _(routed: TODO_LIST row)_
+- ~~Filings watch (#563651/#563652/#563777/#662/#663) — passive, recurring.~~ _(routed: TODO_LIST watch row; #663 re-checked OPEN 2026-09-16 evening)_
 
 ## d) TOTALLY FUCKED UP!
 
@@ -158,69 +158,79 @@ paid as tuition along the way.
 ## f) Next things (impact-ordered; 30 honest items, not padded to 50)
 
 User decisions (minutes each, unblock everything below them):
-1. Renovate: install app or drop `renovate.json`.
-2. mailsuite: file / tweak / skip the staged draft.
-3. Dependabot PR #1: merge or close.
-4. GH013 / Discussions enable-or-issues-only.
-5. D1 rua-mailbox decision → unblocks 19/20/21.
-6. Q6 Junk-filing verdict → gates 24.
-7. D2 license follow-through (whatever ROADMAP D2 resolves to).
+1. ~~Renovate: install app or drop `renovate.json`.~~ _(routed: TODO_LIST row)_
+2. ~~mailsuite: file / tweak / skip the staged draft.~~ _(routed: TODO_LIST row)_
+3. ~~Dependabot PR #1: merge or close.~~ done (MERGED 2026-09-16 16:08 UTC)
+4. ~~GH013 / Discussions enable-or-issues-only.~~ _(routed: SystemNix row / TODO_LIST row)_
+5. ~~D1 rua-mailbox decision → unblocks 19/20/21.~~ standing (ROADMAP D1)
+6. ~~Q6 Junk-filing verdict → gates 24.~~ standing (ROADMAP Q6)
+7. ~~D2 license follow-through (whatever ROADMAP D2 resolves to).~~ standing (ROADMAP D2)
 
 Small self-serve (each verified-needed by this session):
-8. FEATURES.md: add offline + option-docs assertions to the `dmarc-eval`
-   row (5m).
-9. `stalwart-e2e`: direct `jq -e '.data.errors | length == 0'` on the
-   reload response (10m).
-10. Git `pre-push` hook running `nix fmt -- . --check` (15m; kills the
-    d/1 failure class).
-11. Release 0.3.0 after PR #1 resolves: CHANGELOG cut, tag (CI now runs
-    on tags), notes with lock rev/narHash pin (1h).
-12. TODO_LIST re-sweep once 1-4 land (rows resolve either way).
+8. ~~FEATURES.md: add offline + option-docs assertions to the `dmarc-eval`
+   row (5m).~~ done (2026-09-16 evening AUDIT)
+9. ~~`stalwart-e2e`: direct `jq -e '.data.errors | length == 0'` on the
+   reload response (10m).~~ _(routed: TODO_LIST Medium row)_
+10. ~~Git `pre-push` hook running `nix fmt -- . --check` (15m; kills the
+    d/1 failure class).~~ _(routed: TODO_LIST Medium row)_
+11. ~~Release 0.3.0 after PR #1 resolves: CHANGELOG cut, tag (CI now runs
+    on tags), notes with lock rev/narHash pin (1h).~~ _(routed: TODO_LIST High row - PR #1 resolved, UNBLOCKED)_
+12. ~~TODO_LIST re-sweep once 1-4 land (rows resolve either way).~~ done (2026-09-16 evening AUDIT: rebuilt to 14 open rows)
 
 Watch items (passive, recurring):
-13. nixpkgs#563651 / #563652 / #563777 / mjs#662 / mjs#663 responses
-    (dotlambda's "upstream PR first" is answered by #663 — watch merge).
-14. Stalwart >0.15.5 release watch (module README note requirement).
-15. parsedmarc / mailsuite / imapclient minor bumps on nixpkgs moves
-    (always paired with SystemNix lock rev, compat doctrine).
-16. mailsuite issue thread (once filed): PR offer stands in the draft.
+13. ~~nixpkgs#563651 / #563652 / #563777 / mjs#662 / mjs#663 responses
+    (dotlambda's "upstream PR first" is answered by #663 — watch merge).~~ _(routed: TODO_LIST watch row)_
+14. ~~Stalwart >0.15.5 release watch (module README note requirement).~~ standing (Pin-advance runbook doctrine, README)
+15. ~~parsedmarc / mailsuite / imapclient minor bumps on nixpkgs moves
+    (always paired with SystemNix lock rev, compat doctrine).~~ standing (Pin-advance runbook, README)
+16. ~~mailsuite issue thread (once filed): PR offer stands in the draft.~~ _(rides the TODO_LIST file-or-skip row)_
 
 SystemNix side (parallel-session overlap, user-gated):
-17. Push the ~75 commits, clear CI debt (statix sweep, `syn_` policy,
-    2 pin flips, gitleaks `rev=` allowlist) (2h).
-18. Resend SASL smoke against smtp.resend.com:587 (30m, needs key).
-19. Live dmarc-monitor validation against the D1 mailbox (1h).
-20. Migration compare: stalwart-vandelay vs imapsync (1h, D1-gated).
-21. Rotate the three placeholder secrets pre-enablement (20m, D1-gated).
+17. ~~Push the ~75 commits, clear CI debt (statix sweep, `syn_` policy,
+    2 pin flips, gitleaks `rev=` allowlist) (2h).~~ _(routed: TODO_LIST SystemNix row)_
+18. ~~Resend SASL smoke against smtp.resend.com:587 (30m, needs key).~~ _(routed: TODO_LIST row)_
+19. ~~Live dmarc-monitor validation against the D1 mailbox (1h).~~ _(routed: TODO_LIST D1-gated row)_
+20. ~~Migration compare: stalwart-vandelay vs imapsync (1h, D1-gated).~~ _(routed: TODO_LIST D1-gated row)_
+21. ~~Rotate the three placeholder secrets pre-enablement (20m, D1-gated).~~ _(routed: TODO_LIST D1-gated row)_
 
 Hardening / quality (self-serve, low urgency):
-22. ROADMAP Gatus external-view checks (starttls :25, tls :993, cert
-    expiry).
-23. Consider strict required-check enforcement (no bypass) once the
-    daemon/commit flow is settled — see g/7.
-24. Stalwart upstream FR: declarative server-side Junk filing (30m, Q6).
-25. docs-health ANNOTATE pass on this report when it goes stale.
-26. Add the reload-smoke ops step ("check `errors` in the response") to
+22. ~~ROADMAP Gatus external-view checks (starttls :25, tls :993, cert
+    expiry).~~ standing (already a ROADMAP §4 raw idea - no TODO row needed)
+23. ~~Consider strict required-check enforcement (no bypass) once the
+    daemon/commit flow is settled — see g/7.~~ _(routed: TODO_LIST branch-protection policy row)_
+24. ~~Stalwart upstream FR: declarative server-side Junk filing (30m, Q6).~~ _(routed: TODO_LIST row, Q6-gated)_
+25. ~~docs-health ANNOTATE pass on this report when it goes stale.~~ done (2026-09-16 evening pass - this file)
+26. ~~Add the reload-smoke ops step ("check `errors` in the response") to
     the SystemNix runbook if the live host ever uses management-API
-    settings changes.
-27. aarch64: occasionally run the local gate with `--all-systems` (CI
-    shape guard already asserts the set exists).
+    settings changes.~~ _(routed: ROADMAP §4 raw idea - conditional on a live host using management-API settings changes)_
+27. ~~aarch64: occasionally run the local gate with `--all-systems` (CI
+    shape guard already asserts the set exists).~~ _(routed: ROADMAP §5 aarch64 residue line)_
 
 ## g) Questions I can NOT figure out myself
 
-1. **Renovate**: install the GitHub app on LarsArtmann/nix-email, or
+1. ~~**Renovate**: install the GitHub app on LarsArtmann/nix-email, or
    delete `renovate.json` and leave Dependabot on github-actions only?
-   (I verified the app never ran; the choice is yours.)
-2. **mailsuite**: file the staged draft at seanthegeek/mailsuite as-is,
+   (I verified the app never ran; the choice is yours.)~~ _(routed: TODO_LIST row)_
+2. ~~**mailsuite**: file the staged draft at seanthegeek/mailsuite as-is,
    tweak anything first, or skip entirely? (Draft:
-   `docs/planning/mailsuite-starttls-issue-draft.md`.)
-3. **Branch protection**: my pushes bypass the required
+   `docs/planning/mailsuite-starttls-issue-draft.md`.)~~ _(routed: TODO_LIST row)_
+3. ~~**Branch protection**: my pushes bypass the required
    "nix flake check" (remote said so, verbatim). Keep the bypass for
    velocity (the auto-commit daemon could not pass required checks), or
-   tighten it and accept that daemon pushes get rejected until CI-green?
+   tighten it and accept that daemon pushes get rejected until CI-green?~~ _(routed: TODO_LIST policy row)_
 
 ---
 
 *Point-in-time snapshot. Written 2026-09-16 18:03 CEST after CI green on
 `fae9e81`. Format: Markdown per explicit user instruction (skill default
 is HTML). WAITING FOR INSTRUCTIONS.*
+
+---
+
+## Resolution addendum (2026-09-16, docs-health pass)
+
+PR #1 merged at 16:08 UTC - the 0.3.0 gate cleared (TODO_LIST High row).
+All self-serve §f items either executed (8, 12, 25 - this pass), routed
+to TODO_LIST rows (9, 10, 11, 23), or confirmed standing
+watch/ROADMAP items. The user-decision spine (1-7) is routed to
+TODO_LIST rows / ROADMAP open questions. Archived.

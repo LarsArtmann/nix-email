@@ -82,6 +82,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   footgun, and the local GC-root debug recipe
   (`nix build -o /tmp/st-e2e-root .#checks...stalwart-e2e`; CI-side
   gc-roots pointless - CI keeps check paths alive for the log window)
+- docs-health AUDIT, second pass (2026-09-16 evening): the seven
+  2026-09-16 status reports annotated inline (per-item done /
+  won't-implement / routed verdicts citing commits and evidence) and
+  archived under `docs/status/archived/` - `docs/status/` now holds only
+  the archive. Every open item re-verified against the tree
+  (PR #1 MERGED 16:08 UTC; CI green on HEAD; `data.errors` assertion
+  confirmed still absent; dmarc-eval assertions confirmed present) and
+  harvested: TODO_LIST rebuilt to 14 open rows (0.3.0 release now
+  UNBLOCKED, reload-precondition assertion, pre-push fmt hook,
+  branch-protection policy decision, SystemNix row extended with cache
+  hygiene, a 3-row Low hygiene tier), README gained a "Development"
+  section (devShell, gate hierarchy, no-pipes rule) plus the #563652
+  dotlambda/#663 watch note, ROADMAP pruned of shipped items (CI,
+  formatter, upstream filings, aarch64 decision) and extended (reload
+  -smoke ops idea, treefmt-vs-alejandra tradeoff, aarch64 `--all-systems`
+  residue), FEATURES `dmarc-eval` row now carries the offline +
+  option-docs assertions, and the AGENTS deadnix wording was corrected
+  (report-only default; BuildFlow's auto-fix is the removal path)
 
 ### Fixed
 

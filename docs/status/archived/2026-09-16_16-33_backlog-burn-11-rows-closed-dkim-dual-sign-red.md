@@ -23,7 +23,7 @@ Interrupted by this report demand mid-investigation.
 
 ## b) PARTIALLY DONE
 
-1. **DKIM dual-algorithm subtest — RED (run, failed, evidence captured).**
+1. ~~**DKIM dual-algorithm subtest — RED (run, failed, evidence captured).**
    What works (all observed green in the run): `POST /api/dkim` with
    `{"algorithm":"Ed25519","domain":"example.test"}` creates the signature
    (source-verified serde variant-name payload); default id
@@ -35,27 +35,27 @@ Interrupted by this report demand mid-investigation.
    (unverified): the SMTP signing path does not pick up store-written
    signature settings until an explicit `POST /api/reload` — the fix is
    likely one line in the subtest. `tests/stalwart-e2e.nix` is uncommitted
-   (M) pending the fix. Run log: /tmp/e2e-dkim.log, EXIT:1.
-2. **mailsuite upstream knob proposal — mid-gate.** Gates 1+3 pass
+   (M) pending the fix. Run log: /tmp/e2e-dkim.log, EXIT:1.~~ done (hypothesis CONFIRMED and deepened: store-only `config.set` + reload silent-no-op on any config error; fix `891fa44` + sweep `2b7257e`; GREEN, 18-03 §a/1)
+2. ~~**mailsuite upstream knob proposal — mid-gate.** Gates 1+3 pass
    (auto-STARTTLS verified at imap.py:284-286 in the INSTALLED 2.3.1
    package; trap generalizes to any cert-less IMAP server). Real upstream
    repo identified via PyPI metadata: seanthegeek/mailsuite (NOT
    domainaware/* — my first repo guess 404'd), latest release 2.3.2.
    Gates 2+5 (does master 2.3.2 already have a knob? prior issues/PRs?)
    were NOT run — interrupt hit here. verify-before-filing skill loaded
-   and followed to this point; github-voice not yet loaded.
+   and followed to this point; github-voice not yet loaded.~~ done (all 5 gates PASSED in 18-03 §a/3: master imap.py byte-identical to 2.3.1; parsedmarc#534 same trap; draft staged - filing user-gated, TODO_LIST row)
 
 ## c) NOT STARTED (deliberately ordered after the DKIM fix)
 
-- TODO_LIST sweep (delete the 9 now-done rows, update filings row with the
+- ~~TODO_LIST sweep (delete the 9 now-done rows, update filings row with the
   dotlambda conditional-accept + PR #663 watch, convert Renovate row to
-  user-blocked).
-- Full `nix flake check` + push + CI for this segment's edits.
-- CHANGELOG entries for this segment.
-- mailsuite draft + file (after gates 2/5).
-- All user-gated rows (unchanged): PR #1 merge, GH013, Q6, D1/D2,
+  user-blocked).~~ done (`e18758f`)
+- ~~Full `nix flake check` + push + CI for this segment's edits.~~ done (18-03 §a/8: `24def0e` fmt + green runs 35117320385/35118323763)
+- ~~CHANGELOG entries for this segment.~~ done (`2b7257e`)
+- ~~mailsuite draft + file (after gates 2/5).~~ draft done (18-03 §a/3); filing _(routed: TODO_LIST file-or-skip row)_
+- ~~All user-gated rows (unchanged): PR #1 merge, GH013, Q6, D1/D2,
   ANNOTATE scope, `syn_` policy; plus the NEW Renovate-app install
-  decision.
+  decision.~~ PR #1: done (merged 16:08 UTC); ANNOTATE scope: done (evening pass); the rest _(routed: TODO_LIST rows / ROADMAP standing)_
 
 ## d) TOTALLY FUCKED UP (honest failures this segment)
 
@@ -96,43 +96,43 @@ Interrupted by this report demand mid-investigation.
 
 ## f) NEXT (bounded, roughly ordered)
 
-1. DKIM fix: add `POST /api/reload` after the keygen in the subtest;
+1. ~~DKIM fix: add `POST /api/reload` after the keygen in the subtest;
    rerun stalwart-e2e (expect green; if not, read the signer's settings
    resolution in the pinned source — smtp/dkim signing path — before
-   touching anything else).
-2. Commit the DKIM leg; run FULL `nix flake check` (unpiped, log+EXIT);
-   push; watch CI green.
-3. TODO_LIST sweep (see c) + sweep-note update.
-4. CHANGELOG entries for this segment (actionlint step, dmarc-eval
+   touching anything else).~~ done (`891fa44`: reload + pyzor-disable; the deeper reload silent-no-op trap found and ledgered; GREEN)
+2. ~~Commit the DKIM leg; run FULL `nix flake check` (unpiped, log+EXIT);
+   push; watch CI green.~~ done (18-03 §a/8: two green runs after the fmt fix `24def0e`)
+3. ~~TODO_LIST sweep (see c) + sweep-note update.~~ done (`e18758f`)
+4. ~~CHANGELOG entries for this segment (actionlint step, dmarc-eval
    assertions, retention/quota/catch-all docs, release-note pins,
-   GC-root recipe + CI verdict, lessons note, filings state).
-5. mailsuite: finish gates 2/5 (diff master imap.py vs 2.3.1; search
+   GC-root recipe + CI verdict, lessons note, filings state).~~ done (`2b7257e` + prior session-7 entries)
+5. ~~mailsuite: finish gates 2/5 (diff master imap.py vs 2.3.1; search
    seanthegeek/mailsuite + domainaware/parsedmarc issues open AND closed
    for STARTTLS-disable), then github-voice draft + file (or drop with
-   verdict).
-6. Ledger entry: `/api/dkim` keygen contract + (pending) reload
-   requirement — goes in with the DKIM fix once verified.
-7. User-gated queue: PR #1 merge (green, MERGEABLE/CLEAN), GH013 click
+   verdict).~~ done (18-03 §a/3: gates PASSED, draft staged; filing user-gated)
+6. ~~Ledger entry: `/api/dkim` keygen contract + (pending) reload
+   requirement — goes in with the DKIM fix once verified.~~ done (18-03 §a/2: README ledger entry with the live-ops read, `2b7257e`)
+7. ~~User-gated queue: PR #1 merge (green, MERGEABLE/CLEAN), GH013 click
    (SystemNix ~75+ commits), Q6 junk-filing verdict, D1/D2 one-liners,
    ANNOTATE scope, `syn_` policy, and now the Renovate-app install
-   decision (new evidence: never ran).
-8. Cut release 0.3.0 once PR #1 resolves (Unreleased is thick).
-9. Standing D1-gated and user-blocked rows otherwise unchanged.
+   decision (new evidence: never ran).~~ PR #1 done (merged); ANNOTATE done; rest _(routed: TODO_LIST rows / ROADMAP)_
+8. ~~Cut release 0.3.0 once PR #1 resolves (Unreleased is thick).~~ _(routed: TODO_LIST High row - PR #1 merged, UNBLOCKED)_
+9. ~~Standing D1-gated and user-blocked rows otherwise unchanged.~~ standing (TODO_LIST)
 
 ## g) QUESTIONS (cannot resolve myself)
 
-1. **Renovate app**: it has NEVER run on nix-email (no dashboard issue,
+1. ~~**Renovate app**: it has NEVER run on nix-email (no dashboard issue,
    zero activity) — the app simply isn't installed. Install/enable it, or
    drop the config and keep Dependabot(actions) + manual nix bumps under
-   the pairing doctrine?
-2. **DKIM ed25519 leg budget**: fix-forward with the reload-API hypothesis
+   the pairing doctrine?~~ _(routed: TODO_LIST install-or-drop row - standing user decision)_
+2. ~~**DKIM ed25519 leg budget**: fix-forward with the reload-API hypothesis
    (expected ≤2 VM runs), or park the dual-sign subtest if the reload
    theory is wrong and the signer needs a restart (a restart would still
-   be assertable, just a different claim)?
-3. **mailsuite filing**: proceed to file the auto-STARTTLS knob proposal
+   be assertable, just a different claim)?~~ done (fix-forward won: `891fa44`, one VM cycle after the source re-read)
+3. ~~**mailsuite filing**: proceed to file the auto-STARTTLS knob proposal
    at seanthegeek/mailsuite once the remaining gates pass, or
    note-in-ledger-and-skip (low-traffic upstream, our actual production
-   path uses real TLS anyway)?
+   path uses real TLS anyway)?~~ _(routed: TODO_LIST file-or-skip row)_
 
 ## Session artifacts
 
@@ -145,3 +145,12 @@ Interrupted by this report demand mid-investigation.
 - Git: master ahead 5 (daemon heuristic commits carry this segment's
   work); `tests/stalwart-e2e.nix` modified, uncommitted, pending the
   DKIM fix.
+
+---
+
+## Resolution addendum (2026-09-16, docs-health pass)
+
+The RED DKIM leg went green the same day (`891fa44` + `2b7257e`, deeper
+root cause: store-only config.set + reload's silent no-op on any config
+error). The mailsuite gates finished (18:03 report). Everything else
+resolved inline above or routed to TODO_LIST/ROADMAP rows. Archived.
