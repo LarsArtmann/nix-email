@@ -39,6 +39,14 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
 - Gate commands never wear pipes (`cmd | tail` can print PASSED on a failing
   run); test assertions are transcribed from observed transcripts, not from
   expected output (the swaks `<**` vs `<-` lesson).
+- swaks/SMTP forensics without a server (host, minutes): run a tiny python
+  asyncio SMTP sink on a high port (greet, accept, print DATA), point swaks
+  at it, and decode attachment bytes from swaks's own `->` echo lines
+  (base64). This exposed `--attach <path>` sending the path STRING as body
+  (no filename=) vs `@path` reading the file - before any VM run.
+- `rg -rln` is NOT "recursive + line-number": `-r` REPLACES matches with
+  the next arg ("n") and silently corrupts output. Recursive listing is
+  `rg -l -n` or `rg --line-number`.
 - `nix fmt .` (WITH the path): bare `nix fmt` forwards no paths, so
   alejandra 4.0.0 reads STDIN and dies with `unexpected end of file` -
   check-mode is `nix fmt -- . --check` (what CI enforces).

@@ -35,6 +35,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   verdicts) and archived under `docs/{status,planning,reviews}/archived/`;
   every open item re-verified against the tree and harvested into
   TODO_LIST/ROADMAP; TODO_LIST rebuilt from the harvest
+- README verified-facts ledger: five new source/binary-verified traps
+  (Stalwart TOML quoted-dotted-header rejection; mailpit freeform dashed
+  flag names + `smtp-auth-allow-insecure` for plaintext auth;
+  `eval-config.nix` vs `nixos/default.nix` import contract; swaks
+  `--attach` @-prefix for real file attachments; incoming
+  `/api/reports/dmarc` vs outbound `/api/queue/reports` endpoints)
+
+### Fixed
+
+- `stalwart-relay-e2e` green (was eval-broken, never CI-red): null-relay
+  config eval now uses `nixos/lib/eval-config.nix` (the pinned nixpkgs'
+  `import "${pkgs.path}/nixos"` rejects a `modules` argument), the
+  eval-forcing log line targets the smtp node (two-node test has no
+  `machine`), and the relay-side Mailpit gets a plaintext SMTP auth file
+  with dashed freeform flags (`tests/stalwart-relay-e2e.nix`)
+- `stalwart-e2e` native-ingestion subtest green: `report.analysis`
+  settings nest as real attrs (dotted-string keys render a quoted TOML
+  header Stalwart rejects), swaks attaches the DMARC sample with the
+  @-prefix, and the store poll reads `/api/reports/dmarc` (incoming
+  reports) instead of `/api/queue/reports` (the outbound queue - same
+  response shape, permanently `total:0`; items are `<id>_<expires>`
+  strings) (`tests/stalwart-e2e.nix`)
 
 ## [0.2.0] - 2026-09-15
 
