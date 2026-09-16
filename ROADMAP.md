@@ -76,22 +76,27 @@ Raw ideas:
   delivers to INBOX; putting spam in Junk needs a sieve layer (open question 6)
 - Gatus freshness check over the parsedmarc `aggregate.json` sink (verify it
   does not duplicate the consumer registry's `backup.maxAgeHours` coverage)
+- Reload-smoke ops step for the live host: if management-API settings
+  changes are ever used operationally, check the reload response body's
+  `errors` before trusting the 200 - `/api/reload` silently no-ops while
+  ANY config error exists (source-verified 2026-09-16, README ledger)
 
 ### 5. Repo excellence
 
-- CI, nix formatter, Renovate (nixpkgs input must stay paired with SystemNix)
-- Threat-model doc; Stalwart OIDC (Pocket ID) for the admin UI - verified
+- Stalwart OIDC (Pocket ID) for the admin UI - verified
   present in the 0.15.5 source (`common/src/auth/oauth/{openid,oidc}.rs`,
   master plan §10 06c); settings-passthrough wiring when the D1 host exists
 - Post-cutover: retire-or-keep decision documentation for the Resend-only path
 - Retire the two in-repo nixpkgs workarounds once upstream fixes land (host-less
   `[elasticsearch]` emission; imapclient on python 3.14) - re-check on every
   nixpkgs bump; the module comments carry the revert conditions
-- Upstream relations: file the two diagnosed nixpkgs issues and link them from
-  the ledger entries that describe the workarounds
-- aarch64: keep the VM tests x86_64-gated; the eval contract already builds for
-  aarch64 (verified 2026-09-15) - decide whether an emulated ARM VM run earns
-  its CI time
+- Formatter stack decision: treefmt-nix standard stack vs the current
+  minimal-alejandra flake formatter (nix-review checklist prefers the stack;
+  compat doctrine prefers minimal - genuine tradeoff, needs a call)
+- aarch64: VM tests stay x86_64-gated (emulated run attempted 2026-09-15:
+  guest builds+boots but boot alone exceeds the driver timeout -
+  documented-manual, not CI-worthy); residue is an occasional local
+  `nix flake check --all-systems` to keep the eval posture honest
 
 ## Non-goals
 

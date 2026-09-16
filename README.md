@@ -336,6 +336,22 @@ inside nixpkgs are invisible to it, so the checks below are manual):
    reference it (the consumer contract is versioned by the tag, the exact
    rev stays locked in flake.lock).
 
+## Development
+
+The devShell carries the tooling (`nix develop`): alejandra + python3 for
+formatters and scripts. The quality gates, in order of authority:
+
+- `nix flake check` - the full gate: eval contract + the VM E2E tests.
+- `nix fmt -- . --check` - what CI enforces (bare `nix fmt` forwards no
+  paths on alejandra 4.0.0 and dies on stdin - always pass `.`).
+- `buildflow` - the fmt/lint/repair wrapper around both (see
+  `.buildflow.yml` for deliberate skips; AGENTS.md documents known lint
+  noise).
+
+Gate commands never wear pipes (`cmd \| tail` can print PASSED on a failing
+run) - redirect to a file and read it. See CONTRIBUTING.md for the
+verified-facts ledger rules and the architecture-diagram regen command.
+
 ## Platform support
 
 The VM tests gate `stalwart-e2e`/`stalwart-relay-e2e` to **x86_64-linux
@@ -700,6 +716,9 @@ conditions in the module comments and the Pin-advance runbook):
   2026-09-16, `imapclient/imapclient.py:387`); filed as
   [mjs/imapclient#662](https://github.com/mjs/imapclient/issues/662)
   (2026-09-16, drift re-checked: #641 only fixed the `open()` override site).
+  dotlambda (parsedmarc maintainer) answered on the nixpkgs side: the
+  package gets patched only after an upstream fix - mjs/imapclient#663 is
+  that PR (OPEN as of 2026-09-16 evening; watch its merge).
 - [NixOS/nixpkgs#563777](https://github.com/NixOS/nixpkgs/issues/563777) -
   parsedmarc module ships no systemd `Restart` policy: the poller exits 255
   on a transient boot race (observed in the TLS IMAPS VM variant) and stays
