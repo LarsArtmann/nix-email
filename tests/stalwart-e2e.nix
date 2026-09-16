@@ -44,7 +44,7 @@
 # 19. Native report ingestion: a DMARC aggregate mailed to a
 #     report.analysis.addresses recipient with report.analysis.forward=false
 #     is CONSUMED by analyze_report (no INBOX delivery) and lands parsed in
-#     the report store, readable via GET /api/queue/reports
+#     the report store, readable via GET /api/reports/dmarc
 #
 # NOT covered (needs DNS + external relay creds): outbound smarthost relay
 # (see stalwart-relay-e2e). Those stay live-host go-live checks - see

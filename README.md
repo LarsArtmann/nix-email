@@ -600,6 +600,22 @@ json/yaml/markdown.
   Use `import "${pkgs.path}/nixos/lib/eval-config.nix" { system = ...;
   modules = [...]; }` (what `lib.nixosSystem` bottoms out in; the green
   dmarc-eval pattern).
+- INCOMING vs QUEUED report endpoints (SOURCE-VERIFIED 2026-09-16 against
+  v0.15.5 + its bundled openapi.yml, closing the "store stays empty"
+  mystery): native ingestion writes to the report value store
+  (`ValueClass::Report(ReportClass::Dmarc)`, gated on
+  `report.analysis.store`, default "30d" - the write happens with NO
+  explicit setting) and the readout is `GET /api/reports/dmarc`
+  (management/report.rs, `IncomingReportList`). `GET /api/queue/reports`
+  is a DIFFERENT thing entirely: the OUTBOUND report queue
+  (management/queue.rs, `OutgoingReportList` - reports Stalwart itself
+  will send), permanently `total:0` on a host that schedules no outgoing
+  reports. Both return the same `{"data":{"items":[...],"total":N}}`
+  shape, so polling the wrong one looks like a write-side bug but is not.
+  EXTRA shape trap: `/api/reports/dmarc` list items are `"<id>_<expires>"`
+  STRINGS (not objects) - the detail URL is `/api/reports/dmarc/<item>`
+  verbatim. (The 0.15.5 CLI `report list` command itself GETs
+  `/api/queue/reports` - do not copy it as an incoming-reports recipe.)
 
 ## Non-goals
 
