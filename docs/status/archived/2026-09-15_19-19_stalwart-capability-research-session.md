@@ -9,11 +9,11 @@
 
 ## Session log (what actually happened)
 
-| # | User question | What I did | Outcome |
-|---|---------------|------------|---------|
-| 1 | "What features is this project combining?" | Read `FEATURES.md` + `README.md` | Answered correctly, cited sources |
-| 2 | "What else can Stalwart do that's cool?" | `agentic_fetch` **errored** (tool-side json unmarshal); `fetch /docs/` hit a redirect; **ended the turn without answering** | FAILED first attempt; user had to intervene; homepage-based answer delivered next turn |
-| 3 | "Is that ALL stalw.art and this project can or could do?!" | Fetched `/mail-server`, `/mta`, `/integrations`, `/compare`; read `ROADMAP.md`, `TODO_LIST.md` | Comprehensive answer with capability map, project plans, and overlap table |
+| # | User question                                              | What I did                                                                                                                  | Outcome                                                                                |
+| - | ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| 1 | "What features is this project combining?"                 | Read `FEATURES.md` + `README.md`                                                                                            | Answered correctly, cited sources                                                      |
+| 2 | "What else can Stalwart do that's cool?"                   | `agentic_fetch` **errored** (tool-side json unmarshal); `fetch /docs/` hit a redirect; **ended the turn without answering** | FAILED first attempt; user had to intervene; homepage-based answer delivered next turn |
+| 3 | "Is that ALL stalw.art and this project can or could do?!" | Fetched `/mail-server`, `/mta`, `/integrations`, `/compare`; read `ROADMAP.md`, `TODO_LIST.md`                              | Comprehensive answer with capability map, project plans, and overlap table             |
 
 ---
 
@@ -87,7 +87,7 @@
    wrote "worth checking /compare before planning around them" while
    `/compare` was one fetch away — and when Q3 did fetch it, I still didn't
    retry with HTML format after seeing the checkmarks drop. Two chances to
-   close the gap, both skipped. (Honesty check: the gap was always *stated*,
+   close the gap, both skipped. (Honesty check: the gap was always _stated_,
    never hidden — but stated-and-skipped is still a miss.)
 
 ## e) WHAT WE SHOULD IMPROVE
@@ -116,19 +116,19 @@
 
 ### Self-review: the 11 questions, briefly
 
-| Question | Answer |
-|---|---|
-| Forgot? | Redirect-following; HTML re-fetch of /compare; skills at turn 1 |
-| Something stupid we do anyway? | Ending turns on tool output instead of answers (fixed in-session) |
-| Could have done better? | b/2, b/3, d/1-d/3 above |
-| Could still improve? | e/1-e/6 |
-| Did I lie? | No — all unverified claims were labeled as such; no fabricated metrics or features |
-| Less stupid? | Items e/1-e/4 are the mechanism |
-| Ghost systems? | None created; flagged one *potential* split brain: Stalwart automated-DNS vs Terraform-owns-DNS doctrine (f/20) |
-| Scope creep? | Resisted: answered, didn't wire options or edit modules unprompted |
-| Removed something useful? | Nothing removed (read-only session) |
-| Split brains? | See ghost-systems row — DNS truth ownership, if Stalwart-native DNS mgmt ever gets enabled |
-| Tests? | N/A — no code changed; nothing to test. Test debt untouched (TODO_LIST rows stand) |
+| Question                       | Answer                                                                                                          |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------------- |
+| Forgot?                        | Redirect-following; HTML re-fetch of /compare; skills at turn 1                                                 |
+| Something stupid we do anyway? | Ending turns on tool output instead of answers (fixed in-session)                                               |
+| Could have done better?        | b/2, b/3, d/1-d/3 above                                                                                         |
+| Could still improve?           | e/1-e/6                                                                                                         |
+| Did I lie?                     | No — all unverified claims were labeled as such; no fabricated metrics or features                              |
+| Less stupid?                   | Items e/1-e/4 are the mechanism                                                                                 |
+| Ghost systems?                 | None created; flagged one _potential_ split brain: Stalwart automated-DNS vs Terraform-owns-DNS doctrine (f/20) |
+| Scope creep?                   | Resisted: answered, didn't wire options or edit modules unprompted                                              |
+| Removed something useful?      | Nothing removed (read-only session)                                                                             |
+| Split brains?                  | See ghost-systems row — DNS truth ownership, if Stalwart-native DNS mgmt ever gets enabled                      |
+| Tests?                         | N/A — no code changed; nothing to test. Test debt untouched (TODO_LIST rows stand)                              |
 
 ## f) Next tasks (50; brainstorm-grade beyond the top rows)
 
@@ -138,28 +138,28 @@
 
 ### New material from this session (candidates, untracked anywhere)
 
-| # | Task | Impact | Effort | Category |
-|---|------|--------|--------|----------|
-| ~~1~~ | ~~Fetch `/compare` as HTML; resolve Community/Enterprise gating for: DKIM auto-rotation, automated DNS, report viz, OIDC, LLM classifier, masked emails, SCIM, declarative IaC, read replicas~~ done — superseded by the better method: v0.15.5 git-tag source grep + /compare HTML (master plan 10, 05c cross-table) | ~~High~~ | ~~S~~ | ~~Documentation~~ |
-| ~~2~~ | ~~Diff advertised features vs pinned 0.15.5 (stalwart GitHub release notes 0.15.5 → current); record which exist in the shipped binary~~ done — executed via source-tag grep + release-notes diff (master plan 10) | ~~High~~ | ~~M~~ | ~~Research~~ |
-| ~~3~~ | ~~For any candidate feature: verify 0.15.5 config keys against the pinned binary (local debug loop, README ledger pattern) before wrapper options~~ done — executed for the audited candidates; ledger entry carries the runtime-confirmation caveat; live-probe stays a TODO_LIST row | ~~High~~ | ~~M~~ | ~~Research~~ |
-| ~~4~~ | ~~Decide the home for unverified vendor findings (g/Q1) and encode this session's overlap table there~~ done — home found: plan 10 + ledger-with-method-label | ~~Med~~ | ~~S~~ | ~~Documentation~~ |
-| ~~5~~ | ~~Design review: does Stalwart-native DMARC/TLS-RPT/ARF ingestion+viz obsolete the parsedmarc module, complement it (rua fan-out), or lose (file sink, no deps)? D1-adjacent~~ done — 06a verdict: KEEP BOTH (native ingestion is a free complement) | ~~High~~ | ~~M~~ | ~~Design~~ |
-| ~~6~~ | ~~Same review for ROADMAP's "tiny DMARC viewer": native viz vs JSON/CSV viewer, on 0.15.5 Community specifically~~ done — 06b verdict: DEFER (park until D1 webadmin inspection) | ~~Med~~ | ~~M~~ | ~~Design~~ |
-| ~~7~~ | ~~Verify OIDC in 0.15.5 Community for the Pocket-ID admin-UI idea (ROADMAP theme 5)~~ done — 06c: present in 0.15.5 source (openid.rs/oidc.rs) | ~~Med~~ | ~~S~~ | ~~Research~~ |
-| ~~8~~ | ~~Verify Sieve paths in 0.15.5 for spam→Junk filing (open question 6's option (a)) incl. ManageSieve/user-script contexts~~ done — 06d: source-verified wall - settings sieve cannot fileinto (README ledger) | ~~Med~~ | ~~S~~ | ~~Research~~ |
-| ~~9~~ | ~~Check autoconfig/autodiscover serving in 0.15.5; wrapper option or non-goal~~ done — 26a: present; consumer reverse-proxy concern | ~~Low~~ | ~~S~~ | ~~Research~~ |
-| ~~10~~ | ~~Check PROXY protocol in 0.15.5 (Caddy fronting in SystemNix)~~ done — 26: NOT in 0.15.5 - revisit on the 0.16 module | ~~Low~~ | ~~S~~ | ~~Research~~ |
-| ~~11~~ | ~~Check DANE/MTA-STS enforcement knobs in 0.15.5 as inbound hardening candidates~~ done — 26a: MTA-STS/DANE present; TLSA feeds the Terraform module (ROADMAP theme 2) | ~~Med~~ | ~~S~~ | ~~Research~~ |
-| ~~12~~ | ~~Check per-mailbox S/MIME/OpenPGP encryption-at-rest availability in 0.15.5 Community~~ done — 26: present; non-goal for single-user | ~~Low~~ | ~~S~~ | ~~Research~~ |
-| ~~13~~ | ~~Check TOTP / app passwords / API keys availability in 0.15.5 (self-service story)~~ done — 26: TOTP present (app-password labels are 0.16.0) | ~~Low~~ | ~~S~~ | ~~Research~~ |
-| ~~14~~ | ~~Investigate stalwart-vandelay beyond migration (ROADMAP names it only for R6)~~ **Won't implement — D1/R6-gated - stays parked with the migration compare (TODO_LIST BLOCKED).** | ~~Low~~ | ~~S~~ | ~~Research~~ |
-| ~~15~~ | ~~FTS offload (Meilisearch) relevance check — likely non-goal for consistency with the rejected-ES doctrine; write the one-liner~~ done — README non-goals FTS line added 2026-09-16 | ~~Low~~ | ~~S~~ | ~~Documentation~~ |
-| ~~16~~ | ~~POP3 enable-or-non-goal decision (nothing in the repo currently says)~~ done — 26c: POP3 non-goal; README note added 2026-09-16 | ~~Low~~ | ~~S~~ | ~~Design~~ |
-| ~~17~~ | ~~JMAP WebSocket transport: client support survey, enable-or-note~~ done — 26c: present on the HTTP listener; nothing to do | ~~Low~~ | ~~S~~ | ~~Research~~ |
-| ~~18~~ | ~~Wrapper doctrine note: which Stalwart features get module options vs pass-through `settings` (feeds open question 5)~~ done — 26d doctrine written (feeds ROADMAP Q5) | ~~Med~~ | ~~M~~ | ~~Design~~ |
-| ~~19~~ | ~~DNS-truth split-brain guard: if Stalwart automated DNS is ever enabled, it collides with Terraform/domains-repo ownership (ROADMAP theme 2) — write the conflict note now~~ done — 26e: no risk on 0.15.5 (feature absent); guard note in ROADMAP theme 2 | ~~Med~~ | ~~S~~ | ~~Documentation~~ |
-| ~~20~~ | ~~Personal fetch playbook: redirects-retried, failures-narrated, tables-as-HTML (e/1-e/3) — internalize for future sessions~~ done — adopted - later sessions used the playbook | ~~Med~~ | ~~S~~ | ~~Process~~ |
+| #      | Task                                                                                                                                                                                                                                                                                                                  | Impact   | Effort | Category          |
+| ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ------ | ----------------- |
+| ~~1~~  | ~~Fetch `/compare` as HTML; resolve Community/Enterprise gating for: DKIM auto-rotation, automated DNS, report viz, OIDC, LLM classifier, masked emails, SCIM, declarative IaC, read replicas~~ done — superseded by the better method: v0.15.5 git-tag source grep + /compare HTML (master plan 10, 05c cross-table) | ~~High~~ | ~~S~~  | ~~Documentation~~ |
+| ~~2~~  | ~~Diff advertised features vs pinned 0.15.5 (stalwart GitHub release notes 0.15.5 → current); record which exist in the shipped binary~~ done — executed via source-tag grep + release-notes diff (master plan 10)                                                                                                    | ~~High~~ | ~~M~~  | ~~Research~~      |
+| ~~3~~  | ~~For any candidate feature: verify 0.15.5 config keys against the pinned binary (local debug loop, README ledger pattern) before wrapper options~~ done — executed for the audited candidates; ledger entry carries the runtime-confirmation caveat; live-probe stays a TODO_LIST row                                | ~~High~~ | ~~M~~  | ~~Research~~      |
+| ~~4~~  | ~~Decide the home for unverified vendor findings (g/Q1) and encode this session's overlap table there~~ done — home found: plan 10 + ledger-with-method-label                                                                                                                                                         | ~~Med~~  | ~~S~~  | ~~Documentation~~ |
+| ~~5~~  | ~~Design review: does Stalwart-native DMARC/TLS-RPT/ARF ingestion+viz obsolete the parsedmarc module, complement it (rua fan-out), or lose (file sink, no deps)? D1-adjacent~~ done — 06a verdict: KEEP BOTH (native ingestion is a free complement)                                                                  | ~~High~~ | ~~M~~  | ~~Design~~        |
+| ~~6~~  | ~~Same review for ROADMAP's "tiny DMARC viewer": native viz vs JSON/CSV viewer, on 0.15.5 Community specifically~~ done — 06b verdict: DEFER (park until D1 webadmin inspection)                                                                                                                                      | ~~Med~~  | ~~M~~  | ~~Design~~        |
+| ~~7~~  | ~~Verify OIDC in 0.15.5 Community for the Pocket-ID admin-UI idea (ROADMAP theme 5)~~ done — 06c: present in 0.15.5 source (openid.rs/oidc.rs)                                                                                                                                                                        | ~~Med~~  | ~~S~~  | ~~Research~~      |
+| ~~8~~  | ~~Verify Sieve paths in 0.15.5 for spam→Junk filing (open question 6's option (a)) incl. ManageSieve/user-script contexts~~ done — 06d: source-verified wall - settings sieve cannot fileinto (README ledger)                                                                                                         | ~~Med~~  | ~~S~~  | ~~Research~~      |
+| ~~9~~  | ~~Check autoconfig/autodiscover serving in 0.15.5; wrapper option or non-goal~~ done — 26a: present; consumer reverse-proxy concern                                                                                                                                                                                   | ~~Low~~  | ~~S~~  | ~~Research~~      |
+| ~~10~~ | ~~Check PROXY protocol in 0.15.5 (Caddy fronting in SystemNix)~~ done — 26: NOT in 0.15.5 - revisit on the 0.16 module                                                                                                                                                                                                | ~~Low~~  | ~~S~~  | ~~Research~~      |
+| ~~11~~ | ~~Check DANE/MTA-STS enforcement knobs in 0.15.5 as inbound hardening candidates~~ done — 26a: MTA-STS/DANE present; TLSA feeds the Terraform module (ROADMAP theme 2)                                                                                                                                                | ~~Med~~  | ~~S~~  | ~~Research~~      |
+| ~~12~~ | ~~Check per-mailbox S/MIME/OpenPGP encryption-at-rest availability in 0.15.5 Community~~ done — 26: present; non-goal for single-user                                                                                                                                                                                 | ~~Low~~  | ~~S~~  | ~~Research~~      |
+| ~~13~~ | ~~Check TOTP / app passwords / API keys availability in 0.15.5 (self-service story)~~ done — 26: TOTP present (app-password labels are 0.16.0)                                                                                                                                                                        | ~~Low~~  | ~~S~~  | ~~Research~~      |
+| ~~14~~ | ~~Investigate stalwart-vandelay beyond migration (ROADMAP names it only for R6)~~ **Won't implement — D1/R6-gated - stays parked with the migration compare (TODO_LIST BLOCKED).**                                                                                                                                    | ~~Low~~  | ~~S~~  | ~~Research~~      |
+| ~~15~~ | ~~FTS offload (Meilisearch) relevance check — likely non-goal for consistency with the rejected-ES doctrine; write the one-liner~~ done — README non-goals FTS line added 2026-09-16                                                                                                                                  | ~~Low~~  | ~~S~~  | ~~Documentation~~ |
+| ~~16~~ | ~~POP3 enable-or-non-goal decision (nothing in the repo currently says)~~ done — 26c: POP3 non-goal; README note added 2026-09-16                                                                                                                                                                                     | ~~Low~~  | ~~S~~  | ~~Design~~        |
+| ~~17~~ | ~~JMAP WebSocket transport: client support survey, enable-or-note~~ done — 26c: present on the HTTP listener; nothing to do                                                                                                                                                                                           | ~~Low~~  | ~~S~~  | ~~Research~~      |
+| ~~18~~ | ~~Wrapper doctrine note: which Stalwart features get module options vs pass-through `settings` (feeds open question 5)~~ done — 26d doctrine written (feeds ROADMAP Q5)                                                                                                                                               | ~~Med~~  | ~~M~~  | ~~Design~~        |
+| ~~19~~ | ~~DNS-truth split-brain guard: if Stalwart automated DNS is ever enabled, it collides with Terraform/domains-repo ownership (ROADMAP theme 2) — write the conflict note now~~ done — 26e: no risk on 0.15.5 (feature absent); guard note in ROADMAP theme 2                                                           | ~~Med~~  | ~~S~~  | ~~Documentation~~ |
+| ~~20~~ | ~~Personal fetch playbook: redirects-retried, failures-narrated, tables-as-HTML (e/1-e/3) — internalize for future sessions~~ done — adopted - later sessions used the playbook                                                                                                                                       | ~~Med~~  | ~~S~~  | ~~Process~~       |
 
 ### Noticed in passing (ALREADY tracked in TODO_LIST.md — do not re-harvest)
 
@@ -206,7 +206,7 @@
    ~~zero-UNVERIFIED doctrine (correctly) refuses them, so today they evaporate.~~
 2. ~~**Research now vs park (blocks f/1-f/3, f/5-f/19):** is the~~ done (answered: research executed FIRST (master plan L05/L06, section 10))
    ~~Stalwart-native-vs-build-it evaluation worth doing as a bounded research~~
-   ~~task *before* D1/D2 land (it could shrink the gated VPS/Terraform/viewer~~
+   ~~task _before_ D1/D2 land (it could shrink the gated VPS/Terraform/viewer~~
    ~~themes substantially), or is everything parked until the decisions — making~~
    ~~this session's findings explicitly dormant?~~
 3. ~~**Verification bar for exploratory Q&A (shapes all future sessions):** for~~ done (answered: two-tier bar codified in master plan sections 5+8)
@@ -218,9 +218,9 @@
 
 ---
 
-*Point-in-time snapshot (docs-health ANNOTATE, never rewrite). Written by
+_Point-in-time snapshot (docs-health ANNOTATE, never rewrite). Written by
 Crush 2026-09-15 19:19. No code was changed this session; the auto-commit
-daemon owns committing this file.*
+daemon owns committing this file._
 
 ---
 

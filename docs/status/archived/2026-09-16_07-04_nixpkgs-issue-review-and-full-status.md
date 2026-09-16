@@ -205,12 +205,12 @@ corrected or confessed above.
 8. Verify Renovate handles tag pins (`github:…nix-email/v0.2.0`).
 9. Re-check both nixpkgs issues for maintainer responses; if a PR is
    requested, deliver it ("Happy to send a PR" was promised twice).
-10. *(approval)* Push nix-email master (2 doc/auto commits).
-11. *(approval)* Push SystemNix (≈47 commits, incl. another session's
+10. _(approval)_ Push nix-email master (2 doc/auto commits).
+11. _(approval)_ Push SystemNix (≈47 commits, incl. another session's
     work — coordinate first).
-12. ~~*(approval)* HARVEST plan §10 + predecessor §f into TODO_LIST/ROADMAP.~~ done (HARVEST executed 2026-09-16 (docs-health mandate))
-13. *(D1)* dmarc-live + migration-compare tasks (L17–L23).
-14. *(D2)* Hetzner go-live decisions; *(Q6)* spam→Junk; *(scope)*
+12. ~~_(approval)_ HARVEST plan §10 + predecessor §f into TODO_LIST/ROADMAP.~~ done (HARVEST executed 2026-09-16 (docs-health mandate))
+13. _(D1)_ dmarc-live + migration-compare tasks (L17–L23).
+14. _(D2)_ Hetzner go-live decisions; _(Q6)_ spam→Junk; _(scope)_
     ANNOTATE pass over old status docs.
 15. ~~Verify auto-commit daemon is actually alive (last commit 02:10;~~ done (daemon alive - it committed a4fc343..de0737d (07:07-07:19) and later picks)
     ~~silent-but-idle since — indeterminate).~~
@@ -239,8 +239,8 @@ corrected or confessed above.
 
 ---
 
-*Point-in-time snapshot; goes stale fast (two inherited claims were dead
-within 5 h). WAITING for instructions.*
+_Point-in-time snapshot; goes stale fast (two inherited claims were dead
+within 5 h). WAITING for instructions._
 
 ---
 

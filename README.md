@@ -428,7 +428,7 @@ json/yaml/markdown.
 - The nixpkgs parsedmarc unit runs as a DynamicUser and prepares NO writable
   state; parsedmarc 11.0.1 os.makedirs()es its output directory on first
   write, which fails on root-owned /var/lib without `StateDirectory`
-  (verified 2026-09-15 against parsedmarc.nix + parsedmarc/__init__.py:3478;
+  (verified 2026-09-15 against parsedmarc.nix + parsedmarc/**init**.py:3478;
   the wrapper now sets StateDirectory).
 - `mkDefault` lists on `networking.firewall.allowedTCPPorts` are silently
   dropped (ROOT-CAUSED 2026-09-15, closing the 2026-09-14 symptom-only
@@ -542,7 +542,7 @@ json/yaml/markdown.
   parsedmarc, not a replacement; OIDC, TOTP, encryption-at-rest, autoconfig,
   POP3, JMAP-WS, MTA-STS/DANE, Zenoh clustering are present in the 0.15.5
   source; PROXY protocol is NOT (0.16+). Verdicts live in
-  `docs/planning/2026-09-15_19-23_nix-email-pareto-master-plan.md` §10.
+  `docs/planning/archived/2026-09-15_19-23_nix-email-pareto-master-plan.md` §10.
 - SIEVE/JUNK-FILING architecture in 0.15.5 (source-verified 2026-09-15
   against the pinned store source, while implementing wrapper-owned Junk
   filing - it is NOT implementable via settings):
@@ -562,9 +562,9 @@ json/yaml/markdown.
   - No OSS management-API endpoint sets an account's active sieve script
     (JMAP per-account, or the enterprise webadmin) - the OSS CLI has no
     sieve subcommand either.
-  Consequence: Junk filing on this pin is per-account (webmail-managed
-  sieve or per-account JMAP automation), not declarable from the wrapper.
-  Revisit if 0.16+ grows server-side filing.
+    Consequence: Junk filing on this pin is per-account (webmail-managed
+    sieve or per-account JMAP automation), not declarable from the wrapper.
+    Revisit if 0.16+ grows server-side filing.
 
 ## Non-goals
 
