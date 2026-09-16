@@ -15,10 +15,11 @@
 #   8.  DKIM signing: the declarative `signature.<id>` block signs the
 #       submission (header asserted on the stored message); then the
 #       webadmin keygen flow (POST /api/dkim, ed25519) adds the second
-#       default-sign id live - one message, two DKIM-Signature headers
+#       default-sign id live - store-only write, so /api/reload makes the
+#       signer map see it - one message, two DKIM-Signature headers
 #   9.  Metrics: /metrics/prometheus answers 200 on the HTTP listener
-#   10. Journal hygiene: exactly the 2 known-benign "Configuration build
-#       error" lines (resolver/pyzor in the DNS-less VM) - nothing else
+#   10. Journal hygiene: exactly the 1 known-benign "Configuration build
+#       error" line (resolver in the DNS-less VM) - nothing else
 #   11. Restart persistence: message survives `systemctl restart`, anonymous
 #       admin API stays 401
 #   12. Backup/restore: offline `--export`, wipe the store, `--import`,
@@ -294,6 +295,16 @@ in
         forward = false;
       };
 
+      # Pyzor OFF: its default host (public.pyzor.org) is unresolvable in
+      # the DNS-less VM, and that build error is not just cosmetic -
+      # POST/GET /api/reload ABORTS without swapping the rebuilt core if
+      # ANY config error exists (manager/reload.rs: `if !config.errors
+      # .is_empty() { return }` before new_core), so the DKIM keygen
+      # subtest's reload would silently no-op. Disabling pyzor empties
+      # config.errors and lets the reload go through (source-verified
+      # 2026-09-16; pyzor never functioned here anyway - no DNS).
+      services.stalwart.settings.spam-filter.pyzor.enable = false;
+
       environment.systemPackages = [
         pkgs.swaks
         pkgs.openssl
@@ -477,8 +488,10 @@ in
           # store-only (manager/config.rs: no broadcast, no core rebuild),
           # and the SMTP signer resolves from the startup-built signatures
           # map (core.rs resolve_signature) - so an explicit /api/reload
-          # (GET; the handler only matches Method::GET) is required before
-          # submission will dual-sign.
+          # (GET; the handler only matches Method::GET, and it aborts
+          # without swapping the core if ANY config error exists - see
+          # the pyzor-disable comment near the settings) is required
+          # before submission will dual-sign.
           machine.succeed(
               "curl -fsS -u admin:test-admin-secret -X POST "
               "-H 'Content-Type: application/json' "
@@ -555,14 +568,17 @@ in
               + "&& grep -qE '^# (HELP|TYPE)' /tmp/metrics.prom"
           )
 
-      with subtest("journal: exactly the 2 known-benign config-build errors"):
-          # In the DNS-less VM exactly two "Configuration build error" lines
-          # are BENIGN (details only via -o verbose): resolver.type with no
-          # nameservers, and the spam-filter.pyzor.host lookup. Any NEW config
-          # error (e.g. a malformed generated key) must fail this count.
+      with subtest("journal: exactly the 1 known-benign config-build error"):
+          # In this VM exactly ONE "Configuration build error" line is
+          # BENIGN (details only via -o verbose): resolver.type with no
+          # nameservers. (The second historical benign line,
+          # spam-filter.pyzor.host, is gone - pyzor is disabled above so
+          # /api/reload can swap the core; see the spam-filter comment.)
+          # Any NEW config error (e.g. a malformed generated key) must
+          # fail this count.
           machine.succeed(
               "journalctl -u stalwart -b 0 -o cat > /tmp/journal-config.log"
-              "&& test \"$(grep -c 'Configuration build error' /tmp/journal-config.log)\" -eq 2"
+              "&& test \"$(grep -c 'Configuration build error' /tmp/journal-config.log)\" -eq 1"
           )
 
       with subtest("alias: second emails entry delivers to the same account"):
