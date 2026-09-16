@@ -41,6 +41,10 @@
 #      becomes deliverable locally again within the configured
 #      directoryCacheTtlNegative (the 1h-trap regression guard)
 #  18. Nothing panics in the journal
+# 19. Native report ingestion: a DMARC aggregate mailed to a
+#     report.analysis.addresses recipient with report.analysis.forward=false
+#     is CONSUMED by analyze_report (no INBOX delivery) and lands parsed in
+#     the report store, readable via GET /api/queue/reports
 #
 # NOT covered (needs DNS + external relay creds): outbound smarthost relay
 # (see stalwart-relay-e2e). Those stay live-host go-live checks - see
@@ -49,6 +53,17 @@
   # Fixed salt => deterministic hash of "testpass" (sha512-crypt $6$,
   # the exact format the webadmin hashes account passwords with).
   testHash = "$6$StalwartTestSalt$gagC41V16GV6khfXMiraIyZLKuYDgSyRzVfM0TaSFNMRqkLewQ5d/b9Ns0uc1Rr4DWD15BxHHzh2XaC4ZAS97.";
+
+  # Real DMARC aggregate sample (same artifact as parsedmarc-e2e). The
+  # attachment FILENAME matters: Stalwart's report detector matches
+  # attachment names containing '!' or '.xml'
+  # (smtp/src/reporting/analysis.rs), so the VM copy must keep a
+  # report-shaped name.
+  dmarcSample = pkgs.fetchurl {
+    name = "dmarc-sample-aggregate";
+    url = "https://github.com/domainaware/parsedmarc/raw/f45ab94e0608088e0433557608d9f4e9517d3afe/samples/aggregate/estadocuenta1.infonacot.gob.mx!example.com!1536853302!1536939702!2940.xml.zip";
+    sha256 = "0dq64cj49711kbja27pjl2hy0d3azrjxg91kqrh40x46fkn1dwkx";
+  };
 
   # Test-only RSA key (PKCS#8) for the DKIM signing subtest. Published in a
   # public repo ON PURPOSE: it signs nothing but the test domain.
@@ -258,6 +273,17 @@ in
         domain = "example.test";
         selector = "test";
         algorithm = "rsa-sha256";
+      };
+
+      # Native report ingestion (subtest 19): recipients matching
+      # report.analysis.addresses get inbound report messages ANALYZED into
+      # the report store instead of delivered - but ONLY with
+      # report.analysis.forward = false (the v0.15.5 default true merely
+      # forwards; keys verified at
+      # crates/common/src/config/smtp/report.rs:86,90).
+      services.stalwart.settings."report.analysis" = {
+        addresses = ["reports@example.test"];
+        forward = false;
       };
 
       environment.systemPackages = [
