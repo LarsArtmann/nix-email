@@ -462,6 +462,54 @@ in
               "imap-header-probe needle-576a4565b70f5a4c 'd=example.test'"
           )
 
+      with subtest("DKIM: POST /api/dkim keygen + dual-algorithm signing"):
+          # The webadmin keygen flow (source-verified against v0.15.5
+          # management/dkim.rs): POST {"algorithm":"Ed25519","domain":...} -
+          # the algorithm field takes the serde variant name, "Ed25519" -
+          # with no id, so the default id becomes "{algo}-{domain}" =
+          # ed25519-example.test, EXACTLY the second id the default
+          # auth.dkim.sign expression emits. The endpoint writes
+          # signature.<id>.* into the live config store (refusing to
+          # overwrite an existing signature.<id>.private-key) - no
+          # settings-file change, no restart.
+          machine.succeed(
+              "curl -fsS -u admin:test-admin-secret -X POST "
+              "-H 'Content-Type: application/json' "
+              "-d '{\"algorithm\":\"Ed25519\",\"domain\":\"example.test\"}' "
+              "http://127.0.0.1:8080/api/dkim -o /tmp/dkim-create.json"
+          )
+          machine.succeed("cat /tmp/dkim-create.json >&2")
+          # Public-key readout = the DNS TXT payload: a bare base64 string
+          # (ed25519 pubkey = 32 bytes -> ~44 base64 chars).
+          machine.succeed(
+              "curl -fsS -u admin:test-admin-secret "
+              "http://127.0.0.1:8080/api/dkim/ed25519-example.test "
+              "-o /tmp/dkim-pub.json"
+          )
+          machine.succeed("cat /tmp/dkim-pub.json >&2")
+          machine.succeed(
+              "jq -e '.data | type == \"string\" and length >= 40' /tmp/dkim-pub.json"
+          )
+          machine.succeed(
+              "swaks --timeout 120 --server 127.0.0.1:587 --tls --auth PLAIN "
+              "--auth-user user1@example.test --auth-password testpass "
+              "--from user1@example.test --to user2@example.test "
+              "--header 'Subject: dual-sign' --body 'needle-eddsa-77aa' "
+              "> /tmp/swaks-dual.log 2>&1"
+          )
+          machine.succeed("cat /tmp/swaks-dual.log >&2")
+          machine.succeed("! grep -q '<\\*\\*' /tmp/swaks-dual.log")
+          machine.succeed("imap-probe needle-eddsa-77aa")
+          # One message, TWO DKIM-Signature headers: rsa from the
+          # declarative signature block, ed25519 from the API-created key
+          # (algorithm tags per create_dkim_key's mapping).
+          machine.succeed(
+              "imap-header-probe needle-eddsa-77aa 'a=rsa-sha256'"
+          )
+          machine.succeed(
+              "imap-header-probe needle-eddsa-77aa 'a=ed25519-sha256'"
+          )
+
       with subtest("negative-cache expiry: poisoned domain delivers again"):
           # The pre-provision probe poisoned is_local_domain(example.test);
           # with directoryCacheTtlNegative = 5 the entry heals within the

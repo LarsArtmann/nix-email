@@ -94,6 +94,16 @@ the rendered current-state SVG sits next to it.
 | VPS host, DNS cutover, migration, Gatus wiring | Planned - see "Go-live runbook" and ROADMAP.md (gated on the D1/D2 decisions) |
 
 Open work lives in [TODO_LIST.md](TODO_LIST.md); the honest feature
+
+Doctrine note (nixos-mailserver lessons, from a deep study of
+simple-nixos-mailserver at the pinned era, 2026-09-14): that project
+historically SHIPPED backup and monitoring options and later REMOVED
+them - upstream mail software already has native/complementary answers
+(Stalwart: `--export`/`--import`, `/metrics/prometheus`), and wrapper
+options for them rot into a second implementation to maintain. That
+removal independently validates this repo's thin-wrapper doctrine:
+wrap only what needs NixOS wiring (listeners, certs, firewall, systemd
+units), pass everything else through `services.stalwart.settings`.
 inventory in [FEATURES.md](FEATURES.md); long-term direction and the gating
 user decisions in [ROADMAP.md](ROADMAP.md).
 
