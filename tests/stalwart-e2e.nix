@@ -518,6 +518,12 @@ in
               "http://127.0.0.1:8080/api/reload -o /tmp/dkim-reload.json"
           )
           machine.succeed("cat /tmp/dkim-reload.json >&2")
+          # A re-broken reload aborts the core swap and surfaces its config
+          # errors here - fail on the precondition itself, not one step
+          # later via "DKIM signer not found".
+          machine.succeed(
+              "jq -e '.data.errors | length == 0' /tmp/dkim-reload.json"
+          )
           machine.succeed(
               "swaks --timeout 120 --server 127.0.0.1:587 --tls --auth PLAIN "
               "--auth-user user1@example.test --auth-password testpass "
