@@ -651,6 +651,23 @@ json/yaml/markdown.
   STRINGS (not objects) - the detail URL is `/api/reports/dmarc/<item>`
   verbatim. (The 0.15.5 CLI `report list` command itself GETs
   `/api/queue/reports` - do not copy it as an incoming-reports recipe.)
+- DKIM API keygen needs an explicit reload, and the reload can SILENTLY
+  NO-OP (SOURCE-VERIFIED 2026-09-16 against v0.15.5 + VM transcript):
+  `POST /api/dkim` writes `signature.<id>.*` via `config.set(...)`, which
+  is store-only - no broadcast, no core rebuild (manager/config.rs) - and
+  the SMTP signing path resolves signers from the startup-built
+  `signatures` map (core.rs `resolve_signature`), so submissions keep
+  logging "DKIM signer not found" until `GET /api/reload` swaps in a
+  rebuilt core. Second trap on top: the reload handler only matches
+  `Method::GET` for the plain reload, and `reload()` returns WITHOUT a
+  new core while ANY config error exists (manager/reload.rs
+  `if !config.errors.is_empty() { return }` before new_core) - the
+  response is still HTTP 200 with an `errors` dict. In the DNS-less test
+  VM the default pyzor host lookup (`spam-filter.pyzor.host` ->
+  public.pyzor.org) fails at build time and pins EVERY full reload; the
+  test disables `spam-filter.pyzor.enable` so reloads actually apply.
+  Operational read for live hosts: if a settings reload "did nothing",
+  check the response body's `errors` first.
 
 ## Non-goals
 

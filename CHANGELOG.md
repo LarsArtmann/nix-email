@@ -38,6 +38,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   `IMAP4.file` on Python 3.14; supersedes the earlier "file it" TODOs);
   cross-link comment on nixpkgs#563652; README external-issues ledger
   extended with both
+- `stalwart-e2e` DKIM dual-sign subtest: `POST /api/dkim` (Ed25519
+  keygen, default id `ed25519-<domain>`), public-key readout shape
+  asserted, then one submission carrying BOTH `a=rsa-sha256` and
+  `a=ed25519-sha256` DKIM-Signature headers (declarative rsa block +
+  API-created ed25519 key) (`tests/stalwart-e2e.nix`)
+- dmarc-eval contract extensions: `settings.general.offline` passthrough
+  grep and `pkgs.nixosOptionsDoc` rendering assertions
+  (`dmarc-monitor`/`RETENTION`/`parsedmarc.ini` survive option-docs
+  rendering) (`tests/dmarc-eval.nix`)
+- CI actionlint step (`nix run nixpkgs#actionlint` after the YAML parse;
+  registry pin deliberate) (`.github/workflows/ci.yml`)
+- README: "Per-account semantics" section (quota = integer bytes on the
+  principal, accepted-at-SMTP/retried-forever; catch-all `"@domain"`
+  literal disables strict 5xx rejection and cannot coexist with it;
+  negative-cache ordering) and the nixos-mailserver thin-wrapper lessons
+  note; CONTRIBUTING: d2 `--layout=elk` SVG regen command
+- mailsuite auto-STARTTLS opt-out issue draft, all 5
+  verify-before-filing gates passed (no knob on master - `imap.py`
+  byte-identical to 2.3.1; parsedmarc#534 is the same trap); filing
+  user-gated (`docs/planning/mailsuite-starttls-issue-draft.md`)
 
 ### Changed
 
@@ -52,6 +72,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   `eval-config.nix` vs `nixos/default.nix` import contract; swaks
   `--attach` @-prefix for real file attachments; incoming
   `/api/reports/dmarc` vs outbound `/api/queue/reports` endpoints)
+- Release notes v0.1.0/v0.2.0 pinned with the exact nixpkgs lock
+  `rev`/`narHash` both releases shipped with (GitHub releases, 2026-09-16)
+- Renovate verdict: the app NEVER ran on this repo (no
+  Dependency-Dashboard issue, zero branches/PRs); install-or-drop is a
+  user decision, TODO_LIST row converted to user-blocked (2026-09-16)
+- AGENTS.md: host-spike DEAD END note (replaces the stale "much faster
+  than the VM" claim), swaks python-sink forensics recipe, `rg -rn`
+  footgun, and the local GC-root debug recipe
+  (`nix build -o /tmp/st-e2e-root .#checks...stalwart-e2e`; CI-side
+  gc-roots pointless - CI keeps check paths alive for the log window)
 
 ### Fixed
 
@@ -68,6 +98,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   reports) instead of `/api/queue/reports` (the outbound queue - same
   response shape, permanently `total:0`; items are `<id>_<expires>`
   strings) (`tests/stalwart-e2e.nix`)
+- `stalwart-e2e` DKIM dual-sign leg red→green: `POST /api/dkim` writes
+  `signature.<id>.*` store-only (`config.set` does no broadcast/rebuild),
+  and `GET /api/reload` silently no-ops without swapping the core while
+  ANY config error exists - the DNS-less VM's pyzor build error pinned
+  that. Fix: test-side `spam-filter.pyzor.enable = false` (pyzor was never
+  functional without DNS) + explicit `/api/reload` before submission;
+  journal-hygiene count 2→1 accordingly (both traps source-verified
+  2026-09-16, ledgered) (`tests/stalwart-e2e.nix`)
 
 ## [0.2.0] - 2026-09-15
 
