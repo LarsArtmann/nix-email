@@ -120,6 +120,12 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
   metrics curl once failed CI with exit 23 (write error) on a MATCHING
   payload (2026-09-15), and under pipefail the negated form
   `! producer | grep -q` can phantom-green. Dump to /tmp, then grep the file.
+  Mechanized in CI since 2026-09-16 (the "Ban piped grep/tail/head" awk
+  step; `| tail`/`| head` are the same exit-code-eating class and are
+  banned too). Word boundaries in that awk are `([^[:alnum:]]|$)`, NOT
+  `\b` - gawk 5.x regex constants treat `\b` as backspace, which made the
+  first version of the lint a never-firing false green (caught by local
+  negative test).
 - Extract cross-file identifiers mechanically (`grep -o`, `od`, `git diff`
   read-back after multi-line edits) rather than trusting eyes or memory;
   from-memory identifiers have produced corrupted store paths and wrong

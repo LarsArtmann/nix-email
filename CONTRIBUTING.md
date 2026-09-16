@@ -30,6 +30,14 @@ Do not silently rewrite it: correct the entry and note the correction date,
 so future readers know the fact changed (see the parsedmarc `_secret` entry
 for the pattern).
 
+### Known fixture traps (before you write a VM test)
+
+Two live-observed generator traps are recorded in `AGENTS.md` ("VM-test
+fixture traps"): dovecot settings values must not use dovecot's own
+`<path` include prefix (the NixOS generator renders them literally), and
+the ini generator renders booleans Python-style (`True`/`False`, not
+`true`/`false`) — one failed VM run each, 2026-09-15.
+
 ## Changes to the wrapper modules
 
 - All wrapper defaults are `mkDefault`; consumers override through

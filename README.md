@@ -594,4 +594,15 @@ conditions in the module comments and the Pin-advance runbook):
   imapclient `starttls()` assigns the read-only `imaplib.IMAP4.file` on
   python 3.14. Wrapper workaround: unit pinned to the py3.13 build. Root fix
   belongs upstream at mjs/imapclient (still present on master as of
-  2026-09-16, `imapclient/imapclient.py:387`).
+  2026-09-16, `imapclient/imapclient.py:387`); filed as
+  [mjs/imapclient#662](https://github.com/mjs/imapclient/issues/662)
+  (2026-09-16, drift re-checked: #641 only fixed the `open()` override site).
+- [NixOS/nixpkgs#563777](https://github.com/NixOS/nixpkgs/issues/563777) -
+  parsedmarc module ships no systemd `Restart` policy: the poller exits 255
+  on a transient boot race (observed in the TLS IMAPS VM variant) and stays
+  failed. Fixture adds `Restart = on-failure` to stay deterministic; filed
+  2026-09-16 asking for `Restart = lib.mkDefault "on-failure"`.
+- [mjs/imapclient#662](https://github.com/mjs/imapclient/issues/662) -
+  `starttls()` still assigns read-only `IMAP4.file` on python 3.14 (4.0.1 +
+  master). Same root cause as nixpkgs#563652; fixing it upstream retires the
+  py3.13 pin via the Pin-advance runbook.
