@@ -22,9 +22,11 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
   (~2-4 min; the SMTP subtest intentionally waits out ~60 s of resolver
   timeouts in the DNS-less VM). NOTE: failed check results are CACHED - a
   rerun without an input change replays the old verdict.
-- Local debug loop (much faster than the VM): run the pinned binary by hand
-  with a minimal config in /tmp - see the pattern in the verified-facts
-  ledger history (bind high ports, `certificate.self-signed = true`).
+- Host binary spike = DEAD END for Stalwart (2026-09-16): the pinned binary
+  boots and parses config on the host but listeners never bind (futex-wait
+  after external-resource downloads); the same binary boots fine in the VM.
+  Use the VM debug loop below instead. Host loops remain fine for pure
+  client-side forensics (swaks/SMTP sink, see below).
 - VM debug loop: realize the driver
   (`nix-store -r $(nix-store -q --references $(nix eval --raw
   .#checks.x86_64-linux.stalwart-e2e.drvPath) | grep nixos-test-driver)`)
