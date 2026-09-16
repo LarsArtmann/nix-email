@@ -1,0 +1,18 @@
+# BuildFlow project config - non-default information ONLY (restating
+# defaults is a fleet anti-pattern; unknown keys warn at every load).
+# Canonical keys: BuildFlow skill references/commands.md.
+skip_steps:
+  # vulnix crashes fleet-wide updating the NVD feed: HTTP 404 on
+  # nvdcve-2.0-modified.json.gz (NVD retired the legacy JSON 2.0 feeds;
+  # vulnix 1.12.5 is unmaintained upstream). BuildFlow's "unscannable
+  # store path" hint misdiagnoses this. Re-enable when BuildFlow ships a
+  # CVE scanner that works.
+  - vulnix
+  # No pytest suite exists - all tests are NixOS VM tests in tests/*.nix;
+  # pytest reports its own "collected 0 items" banner as findings noise.
+  - pytest-test
+  # The only Python file is tests/fixtures/debug-template.py, a NixOS
+  # test-driver template whose start_all/machine globals are injected at
+  # runtime, so every name-defined finding is a false positive (ruff is
+  # silenced in-file instead). Revisit if real Python modules land.
+  - mypy-check

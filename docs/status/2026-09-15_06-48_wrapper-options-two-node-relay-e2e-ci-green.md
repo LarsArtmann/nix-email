@@ -107,7 +107,7 @@ stalwart-relay-e2e, 2026-09-15 ~06:40, after 3 gate iterations).
 2. ~~Push + watch the first real CI run; fix runner realities (KVM, disk) if any.~~ done (pushed; CI green (runs 34999737899, 35000478603))
 3. ~~Branch protection: make `nix flake check` required on master (needs your GitHub settings call).~~ done (branch protection still NOT set (verified 2026-09-16, gh api 404) - TODO_LIST user-blocked row; push half resolved)
 4. ~~Authenticated relay leg E2E (Mailpit with `--smtp-auth-file` bcrypt) OR document authless-only coverage honestly in FEATURES.~~ done (authless-only coverage documented in FEATURES (the (c) verdict was honest-documentation))
-5. ~~A real Resend smoke (1 API-key account, one submission) to prove the relay option end-to-end against the actual smarthost.~~ **Won't implement — needs a real Resend account/API key - TODO_LIST BLOCKED row.**
+5. A real Resend smoke (1 API-key account, one submission) to prove the relay option end-to-end against the actual smarthost. _(routed: TODO_LIST BLOCKED on a Resend account - still open)_
 6. ~~Pure-eval stalwart contract test (force the generated stalwart TOML: listeners, relay strategy, certificate tier, signature) - 5 s regression gate.~~ **Won't implement — optional fast-loop; the VM gate + the narrow-first build rule (AGENTS Commands) cover it.**
 7. ~~parsedmarc E2E VM test: dovecot mailbox + seeded aggregate report + assert JSON/CSV lands.~~ done (parsedmarc-e2e shipped in v0.2.0 (two nodes incl. TLS IMAPS))
 8. ~~Negative-cache regression subtest: probe-before-provision, assert MX-path poisoning, assert TTL knob rescues it.~~ done (negative-cache poisoning + low-TTL recovery regression pair shipped in v0.2.0)
@@ -116,7 +116,7 @@ stalwart-relay-e2e, 2026-09-15 ~06:40, after 3 gate iterations).
 11. ~~Junk-delivery subtest (spam classification in VM - flake risk, needs the benign-filter story first).~~ **Won't implement — 0.15.5 never auto-files Junk (sieve wall, README ledger); GTUBE subtest proves tag-only; ROADMAP Q6.**
 12. ~~Per-boot journal scoping (`-b 0` → per-unit-invocation) so the count subtest survives reordering.~~ **Won't implement — order-dependent by design - the subtest's placement before the restart subtest is the documented contract.**
 13. ~~`services.stalwart.credentials` should perhaps be mkDefault-mergeable surface in the wrapper doc (sops recipe lives in SystemNix - document the handoff explicitly).~~ done (credentials macro + SystemNix handoff documented in README (integration section + runbook))
-14. ~~DKIM: second signature id (ed25519) test leg, matching the default sign expression's second id.~~ **Won't implement — open as TODO_LIST low row (ed25519 leg not yet asserted).**
+14. DKIM: second signature id (ed25519) test leg, matching the default sign expression's second id. _(routed: TODO_LIST low row - still open)_
 15. ~~TLS strategy / per-listener cert pinning option (only if a consumer need appears - YAGNI guard).~~ **Won't implement — YAGNI guard held - no consumer need appeared.**
 16. ~~`relay` per-domain override (transport map) - ROADMAP-tier idea, do not build yet.~~ **Won't implement — ROADMAP-tier by its own text - deliberately not built.**
 17. ~~Metric labels/allowlist check (assert a stalwart_* metric name, not just `# HELP` format).~~ **Won't implement — format + presence asserted; a name-allowlist is over-spec.**
@@ -146,7 +146,7 @@ stalwart-relay-e2e, 2026-09-15 ~06:40, after 3 gate iterations).
 37. ~~git-town: verify `git town config` parses the new toml.~~ **Won't implement — git-town.toml committed and used; no drift reported.**
 38. ~~tags: consider v0.1.0 release once CI is green on GitHub (go-release checklist).~~ done (v0.1.0 AND v0.2.0 tagged + GitHub releases created (v0.1.0 retroactive at f603169, v0.2.0 at 598db0f))
 39. ~~LICENSE decision (BLOCKED on you - MIT recommended).~~ done (MIT confirmed 2026-09-15 and shipped)
-40. ~~GitHub: enable Discussions or keep issues-only (your call).~~ **Won't implement — user call, stays open - TODO_LIST user-blocked row.**
+40. GitHub: enable Discussions or keep issues-only (your call). _(routed: TODO_LIST user-blocked row - still open)_
 41. ~~Set up the FlakeHub/cachix cache for CI (workflow uses flakehub-cache-action - verify it actually hit cache on first run).~~ done (FlakeHub cache step ran green in every CI run since)
 42. ~~Benchmark the gate runtime after alejandra (report the number in README).~~ **Won't implement — not load-bearing; ~2-4 min documented in AGENTS.**
 43. ~~Consider `--all-systems` warnings cleanup: silence the aarch64 omission notice or eval-gate checks per-system cleanly.~~ **Won't implement — shape guard + attrNames eval handle the omission cleanly; no suppression needed.**
@@ -166,10 +166,18 @@ stalwart-relay-e2e, 2026-09-15 ~06:40, after 3 gate iterations).
    username `resend` + API key as password? I refuse to guess-config the
    flagship use of `relay.secretFile`; it needs a Resend account/API key (or
    their docs page you trust) to verify.
-2. **Push + branch protection**: may I push this branch and make
-   `nix flake check` a required status check on master? The CI workflow is
-   written but its first real run (runner KVM/disk reality) is unverified -
-   I need push rights/permission to find out.
-3. **ARM relevance**: does any planned host run aarch64 (Oracle/Ampere,
-   Apple-adjacent)? If no, I keep the x86_64-only posture documented and
-   drop item 50 permanently; if yes, I schedule the slow-TCO run.
+2. ~~**Push + branch protection**: may I push this branch and make~~ done (push half RESOLVED (pushed, CI green); branch-protection half routed to TODO_LIST (user-blocked, still open - verified unprotected 2026-09-16))
+   ~~`nix flake check` a required status check on master? The CI workflow is~~
+   ~~written but its first real run (runner KVM/disk reality) is unverified -~~
+   ~~I need push rights/permission to find out.~~
+3. ~~**ARM relevance**: does any planned host run aarch64 (Oracle/Ampere,~~ done (RESOLVED 2026-09-15: no ARM host planned - emulated run attempted, documented-manual posture stands)
+   ~~Apple-adjacent)? If no, I keep the x86_64-only posture documented and~~
+   ~~drop item 50 permanently; if yes, I schedule the slow-TCO run.~~
+
+
+## Resolution addendum (2026-09-16, docs-health pass)
+
+Every (b)/(f)/(g) item carries an inline verdict; items explicitly marked
+_(routed: ...)_ remain OPEN and live in TODO_LIST.md (Resend smoke, ed25519
+leg, Discussions, branch protection); the D1-gated block (f/45-50 subset)
+lives in TODO_LIST/ROADMAP. Archived.

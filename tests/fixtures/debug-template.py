@@ -1,3 +1,6 @@
+# ruff: noqa: F821
+# start_all/machine are injected by the nixos-test-driver at runtime; every
+# undefined-name finding on this template is a false positive.
 # VM debug template - run an ad-hoc script against the stalwart-e2e VM
 # without editing the committed test (pattern distilled 2026-09-15; the
 # working script lived in /tmp and was lost twice before this).

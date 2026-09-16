@@ -8,6 +8,16 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
 
 ## Commands
 
+- `buildflow` - the quality gate wrapper (fmt/lint/repairs + nix targets).
+  Skips with rationale live in `.buildflow.yml` (vulnix, pytest-test,
+  mypy-check - reasons inline there). Tools run inside the flake devShell:
+  `devShells.<system>.default` must stay resolvable (`nix develop -c echo
+  ok`), else every tool fails with "does not provide attribute
+  'devShells...'". Warning-level findings (statix W20, nix-checker
+  hardcoded-hash) do NOT fail the gate (default threshold: error) - see
+  Working rules for the deliberate non-fixes. "N tools unavailable"
+  (jest/knip/madge/pnpm tools, interrogate) is expected noise for a
+  Nix-only repo.
 - `nix flake check` - the full gate: eval contract + Stalwart VM E2E test
   (~2-4 min; the SMTP subtest intentionally waits out ~60 s of resolver
   timeouts in the DNS-less VM). NOTE: failed check results are CACHED - a
@@ -80,6 +90,24 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
 
 ## Working rules (learned the hard way)
 
+- NEVER "clean up" the flake outputs lambda signature: Nix ALWAYS passes
+  `self` to outputs, so the pattern needs the ellipsis
+  (`outputs = { nixpkgs, ... }:`). Commit a4fc343 (2026-09-16) dropped the
+  "unused" self as a lint nit and the whole flake died ("function 'outputs'
+  called with unexpected argument 'self'"; every tool cascaded red). A
+  named-but-unused `self` is not an option either - deadnix --fix re-removes
+  it every run. The ellipsis is the only shape that survives both.
+- Known lint noise - deliberate non-fixes, do NOT "repair":
+  tests/parsedmarc-e2e.nix:39 fetchurl sha256 pin is intentional
+  reproducibility (nix-checker hardcoded-hash/inline-hash findings are
+  wrong about fixtures); statix W20 "repeated keys" is a style opinion
+  about idiomatic `services.<name> = {...}` blocks in node configs; ruff
+  F821 in tests/fixtures/debug-template.py is silenced in-file (the
+  nixos-test-driver injects start_all/machine at runtime).
+- vulnix crashes fleet-wide: NVD retired the legacy JSON feeds (404 on
+  nvdcve-2.0-modified.json.gz; vulnix 1.12.5 unmaintained) - BuildFlow's
+  "unscannable store path ./result" hint is a MISDIAGNOSIS of that crash,
+  and `rm result` + rebuild does not help. Skipped via .buildflow.yml.
 - Gate commands redirect, never pipe: `nix flake check > /tmp/gate.log 2>&1;
   echo "EXIT:$?" >> /tmp/gate.log`, then read the log. A pipe reports the
   FILTER's exit code - two fake greens shipped that way in one session.
