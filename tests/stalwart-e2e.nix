@@ -628,17 +628,21 @@ in
           machine.succeed("! grep -q '<\\*\\*' /tmp/swaks-report.log")
           # Parsed asynchronously (tokio::spawn in analyze_report): poll the
           # store list until the report appears, then dump the detail for
-          # the transcript.
+          # the transcript. Response shape (management API):
+          # {"data":{"items":[{...,"id":...}],"total":N}} - assert on
+          # .data.total, NEVER bare `length` (the wrapper object's length
+          # is 1 even with zero items - a vacuous pass burned one VM run
+          # 2026-09-16).
           machine.wait_until_succeeds(
               "curl -fsS -u admin:test-admin-secret "
               "http://127.0.0.1:8080/api/queue/reports -o /tmp/report-ids.json "
-              "&& jq -e 'length >= 1' /tmp/report-ids.json",
-              timeout=60,
+              "&& jq -e '.data.total >= 1' /tmp/report-ids.json",
+              timeout=120,
           )
           machine.succeed("cat /tmp/report-ids.json >&2")
           machine.succeed(
               "curl -fsS -u admin:test-admin-secret "
-              "http://127.0.0.1:8080/api/queue/reports/$(jq -r '.[0]' /tmp/report-ids.json) "
+              "http://127.0.0.1:8080/api/queue/reports/$(jq -r '.data.items[0].id' /tmp/report-ids.json) "
               "-o /tmp/report-detail.json"
           )
           machine.succeed("cat /tmp/report-detail.json >&2")

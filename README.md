@@ -565,6 +565,34 @@ json/yaml/markdown.
     Consequence: Junk filing on this pin is per-account (webmail-managed
     sieve or per-account JMAP automation), not declarable from the wrapper.
     Revisit if 0.16+ grows server-side filing.
+- Stalwart's TOML parser (BINARY-VERIFIED 2026-09-16, pinned 0.15.5, a/b
+  probe with the local binary) REJECTS a fully-quoted dotted table header:
+  `["report.analysis"]` fails with "Invalid configuration file: Unexpected
+  end of line" at exactly the header's line. Bare-dotted (`[report.
+  analysis]`) and mixed (`[signature."rsa-example.test"]`) headers parse
+  fine. Consequence for settings style: nest via real attr structure
+  (`settings.report.analysis = {...}`), never a dotted-string attr key
+  holding a table (`settings."report.analysis" = {...}` renders the broken
+  quoted header; scalar dotted-string keys like `"server.hostname"` are
+  fine).
+- nixpkgs mailpit module freeform keys (BINARY-VERIFIED 2026-09-16, mailpit
+  1.31.0 usage dump + startup probes): `services.mailpit.instances.<id>`
+  freeform attrs go through `lib.cli.toCommandLineGNU` VERBATIM - there is
+  no camelCase/underscore mangling, so flag names must be written as
+  DASHED, QUOTED attr keys (`"smtp-auth-file" = "/etc/...";`). A camelCase
+  key (`smtpAuthFile`) renders the literal `--smtpAuthFile`, an unknown
+  flag, and mailpit exits 1 at start. Also: with a PLAIN `user:pass` auth
+  file and no TLS on the SMTP listener, mailpit REFUSES TO START
+  ("authentication requires STARTTLS or TLS encryption") unless
+  `"smtp-auth-allow-insecure" = true;` is set - the flag pair for
+  plaintext test hops.
+- Import-and-eval inside `{pkgs}` tests (bit dependabot PR #1's CI
+  2026-09-16): `import "${pkgs.path}/nixos"` accepts ONLY
+  `{configuration, system, specialArgs}` on the pinned nixpkgs - a
+  `modules` argument throws "function called with unexpected argument".
+  Use `import "${pkgs.path}/nixos/lib/eval-config.nix" { system = ...;
+  modules = [...]; }` (what `lib.nixosSystem` bottoms out in; the green
+  dmarc-eval pattern).
 
 ## Non-goals
 
