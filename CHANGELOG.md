@@ -9,6 +9,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Local `pre-push` hook (`.githooks/pre-push`, wired via the existing
+  `core.hooksPath`) running `nix fmt -- . --check` so an unformatted tree
+  fails the push locally instead of going red on master; CONTRIBUTING
+  gained a "Formatting gate (pre-push)" section
+- `stalwart-e2e`: direct `jq -e '.data.errors | length == 0'` assertion on
+  the DKIM dual-sign `/api/reload` response - a re-broken reload now fails
+  on the precondition itself, not one step later via "DKIM signer not
+  found" (response shape source-verified against stalwart v0.15.5)
+
+### Changed
+
+- Refreshed the committed `current` architecture SVG after a full
+  label-level d2↔SVG re-diff (50/50 text nodes identical; the byte drift
+  was elk-geometry only from d2 version churn)
+
+### Added
+
 - CI pipe-lint step (fail-closed): bans `producer | grep/tail/head`
   assertions inside `tests/*.nix` testScripts - under the test shell's
   pipefail, `grep -q`'s early exit EPIPEs the producer (observed in CI as
