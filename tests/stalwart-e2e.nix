@@ -389,7 +389,9 @@ in
 
       with subtest("HTTP admin/JMAP answers on loopback"):
           machine.succeed(
-              "curl -fsSL -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/ | grep -Eq '200|30[0-9]'"
+              "curl -fsSL -o /dev/null -w '%{http_code}' "
+              "http://127.0.0.1:8080/ > /tmp/http-root-code.txt"
+              "&& grep -Eq '200|30[0-9]' /tmp/http-root-code.txt"
           )
 
       with subtest("admin API: fallback-admin works, anonymous rejected"):
@@ -397,7 +399,9 @@ in
               "curl -fsS -u admin:test-admin-secret http://127.0.0.1:8080/api/principal -o /tmp/principals.json"
           )
           machine.succeed(
-              "curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/api/principal | grep -q 401"
+              "curl -sS -o /dev/null -w '%{http_code}' "
+              "http://127.0.0.1:8080/api/principal > /tmp/api-anon-code.txt"
+              "&& grep -q 401 /tmp/api-anon-code.txt"
           )
 
       with subtest("submission: authenticated SMTP on 587 delivers to INBOX"):
@@ -570,7 +574,9 @@ in
           machine.wait_for_open_port(993, timeout=180)
           machine.succeed("imap-probe needle-576a4565b70f5a4c")
           machine.succeed(
-              "curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/api/principal | grep -q 401"
+              "curl -sS -o /dev/null -w '%{http_code}' "
+              "http://127.0.0.1:8080/api/principal > /tmp/api-anon-code.txt"
+              "&& grep -q 401 /tmp/api-anon-code.txt"
           )
 
       with subtest("backup/restore: export, wipe, import, message survives"):
