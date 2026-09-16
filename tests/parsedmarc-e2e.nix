@@ -383,5 +383,7 @@ in
           tls.succeed(
               "! grep -qiE 'CERTIFICATE_VERIFY_FAILED|SSL:.+(WRONG|FAILED)' /tmp/journal-tls.log"
           )
+          # DEBUG (transcript capture for the TLS-handshake assertion):
+          tls.succeed("journalctl -u dovecot -b 0 --no-pager -o cat >&2")
     '';
   }
