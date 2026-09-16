@@ -13,7 +13,7 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
   mypy-check - reasons inline there). Tools run inside the flake devShell:
   `devShells.<system>.default` must stay resolvable (`nix develop -c echo
   ok`), else every tool fails with "does not provide attribute
-  'devShells...'". Warning-level findings (statix W20, nix-checker
+  'devShells..."'. Warning-level findings (nix-checker
   hardcoded-hash) do NOT fail the gate (default threshold: error) - see
   Working rules for the deliberate non-fixes. "N tools unavailable"
   (jest/knip/madge/pnpm tools, interrogate) is expected noise for a
@@ -122,10 +122,17 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
 - Known lint noise - deliberate non-fixes, do NOT "repair":
   tests/parsedmarc-e2e.nix:39 fetchurl sha256 pin is intentional
   reproducibility (nix-checker hardcoded-hash/inline-hash findings are
-  wrong about fixtures); statix W20 "repeated keys" is a style opinion
-  about idiomatic `services.<name> = {...}` blocks in node configs; ruff
+  wrong about fixtures); ruff
   F821 in tests/fixtures/debug-template.py is silenced in-file (the
   nixos-test-driver injects start_all/machine at runtime).
+- statix W20 is FIXED, not tolerated (2026-09-16, reversing the earlier
+  deliberate non-fix per user decision): VM-test node configs use fully
+  collapsed `services = { ... }` blocks. The warning fires when a
+  first SEGMENT repeats 3+ times within ONE attrset level and RECURSES
+  after each collapse (`services = { stalwart.settings.x = ...; }`
+  gets re-flagged on repeated `stalwart`), so collapse common prefixes
+  all the way down (`services = { stalwart = { settings = { ... }; }; }`).
+  A 2-repeat partial collapse passes today and trips on the next entry.
 - vulnix crashes fleet-wide: NVD retired the legacy JSON feeds (404 on
   nvdcve-2.0-modified.json.gz; vulnix 1.12.5 unmaintained) - BuildFlow's
   "unscannable store path ./result" hint is a MISDIAGNOSIS of that crash,
