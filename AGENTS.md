@@ -115,8 +115,10 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
   (`outputs = { nixpkgs, ... }:`). Commit a4fc343 (2026-09-16) dropped the
   "unused" self as a lint nit and the whole flake died ("function 'outputs'
   called with unexpected argument 'self'"; every tool cascaded red). A
-  named-but-unused `self` is not an option either - deadnix --fix re-removes
-  it every run. The ellipsis is the only shape that survives both.
+  named-but-unused `self` is not an option either - deadnix flags it every
+  run and BuildFlow's edit-mode auto-fix strips it (deadnix alone is
+  report-only by default; the removal path is BuildFlow's `-e` mode).
+  The ellipsis is the only shape that survives both.
 - Known lint noise - deliberate non-fixes, do NOT "repair":
   tests/parsedmarc-e2e.nix:39 fetchurl sha256 pin is intentional
   reproducibility (nix-checker hardcoded-hash/inline-hash findings are
