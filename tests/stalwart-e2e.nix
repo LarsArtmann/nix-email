@@ -261,50 +261,54 @@ in
           directoryCacheTtlNegative = 5;
         };
 
-        # Headless admin: the fallback-admin exists even with an empty
-        # internal directory (reference config pattern from the upstream repo).
-        stalwart.settings.authentication.fallback-admin = {
-          user = "admin";
-          secret = "test-admin-secret";
-        };
+        stalwart = {
+          settings = {
+            # Headless admin: the fallback-admin exists even with an empty
+            # internal directory (reference config pattern from the upstream repo).
+            authentication.fallback-admin = {
+              user = "admin";
+              secret = "test-admin-secret";
+            };
 
-        # DKIM signing: the default `auth.dkim.sign` expression signs local-
-        # domain mail with ids `['rsa-' + sender_domain, ...]`, so the id below
-        # is exactly "rsa-" + example.test (key names verified against v0.15.5
-        # source, README ledger).
-        stalwart.settings.signature."rsa-example.test" = {
-          private-key = testDkimKey;
-          domain = "example.test";
-          selector = "test";
-          algorithm = "rsa-sha256";
-        };
+            # DKIM signing: the default `auth.dkim.sign` expression signs local-
+            # domain mail with ids `['rsa-' + sender_domain, ...]`, so the id below
+            # is exactly "rsa-" + example.test (key names verified against v0.15.5
+            # source, README ledger).
+            signature."rsa-example.test" = {
+              private-key = testDkimKey;
+              domain = "example.test";
+              selector = "test";
+              algorithm = "rsa-sha256";
+            };
 
-        # Native report ingestion (subtest 19): recipients matching
-        # report.analysis.addresses get inbound report messages ANALYZED into
-        # the report store instead of delivered - but ONLY with
-        # report.analysis.forward = false (the v0.15.5 default true merely
-        # forwards; keys verified at
-        # crates/common/src/config/smtp/report.rs:86,90).
-        # NOTE: nested via REAL attrs (settings.report.analysis), NOT the
-        # dotted-string key "report.analysis" - the latter renders as a
-        # fully-quoted table header ["report.analysis"], which Stalwart's
-        # TOML parser rejects ("Unexpected end of line"; binary probe
-        # 2026-09-16, /tmp/st-probe). Bare-dotted and mixed headers
-        # ([metrics.prometheus], [signature."rsa-example.test"]) parse fine.
-        stalwart.settings.report.analysis = {
-          addresses = ["reports@example.test"];
-          forward = false;
-        };
+            # Native report ingestion (subtest 19): recipients matching
+            # report.analysis.addresses get inbound report messages ANALYZED into
+            # the report store instead of delivered - but ONLY with
+            # report.analysis.forward = false (the v0.15.5 default true merely
+            # forwards; keys verified at
+            # crates/common/src/config/smtp/report.rs:86,90).
+            # NOTE: nested via REAL attrs (settings.report.analysis), NOT the
+            # dotted-string key "report.analysis" - the latter renders as a
+            # fully-quoted table header ["report.analysis"], which Stalwart's
+            # TOML parser rejects ("Unexpected end of line"; binary probe
+            # 2026-09-16, /tmp/st-probe). Bare-dotted and mixed headers
+            # ([metrics.prometheus], [signature."rsa-example.test"]) parse fine.
+            report.analysis = {
+              addresses = ["reports@example.test"];
+              forward = false;
+            };
 
-        # Pyzor OFF: its default host (public.pyzor.org) is unresolvable in
-        # the DNS-less VM, and that build error is not just cosmetic -
-        # POST/GET /api/reload ABORTS without swapping the rebuilt core if
-        # ANY config error exists (manager/reload.rs: `if !config.errors
-        # .is_empty() { return }` before new_core), so the DKIM keygen
-        # subtest's reload would silently no-op. Disabling pyzor empties
-        # config.errors and lets the reload go through (source-verified
-        # 2026-09-16; pyzor never functioned here anyway - no DNS).
-        stalwart.settings.spam-filter.pyzor.enable = false;
+            # Pyzor OFF: its default host (public.pyzor.org) is unresolvable in
+            # the DNS-less VM, and that build error is not just cosmetic -
+            # POST/GET /api/reload ABORTS without swapping the rebuilt core if
+            # ANY config error exists (manager/reload.rs: `if !config.errors
+            # .is_empty() { return }` before new_core), so the DKIM keygen
+            # subtest's reload would silently no-op. Disabling pyzor empties
+            # config.errors and lets the reload go through (source-verified
+            # 2026-09-16; pyzor never functioned here anyway - no DNS).
+            spam-filter.pyzor.enable = false;
+          };
+        };
       };
 
       environment.systemPackages = [

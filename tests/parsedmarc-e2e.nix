@@ -214,18 +214,20 @@ in
           settings.general.offline = true;
         };
 
-        parsedmarc.provision = {
-          geoIp = false;
-          localMail = {
-            enable = true;
-            hostname = "localhost";
+        parsedmarc = {
+          provision = {
+            geoIp = false;
+            localMail = {
+              enable = true;
+              hostname = "localhost";
+            };
           };
-        };
 
-        # Force the TLS path over the provision's plaintext defaults.
-        parsedmarc.settings.imap = {
-          port = lib.mkForce 993;
-          ssl = lib.mkForce true;
+          # Force the TLS path over the provision's plaintext defaults.
+          settings.imap = {
+            port = lib.mkForce 993;
+            ssl = lib.mkForce true;
+          };
         };
 
         postfix.settings.main.home_mailbox = "Maildir/";
