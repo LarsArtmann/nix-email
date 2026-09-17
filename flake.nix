@@ -61,11 +61,21 @@
         system = "x86_64-linux";
         modules = [
           self.nixosModules.default
-          ({pkgs, ...}: let
+          ({
+            modulesPath,
+            pkgs,
+            ...
+          }: let
             # sha512-crypt of "demo" (fixed salt => deterministic; the exact
             # hash format the webadmin uses for principal secrets).
             demoHash = "$6$nixemaildemo$oK4UNSKSdI4Ye5sGdvn8ZYPOFQ1e8rNpbn5w8cZ0Qiu6s1gkcSP.x7PGE67K.iPdJeRb6o3d8zoj9crztuLon0";
           in {
+            # The demo IS a VM (telephony hosts/pbx pattern): importing
+            # qemu-vm.nix defines the virtualisation.* options below and
+            # shapes the toplevel for `system.build.vm`.
+            imports = [
+              (modulesPath + "/virtualisation/qemu-vm.nix")
+            ];
             services.mail-server = {
               enable = true;
               hostname = "mail.demo.invalid";
@@ -84,31 +94,59 @@
               # config-error risk for zero demo value.
               spam-filter.pyzor.enable = false;
             };
+            # Headless (telephony hosts/pbx): the console goes to stdio, so
+            # `nix run .#vm` works from any terminal. Ports bind 127.0.0.1
+            # on the host - unprivileged, no LAN clash.
             virtualisation = {
-              # Serial console in the terminal; no GUI window.
               graphics = false;
               memorySize = 2048;
               forwardPorts = [
                 {
-                  hostPort = 8080;
-                  guestPort = 8080;
+                  from = "host";
+                  host.address = "127.0.0.1";
+                  host.port = 8080;
+                  guest.port = 8080;
                 }
                 {
-                  hostPort = 2525;
-                  guestPort = 25;
+                  from = "host";
+                  host.address = "127.0.0.1";
+                  host.port = 2525;
+                  guest.port = 25;
                 }
                 {
-                  hostPort = 2587;
-                  guestPort = 587;
+                  from = "host";
+                  host.address = "127.0.0.1";
+                  host.port = 2587;
+                  guest.port = 587;
                 }
                 {
-                  hostPort = 2593;
-                  guestPort = 993;
+                  from = "host";
+                  host.address = "127.0.0.1";
+                  host.port = 2593;
+                  guest.port = 993;
                 }
               ];
             };
             services.getty.autologinUser = "root";
             environment.systemPackages = [pkgs.swaks pkgs.curl];
+            # Printed by every root login shell (the autologin getty shows it).
+            environment.etc."profile.d/mail-demo-banner.sh".text = ''
+              cat <<'BANNER'
+              ==================================================================
+               nix-email demo VM - throwaway, all state dies with the process
+
+                 web admin / JMAP / API : http://localhost:8080  (admin / demo-admin)
+                 SMTP                   : swaks --server localhost:2525 \\
+                                          --to anyone@mail.demo.invalid \\
+                                          --from you@example.com
+                 submission (STARTTLS)  : localhost:2587  (demo@mail.demo.invalid / demo)
+                 IMAPS                  : localhost:2593  (demo@mail.demo.invalid / demo)
+
+                 The catch-all accepts mail for ANY local part; provisioned
+                 by mail-demo-provision.service (journal: systemctl status).
+              ==================================================================
+              BANNER
+            '';
             systemd.services.mail-demo-provision = {
               description = "Provision the nix-email demo domain, account, and catch-all";
               wantedBy = ["multi-user.target"];
