@@ -102,6 +102,14 @@
             virtualisation = {
               graphics = false;
               memorySize = 2048;
+              # PIN-SKEW WORKAROUND (drop when nixpkgs moves past eaad089):
+              # this pin's qemu-vm.nix defaults enableSharedMemory to FALSE
+              # (later nixpkgs defaults it to useVirtiofs). Without the memfd
+              # memory backend, vhost-user-fs (the shared nix store) fails
+              # with "vhost_set_vring_kick failed: EIO" and the guest drops
+              # to emergency mode. The VM-test framework sets it itself; a
+              # bare build-vm does not.
+              qemu.enableSharedMemory = true;
               forwardPorts = [
                 {
                   from = "host";
