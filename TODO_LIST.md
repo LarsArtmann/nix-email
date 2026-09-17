@@ -24,12 +24,6 @@
 | 🔵 `BLOCKED`     | Cannot proceed; external dependency or decision needed. |
 | 🟢 `DONE`        | Completed. Remove from this list and log in CHANGELOG.  |
 
-## High Impact
-
-| Task                                                                                                                                                                                                    | Status    | Impact | Effort | Evidence                                                                                                                                                                                     |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- | ------ | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Cut release 0.3.0: cut the CHANGELOG `[Unreleased]` section, tag `v0.3.0` (CI now runs on `v*` tags), release notes with the exact nixpkgs lock `rev`/`narHash` (v0.1.0/v0.2.0 both shipped `eaad089…`) | 🔴 `TODO` | High   | 1h     | UNBLOCKED 2026-09-16: dependabot PR #1 MERGED (16:08 UTC) - the last gate the 18-03 report waited on; `[Unreleased]` is thick (relay, native ingestion, DKIM dual-sign, pipe-lint, devShell) |
-
 ## Medium Impact
 
 | Task                                                                                                                                                                                                                                                                     | Status                 | Impact | Effort | Evidence                                                                                                                                                                                                                                                                                                                                                    |
