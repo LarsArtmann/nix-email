@@ -111,14 +111,23 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
 ## Working rules (learned the hard way)
 
 - NEVER "clean up" the flake outputs lambda signature: Nix ALWAYS passes
-  `self` to outputs, so the pattern needs the ellipsis
-  (`outputs = { nixpkgs, ... }:`). Commit a4fc343 (2026-09-16) dropped the
-  "unused" self as a lint nit and the whole flake died ("function 'outputs'
-  called with unexpected argument 'self'"; every tool cascaded red). A
-  named-but-unused `self` is not an option either - deadnix flags it every
-  run and BuildFlow's deadnix auto-fix strips it (deadnix alone is
-  report-only by default; the removal path is BuildFlow's edit mode).
-  The ellipsis is the only shape that survives both.
+  `self` to outputs, and flake-parts additionally consumes the whole
+  `inputs` set, so the pattern needs the ellipsis
+  (`outputs = inputs@{flake-parts, nixpkgs, ...}:`). Commit a4fc343
+  (2026-09-16) dropped the "unused" self as a lint nit and the whole flake
+  died ("function 'outputs' called with unexpected argument 'self'"; every
+  tool cascaded red). A named-but-unused `self` is not an option either -
+  deadnix flags it every run and BuildFlow's deadnix auto-fix strips it
+  (deadnix alone is report-only by default; the removal path is BuildFlow's
+  edit mode). The ellipsis is the only shape that survives both.
+- flake-parts perSystem (2026-09-17 migration): `pkgs` comes from
+  flake-parts' built-in nixpkgs module (`inputs'.nixpkgs.legacyPackages`) -
+  do NOT redefine `_module.args.pkgs` inside perSystem (verified 2026-09-17
+  on flake-parts 31729ca8: pkgs ends up UNBOUND when checks eval; both
+  reference flakes - nix-international-telephony, SystemNix - just
+  destructure `pkgs` and use `pkgs.lib`, not a bare `lib`, inside
+  perSystem). dmarc-eval still receives the raw `nixpkgs` input, so its
+  own legacyPackages semantics are unchanged.
 - Known lint noise - deliberate non-fixes, do NOT "repair":
   tests/parsedmarc-e2e.nix:39 fetchurl sha256 pin is intentional
   reproducibility (nix-checker hardcoded-hash/inline-hash findings are

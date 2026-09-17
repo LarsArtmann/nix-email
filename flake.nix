@@ -23,7 +23,11 @@
   # flake-parts additionally needs the whole `inputs` set. A closed
   # pattern (the "flake lint nit" of commit a4fc343) broke evaluation:
   # "function 'outputs' called with unexpected argument 'self'".
-  outputs = inputs@{flake-parts, nixpkgs, ...}:
+  outputs = inputs @ {
+    flake-parts,
+    nixpkgs,
+    ...
+  }:
     flake-parts.lib.mkFlake {inherit inputs;} {
       systems = [
         "x86_64-linux"
@@ -56,7 +60,6 @@
         system,
         ...
       }: {
-
         # NixOS VM tests only run reliably on x86_64-linux. MEASURED
         # 2026-09-15 (one emulated stalwart-e2e attempt on an x86 host with
         # qemu-aarch64 binfmt): the aarch64 guest BUILDS and BOOTS fine
@@ -67,14 +70,15 @@
         # Decision: documented-manual - NOT worth CI time; anyone porting to
         # aarch64 re-runs it on real ARM hardware. The pure-eval contract
         # test below is arch-independent and runs everywhere.
-        checks = {
-          dmarc-eval = import ./tests/dmarc-eval.nix {inherit nixpkgs system;};
-        }
-        // pkgs.lib.optionalAttrs (system == "x86_64-linux") {
-          stalwart-e2e = import ./tests/stalwart-e2e.nix {inherit pkgs;};
-          stalwart-relay-e2e = import ./tests/stalwart-relay-e2e.nix {inherit pkgs;};
-          parsedmarc-e2e = import ./tests/parsedmarc-e2e.nix {inherit pkgs;};
-        };
+        checks =
+          {
+            dmarc-eval = import ./tests/dmarc-eval.nix {inherit nixpkgs system;};
+          }
+          // pkgs.lib.optionalAttrs (system == "x86_64-linux") {
+            stalwart-e2e = import ./tests/stalwart-e2e.nix {inherit pkgs;};
+            stalwart-relay-e2e = import ./tests/stalwart-relay-e2e.nix {inherit pkgs;};
+            parsedmarc-e2e = import ./tests/parsedmarc-e2e.nix {inherit pkgs;};
+          };
 
         # Tool environment for `nix develop` (and the BuildFlow tool runners,
         # which execute ruff/mypy/pytest/dprint inside this shell). Minimal on

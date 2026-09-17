@@ -13,7 +13,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
-- Nothing yet.
+- flake.nix migrated to flake-parts (hercules-ci), following the
+  nix-international-telephony / SystemNix pattern. Exported surface is
+  unchanged - `nixosModules.{default,mail-server,dmarc-monitor}`, the
+  four checks (CI lockstep + shape guards hold verbatim), devShells,
+  alejandra `nix fmt`. One new input: `flake-parts` with
+  `nixpkgs-lib.follows = "nixpkgs"`, so the compat-doctrine nixpkgs rev
+  stays the only nixpkgs in the lock. Release-tag consumers are
+  unaffected; on the next bump they can dedupe the new input with
+  `inputs.nix-email.inputs.flake-parts.follows = "flake-parts"`.
 
 ### Fixed
 
