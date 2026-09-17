@@ -68,6 +68,10 @@ Raw ideas:
     nothing until the live webadmin is inspected (D1) AND parsedmarc JSON
     proves insufficient
 - Optional PostgreSQL sink for parsedmarc (psycopg override experiment)
+- Stalwart telemetry wiring per `docs/TELEMETRY.md` (the metrics surface
+  behind the Prometheus scrape above) - the guide carries an
+  upstream-object-model vs pinned-0.15.5 skew caveat: verify keys against
+  the binary before wiring anything
 - Paperless mail accounts off Gmail app passwords onto own IMAP; smartd
   remote-alert path decoupled from the mail relay (circular-dependency risk);
   InboxClean JMAP/IMAP spike post-migration
@@ -90,9 +94,18 @@ Raw ideas:
 - Retire the two in-repo nixpkgs workarounds once upstream fixes land (host-less
   `[elasticsearch]` emission; imapclient on python 3.14) - re-check on every
   nixpkgs bump; the module comments carry the revert conditions
+- Split `flake.nix` into `flake-modules/*.nix` (the flake-parts idiom)
+  only when it outgrows ~300 lines - it is ~105 after the 2026-09-17
+  migration; splitting earlier costs navigation for nothing
+- Replace the vulnix CVE scan once BuildFlow ships a working scanner
+  (NVD retired the legacy JSON feeds that crashed vulnix 1.12.5
+  fleet-wide; `.buildflow.yml` carries the skip rationale)
 - Formatter stack decision: treefmt-nix standard stack vs the current
-  minimal-alejandra flake formatter (nix-review checklist prefers the stack;
-  compat doctrine prefers minimal - genuine tradeoff, needs a call)
+  minimal-alejandra flake formatter. Narrowed 2026-09-17: the flake-parts
+  migration REJECTED adding treefmt-nix to this repo (it would swap
+  alejandra for nixfmt, reformat everything, and break the
+  `nix fmt -- . --check` CI contract - recorded in AGENTS.md Conventions);
+  what remains open is only whether the fleet ever standardizes on it
 - aarch64: VM tests stay x86_64-gated (emulated run attempted 2026-09-15:
   guest builds+boots but boot alone exceeds the driver timeout -
   documented-manual, not CI-worthy); residue is an occasional local
@@ -153,3 +166,13 @@ any repo; they are Lars's calls.
    documented end state, (d) upstream feature request for declarative
    server-side filing and revisit on 0.16+. Recommendation: (c) now + (d)
    as the path to (a) later; awaiting the final call.
+7. **Demo VM boundary (2026-09-17 flake-parts session):** a runnable
+   throwaway mail VM in THIS repo (`nix run .#vm`, telephony's `apps.vm`
+   pattern), or does "boot the stack" belong to the consumer layer
+   (SystemNix) with this repo staying tests-only? AGENTS.md assigns
+   SystemNix layers to the consumer, but a demo VM is arguably
+   product-side - the line is Lars's call.
+8. **Next release tag cadence:** the flake-parts migration sits in
+   CHANGELOG [Unreleased] - cut a fast `v0.3.1` so SystemNix can bump
+   and dedupe early, or batch it into the next feature release? Gates
+   the SystemNix pin advance (TODO_LIST).

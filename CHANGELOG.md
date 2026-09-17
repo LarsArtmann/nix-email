@@ -9,7 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
-- Nothing yet.
+- Docs: AGENTS.md records the flake-parts decisions (floating input +
+  lock-pin policy, treefmt/`systems`/git-hooks rejections, reference-first
+  migration rule with immediate eval guards); the README Pin-advance
+  runbook gained the `flake-parts` dedupe step for the next SystemNix
+  bump and the `dovecot2.protocols` expected-noise note
 
 ### Changed
 
