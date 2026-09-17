@@ -72,7 +72,9 @@
           in {
             # The demo IS a VM (telephony hosts/pbx pattern): importing
             # qemu-vm.nix defines the virtualisation.* options below and
-            # shapes the toplevel for `system.build.vm`.
+            # shapes the toplevel for `system.build.vm`. hostName also names
+            # the runner script (run-demo-vm, via system.name).
+            networking.hostName = "demo";
             imports = [
               (modulesPath + "/virtualisation/qemu-vm.nix")
             ];
