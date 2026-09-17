@@ -326,12 +326,22 @@ inside nixpkgs are invisible to it, so the checks below are manual):
    - Watch for `services.stalwart` passing 0.15.5: the wrapper's verified key
      set (relay IfBlocks, certificate tiers) must be re-verified against the
      new source before riding the bump.
+   Expected noise during the bump's check evals: the `dovecot2.protocols`
+   rename warning is nixpkgs-internal (`parsedmarc.nix` sets it under
+   `provision.localMail.enable`; verdict 2026-09-16: not ours) and should
+   disappear on a future pin advance - do not chase it.
 3. **Advance the SystemNix consumer pin**: update the `nix-email` input rev
    (hard rev or release tag - see PIN DISCIPLINE above), `nix flake update
    nix-email`, restore any option-gated test cases the old pin forced out
    (the relay-credential assertions were the first instance), delete dead
    option-existence guards, then `nix flake check` in BOTH repos. Gate
-   commands never wear pipes.
+   commands never wear pipes. Since the 2026-09-17 flake-parts migration,
+   the bump also decides what happens to nix-email's `flake-parts` input:
+   dedupe it (`inputs.nix-email.inputs.flake-parts.follows =
+   "flake-parts"` in SystemNix - the fleet already carries one
+   flake-parts node) or accept a second lock node; nix-email floats
+   flake-parts (lock-pinned), so `nix flake update flake-parts` moves it
+   independently of nixpkgs.
 4. Tag a release here when the modules changed; SystemNix's pin should
    reference it (the consumer contract is versioned by the tag, the exact
    rev stays locked in flake.lock).

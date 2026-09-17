@@ -79,6 +79,20 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
   0.15.5. The full bump + consumer-pin + workaround-retirement procedure
   is the README "Pin-advance runbook" (SystemNix's pin references release
   tags; current: v0.2.0).
+- flake-parts input policy (decided 2026-09-17): FLOATING
+  `github:hercules-ci/flake-parts`, pinned by flake.lock only - both
+  reference flakes (SystemNix, nix-international-telephony) float it too,
+  so the lock pin is the fleet's reproducibility control; a URL-hard rev
+  would diverge from fleet posture without adding safety. The
+  `nixpkgs-lib.follows = "nixpkgs"` follow is NOT optional - a dropped
+  follow smuggles a second nixpkgs rev into every consumer lock (eval
+  guard tracked in TODO_LIST).
+- Flake-parts adoption decisions (2026-09-17, do not re-litigate without
+  new evidence): treefmt-nix REJECTED (swaps alejandra for nixfmt,
+  reformats the whole repo, breaks the `nix fmt -- . --check` CI
+  contract); the flake-parts `systems` input REJECTED (the hardcoded
+  two-system list matches both references); git-hooks-nix REJECTED
+  (BuildFlow owns pre-commit).
 - Wrapper options are `services.mail-server` / `services.dmarc-monitor`
   (NOT `services.stalwart-mail` - collides with an nixpkgs rename alias).
 - All wrapper defaults are `mkDefault`; consumers override via
@@ -128,12 +142,25 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
   destructure `pkgs` and use `pkgs.lib`, not a bare `lib`, inside
   perSystem). dmarc-eval still receives the raw `nixpkgs` input, so its
   own legacyPackages semantics are unchanged.
+- Reference-first for structural migrations: when a sibling repo carries
+  the proven pattern, the first draft is its verbatim shape - verify
+  green, THEN deviate one step at a time with evidence (2026-09-17: a
+  from-memory `_module.args.pkgs` "improvement" produced a dead flake the
+  reference shape would have prevented). Run the two `nix eval` guards
+  (`nix eval .#checks.x86_64-linux --apply 'builtins.attrNames'` + the
+  aarch64 shape) IMMEDIATELY after every flake-structure write - the
+  auto-commit daemon commits mid-session, so a dead flake becomes git
+  history within minutes.
 - Known lint noise - deliberate non-fixes, do NOT "repair":
   tests/parsedmarc-e2e.nix:39 fetchurl sha256 pin is intentional
   reproducibility (nix-checker hardcoded-hash/inline-hash findings are
   wrong about fixtures); ruff
   F821 in tests/fixtures/debug-template.py is silenced in-file (the
-  nixos-test-driver injects start_all/machine at runtime).
+  nixos-test-driver injects start_all/machine at runtime); `{ ... }` vs
+  `{...}` in tests/*.nix coexists intentionally (commit ba7645c was a
+  manual edit, no formatter involved: alejandra 4.0.0 preserves `{ ... }`
+  on round-trip and dprint has no nix plugin - do not normalize either
+  style).
 - statix W20 is FIXED, not tolerated (2026-09-16, reversing the earlier
   deliberate non-fix per user decision): VM-test node configs use fully
   collapsed `services = { ... }` blocks. The warning fires when a
