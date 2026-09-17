@@ -1,0 +1,151 @@
+# Status Report: v0.3.1 Release + Demo VM (hostfwd hang) Session
+
+- **Date:** 2026-09-17 21:07 CEST
+- **Session scope:** (1) docs-health HARVEST of the 17-28 flake-parts migration report, (2) the user's two answered decisions executed - tag `v0.3.1` NOW and add the demo VM to THIS repo, (3) demo VM implementation + boot debugging.
+- **Session verdict:** Harvest fully shipped and gated. **v0.3.1 RELEASED** (tag pushed, GitHub Release live, CI green on both master and the tag - this release carries the flake-parts migration to consumers). Demo VM: boots fully with a healthy guest stack, but **host→guest HTTP hangs** - one bug open, feature NOT end-to-end, docs deliberately not written.
+- **Tree state:** `master` **ahead 13** of origin (all 13 are daemon auto-commits of the demo-VM flake.nix iterations; **CI has never seen the VM work** - origin/master stops at the released v0.3.1 commit `8a96e1b`). Working tree clean; `./result` symlink pins the built VM closure (kept as GC root for the next debug round). Debug qemu/virtiofsd processes killed.
+- **Format note:** Markdown per your explicit instruction, overriding the status-report skill's HTML-dashboard default (same override as the 17-28 report).
+
+---
+
+## Straight answers to the three opening questions
+
+**What did you forget?**
+1. That **`curl` is banned in this harness**. I ran a 36×5 s poll loop where every single probe was a no-op ("command is not allowed" ×36 at the tail of the output) - and initially read the empty results as evidence "the API is down". A probe framework I never smoke-tested produced a fake negative. (Switched to python3/urllib.)
+2. **Exit-code masking by interleaved `echo`**: in my first eval-guard batch I put `echo ""` between the command and `$?` capture, so EVAL3/EVAL4 printed fake `0`s while the log text showed an option error. This is THIS repo's #1 documented trap class (gate commands never wear pipes / never interleave) and I recreated a variant of it in the same session that re-read the rule.
+3. To **read the pinned nixpkgs' `qemu-vm.nix` before writing VM config from NixOS-manual memory**. Three iterations (undefined `self`; undefined `virtualisation.*` options; runner named `run-nixos-vm` instead of `run-demo-vm`) were each fully preventable by a 2-minute option-existence grep - and this, in the same session where I codified "reference-first / source-first" into AGENTS.md.
+4. That the **control experiment comes first**: I fought the emergency-mode virtiofs failure for two boot attempts before booting telephony's demo VM as a control - which instantly exonerated the environment and pointed at the nixpkgs pin delta.
+5. That `ss -tln` showing a LISTENING forwarded port proves **nothing end-to-end** (qemu binds hostfwd ports regardless of guest state) - so my telephony control verified "boots", but never verified the host→guest HTTP path. Half a control.
+
+**What could you have done better?**
+- Guest-side probes first. One scripted-console `curl -v 127.0.0.1:8080` inside the guest (the diagnostic I only built in boot #3) would have split the problem space - guest app vs host↔guest transport - in run 1 instead of run 4.
+- The boot-smoke should have been **layered**: guest service health → in-guest loopback HTTP → host-forwarded HTTP. I probed only the top layer and stared at timeouts.
+- I should have treated "the E2E framework does X itself" as a first-class suspect earlier: the VM-test driver sets `qemu.enableSharedMemory` (or equivalent) for its guests; a bare `build-vm` run does not. The repo's own "no new assertion without a transcript" culture applies to VM options too.
+
+**What could you still improve?**
+See sections (e) and (f). Highest leverage: finish the hostfwd/API-hang root cause with the layered-probe method, then land the docs that are deliberately waiting on a working end-to-end demo.
+
+---
+
+## a) FULLY DONE
+
+| # | Item | Evidence |
+|---|------|----------|
+| a1 | **docs-health HARVEST of the 17-28 report shipped**: TODO_LIST.md rewritten - 6 DONE rows deleted (docs-health mandate: done items never stay), their two no-action verdicts preserved in better homes (dovecot2.protocols → README runbook; `{ ... }` formatter forensics → AGENTS.md), 11 new rows added (7 Medium, 3 Low, 1 Blocked), sweep header updated to 2026-09-17 | `TODO_LIST.md`; diff read-back against `bdf77d3` confirmed kept rows byte-identical |
+| a2 | **Pin policy (g2) DECIDED and recorded**: flake-parts stays FLOATING + lock-pinned - both reference flakes (SystemNix `flake.nix:27`, telephony `:19`) float it; the lock pin is the fleet's reproducibility control; a URL-hard rev adds zero safety and diverges from fleet posture | AGENTS.md Conventions (dated 2026-09-17, reversible) |
+| a3 | **c6 un-decisions recorded as decisions**: treefmt-nix REJECTED (swaps alejandra→nixfmt, breaks the `nix fmt -- . --check` CI contract), flake-parts `systems` input REJECTED, git-hooks-nix REJECTED (BuildFlow owns pre-commit) | AGENTS.md Conventions |
+| a4 | **Reference-first + immediate-eval-guards working rule codified** (e1/e2 of the 17-28 report) - and it fired for real this session, catching the `self` bug seconds after the write | AGENTS.md Working rules |
+| a5 | **README Pin-advance runbook updated** (f1/c1, the High-priority harvest item): flake-parts dedupe step for the next SystemNix bump + `dovecot2.protocols` expected-noise note. Evidence-verified before writing: runbook existed with ZERO flake-parts mentions | `README.md` §Pin-advance runbook |
+| a6 | **ROADMAP updated**: open questions 7 (demo VM boundary) and 8 (next-tag cadence) added; telemetry-wiring idea (§4); `flake-modules/` split trigger + vulnix replacement (§5); treefmt line narrowed to fleet-only scope, removing the split brain with the new AGENTS.md rejection | `ROADMAP.md` |
+| a7 | **`nix flake show` sanity EXIT:0** (f11 - shipped, not listed): checks/devShells/formatter/nixosModules all render clean under flake-parts | `/tmp/flake-show.log` |
+| a8 | **v0.3.1 RELEASED**: CHANGELOG cut (`[0.3.1] - 2026-09-17`, Unreleased placeholders restored), explicit commit `8a96e1b`, annotated tag, push of master + tag through the pre-push fmt hook, GitHub Release created in v0.3.0 house style | `CHANGELOG.md`; `https://github.com/LarsArtmann/nix-email/releases/tag/v0.3.1` |
+| a9 | **CI green on the release**: master push run 35247916196-class → run 35254795607 (8m15s success) AND tag-push run 35254795046 (8m20s success). The flake-parts migration is now consumer-visible via `github:LarsArtmann/nix-email/v0.3.1` | `gh run list` |
+| a10 | **All gates re-run green pre-release**: full `nix flake check --print-build-logs` EXIT:0, `buildflow` EXIT:0 (known noise only), `nix fmt -- . --check` EXIT:0 | `/tmp/gate-release.log`, `/tmp/bf-harvest.log`, `/tmp/fmt-harvest.log` |
+| a11 | **Demo VM research** (reference-first): telephony pattern extracted - `nixosConfigurations.<host>` + `perSystem.apps.vm` pointing at `config.system.build.vm`; runner named `run-${config.system.name}-vm` (qemu-vm.nix:1456-1461), `system.name` derives from `networking.hostName` | telephony `flake.nix:140-145`, `hosts/pbx/default.nix:18,92-110` |
+| a12 | **Demo host implemented** in flake.nix: `nixosConfigurations.demo` (imports qemu-vm.nix; mail-server enabled, `hostname = mail.demo.invalid`, `httpBind = 0.0.0.0:8080`, pyzor off per the tested E2E posture, fallback-admin, 4 forwards bound to 127.0.0.1, serial console, root autologin, credential banner, provisioning oneshot with sha512-crypt demo hash + catch-all, provisioning recipe mirrored verbatim from stalwart-e2e) + `apps.vm` (x86_64-only) | `flake.nix:60-207` (approx) |
+| a13 | **Three eval/boot bugs root-caused and fixed with source-level evidence**: (1) `self` unbound in the outputs lambda → destructure like telephony (`inputs@{self, flake-parts, nixpkgs, ...}`); (2) `virtualisation.*` options live in qemu-vm.nix → import it (telephony `hosts/pbx:18`); (3) **the big one**: our pin's `qemu-vm.nix` has `enableSharedMemory = mkEnableOption` (default FALSE) vs telephony's newer pin `default = useVirtiofs` (TRUE) - without the memfd backend, `vhost-user-fs-pci` fails `vhost_set_vring_kick: EIO` and the guest drops to emergency mode. Fixed consumer-side: `virtualisation.qemu.enableSharedMemory = true;` with a PIN-SKEW WORKAROUND comment (drop when the pin advances) | side-by-side diff of both pins' `qemu-vm.nix` (option at ~line 740, memfd gate at ~1277) |
+| a14 | **The demo VM BOOTS**: full userspace, `root@demo` autologin, `Stalwart Server v0.15.5` active, guest-side `ss` transcript shows LISTEN on `0.0.0.0:8080` + 25/465/587/993, "Webadmin resource unpacked" | `/tmp/demo-boot3.log:285-290` (guest console transcript) |
+| a15 | **Eval guards honored after every flake write** - and the reflex rule earned its keep: the `self` bug was caught by the guard seconds after the write, exactly as codified | `/tmp/fmt-vm.log`, `/tmp/fmt-vm2.log`, `/tmp/fmt-vm3.log` |
+| a16 | **Control experiment executed**: telephony's own demo VM boots fully on this host (root autologin transcript, 8443/18443 listening) → environment exonerated → pointed straight at the pin delta the diff then confirmed | `/tmp/tel-boot.log` |
+
+## b) PARTIALLY DONE
+
+| # | Item | What works | What remains | Blocker | Effort |
+|---|------|-----------|--------------|---------|--------|
+| b1 | **Demo VM end-to-end** | Boots; guest stack fully healthy (stalwart active, all listeners up, webadmin unpacked, provisioning oneshot correctly waiting on the API) | **Host→guest HTTP hangs**: `GET 127.0.0.1:18080/api/principal` times out from the host (last probe: 10.1 s timeout, reproduced across runs). NOT connection-refused - the connection opens and no answer comes. Guest-side loopback API behavior untested (the oneshot is still "activating", consistent with the API not answering even in-guest). Also unexamined: 6× "Configuration build warning" in the stalwart journal, and the repeating "Downloading external resource" lines - the E2E never sees these (its VM is DNS-less; the demo has live slirp DNS) | Root cause unknown; suspect order: stalwart HTTP layer (warnings/downloads blocking) > slirp hostfwd path | M |
+| b2 | **Shipping the VM work** | Fully local on master, boots | **13 unpushed daemon commits** (flake.nix iterations incl. broken intermediates); CI has never seen any of it | b1 green + gates + then push | S (after b1) |
+| b3 | **Post-VM docs** | All drafted in-session, deliberately withheld | README "Try it in a VM" section, CHANGELOG Unreleased entry, ROADMAP Q7 inline resolution, AGENTS.md (`nix run .#vm` command line + lambda-rule `self` mention + pin-skew ledger note) | Repo rule: no doc claim without a transcript; docs wait for a working demo | S (after b1) |
+| b4 | **Post-VM gates** | Per-write eval guards green | Full `nix flake check` + buildflow not re-run since the demo config landed (`nix flake check` now also evaluates the demo toplevel - new eval surface; possibly a toplevel build) | b1 | M |
+| b5 | **SystemNix bump (f4)** | The gate is RESOLVED - v0.3.1 exists and is CI-green | The bump + `flake-parts.follows` dedupe itself happens in the SystemNix repo | Consumer-repo authorization/push policy (your call) | S |
+| b6 | **TODO_LIST SystemNix row status** | Row exists, correctly routed | Still says `BLOCKED (next-tag cadence)` - the tag now exists, so it should flip to actionable | 2-minute edit, folded into the next harvest | XS |
+
+## c) NOT STARTED
+
+All deliberate holds, not drift:
+
+| # | Item | Why not started |
+|---|------|-----------------|
+| c1 | Demo VM boot-smoke as a documented debug loop (the scripted-console diagnostic pattern) in AGENTS.md Commands | Waits for b1 - the loop should be documented with a working endpoint |
+| c2 | CI surface for the demo (lockstep guard covers `checks` only; `apps`/`nixosConfigurations` shape is unguarded) | Needs a measured decision on what `nix flake check` already evaluates for the demo toplevel before adding guard steps |
+| c3 | dmarc-monitor in the demo (via a local Mailpit sink as a faked rua mailbox) | Scope call is yours (see g2); current demo is deliberately mail-server-only |
+| c4 | Upstream verification of the enableSharedMemory fix (I verified the DELTA between the two pins line-level; the "fixed later upstream" claim in my comment cites telephony's pin, not an upstream commit) | verify-before-filing / verify-external-claims discipline; 10 min with the nixpkgs history |
+| c5 | FEATURES.md row for the demo VM | Feature not functional yet |
+
+## d) TOTALLY FUCKED UP
+
+Nothing shipped is broken - origin/master (= v0.3.1) is green and released. These went wrong locally this session:
+
+| # | What went wrong | Severity at the time | Root cause | Resolution / mitigation |
+|---|----------------|---------------------|------------|------------------------|
+| d1 | **36-poll fake probe loop**: every host-side poll was a banned-command no-op, and the output pattern read as "API down" | Misleading signal for one debug round | Forgot the harness bans `curl`; never smoke-tested the probe | Switched to python3/urllib; e3 below |
+| d2 | **Fake-green exit codes**: interleaved `echo` between command and `$?` → EVAL3/EVAL4 printed 0 while the log showed an option error | Would have miscounted guard results | The exact exit-code-masking class this repo documents, recreated by hand | Caught because log text contradicted the 0; reverted to adjacent capture |
+| d3 | **Three config iterations written from memory** (self; virtualisation options; runner name) instead of reading the pinned qemu-vm.nix first | ~30 min + 3 wasted builds | Reference-first violation against nixpkgs internals - the rule I codified hours earlier | Fixes landed with source citations (qemu-vm.nix:1456); e1 below |
+| d4 | **Emergency-mode boot with a locked console**: the pin-skew vhost EIO dropped the guest to sulogin with "root account is locked" - had this been shipped with docs, that dead end IS the first-run user experience | Latent product risk (unpushed) | Our pin's `enableSharedMemory` default FALSE + unconditional `vhost-user-fs-pci` | Fixed + commented as PIN-SKEW WORKAROUND; c4 verifies the upstream fix commit |
+| d5 | **13 unpushed daemon commits of iterating states** sit on local master (incl. broken intermediates); branch protection is bypassed by policy, so one daemon push ships non-green state to master | Latent (history hygiene) | Daemon races every save by design; I did not batch-or-squash the WIP | Nothing pushed yet; see g3 |
+
+## e) WHAT WE SHOULD IMPROVE
+
+1. **Read the pinned module source before using any option outside the E2E-tested surface.** The reference-first rule extends from "sibling repo flakes" to "the exact nixpkgs rev under our feet" - option existence is a grep, not a boot attempt.
+2. **Layered VM debugging doctrine**: prove the service in-guest → in-guest loopback → host-forwarded transport, in that order, one layer per probe. Never start at the top layer.
+3. **Smoke-test the probe before trusting it**: one `curl --version` would have exposed the banned-tool no-op in 1 second instead of 3 minutes of fake polls.
+4. **Exit-code capture discipline**: command and `echo EXIT:$?` adjacent, nothing between - the repo has now burned on this class three separate times (pipes, `head` truncation, interleaved echo).
+5. **Control experiments before config surgery**: when "the same machinery works elsewhere" is known, boot the known-good control FIRST (it took one attempt and exonerated half the stack).
+6. **Pin-skew workarounds need a verification trail**: my flake comment says "later nixpkgs defaults it to useVirtiofs" - true per the telephony diff, but the upstream fix commit should be cited (c4) so the revert condition is precise.
+7. **Debug-resource hygiene as a wrap-up step**: kill qemu/virtiofsd, keep the `result` GC root, note what's running - done at report time, should be reflex at each debug-round end.
+
+## f) NEXT TASKS (impact-ranked; session-grounded, ~30 real ones - the surviving ones route to TODO_LIST/ROADMAP via the next HARVEST)
+
+**Demo VM finish (blocks the rest of the feature):**
+
+| # | Task | Impact | Effort |
+|---|------|--------|--------|
+| 1 | Root-cause the hostfwd/API hang: guest-side `curl -v 127.0.0.1:8080` first, then read the 6 "Configuration build warning" lines, then check whether the repeating "Downloading external resource" (spam-filter lists over live DNS - a behavior the DNS-less E2E never exercises) stalls the HTTP layer | High | M |
+| 2 | Fix per findings and re-smoke with LAYERED assertions (guest loopback → host 18080 → swaks 2525 catch-all accept → IMAPS 2593 login demo/demo) - transcripts before any doc claim | High | M |
+| 3 | Then land the withheld docs: README "Try it in a VM", CHANGELOG Unreleased, ROADMAP Q7 inline resolve, AGENTS.md (`nix run .#vm`, lambda `self` mention, pin-skew note) | High | S |
+| 4 | Full `nix flake check` + `buildflow` on the final state (demo toplevel adds eval surface to the gate) | High | M |
+| 5 | Push the VM work once green; decide on the 13-commit daemon history (push as-is vs squash - needs your explicit commit authorization, see g3) | High | S |
+| 6 | Measure what `nixosConfigurations.demo` adds to `nix flake check` wall time (once) | Low | S |
+| 7 | Re-run `nix flake show` - the public surface grew (`apps`, `nixosConfigurations`) and the a7 check predates it | Low | S |
+| 8 | Ledger entry (README or AGENTS.md) for the `enableSharedMemory` pin-skew: fact + method + revert condition | Med | S |
+| 9 | c4: cite the upstream commit that flipped the `enableSharedMemory` default (verify-external-claims on my own comment) | Med | S |
+| 10 | Investigate the "Configuration build warning" content even if benign - the demo journal should not greet new users with warnings | Med | S |
+| 11 | "Downloading external resource" loop: identify which URLs; decide whether the demo should disable that path (and note the E2E-vs-demo behavior delta in the ledger) | Med | M |
+| 12 | Optional (your call, g2): dmarc-monitor in the demo against a Mailpit sink | Low | M |
+| 13 | Optional: scripted end-to-end self-test at VM boot (swaks in-guest) - nice demo, more moving parts | Low | S |
+| 14 | Document the scripted-console VM debug loop in AGENTS.md (c1) | Low | S |
+| 15 | FEATURES.md: demo-VM row (PLANNED → FULLY_FUNCTIONAL when green) | Low | S |
+| 16 | Consider CI guard coverage for `apps`/`nixosConfigurations` shape (c2) | Low | S |
+
+**Release v0.3.1 fallout:**
+
+| # | Task | Impact | Effort |
+|---|------|--------|--------|
+| 17 | SystemNix bump to `v0.3.1` + `flake-parts.follows` dedupe (b5 - consumer repo, your authorization) | High | S |
+| 18 | Flip the TODO_LIST SystemNix row from BLOCKED-on-cadence to actionable (b6) | Low | XS |
+| 19 | Confirm the v0.3.1 GitHub Release renders correctly (created via `gh`, not eyeballed post-facto) | Low | XS |
+
+**Already tracked in TODO_LIST.md (unchanged, harvested earlier today):**
+
+| # | Task |
+|---|------|
+| 20 | Eval guard: nixpkgs rev parity with SystemNix (High) |
+| 21 | Eval guard: `nixpkgs-lib` still `follows = "nixpkgs"` (Med) |
+| 22 | `checks` entry asserting `nixosModules.default` imports via `nixosSystem` both arches (Med) |
+| 23 | Relay `queue.route` IfBlock hardening follow-ups (Med) |
+| 24 | Over-quota surface: warning/doc decision (Med) |
+| 25 | Catch-all ordering: module assertion or doc note (Med) |
+| 26 | Investigate `nix flake lock` forcing output eval (Med) |
+| 27 | IMAP LOGIN-by-principal-NAME in option descriptions (Low) |
+| 28 | imapsync/mailpit/swaks presence re-verify at next pin bump (Low) |
+| 29 | `docs/status/` archive sweep (Low) |
+| 30 | Unchanged user-blocked set: Resend smoke, SystemNix push debt, branch-protection bypass call, Renovate install-or-drop, mailsuite draft file-or-skip, Junk upstream request, Discussions |
+
+## g) QUESTIONS I CANNOT FIGURE OUT MYSELF
+
+1. **Host port 18080 (gates f/1-5 docs wording):** something listens on `*:8080` on this machine with no process attribution visible to me (`ss -tlnp` shows no owner). Is 18080 acceptable as the permanent demo web port, or do you want to identify/free the 8080 occupant so the demo can use the natural port? I cannot see the owner from my side and will not kill processes I did not start.
+2. **Demo honesty vs completeness (f/12):** once the API hang is fixed - should the demo also enable `dmarc-monitor` against a local Mailpit sink (full-stack demo with FAKED rua mail), or stay mail-server-only (real but half the stack's story)? I chose mail-server-only because a `.invalid` VM can never receive real DMARC reports; a faked half is a UX call, not a technical one.
+3. **Push policy for the WIP history (f/5, d5):** the 13 unpushed daemon commits are one-file flake.nix iterations including broken intermediates. Once the VM is green and gated: push that noisy history as-is, or do you want me to squash the flake.nix iterations into one clean "add demo VM" commit first? Either needs your explicit commit authorization - I will not rewrite or push master history unprompted.
+
+---
+
+*Report is a point-in-time snapshot (2026-09-17 21:07 CEST). Section (f) is HARVEST input for TODO_LIST.md/ROADMAP.md per docs-health. Reproduce the open bug with: `nix build .#nixosConfigurations.demo.config.system.build.vm && result/bin/run-demo-vm` then poll `http://127.0.0.1:18080/api/principal` (admin/demo-admin) from the host while the guest console shows stalwart LISTENING.*
