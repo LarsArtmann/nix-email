@@ -15,16 +15,16 @@
 
 ## Verification matrix (all no-pipe, redirect-to-log discipline)
 
-| Gate | Result | Evidence quality |
-|---|---|---|
-| `statix check` | EXIT 0, zero findings | Full re-run, not the pasted output |
-| `nix fmt -- . --check` | EXIT 0 (7 files, alejandra) | CI check-mode |
-| Eval `drvPath` of 3 checks | EXIT 0 ×3 | Static: syntax + attrset correctness |
-| BuildFlow full gate | EXIT 0 | **Caveat found:** its nix-flake-check step is eval-only (0 ms) - did NOT execute VM tests |
-| `nix build` 3 VM checks | EXIT 0, but **empty build log** | Cache hit - NOT a run; near fake-green, see (d) |
-| `nix build --rebuild -L` 3 VM checks | EXIT 0, 6434-line transcript, 3 clean teardowns | **Real fresh execution - the decisive proof** |
-| Full `nix flake check` | "all checks passed!" EXIT 0 | All 4 checks incl. dmarc-eval; aarch64 omitted (see f-27) |
-| Git state | All changes committed by daemon; `cmp` byte-identical vs HEAD | Daemon's "N file(s)" commit messages are unreliable heuristics |
+| Gate                                 | Result                                                        | Evidence quality                                                                          |
+| ------------------------------------ | ------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `statix check`                       | EXIT 0, zero findings                                         | Full re-run, not the pasted output                                                        |
+| `nix fmt -- . --check`               | EXIT 0 (7 files, alejandra)                                   | CI check-mode                                                                             |
+| Eval `drvPath` of 3 checks           | EXIT 0 ×3                                                     | Static: syntax + attrset correctness                                                      |
+| BuildFlow full gate                  | EXIT 0                                                        | **Caveat found:** its nix-flake-check step is eval-only (0 ms) - did NOT execute VM tests |
+| `nix build` 3 VM checks              | EXIT 0, but **empty build log**                               | Cache hit - NOT a run; near fake-green, see (d)                                           |
+| `nix build --rebuild -L` 3 VM checks | EXIT 0, 6434-line transcript, 3 clean teardowns               | **Real fresh execution - the decisive proof**                                             |
+| Full `nix flake check`               | "all checks passed!" EXIT 0                                   | All 4 checks incl. dmarc-eval; aarch64 omitted (see f-27)                                 |
+| Git state                            | All changes committed by daemon; `cmp` byte-identical vs HEAD | Daemon's "N file(s)" commit messages are unreliable heuristics                            |
 
 ## a) FULLY DONE
 
@@ -70,8 +70,9 @@
 ## f) WHAT TO DO NEXT (grounded in this session's observations; no new research)
 
 **Verification tooling**
+
 1. File or fix the BuildFlow gap: nix-flake-check step is eval-only (0 ms) - either make it build checks or document "VM execution requires a separate `nix flake check`/`nix build`".
-2. Add a CI assertion that VM-test execution is *observed* (driver output lines present in logs), per the "instrument must prove it measured" doctrine.
+2. Add a CI assertion that VM-test execution is _observed_ (driver output lines present in logs), per the "instrument must prove it measured" doctrine.
 3. Decide whether statix should now be a hard gate (`--strict`/threshold) for `.nix` files, given zero findings.
 4. Confirm BuildFlow result-cache re-runs statix on edited files (no stale-finding replay after this cleanup).
 5. AGENTS.md: add the "empty build log = cache hit, not a run - use --rebuild when execution is the claim" lesson next to the pipes rule.
@@ -106,7 +107,7 @@
 24. Carry the "cache makes EXIT 0 cheap" doctrine into other LarsArtmann repos' AGENTS.md where BuildFlow is used the same way.
 25. When a session's env snapshot and live git disagree, note the daemon race in the session report (done here) so future sessions skip the investigation.
 
-*(List capped at the genuinely grounded items - padding to 50 would invent work.)*
+_(List capped at the genuinely grounded items - padding to 50 would invent work.)_
 
 ## g) QUESTIONS (cannot self-answer)
 
