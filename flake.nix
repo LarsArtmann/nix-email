@@ -45,14 +45,17 @@
         dmarc-monitor = import ./modules/dmarc-monitor.nix;
       };
 
+      # `pkgs` is provided by flake-parts' built-in nixpkgs module
+      # (inputs'.nixpkgs.legacyPackages - the semantics the tests were
+      # verified against). NOTE: inside perSystem use `pkgs.lib`, not a
+      # bare `lib` - that is the shape proven in
+      # nix-international-telephony; redefining _module.args.pkgs here is
+      # NOT (it leaves pkgs unbound in this flake-parts rev).
       perSystem = {
+        pkgs,
         system,
-        lib,
         ...
       }: {
-        # legacyPackages, not `import nixpkgs {}`: the exact pkgs semantics
-        # the tests were verified against, before and after the migration.
-        _module.args.pkgs = nixpkgs.legacyPackages.${system};
 
         # NixOS VM tests only run reliably on x86_64-linux. MEASURED
         # 2026-09-15 (one emulated stalwart-e2e attempt on an x86 host with
@@ -67,7 +70,7 @@
         checks = {
           dmarc-eval = import ./tests/dmarc-eval.nix {inherit nixpkgs system;};
         }
-        // lib.optionalAttrs (system == "x86_64-linux") {
+        // pkgs.lib.optionalAttrs (system == "x86_64-linux") {
           stalwart-e2e = import ./tests/stalwart-e2e.nix {inherit pkgs;};
           stalwart-relay-e2e = import ./tests/stalwart-relay-e2e.nix {inherit pkgs;};
           parsedmarc-e2e = import ./tests/parsedmarc-e2e.nix {inherit pkgs;};
