@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Nothing yet.
+
+### Changed
+
+- Nothing yet.
+
+### Fixed
+
+- Nothing yet.
+
+## [0.3.1] - 2026-09-17
+
+### Added
+
 - Docs: AGENTS.md records the flake-parts decisions (floating input +
   lock-pin policy, treefmt/`systems`/git-hooks rejections, reference-first
   migration rule with immediate eval guards); the README Pin-advance
