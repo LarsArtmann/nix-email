@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Nothing yet.
+
+### Changed
+
+- Nothing yet.
+
+### Fixed
+
+- Nothing yet.
+
+## [0.3.0] - 2026-09-17
+
+### Added
+
 - Local `pre-push` hook (`.githooks/pre-push`, wired via the existing
   `core.hooksPath`) running `nix fmt -- . --check` so an unformatted tree
   fails the push locally instead of going red on master; CONTRIBUTING
@@ -17,14 +31,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   the DKIM dual-sign `/api/reload` response - a re-broken reload now fails
   on the precondition itself, not one step later via "DKIM signer not
   found" (response shape source-verified against stalwart v0.15.5)
-
-### Changed
-
-- Refreshed the committed `current` architecture SVG after a full
-  label-level d2↔SVG re-diff (50/50 text nodes identical; the byte drift
-  was elk-geometry only from d2 version churn)
-
-### Added
 
 - CI pipe-lint step (fail-closed): bans `producer | grep/tail/head`
   assertions inside `tests/*.nix` testScripts - under the test shell's
@@ -78,6 +84,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- Refreshed the committed `current` architecture SVG after a full
+  label-level d2↔SVG re-diff (50/50 text nodes identical; the byte drift
+  was elk-geometry only from d2 version churn)
 - docs-health AUDIT (2026-09-16): all 21 `2026-0*` historical snapshots
   annotated inline (done-at hashes / verified-evidence / won't-implement
   verdicts) and archived under `docs/{status,planning,reviews}/archived/`;
