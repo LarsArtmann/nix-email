@@ -24,6 +24,7 @@
   # pattern (the "flake lint nit" of commit a4fc343) broke evaluation:
   # "function 'outputs' called with unexpected argument 'self'".
   outputs = inputs @ {
+    self,
     flake-parts,
     nixpkgs,
     ...
@@ -188,15 +189,13 @@
 
         # Throwaway demo VM: `nix run .#vm` (x86_64-linux only - same
         # constraint as the VM tests above).
-        apps =
-          pkgs.lib.optionalAttrs (system == "x86_64-linux") {
-            vm = {
-              type = "app";
-              program =
-                "${self.nixosConfigurations.demo.config.system.build.vm}/bin/run-demo-vm";
-              meta.description = "Boot the demo mail stack as a throwaway QEMU VM";
-            };
+        apps = pkgs.lib.optionalAttrs (system == "x86_64-linux") {
+          vm = {
+            type = "app";
+            program = "${self.nixosConfigurations.demo.config.system.build.vm}/bin/run-demo-vm";
+            meta.description = "Boot the demo mail stack as a throwaway QEMU VM";
           };
+        };
       };
     };
 }
