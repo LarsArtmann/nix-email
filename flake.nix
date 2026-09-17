@@ -49,6 +49,97 @@
         dmarc-monitor = import ./modules/dmarc-monitor.nix;
       };
 
+      # Throwaway demo host for `nix run .#vm` (see apps.vm below): boots the
+      # full stack with a provisioned demo account + catch-all. NOT a consumer
+      # template - real hosts wire the modules in SystemNix (AGENTS.md:
+      # consumer layers live there). `nix flake check` evaluates this
+      # toplevel, so the demo cannot rot silently (nix-international-telephony's
+      # pbx-prod pattern). Provisioning recipe mirrors tests/stalwart-e2e.nix
+      # ("roles": ["user"] is REQUIRED; catch-all = the bare "@domain" address).
+      flake.nixosConfigurations.demo = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          self.nixosModules.default
+          ({pkgs, ...}: let
+            # sha512-crypt of "demo" (fixed salt => deterministic; the exact
+            # hash format the webadmin uses for principal secrets).
+            demoHash = "$6$nixemaildemo$oK4UNSKSdI4Ye5sGdvn8ZYPOFQ1e8rNpbn5w8cZ0Qiu6s1gkcSP.x7PGE67K.iPdJeRb6o3d8zoj9crztuLon0";
+          in {
+            services.mail-server = {
+              enable = true;
+              hostname = "mail.demo.invalid";
+              # The default loopback bind only serves inside the guest; the
+              # demo forwards host:8080 to the web admin/JMAP/API listener.
+              httpBind = "0.0.0.0:8080";
+            };
+            # dmarc-monitor stays OFF: parsedmarc polls a real rua mailbox,
+            # which a throwaway .invalid VM cannot have (ROADMAP D1).
+            services.stalwart.settings = {
+              authentication.fallback-admin = {
+                user = "admin";
+                secret = "demo-admin";
+              };
+              # Tested posture from stalwart-e2e: pyzor's public host adds
+              # config-error risk for zero demo value.
+              spam-filter.pyzor.enable = false;
+            };
+            virtualisation = {
+              # Serial console in the terminal; no GUI window.
+              graphics = false;
+              memorySize = 2048;
+              forwardPorts = [
+                {
+                  hostPort = 8080;
+                  guestPort = 8080;
+                }
+                {
+                  hostPort = 2525;
+                  guestPort = 25;
+                }
+                {
+                  hostPort = 2587;
+                  guestPort = 587;
+                }
+                {
+                  hostPort = 2593;
+                  guestPort = 993;
+                }
+              ];
+            };
+            services.getty.autologinUser = "root";
+            environment.systemPackages = [pkgs.swaks pkgs.curl];
+            systemd.services.mail-demo-provision = {
+              description = "Provision the nix-email demo domain, account, and catch-all";
+              wantedBy = ["multi-user.target"];
+              after = ["stalwart.service"];
+              serviceConfig = {
+                Type = "oneshot";
+                RemainAfterExit = true;
+              };
+              script = let
+                api = "curl -fsS -u admin:demo-admin -H 'Content-Type: application/json' -X POST http://127.0.0.1:8080/api/principal -d";
+              in ''
+                # Wait for the management API: the auth'd GET is the same
+                # request stalwart-e2e asserts works before any POST.
+                for i in $(seq 1 120); do
+                  if curl -fsS -u admin:demo-admin \
+                      http://127.0.0.1:8080/api/principal >/dev/null 2>&1; then
+                    break
+                  fi
+                  sleep 1
+                done
+                # Reboot-tolerant: conflicts from already-provisioned
+                # principals are non-fatal; readiness is gated above.
+                ${api} '{"type":"domain","name":"mail.demo.invalid"}' || true
+                ${api} '{"type":"individual","name":"demo@mail.demo.invalid","emails":["demo@mail.demo.invalid"],"roles":["user"],"secrets":["${demoHash}"]}' || true
+                ${api} '{"type":"individual","name":"catchall","emails":["catchall@mail.demo.invalid","@mail.demo.invalid"],"roles":["user"]}' || true
+                echo "demo ready: SMTP/IMAP demo@mail.demo.invalid / demo (web admin on :8080, admin / demo-admin)"
+              '';
+            };
+          })
+        ];
+      };
+
       # `pkgs` is provided by flake-parts' built-in nixpkgs module
       # (inputs'.nixpkgs.legacyPackages - the semantics the tests were
       # verified against). NOTE: inside perSystem use `pkgs.lib`, not a
@@ -94,6 +185,18 @@
         # `nix fmt` - the one .nix formatter for this repo (dprint covers
         # json/yaml/markdown only).
         formatter = pkgs.alejandra;
+
+        # Throwaway demo VM: `nix run .#vm` (x86_64-linux only - same
+        # constraint as the VM tests above).
+        apps =
+          pkgs.lib.optionalAttrs (system == "x86_64-linux") {
+            vm = {
+              type = "app";
+              program =
+                "${self.nixosConfigurations.demo.config.system.build.vm}/bin/run-demo-vm";
+              meta.description = "Boot the demo mail stack as a throwaway QEMU VM";
+            };
+          };
       };
     };
 }
