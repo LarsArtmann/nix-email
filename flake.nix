@@ -106,7 +106,9 @@
                 {
                   from = "host";
                   host.address = "127.0.0.1";
-                  host.port = 8080;
+                  # Host side is 18080, not 8080: dev servers squat on 8080,
+                  # and QEMU aborts loudly when a forward target is taken.
+                  host.port = 18080;
                   guest.port = 8080;
                 }
                 {
@@ -137,7 +139,7 @@
               ==================================================================
                nix-email demo VM - throwaway, all state dies with the process
 
-                 web admin / JMAP / API : http://localhost:8080  (admin / demo-admin)
+                 web admin / JMAP / API : http://localhost:18080  (admin / demo-admin)
                  SMTP                   : swaks --server localhost:2525 \\
                                           --to anyone@mail.demo.invalid \\
                                           --from you@example.com
