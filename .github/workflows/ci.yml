@@ -38,7 +38,7 @@ jobs:
             allow-import-from-derivation = true
 
       - name: Cache Nix store
-        uses: DeterminateSystems/flakehub-cache-action@e80fccc9c4e3a885ad51721c8b92ba3f839d2f6f # v1 (SHA resolved via git ref tags/v1)
+        uses: DeterminateSystems/flakehub-cache-action@83282a8aef353db1d659d3bacf4a28b6683de0b3 # v1 (SHA resolved via git ref tags/v1)
 
       - name: Parse all Nix files
         run: |
