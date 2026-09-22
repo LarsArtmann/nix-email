@@ -13,6 +13,16 @@ fit together, and a recommended baseline that avoids the known footguns.
 > Exact TOML key paths under `services.stalwart.settings` must be verified
 > against the pinned binary before any wiring; do not re-derive keys from
 > this document. Ledger doctrine applies.
+>
+> **UPDATE 2026-09-22: the core keys ARE now source-verified** against the
+> pinned v0.15.5 tarball (README ledger entry "Monitoring/observability
+> config keys"): `metrics.prometheus.enable` (+ `.auth.username/.secret`),
+> `tracing.level.<event>`, `tracing.history.enable/.store` all exist in
+> 0.15.5 with the shapes this guide describes. What remains UNVERIFIED
+> here is the wider object-model surface (webhooks, alert objects,
+> retention stores) and any series names - transcribe those from a live
+> `/metrics/prometheus` dump (the stalwart-e2e build log carries one)
+> before writing rules.
 
 ## 1. Mental model: one stream, many consumers
 

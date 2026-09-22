@@ -326,10 +326,10 @@ inside nixpkgs are invisible to it, so the checks below are manual):
    - Watch for `services.stalwart` passing 0.15.5: the wrapper's verified key
      set (relay IfBlocks, certificate tiers) must be re-verified against the
      new source before riding the bump.
-   Expected noise during the bump's check evals: the `dovecot2.protocols`
-   rename warning is nixpkgs-internal (`parsedmarc.nix` sets it under
-   `provision.localMail.enable`; verdict 2026-09-16: not ours) and should
-   disappear on a future pin advance - do not chase it.
+     Expected noise during the bump's check evals: the `dovecot2.protocols`
+     rename warning is nixpkgs-internal (`parsedmarc.nix` sets it under
+     `provision.localMail.enable`; verdict 2026-09-16: not ours) and should
+     disappear on a future pin advance - do not chase it.
 3. **Advance the SystemNix consumer pin**: update the `nix-email` input rev
    (hard rev or release tag - see PIN DISCIPLINE above), `nix flake update
    nix-email`, restore any option-gated test cases the old pin forced out
@@ -710,27 +710,27 @@ json/yaml/markdown.
   helo_domain, listener, local_ip - throttle.rs:87), optional `match`
   expression, and REQUIRED `rate` ("requests/period" Rate; throttle.rs:80).
   (d) SPAM-FILTER DNSBL: `spam-filter.dnsbl.server.<id>.{enable,scope,...}`
-  + `spam-filter.dnsbl.max-check.{ip,domain,email,url}`
-  (spamfilter.rs:268-304) - this is CONTENT-analysis DNSBL inside the spam
-  filter, NOT a connection-level client-IP blocklist (no such static key in
-  0.15.5). (e) AUTO-EXPUNGE: `email.auto-expunge` (default 30d) and
-  `email-submission.auto-expunge` (default 3d) purge destroyed/expired JMAP
-  emails (jmap/settings.rs:282-286) - already active by default; there is
-  NO per-mailbox (Junk-only) expunge knob. (f) AUDIT: NO audit-log config
-  surface exists in 0.15.5 (zero `audit` strings in the crates) - the audit
-  trail is `tracing.level.*` verbosity + journald/history-store retention.
-  (g) AUTOCONFIG: the HTTP crate serves Thunderbird autoconfig XML
-  (`crates/http/src/autoconfig/mod.rs`, routes in request.rs:321-331/475
-  incl. `.well-known` + `config-v1.1.xml`) on the existing HTTP listener -
-  no server wiring needed; client discovery is DNS-side (autoconfig./SRV).
-  (h) TLS-RPT CONSUMPTION: parsedmarc 11.0.1 (the nixpkgs pin this flake
-  ships) parses RFC 8460 reports - `parse_smtp_tls_report_json`
-  (`parsedmarc/__init__.py:737` in the built package) - and the shared
-  mailbox poll routes them (`report_type == "smtp_tls"`,
-  `__init__.py:2124`), writing `smtp_tls.json/csv` next to the aggregate
-  output. TLS-RPT rides the SAME rua mailbox as DMARC: point the
-  `_smtp._tls` TXT `rua` mailto at the same mailbox - no new polling exists
-  or is needed.
+  - `spam-filter.dnsbl.max-check.{ip,domain,email,url}`
+    (spamfilter.rs:268-304) - this is CONTENT-analysis DNSBL inside the spam
+    filter, NOT a connection-level client-IP blocklist (no such static key in
+    0.15.5). (e) AUTO-EXPUNGE: `email.auto-expunge` (default 30d) and
+    `email-submission.auto-expunge` (default 3d) purge destroyed/expired JMAP
+    emails (jmap/settings.rs:282-286) - already active by default; there is
+    NO per-mailbox (Junk-only) expunge knob. (f) AUDIT: NO audit-log config
+    surface exists in 0.15.5 (zero `audit` strings in the crates) - the audit
+    trail is `tracing.level.*` verbosity + journald/history-store retention.
+    (g) AUTOCONFIG: the HTTP crate serves Thunderbird autoconfig XML
+    (`crates/http/src/autoconfig/mod.rs`, routes in request.rs:321-331/475
+    incl. `.well-known` + `config-v1.1.xml`) on the existing HTTP listener -
+    no server wiring needed; client discovery is DNS-side (autoconfig./SRV).
+    (h) TLS-RPT CONSUMPTION: parsedmarc 11.0.1 (the nixpkgs pin this flake
+    ships) parses RFC 8460 reports - `parse_smtp_tls_report_json`
+    (`parsedmarc/__init__.py:737` in the built package) - and the shared
+    mailbox poll routes them (`report_type == "smtp_tls"`,
+    `__init__.py:2124`), writing `smtp_tls.json/csv` next to the aggregate
+    output. TLS-RPT rides the SAME rua mailbox as DMARC: point the
+    `_smtp._tls` TXT `rua` mailto at the same mailbox - no new polling exists
+    or is needed.
 
 ## Non-goals
 

@@ -1,38 +1,38 @@
 # Monitoring & Alerting — taxonomy, coverage matrix, routing
 
-| Field | Value |
-| ----- | ----- |
-| Created | 2026-09-22 (execution session; Pareto plan M11 + M9.4/M20.1) |
-| Owner split | This repo owns wrapper-side sources (metrics exposure, report sinks, logs). The CONSUMER host (SystemNix) owns alert routing, Gatus external checks, Prometheus scrape, and the notification channel. |
-| Standing rule | **Alerts never ride the mail stack they watch.** The delivery channel must be non-mail (C24 decision pending; recommendation: the consumer's existing Discord path). |
-| Standing rule | **The monitors are monitored** (dead-man switch): every checker must itself emit a heartbeat or be covered by an `absent()`-style rule (M13). |
+| Field         | Value                                                                                                                                                                                                 |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Created       | 2026-09-22 (execution session; Pareto plan M11 + M9.4/M20.1)                                                                                                                                          |
+| Owner split   | This repo owns wrapper-side sources (metrics exposure, report sinks, logs). The CONSUMER host (SystemNix) owns alert routing, Gatus external checks, Prometheus scrape, and the notification channel. |
+| Standing rule | **Alerts never ride the mail stack they watch.** The delivery channel must be non-mail (C24 decision pending; recommendation: the consumer's existing Discord path).                                  |
+| Standing rule | **The monitors are monitored** (dead-man switch): every checker must itself emit a heartbeat or be covered by an `absent()`-style rule (M13).                                                         |
 
 ## 1. Severity taxonomy
 
-| Severity | Meaning | Reaction | Channel |
-| -------- | ------- | -------- | ------- |
-| CRITICAL | Mail is not flowing or data is at risk (queue age high, canary broken, backup stale beyond RPO, cert expired) | Wake-up | Non-mail push (C24) |
-| WARNING | Degraded but flowing (auth-failure burst, TLS-RPT failure spike, disk > 80%, quota pressure, report freshness lag) | Same-day | Non-mail push (C24) |
-| INFO | Normal-but-notable (new DMARC sender org, new TLS-RPT reporter, deploy/reload happened) | Digest | Channel digest (C24) |
+| Severity | Meaning                                                                                                            | Reaction | Channel              |
+| -------- | ------------------------------------------------------------------------------------------------------------------ | -------- | -------------------- |
+| CRITICAL | Mail is not flowing or data is at risk (queue age high, canary broken, backup stale beyond RPO, cert expired)      | Wake-up  | Non-mail push (C24)  |
+| WARNING  | Degraded but flowing (auth-failure burst, TLS-RPT failure spike, disk > 80%, quota pressure, report freshness lag) | Same-day | Non-mail push (C24)  |
+| INFO     | Normal-but-notable (new DMARC sender org, new TLS-RPT reporter, deploy/reload happened)                            | Digest   | Channel digest (C24) |
 
 ## 2. Signal inventory (wrapper-side sources)
 
-| # | Signal | Source (verified) | Status | Alert condition (spec) | Sev |
-| - | ------ | ----------------- | ------ | ---------------------- | --- |
-| 1 | Metrics endpoint | `metrics.prometheus.enable`, `/metrics/prometheus` on the HTTP listener (README ledger 2026-09-22; e2e-asserted 200) | **AVAILABLE** (e2e asserts; wrapper exposes passthrough) | scrape by consumer; `absent()` dead-man | CRITICAL |
-| 2 | Queue depth / age | `/metrics/prometheus` series (names to be transcribed from a live e2e metrics dump before rules are written - no assertion without a transcript) | **SPEC ONLY** (M12 follow-up; consumer rules) | `queue_oldest_message_age > 1h` while queue non-empty | CRITICAL |
-| 3 | Over-quota retry-forever | same queue series (README ledger: over-quota mail retries forever, `Message rescheduled for delivery`) | **SPEC ONLY** | queue age high + recipient quota near limit | WARNING |
-| 4 | Failed auth burst | `tracing.level.auth` (journal) or telemetry counters - source verified 0.15.5; pick ONE source at wiring time | **SPEC ONLY** (M15) | > N failed logins / 5 min per remote IP | WARNING |
-| 5 | SMTP TLS-RPT failures | parsedmarc `smtp_tls.json` sink (`application/tlsrpt+json` rides the rua mailbox poll - verified + e2e-asserted 2026-09-22) | **COLLECTED** (e2e green) | new `certificate-expired`/`validation-failure` entries with failed-session-count > 0 | WARNING |
-| 6 | DMARC aggregate anomalies | parsedmarc `aggregate.json` sink | **COLLECTED** (e2e green) | new sending org / policy domain; rua volume drops to zero for a domain | WARNING/INFO |
-| 7 | Report freshness | mtime of `aggregate.json` / parsedmarc unit liveness | **SPEC ONLY** (M13/M23; dedupe against the consumer registry's `backup.maxAgeHours`) | mtime older than 48 h | WARNING |
-| 8 | Backup freshness + restore drill | consumer backup-coordination; repo documents the `--export`/`--import` drill | **CONSUMER LAYER** (D1-gated build-out, M23) | recovery-age key exceeds RPO | CRITICAL |
-| 9 | External reachability (STARTTLS :25, implicit TLS :993, cert expiry) | Gatus external checks | **CONSUMER LAYER** (M13 spec) | connect/verify failure; cert < 14 d | CRITICAL/WARNING |
-| 10 | Round-trip canary (send -> receive SLO) | M18 design (vantage = C29 decision; recommendation evo-x2 timer) | **DESIGN PENDING DECISION** | delivery SLO breach (e.g. > 10 min) | CRITICAL |
-| 11 | Capacity: disk + per-mailbox quota | `/metrics` series probe + quota principal fields | **SPEC ONLY** (M12/M17) | disk > 80 %; mailbox > 80 % quota | WARNING |
-| 12 | Audit trail | NO audit-log knob exists in 0.15.5 (README ledger) - `tracing.level.*` + journald retention is the surface | **DOCUMENTED** | (no alert; journald retention is consumer policy) | INFO |
-| 13 | Dead-man of parsedmarc + canary | systemd unit states + heartbeat | **SPEC ONLY** (M13) | unit inactive / heartbeat absent 2 periods | CRITICAL |
-| 14 | Outbound bounce/complaint telemetry | Resend webhooks (SASL shape doc-verified 2026-09-22: smtp.resend.com, username `resend`, password = API key, 587 STARTTLS / 465 implicit) | **GATED on Resend account + public webhook endpoint (D1-adjacent)** | bounce/complaint event received | WARNING |
+| #  | Signal                                                               | Source (verified)                                                                                                                                | Status                                                                               | Alert condition (spec)                                                               | Sev              |
+| -- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ | ---------------- |
+| 1  | Metrics endpoint                                                     | `metrics.prometheus.enable`, `/metrics/prometheus` on the HTTP listener (README ledger 2026-09-22; e2e-asserted 200)                             | **AVAILABLE** (e2e asserts; wrapper exposes passthrough)                             | scrape by consumer; `absent()` dead-man                                              | CRITICAL         |
+| 2  | Queue depth / age                                                    | `/metrics/prometheus` series (names to be transcribed from a live e2e metrics dump before rules are written - no assertion without a transcript) | **SPEC ONLY** (M12 follow-up; consumer rules)                                        | `queue_oldest_message_age > 1h` while queue non-empty                                | CRITICAL         |
+| 3  | Over-quota retry-forever                                             | same queue series (README ledger: over-quota mail retries forever, `Message rescheduled for delivery`)                                           | **SPEC ONLY**                                                                        | queue age high + recipient quota near limit                                          | WARNING          |
+| 4  | Failed auth burst                                                    | `tracing.level.auth` (journal) or telemetry counters - source verified 0.15.5; pick ONE source at wiring time                                    | **SPEC ONLY** (M15)                                                                  | > N failed logins / 5 min per remote IP                                              | WARNING          |
+| 5  | SMTP TLS-RPT failures                                                | parsedmarc `smtp_tls.json` sink (`application/tlsrpt+json` rides the rua mailbox poll - verified + e2e-asserted 2026-09-22)                      | **COLLECTED** (e2e green)                                                            | new `certificate-expired`/`validation-failure` entries with failed-session-count > 0 | WARNING          |
+| 6  | DMARC aggregate anomalies                                            | parsedmarc `aggregate.json` sink                                                                                                                 | **COLLECTED** (e2e green)                                                            | new sending org / policy domain; rua volume drops to zero for a domain               | WARNING/INFO     |
+| 7  | Report freshness                                                     | mtime of `aggregate.json` / parsedmarc unit liveness                                                                                             | **SPEC ONLY** (M13/M23; dedupe against the consumer registry's `backup.maxAgeHours`) | mtime older than 48 h                                                                | WARNING          |
+| 8  | Backup freshness + restore drill                                     | consumer backup-coordination; repo documents the `--export`/`--import` drill                                                                     | **CONSUMER LAYER** (D1-gated build-out, M23)                                         | recovery-age key exceeds RPO                                                         | CRITICAL         |
+| 9  | External reachability (STARTTLS :25, implicit TLS :993, cert expiry) | Gatus external checks                                                                                                                            | **CONSUMER LAYER** (M13 spec)                                                        | connect/verify failure; cert < 14 d                                                  | CRITICAL/WARNING |
+| 10 | Round-trip canary (send -> receive SLO)                              | M18 design (vantage = C29 decision; recommendation evo-x2 timer)                                                                                 | **DESIGN PENDING DECISION**                                                          | delivery SLO breach (e.g. > 10 min)                                                  | CRITICAL         |
+| 11 | Capacity: disk + per-mailbox quota                                   | `/metrics` series probe + quota principal fields                                                                                                 | **SPEC ONLY** (M12/M17)                                                              | disk > 80 %; mailbox > 80 % quota                                                    | WARNING          |
+| 12 | Audit trail                                                          | NO audit-log knob exists in 0.15.5 (README ledger) - `tracing.level.*` + journald retention is the surface                                       | **DOCUMENTED**                                                                       | (no alert; journald retention is consumer policy)                                    | INFO             |
+| 13 | Dead-man of parsedmarc + canary                                      | systemd unit states + heartbeat                                                                                                                  | **SPEC ONLY** (M13)                                                                  | unit inactive / heartbeat absent 2 periods                                           | CRITICAL         |
+| 14 | Outbound bounce/complaint telemetry                                  | Resend webhooks (SASL shape doc-verified 2026-09-22: smtp.resend.com, username `resend`, password = API key, 587 STARTTLS / 465 implicit)        | **GATED on Resend account + public webhook endpoint (D1-adjacent)**                  | bounce/complaint event received                                                      | WARNING          |
 
 Status vocabulary: AVAILABLE (source exists and is asserted by a check), COLLECTED (data lands in a sink), SPEC ONLY (source verified, alert rules not yet encoded anywhere), CONSUMER LAYER (belongs to SystemNix by AGENTS.md doctrine), DESIGN PENDING DECISION (blocked on a C-decision).
 
@@ -112,13 +112,13 @@ Alert severity mapping: connect failure = CRITICAL; cert < 14 d = WARNING.
 
 `crates/http/src/management/queue.rs` routes (basic auth as admin):
 
-| Lever | Call | Effect |
-| ----- | ---- | ------ |
-| Inspect | `GET /api/queue/messages` | list queued messages (id, sender, recipients, status) |
-| Pause delivery | `PATCH /api/queue/status/stop` | queue-wide pause (`QueueEvent::Paused(true)`) |
-| Resume | `PATCH /api/queue/status/start` (any action ≠ "stop") | unpause |
-| Hold/reschedule | `PATCH /api/queue/messages?...&at=<ts>` (+ per-id PATCH) | push retry due to `at` (the hold lever) |
-| Drop | `DELETE /api/queue/messages` (filtered or per-id) | cancel delivery |
+| Lever           | Call                                                     | Effect                                                |
+| --------------- | -------------------------------------------------------- | ----------------------------------------------------- |
+| Inspect         | `GET /api/queue/messages`                                | list queued messages (id, sender, recipients, status) |
+| Pause delivery  | `PATCH /api/queue/status/stop`                           | queue-wide pause (`QueueEvent::Paused(true)`)         |
+| Resume          | `PATCH /api/queue/status/start` (any action ≠ "stop")    | unpause                                               |
+| Hold/reschedule | `PATCH /api/queue/messages?...&at=<ts>` (+ per-id PATCH) | push retry due to `at` (the hold lever)               |
+| Drop            | `DELETE /api/queue/messages` (filtered or per-id)        | cancel delivery                                       |
 
 Quarantine review in the 0.15.5 reality = inspect queued messages +
 `GET /api/queue/reports` (ingested reports) - the tag-only spam posture
@@ -143,3 +143,17 @@ The channel decision, vantage decision, and any consumer wiring land via
 `docs/planning/decision-batch.md` (C24, C29) - answer there and the
 SPEC ONLY rows graduate into TODO_LIST work items.
 
+## 7. Threat-model cross-check (2026-09-22)
+
+Each `docs/THREAT_MODEL.md` attacker scenario mapped to its monitoring signal:
+
+| Threat scenario (THREAT_MODEL)                   | Monitoring signal                                                                   | Gap                                                                     |
+| ------------------------------------------------ | ----------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| Open relay attempt                               | row 4 (auth failures) + row 2 (queue)                                               | none beyond the SPEC rows                                               |
+| Directory-cache poisoning (mail misrouted to MX) | row 2 (queue age) + row 10 (canary catches misrouting symptomatically)              | no direct metric for negative-cache hits - acceptable, symptoms covered |
+| SSRF via relay target                            | eval-time (wrapper assertions, incl. the 2026-09-22 loopback eval rejection)        | n/a - static                                                            |
+| Anonymous admin API access                       | row 4 (tracing auth events also carry admin-auth failures)                          | consumer reverse-proxy exposure policy is THREAT_MODEL "out of scope"   |
+| Spam into INBOX (tag-only, Q6)                   | rows 5-6 (TLS-RPT + DMARC reports give spoofing visibility)                         | no per-mailbox spam-volume series in 0.15.5                             |
+| Store/secrets leakage                            | by construction (no monitoring signal exists or needed)                             | -                                                                       |
+| Quota exhaustion / oversized mail                | rows 3 + 11 (queue age under quota pressure; capacity)                              | the retry-forever trap makes row 2 the operative signal                 |
+| Local-part enumeration behind a catch-all        | deliberately unmonitorable (catch-all makes every RCPT valid - documented tradeoff) | accepted                                                                |

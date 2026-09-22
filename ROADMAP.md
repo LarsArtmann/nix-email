@@ -67,7 +67,7 @@ the verified-source work (what the wrapper OWNS) is done or specified in
 - dmarc-monitor live on evo-x2 against the `dmarc@` mailbox; DMARC ladder
   (`none → quarantine → reject`) driven by parsedmarc data
 - Stalwart telemetry: keys SOURCE-VERIFIED in the pinned 0.15.5
-  (metrics.prometheus.enable, tracing.level.*, tracing.history.* - README
+  (metrics.prometheus.enable, tracing.level._, tracing.history._ - README
   ledger 2026-09-22); TLS-RPT reports ride the parsedmarc rua poll
   (e2e-asserted same day)
 - Gatus external-view checks (starttls :25, tls :993, cert expiry) and
