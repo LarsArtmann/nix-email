@@ -238,12 +238,16 @@ integration-registry backup-freshness entry) and is eval-contract-tested in
 consumer-config flip plus filling the real
 `platforms/nixos/secrets/nix-email.yaml` secret, not new wiring.
 
-PIN DISCIPLINE: SystemNix pins this repo by a hard rev/tag (not `?ref=master`):
-the wrapper is verified against the nixpkgs `services.stalwart` module (0.15.5)
-at a specific nixpkgs rev, and both repos deliberately pin the SAME nixpkgs
-rev (compat doctrine - bump both together; Renovate PRs are approval-gated so
-a nixpkgs move never lands unreviewed). InboxClean's `?ref=master` is fine
-there because it has no nixpkgs-version-sensitive contract; this repo does.
+PIN DISCIPLINE: consumers of this flake MUST pin it by a hard rev/tag (not
+`?ref=master`): the wrapper is verified against the nixpkgs
+`services.stalwart` module (0.15.5) at a specific nixpkgs rev, and both
+repos deliberately pin the SAME nixpkgs rev (compat doctrine - bump both
+together; Renovate PRs are approval-gated so a nixpkgs move never lands
+unreviewed). STATUS 2026-09-22: SystemNix VIOLATES this today - its input
+floats `github:LarsArtmann/nix-email?ref=master` (flake.nix:671); the
+hard-pin + push move is decision-gated (docs/planning/decision-batch.md
+C17/C18). InboxClean's `?ref=master` is fine there because it has no
+nixpkgs-version-sensitive contract; this repo does.
 
 Gatus checks for the VPS (on evo-x2, external viewpoint):
 

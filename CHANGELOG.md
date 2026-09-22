@@ -9,15 +9,58 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
-- Nothing yet.
+- Wrapper hardening options (M14): `services.mail-server.rateLimits`
+  (opt-in sustained inbound limiter, default OFF - v0.15.5 already ships
+  two conservative limiters, README ledger (i)) and
+  `services.mail-server.spamFilter.dnsbl.servers` (typed DNSBL entries:
+  scope enum ip|domain|email|url, zone/tag emitted as quoted expression
+  constants; default `{}` = DNSBL inert - no master switch exists upstream,
+  README ledger (j)). Eval-time assertions validate throttle keys and
+  non-empty zones.
+- `checks.module-import-eval` on both arches: `nixosSystem` import of the
+  full wrapper surface (mail-server + dmarc-monitor in ONE toplevel),
+  option-surface contract, M14 default-absence + rendered-shape +
+  assertion-trip proofs.
+- Eval guards in `flake.nix` (fleet-compat doctrine mechanized):
+  nixpkgs-pin equality with the documented fleet pin,
+  `flake-parts/nixpkgs-lib` follow presence, and the lock-file sanity
+  checks run via `builtins.seq` at output construction.
+- TLS-RPT end-to-end: the parsedmarc E2E now sends an inline RFC 8460
+  report (`application/tlsrpt+json`) and asserts `smtp_tls.json`/`csv`
+  land in the output dir (parser routing verified against parsedmarc
+  11.0.1 source, README ledger (h)).
+- Relay loopback assertion: `relay.address` pointing at
+  localhost/127.0.0.1/::1/0.0.0.0 is rejected at eval time (Stalwart's
+  SSRF guard would refuse it at first submission).
+- `docs/MONITORING.md`: severity taxonomy, 14-row signal inventory,
+  coverage matrix, Gatus/dead-man/failed-auth specs, queue-IR levers,
+  canary design, threat-model cross-check.
+- `docs/planning/decision-batch.md`: every open user decision on one page
+  (D1/D2, C24/C29, C18/C19/C20/C22/C34, Q4-Q6, demo-VM g1/g2, C17).
+- README verified-facts ledger entries (a)-(j): metrics/tracing keys,
+  queue-management API routes, auto-expunge default, absent audit stream,
+  autoconfig routes, TLS-RPT consumption, upstream default rate limiters
+  (boot.rs DEFAULT_SETTINGS), DNSBL config shape.
 
 ### Changed
 
-- Nothing yet.
+- nixpkgs pin advanced `eaad0894` -> `6774f7bc` (fleet lock rev); the
+  qemu `enableSharedMemory` workaround is RETIRED - the new pin's
+  `qemu-vm.nix` defaults `useVirtiofs = true`, the 9p pairing that made
+  shared memory impossible is gone.
+- MONITORING row 2 corrected against the transcribed metrics dump:
+  0.15.5 exposes NO queue-depth/age gauge - the queue alert spec now
+  uses a consumer poll of `GET /api/queue/messages` (§5.4).
+- Pin-discipline docs updated to observed reality: SystemNix consumes
+  this flake via `?ref=master` (verified 2026-09-22), not a tag pin -
+  the runbook/decision docs now say so instead of asserting compliance.
 
 ### Fixed
 
-- Nothing yet.
+- The 2026-09-17 "lock evaluates outputs" mystery SOLVED: `nix flake
+  lock` does NOT evaluate outputs (throw-in-checks repro), but any
+  UNDEFINED VARIABLE in flake.nix fails lock as a parse-time scope
+  error. Mechanism documented in the flake.nix guard comment.
 
 ## [0.3.1] - 2026-09-17
 
