@@ -39,6 +39,53 @@
     sha256 = "0dq64cj49711kbja27pjl2hy0d3azrjxg91kqrh40x46fkn1dwkx";
   };
 
+  # RFC 8460 SMTP TLS-RPT fixture (fields mirror RFC 8460 A.2; the parser's
+  # REQUIRED fields are organization-name, date-range, contact-info,
+  # report-id, policies[] with policy.{policy-type,policy-domain} +
+  # summary.{total-successful,total-failure}-session-count - verified
+  # against the pinned parsedmarc 11.0.1 parse_smtp_tls_report_json and
+  # _parse_smtp_tls_report_policy). RFC 8460 sends these as
+  # application/tlsrpt+json attachments - the content type parsedmarc's
+  # mailbox poll routes to parse_smtp_tls_report_json (__init__.py:2118).
+  # Inline (not fetchurl): zero moving parts, byte-stable forever.
+  smtpTlsReport = pkgs.writeText "smtp-tls-report" (builtins.toJSON {
+    organization-name = "Company-X";
+    date-range = {
+      start-datetime = "2026-09-22T00:00:00Z";
+      end-datetime = "2026-09-22T23:59:59Z";
+    };
+    contact-info = "sts-reporting@company-x.example";
+    report-id = "5065427c-23d3-47ca-b6e0-946ea0e8c4be";
+    policies = [
+      {
+        policy = {
+          policy-type = "sts";
+          policy-domain = "company-y.example";
+          policy-string = [
+            "version: STSv1"
+            "mode: testing"
+            "mx: *.mail.company-y.example"
+            "max_age: 86400"
+          ];
+          mx-host-pattern = ["*.mail.company-y.example"];
+        };
+        summary = {
+          total-successful-session-count = 5324;
+          total-failure-session-count = 303;
+        };
+        failure-details = [
+          {
+            result-type = "certificate-expired";
+            sending-mta-ip = "2001:db8:abcd:0012::1";
+            receiving-mx-hostname = "*.mail.company-y.example";
+            receiving-mx-helo = "mail.company-y.example";
+            failed-session-count = 137;
+          }
+        ];
+      }
+    ];
+  });
+
   # Mails the sample report as a .xml.zip attachment (cribbed from
   # nixpkgs nixos/tests/parsedmarc: parsedmarc extracts report files by
   # attachment extension .xml/.xml.gz/.zip).
@@ -77,6 +124,27 @@
 
     with smtplib.SMTP('localhost') as server:
         server.sendmail(sender_email, receiver_email, text)
+        server.quit()
+
+    # SMTP TLS-RPT (RFC 8460) probe: the _smtp._tls rua mailto lands in the
+    # SAME mailbox as DMARC rua - one poll must carry both report types.
+    tls_message = MIMEMultipart()
+    tls_message["From"] = sender_email
+    tls_message["To"] = receiver_email
+    tls_message["Subject"] = "Report Domain: company-y.example Submitter: Company-X"
+
+    tls_attachment = MIMEBase("application", "tlsrpt+json")
+    with open("${smtpTlsReport}", "rb") as report:
+        tls_attachment.set_payload(report.read())
+    encoders.encode_base64(tls_attachment)
+    tls_attachment.add_header(
+        "Content-Disposition", "attachment", filename="company-y.example!5065427c.json"
+    )
+    tls_message.attach(tls_attachment)
+    tls_text = tls_message.as_string()
+
+    with smtplib.SMTP('localhost') as server:
+        server.sendmail(sender_email, receiver_email, tls_text)
         server.quit()
   '';
 
@@ -331,6 +399,34 @@ in
           )
           machine.succeed(
               "grep -q 'example.com' /var/lib/parsedmarc/reports/aggregate.csv"
+          )
+
+      with subtest("SMTP TLS-RPT report rides the same mailbox poll"):
+          # RFC 8460 reports arrive as application/tlsrpt+json mail in the
+          # rua mailbox; parsedmarc 11 classifies them inside the SAME poll
+          # (no separate TLS-RPT config) and save_output writes fixed
+          # filenames smtp_tls.json/csv next to the aggregate sink
+          # (11.0.1 __init__.py save_output defaults). The TLS-RPT DNS
+          # record itself is the DNS-estate's job (_smtp._tls TXT, see the
+          # go-live runbook).
+          machine.wait_until_succeeds(
+              "test -s /var/lib/parsedmarc/reports/smtp_tls.json",
+              timeout=120,
+          )
+          machine.succeed(
+              "jq -e '.[] | select(.organization_name == \"Company-X\")' "
+              "/var/lib/parsedmarc/reports/smtp_tls.json"
+          )
+          machine.succeed(
+              "jq -e '.[] | select(.policies[0].policy_domain == \"company-y.example\")' "
+              "/var/lib/parsedmarc/reports/smtp_tls.json"
+          )
+          machine.succeed(
+              "jq -e '.[] | select(.policies[0].failure_details[0].result_type == \"certificate-expired\")' "
+              "/var/lib/parsedmarc/reports/smtp_tls.json"
+          )
+          machine.succeed(
+              "test \"$(wc -l < /var/lib/parsedmarc/reports/smtp_tls.csv)\" -ge 2"
           )
 
       with subtest("no file-output errors: StateDirectory fix holds"):
