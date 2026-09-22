@@ -695,6 +695,43 @@ json/yaml/markdown.
   Operational read for live hosts: if a settings reload "did nothing",
   check the response body's `errors` first.
 
+- Monitoring/observability config keys (SOURCE-VERIFIED 2026-09-22 against
+  the pinned v0.15.5 tarball, store-path grep - do not re-derive):
+  (a) METRICS: `metrics.prometheus.enable` (default false; telemetry.rs:626)
+  with optional `metrics.prometheus.auth.username`/`auth.secret`; endpoint
+  `/metrics/prometheus` on the HTTP listener; series names are trc-driven
+  (prometheus.rs renders Collector counters/gauges/histograms). (b)
+  TELEMETRY: `tracing.level.<event>` per-event levels (telemetry.rs:167)
+  and `tracing.history.enable` + `tracing.history.store` (telemetry.rs:529)
+  for store-backed event history. (c) RATE LIMITS:
+  `queue.limiter.inbound.<id>` / `queue.limiter.outbound.<id>`
+  (queue.rs:563,612) with sub-keys `enable` (default true), `key` (one or
+  more of rcpt, rcpt_domain, sender, sender_domain, remote_ip, auth_as,
+  helo_domain, listener, local_ip - throttle.rs:87), optional `match`
+  expression, and REQUIRED `rate` ("requests/period" Rate; throttle.rs:80).
+  (d) SPAM-FILTER DNSBL: `spam-filter.dnsbl.server.<id>.{enable,scope,...}`
+  + `spam-filter.dnsbl.max-check.{ip,domain,email,url}`
+  (spamfilter.rs:268-304) - this is CONTENT-analysis DNSBL inside the spam
+  filter, NOT a connection-level client-IP blocklist (no such static key in
+  0.15.5). (e) AUTO-EXPUNGE: `email.auto-expunge` (default 30d) and
+  `email-submission.auto-expunge` (default 3d) purge destroyed/expired JMAP
+  emails (jmap/settings.rs:282-286) - already active by default; there is
+  NO per-mailbox (Junk-only) expunge knob. (f) AUDIT: NO audit-log config
+  surface exists in 0.15.5 (zero `audit` strings in the crates) - the audit
+  trail is `tracing.level.*` verbosity + journald/history-store retention.
+  (g) AUTOCONFIG: the HTTP crate serves Thunderbird autoconfig XML
+  (`crates/http/src/autoconfig/mod.rs`, routes in request.rs:321-331/475
+  incl. `.well-known` + `config-v1.1.xml`) on the existing HTTP listener -
+  no server wiring needed; client discovery is DNS-side (autoconfig./SRV).
+  (h) TLS-RPT CONSUMPTION: parsedmarc 11.0.1 (the nixpkgs pin this flake
+  ships) parses RFC 8460 reports - `parse_smtp_tls_report_json`
+  (`parsedmarc/__init__.py:737` in the built package) - and the shared
+  mailbox poll routes them (`report_type == "smtp_tls"`,
+  `__init__.py:2124`), writing `smtp_tls.json/csv` next to the aggregate
+  output. TLS-RPT rides the SAME rua mailbox as DMARC: point the
+  `_smtp._tls` TXT `rua` mailto at the same mailbox - no new polling exists
+  or is needed.
+
 ## Non-goals
 
 Piler (archiving - maildir snapshots + paperless cover personal use),
