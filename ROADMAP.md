@@ -58,32 +58,55 @@ Raw ideas:
 
 ### 4. Monitoring, DMARC, and downstream consumers
 
+Reorganized 2026-09-22 into the detect → alert → respond → verify arc;
+the verified-source work (what the wrapper OWNS) is done or specified in
+`docs/MONITORING.md`, the alerting itself is consumer-layer.
+
+**Detect** (wrapper-owned, sources):
+
 - dmarc-monitor live on evo-x2 against the `dmarc@` mailbox; DMARC ladder
   (`none → quarantine → reject`) driven by parsedmarc data
+- Stalwart telemetry: keys SOURCE-VERIFIED in the pinned 0.15.5
+  (metrics.prometheus.enable, tracing.level.*, tracing.history.* - README
+  ledger 2026-09-22); TLS-RPT reports ride the parsedmarc rua poll
+  (e2e-asserted same day)
 - Gatus external-view checks (starttls :25, tls :993, cert expiry) and
   Prometheus scrape of `/metrics/prometheus` via reverse proxy or tunnel
+- Blacklist (RBL) monitoring for the VPS IP
+- Gatus freshness check over the parsedmarc `aggregate.json` sink (verify it
+  does not duplicate the consumer registry's `backup.maxAgeHours` coverage)
+
+**Alert** (consumer-owned routing, `docs/MONITORING.md` taxonomy):
+
+- Queue-depth/queue-age alerting off the Prometheus metrics (series names
+  transcribe from the stalwart-e2e metrics dump, never guessed)
+- Failed-auth burst alerts from the tracing/journal surface; rate limits
+  (`queue.limiter.inbound`) as the mechanized response
+- The non-mail-channel rule: alerts never ride the mail stack (C24)
+
+**Respond** (runbooks):
+
+- Queue IR levers via the management API - pause/inspect/hold/drop, all
+  SOURCE-VERIFIED in the pinned 0.15.5 queue.rs (MONITORING.md §5.4)
+- Reload-smoke ops step for the live host: if management-API settings
+  changes are ever used operationally, check the reload response body's
+  `errors` before trusting the 200 - `/api/reload` silently no-ops while
+  ANY config error exists (source-verified 2026-09-16, README ledger)
+- Spam/Junk policy productization: 0.15.5 only TAGS spam (`X-Spam-Status`) and
+  delivers to INBOX; putting spam in Junk needs a sieve layer (open question 6)
+
+**Verify** (prove the probes themselves):
+
 - Tiny DMARC viewer over the JSON/CSV output (the monitoring report's gap #3)
   - DEFERRED (2026-09-15 verdict, master plan §10 06b): Stalwart 0.15.5
     already stores analyzed reports natively with a CLI readout; build
     nothing until the live webadmin is inspected (D1) AND parsedmarc JSON
     proves insufficient
 - Optional PostgreSQL sink for parsedmarc (psycopg override experiment)
-- Stalwart telemetry wiring per `docs/TELEMETRY.md` (the metrics surface
-  behind the Prometheus scrape above) - the guide carries an
-  upstream-object-model vs pinned-0.15.5 skew caveat: verify keys against
-  the binary before wiring anything
+- Round-trip canary (MONITORING.md §6; vantage = C29)
 - Paperless mail accounts off Gmail app passwords onto own IMAP; smartd
   remote-alert path decoupled from the mail relay (circular-dependency risk);
   InboxClean JMAP/IMAP spike post-migration
-- Blacklist (RBL) monitoring for the VPS IP
-- Spam/Junk policy productization: 0.15.5 only TAGS spam (`X-Spam-Status`) and
-  delivers to INBOX; putting spam in Junk needs a sieve layer (open question 6)
-- Gatus freshness check over the parsedmarc `aggregate.json` sink (verify it
-  does not duplicate the consumer registry's `backup.maxAgeHours` coverage)
-- Reload-smoke ops step for the live host: if management-API settings
-  changes are ever used operationally, check the reload response body's
-  `errors` before trusting the 200 - `/api/reload` silently no-ops while
-  ANY config error exists (source-verified 2026-09-16, README ledger)
 
 ### 5. Repo excellence
 

@@ -32,6 +32,7 @@
 | 11 | Capacity: disk + per-mailbox quota | `/metrics` series probe + quota principal fields | **SPEC ONLY** (M12/M17) | disk > 80 %; mailbox > 80 % quota | WARNING |
 | 12 | Audit trail | NO audit-log knob exists in 0.15.5 (README ledger) - `tracing.level.*` + journald retention is the surface | **DOCUMENTED** | (no alert; journald retention is consumer policy) | INFO |
 | 13 | Dead-man of parsedmarc + canary | systemd unit states + heartbeat | **SPEC ONLY** (M13) | unit inactive / heartbeat absent 2 periods | CRITICAL |
+| 14 | Outbound bounce/complaint telemetry | Resend webhooks (SASL shape doc-verified 2026-09-22: smtp.resend.com, username `resend`, password = API key, 587 STARTTLS / 465 implicit) | **GATED on Resend account + public webhook endpoint (D1-adjacent)** | bounce/complaint event received | WARNING |
 
 Status vocabulary: AVAILABLE (source exists and is asserted by a check), COLLECTED (data lands in a sink), SPEC ONLY (source verified, alert rules not yet encoded anywhere), CONSUMER LAYER (belongs to SystemNix by AGENTS.md doctrine), DESIGN PENDING DECISION (blocked on a C-decision).
 

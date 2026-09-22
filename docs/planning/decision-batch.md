@@ -76,6 +76,13 @@ Public README carries go-live runbook detail (migration window, DR design) with 
 - **[rec] Approve push** once the pin bump (TODO_LIST row, v0.3.1) is in; CI debt list triaged in the same pass.
 - Note: I performed the LOCAL pin-bump edit + dedupe today; push stays gated on this approval.
 
+### C16-adjacent — Resend account actions (not strictly decisions; user actions)
+The SASL shape is now DOC-VERIFIED (resend.com/docs/send-with-smtp, 2026-09-22):
+`smtp.resend.com`, username `resend`, password = API key, 587 STARTTLS /
+465 implicit — exactly the wrapper relay shape. Still needs FROM LARS:
+(a) an API key for the one live :587 smoke (TODO row), (b) webhook
+endpoint setup for outbound bounce/complaint telemetry (MONITORING.md row 14).
+
 ### C14 — Rotate the 3 placeholder secrets (SystemNix `nix-email.yaml`)
 Gated on D1 (rotation-due check before live enablement). **No recommendation needed** — it executes as part of M22/M26 when D1 lands.
 
