@@ -155,23 +155,26 @@
             imports = [
               (modulesPath + "/virtualisation/qemu-vm.nix")
             ];
-            services.mail-server = {
-              enable = true;
-              hostname = "mail.demo.invalid";
-              # The default loopback bind only serves inside the guest; the
-              # demo forwards host:8080 to the web admin/JMAP/API listener.
-              httpBind = "0.0.0.0:8080";
-            };
-            # dmarc-monitor stays OFF: parsedmarc polls a real rua mailbox,
-            # which a throwaway .invalid VM cannot have (ROADMAP D1).
-            services.stalwart.settings = {
-              authentication.fallback-admin = {
-                user = "admin";
-                secret = "demo-admin";
+            services = {
+              mail-server = {
+                enable = true;
+                hostname = "mail.demo.invalid";
+                # The default loopback bind only serves inside the guest; the
+                # demo forwards host:8080 to the web admin/JMAP/API listener.
+                httpBind = "0.0.0.0:8080";
               };
-              # Tested posture from stalwart-e2e: pyzor's public host adds
-              # config-error risk for zero demo value.
-              spam-filter.pyzor.enable = false;
+              # dmarc-monitor stays OFF: parsedmarc polls a real rua mailbox,
+              # which a throwaway .invalid VM cannot have (ROADMAP D1).
+              stalwart.settings = {
+                authentication.fallback-admin = {
+                  user = "admin";
+                  secret = "demo-admin";
+                };
+                # Tested posture from stalwart-e2e: pyzor's public host adds
+                # config-error risk for zero demo value.
+                spam-filter.pyzor.enable = false;
+              };
+              getty.autologinUser = "root";
             };
             # Headless (telephony hosts/pbx): the console goes to stdio, so
             # `nix run .#vm` works from any terminal. Ports bind 127.0.0.1
@@ -214,7 +217,6 @@
                 }
               ];
             };
-            services.getty.autologinUser = "root";
             environment.systemPackages = [pkgs.swaks pkgs.curl];
             # Printed by every root login shell (the autologin getty shows it).
             environment.etc."profile.d/mail-demo-banner.sh".text = ''
