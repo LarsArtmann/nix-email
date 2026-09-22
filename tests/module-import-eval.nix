@@ -107,30 +107,34 @@
   hasMailServer = lib.hasAttr "mail-server" servicesOptions;
   hasDmarcMonitor = lib.hasAttr "dmarc-monitor" servicesOptions;
 
-  rendered = builtins.toJSON {
+  renderedAttrs = {
     stalwartEnabled = cfg.services.stalwart.enable;
     parsedmarcEnabled = cfg.services.parsedmarc.enable;
     hostname = cfg.services.mail-server.hostname;
     inherit hasMailServer hasDmarcMonitor;
     inherit badKeyTrips emptyZoneTrips;
     defaultHasQueue = defaultSettings ? queue;
-    defaultHasDnsbl = defaultSettings ? "spam-filter";
+    # NOTE: settings DOES carry spam-filter.resource by default (the nixpkgs
+    # module's external-rules pointer) - the absence contract is scoped to
+    # the DNSBL subtree this wrapper owns.
+    defaultHasDnsbl = (defaultSettings."spam-filter" or {}) ? dnsbl;
     limiterRate = hardened.queue.limiter.inbound.wrapper-sustained.rate;
     limiterKeys = hardened.queue.limiter.inbound.wrapper-sustained.key;
     dnsblScope = hardened.spam-filter.dnsbl.server.hardcore.scope;
   };
+  rendered = builtins.toJSON renderedAttrs;
 in
   assert hasMailServer || throw "module-import-eval: services.mail-server option surface missing - the export-surface contract is broken (nixosModules.default no longer carries mail-server.nix).";
   assert hasDmarcMonitor || throw "module-import-eval: services.dmarc-monitor option surface missing - the export-surface contract is broken (nixosModules.default no longer carries dmarc-monitor.nix).";
-  assert !rendered.defaultHasQueue || throw "module-import-eval: default settings must not contain queue.* keys - the wrapper's rateLimits default OFF posture is broken and consumers silently diverge from upstream DEFAULT_SETTINGS.";
-  assert !rendered.defaultHasDnsbl || throw "module-import-eval: default settings must not contain spam-filter.* keys - the DNSBL default OFF posture (DNS-less E2E lesson) is broken.";
+  assert !renderedAttrs.defaultHasQueue || throw "module-import-eval: default settings must not contain queue.* keys - the wrapper's rateLimits default OFF posture is broken and consumers silently diverge from upstream DEFAULT_SETTINGS.";
+  assert !renderedAttrs.defaultHasDnsbl || throw "module-import-eval: default settings must not contain spam-filter.dnsbl.* keys - the DNSBL default OFF posture (DNS-less E2E lesson) is broken.";
   assert hardened.queue.limiter.inbound.wrapper-sustained.rate == "100/1h" || throw "module-import-eval: rateLimits.rate did not render into queue.limiter.inbound.<id>.rate.";
   assert hardened.queue.limiter.inbound.wrapper-sustained.key == ["sender_domain" "remote_ip"] || throw "module-import-eval: rateLimits.keys did not render into queue.limiter.inbound.<id>.key.";
   assert hardened.spam-filter.dnsbl.server.hardcore.scope == "ip" || throw "module-import-eval: dnsbl scope did not render.";
   assert hardened.spam-filter.dnsbl.server.hardcore.zone == "'zen.spamhaus.org'" || throw "module-import-eval: dnsbl zone must render as a QUOTED expression constant ('zone') - unquoted values fail the v0.15.5 expression tokenizer.";
   assert hardened.spam-filter.dnsbl.server.hardcore.tag == "'spamhaus-hit'" || throw "module-import-eval: dnsbl tag must render as a quoted expression constant.";
-  assert badKeyTrips || throw "module-import-eval: an invalid rateLimits key (auth_as) did not trip the throttle-key assertion.";
-  assert emptyZoneTrips || throw "module-import-eval: an empty dnsbl zone did not trip the zone assertion.";
+  assert renderedAttrs.badKeyTrips || throw "module-import-eval: an invalid rateLimits key (auth_as) did not trip the throttle-key assertion.";
+  assert renderedAttrs.emptyZoneTrips || throw "module-import-eval: an empty dnsbl zone did not trip the zone assertion.";
     builtins.derivation {
       name = "module-import-eval-${system}";
       inherit system;

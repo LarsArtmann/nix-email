@@ -20,8 +20,8 @@
 | #  | Signal                                                               | Source (verified)                                                                                                                                | Status                                                                               | Alert condition (spec)                                                               | Sev              |
 | -- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ | ---------------- |
 | 1  | Metrics endpoint                                                     | `metrics.prometheus.enable`, `/metrics/prometheus` on the HTTP listener (README ledger 2026-09-22; e2e-asserted 200)                             | **AVAILABLE** (e2e asserts; wrapper exposes passthrough)                             | scrape by consumer; `absent()` dead-man                                              | CRITICAL         |
-| 2  | Queue depth / age                                                    | `/metrics/prometheus` series (names to be transcribed from a live e2e metrics dump before rules are written - no assertion without a transcript) | **SPEC ONLY** (M12 follow-up; consumer rules)                                        | `queue_oldest_message_age > 1h` while queue non-empty                                | CRITICAL         |
-| 3  | Over-quota retry-forever                                             | same queue series (README ledger: over-quota mail retries forever, `Message rescheduled for delivery`)                                           | **SPEC ONLY**                                                                        | queue age high + recipient quota near limit                                          | WARNING          |
+| 2  | Queue depth / age                                                    | TRANSCRIPT-PROVEN ABSENT from `/metrics`: 0.15.5 exposes NO queue-depth/age gauge (40 HELP series transcribed from the e2e dump, none queue-related). Implementable source: consumer poll `GET /api/queue/messages` (basic auth admin, §5.4) - depth = list length, age = oldest queued timestamp | **SPEC ONLY** (M12 follow-up; consumer poll rules)                                  | queue non-empty AND oldest entry > 1 h = CRITICAL (poll on the loopback/rev-proxy path) | CRITICAL         |
+| 3  | Over-quota retry-forever                                             | same queue POLL (README ledger: over-quota mail retries forever, `Message rescheduled for delivery`; assert IMAP absence, not SMTP refusal)      | **SPEC ONLY**                                                                        | queue age high + recipient quota near limit                                          | WARNING          |
 | 4  | Failed auth burst                                                    | `tracing.level.auth` (journal) or telemetry counters - source verified 0.15.5; pick ONE source at wiring time                                    | **SPEC ONLY** (M15)                                                                  | > N failed logins / 5 min per remote IP                                              | WARNING          |
 | 5  | SMTP TLS-RPT failures                                                | parsedmarc `smtp_tls.json` sink (`application/tlsrpt+json` rides the rua mailbox poll - verified + e2e-asserted 2026-09-22)                      | **COLLECTED** (e2e green)                                                            | new `certificate-expired`/`validation-failure` entries with failed-session-count > 0 | WARNING          |
 | 6  | DMARC aggregate anomalies                                            | parsedmarc `aggregate.json` sink                                                                                                                 | **COLLECTED** (e2e green)                                                            | new sending org / policy domain; rua volume drops to zero for a domain               | WARNING/INFO     |
@@ -104,9 +104,12 @@ Alert severity mapping: connect failure = CRITICAL; cert < 14 d = WARNING.
 - Rule: > 5 failed LOGIN/IMAP/SMTP-AUTH attempts for the same remote IP
   within 5 min = WARNING (dedupe by IP, 30 min window); sustained > 50/h
   = CRITICAL.
-- Companion knob (wrapper-side, source-verified): rate limiting via
-  `queue.limiter.inbound.<id>` (`key = remote_ip/auth_as`, REQUIRED
-  `rate = N/period`) - the response, not just the alarm.
+- Companion knob (wrapper-side, source-verified + SHIPPED 2026-09-22):
+  `services.mail-server.rateLimits` (default OFF - v0.15.5 already ships two
+  conservative inbound limiters, README ledger (i)) stacks a sustained
+  per-remote-ip damper; valid keys include `remote_ip` and
+  `authenticated_as` (NOT "auth_as"), `rate = N/period` REQUIRED. The
+  response, not just the alarm.
 
 ### 5.4 Queue IR levers (management API, source-verified 2026-09-22)
 

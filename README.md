@@ -731,6 +731,36 @@ json/yaml/markdown.
     output. TLS-RPT rides the SAME rua mailbox as DMARC: point the
     `_smtp._tls` TXT `rua` mailto at the same mailbox - no new polling exists
     or is needed.
+    (i) RATE LIMITING (2026-09-22, pinned source): v0.15.5 SHIPS two
+    conservative inbound limiters via `DEFAULT_SETTINGS` (boot.rs:85-94) -
+    `queue.limiter.inbound.ip`: key `remote_ip`, rate `5/1s` (burst) and
+    `queue.limiter.inbound.sender`: keys `[sender_domain, rcpt]`, rate
+    `25/1h`. Limiter schema (throttle.rs:53-87, queue.rs:563-641):
+    `queue.limiter.inbound.<id>.{enable,key,match,rate}`, `key` is a string
+    OR list from exactly: rcpt, rcpt_domain, sender, sender_domain,
+    `authenticated_as` (NOT "auth_as"), listener, mx, remote_ip, local_ip,
+    helo_domain; `rate` = `<digits>/<digits><ms|s|m|h|d>`
+    (utils/config/utils.rs:594-620) and "false"/"none"/"unlimited" silently
+    DISABLE the limiter (zero-request rate filtered, throttle.rs:56-58).
+    Multiple limiters stack: every matching one must allow. Enforcement is
+    connection-gating (`session.is_allowed()`, inbound/spawn.rs:45), so a
+    tripped limiter is a pre-SMTP hangup, not a 4xx code. The wrapper's
+    `services.mail-server.rateLimits` is therefore OPT-IN (default OFF):
+    enabling stacks a sustained-volume damper NEXT to the upstream pair.
+    (j) DNSBL (2026-09-22, pinned source): v0.15.5 has NO master switch -
+    `spam-filter.dnsbl.server.<id>` entries ARE the switch (none shipped by
+    default). Per-server: `scope` REQUIRED, exactly one of
+    ip|domain|email|url (spamfilter.rs:268-320 + Element parse 579-592;
+    header/body/any are unreachable in check_dnsbl, dnsbl.rs:37-45),
+    `zone`/`tag` are IfBlocks that accept a single value, which MUST be a
+    QUOTED expression constant (`zone = "'zen.spamhaus.org'"`) - unquoted
+    strings die in the tokenizer with "Invalid variable or constant"
+    (tokenizer.rs:342); `enable` per server defaults true (spamfilter.rs:297).
+    Lookups happen in CONTENT ANALYSIS only (matches add spam tags; nothing
+    is rejected at connection time, dnsbl.rs:19-57) and need working resolver
+    DNS - hence the wrapper's `spamFilter.dnsbl.servers` defaults to `{}`.
+    Caps: `spam-filter.dnsbl.max-check.{ip,domain,email,url}` (default "50"
+    parsed, spamfilter.rs:276-286).
 
 ## Non-goals
 
