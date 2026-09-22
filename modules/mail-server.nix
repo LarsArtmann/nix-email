@@ -17,7 +17,10 @@
 #   25   smtp          inbound MX (TLS via STARTTLS, opportunistic at first)
 #   587  submission    client auth + STARTTLS
 #   465  submissions   client auth + implicit TLS
-#   993  imaps         mailbox access, implicit TLS
+#   993  imaps         mailbox access, implicit TLS. IMAP LOGIN resolves by
+#                      principal NAME, not by the principal's email addresses
+#                      (README ledger: principals whose name differs from
+#                      their address cannot log in as the address).
 #   http admin/JMAP listener binds LOOPBACK ONLY by default - expose via a
 #   reverse proxy (Caddy protectedVHost / native OIDC doctrine), never raw.
 #

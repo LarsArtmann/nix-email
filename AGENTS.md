@@ -212,6 +212,10 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
   (mtimes are epoch-normalized). BuildFlow's nix-flake-check step is
   EVAL-ONLY (observed 0 ms, 2026-09-16) - real VM execution is owned by
   `nix flake check` / CI, never by the buildflow gate.
+- Release procedure (cut CHANGELOG -> gates -> annotated tag -> push ->
+  tag-CI verify -> gh release): CONTRIBUTING "Release procedure" section
+  owns the checklist. The daemon races explicit commits on release-critical
+  files - edit and commit in the SAME tool call.
 - `core.hooksPath` can dangle silently: it pointed at `.githooks/` for the
   hook's whole lifetime while the directory did not exist (2026-09-16) -
   zero symptoms until invoked. When touching hook config, check `git

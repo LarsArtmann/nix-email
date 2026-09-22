@@ -76,6 +76,34 @@ runs pipefail, so grep -q's early exit can EPIPE the producer (observed as
 curl exit 23 on a matching payload, 2026-09-15) - and `! producer | grep -q`
 can phantom-green. Dump the producer to a file, then grep the file.
 
+## Release procedure
+
+Distilled from the v0.3.0/v0.3.1 cuts (2026-09-17). The auto-commit daemon
+races explicit commits - for release-critical files (CHANGELOG above all),
+commit in the SAME tool call that edits them, before drafting anything else.
+
+1. Assess: `git log <last-tag>..HEAD --oneline` - is [Unreleased] carrying a
+   release-worthy payload?
+2. Cut the CHANGELOG: rename `## [Unreleased]` -> `## [X.Y.Z] - <date>`,
+   merge any duplicate `### Added/Changed/Fixed` blocks into single sections
+   (sessions append in parallel - check for doubles), leave a fresh empty
+   `## [Unreleased]` with the three headers. Commit immediately.
+3. Verify the claim surface BEFORE writing notes: `git diff <last>..HEAD --
+   modules/` (a "docs-only / no breaking changes" claim needs this diff).
+4. Gates: `buildflow` (wrapper) AND the full `nix flake check` (the VM
+   suites - buildflow's flake-check step is eval-only). Both redirect to
+   logs, read the logs, EXIT:0 required.
+5. Annotated tag: `git tag -a vX.Y.Z -m "<key changes one-liner>"`, then
+   verify the tagged tree: `git show vX.Y.Z:CHANGELOG.md | grep '<X.Y.Z>'`.
+6. Push master + tag (the pre-push alejandra hook runs).
+7. Verify tag CI goes green (`gh run list`, the tag push runs the full
+   `nix flake check`).
+8. `gh release create vX.Y.Z --latest --title ... --notes-file ...` with a
+   nixpkgs-pin evidence footer (rev + "narHash unchanged since vX.Y.Z-1"
+   from flake.lock), then `gh release view vX.Y.Z` (not draft, Latest).
+9. Note the release in TODO_LIST/decision docs if a consumer pin decision
+   (C17-class) was waiting on the tag.
+
 ## Formatting gate (pre-push)
 
 CI fail-closes on `nix fmt -- . --check` (alejandra). A local `pre-push`
