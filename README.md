@@ -792,14 +792,14 @@ conditions in the module comments and the Pin-advance runbook):
   unfixed on nixpkgs master same day.
 - [NixOS/nixpkgs#563652](https://github.com/NixOS/nixpkgs/issues/563652) -
   imapclient `starttls()` assigns the read-only `imaplib.IMAP4.file` on
-  python 3.14. Wrapper workaround: unit pinned to the py3.13 build. Root fix
-  belongs upstream at mjs/imapclient (still present on master as of
-  2026-09-16, `imapclient/imapclient.py:387`); filed as
-  [mjs/imapclient#662](https://github.com/mjs/imapclient/issues/662)
-  (2026-09-16, drift re-checked: #641 only fixed the `open()` override site).
-  dotlambda (parsedmarc maintainer) answered on the nixpkgs side: the
-  package gets patched only after an upstream fix - mjs/imapclient#663 is
-  that PR (OPEN as of 2026-09-16 evening; watch its merge).
+  python 3.14. Wrapper workaround: unit pinned to the py3.13 build. UPSTREAM
+  FIX LANDED: [mjs/imapclient#663](https://github.com/mjs/imapclient/pull/663)
+  MERGED 2026-09-18 and released in imapclient 4.1.0 (maintainer comment on
+  the nixpkgs issue, gh re-checked 2026-09-22); the pinned rev `6774f7bc`
+  still ships 4.0.1 on py3.13 AND py3.14 (`nix eval` 2026-09-22), so the
+  py3.13 pin retires at the next bump carrying >= 4.1.0 (Pin-advance
+  runbook). [mjs/imapclient#662](https://github.com/mjs/imapclient/issues/662)
+  (the upstream crash report) is CLOSED as fixed.
 - [NixOS/nixpkgs#563777](https://github.com/NixOS/nixpkgs/issues/563777) -
   parsedmarc module ships no systemd `Restart` policy: the poller exits 255
   on a transient boot race (observed in the TLS IMAPS VM variant) and stays

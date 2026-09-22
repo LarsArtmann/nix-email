@@ -32,13 +32,13 @@
   cfg = config.services.dmarc-monitor;
 
   # Compatibility pin (README ledger 2026-09-15; re-check procedure:
-  # README "Pin-advance runbook"): the NixOS python scope
-  # on this nixpkgs rev resolves imapclient 3.1.0, whose
-  # IMAP4WithTimeout.open() assigns self.file - a read-only property since
-  # python 3.14 - so parsedmarc crashes at its first IMAP connect
-  # (AttributeError, exit 255). The SAME rev ships parsedmarc 11.0.1 on
-  # python 3.13, where 3.1.0 still works: pin the unit's binary to that
-  # build. Revert when nixpkgs ships an imapclient >= the fix for py3.14.
+  # README "Pin-advance runbook"): imapclient `starttls()` assigns
+  # the read-only-since-python-3.14 `IMAP4.file`, so parsedmarc crashes
+  # at its first IMAP connect (AttributeError, exit 255) on the py3.14
+  # scope; the py3.13 build works there. Current pin `6774f7bc` ships
+  # imapclient 4.0.1 on BOTH pythons (`nix eval` 2026-09-22), and 4.0.1
+  # is still broken. Revert when nixpkgs ships imapclient >= 4.1.0 (the
+  # fix release: mjs/imapclient#663 MERGED 2026-09-18).
   parsedmarcPackage = pkgs.python313Packages.parsedmarc;
 in {
   options.services.dmarc-monitor = {
