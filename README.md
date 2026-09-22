@@ -366,6 +366,38 @@ Gate commands never wear pipes (`cmd \| tail` can print PASSED on a failing
 run) - redirect to a file and read it. See CONTRIBUTING.md for the
 verified-facts ledger rules and the architecture-diagram regen command.
 
+### Try it in a VM (demo stack, end-to-end verified 2026-09-22)
+
+`nix run .#vm` (x86_64-linux) boots a throwaway QEMU VM with the full
+mail-server stack, a provisioned `demo@mail.demo.invalid` account, and a
+catch-all. All state dies with the process. Host-side endpoints (bound to
+127.0.0.1 only):
+
+| Host port | Guest | What it is |
+| --------- | ----- | ---------- |
+| 18080 | 8080 | web admin / JMAP / REST API (`admin` / `demo-admin`) |
+| 2525 | 25 | SMTP (unauthenticated inbound; catch-all accepts ANY local part) |
+| 2587 | 587 | submission, STARTTLS + AUTH (`demo@mail.demo.invalid` / `demo`) |
+| 2593 | 993 | IMAPS (`demo@mail.demo.invalid` / `demo`) |
+
+Verified from the host in one session (transcripts in the 2026-09-22 demo
+session log): `GET /api/principal` answers `200` in ~0.01 s; external mail
+via 2525 is accepted and **filed to Junk Mail** (`X-Spam-Status: Yes` - the
+spam filter visibly works on unauthenticated no-SPF senders); authenticated
+submission via 2587 delivers to the **INBOX** (`X-Spam-Status: No`); IMAPS
+login + fetch works for both folders. Two VM bugs were root-caused on the
+way (guest firewall never opened the non-loopback `httpBind` port - the
+"connects but never answers" hostfwd hang - and the provisioning oneshot's
+`curl` was unreachable under systemd's minimal PATH): both fixed, see the
+ledger below.
+
+Known cosmetic startup noise in the demo journal: `Spam classifier model
+not found`, 3x `Resource error` (the spam-filter resource's ASN/GeoIP CSV
+downloads from cdn.jsdelivr.net fail in the slirp NAT - non-fatal, the
+lookups just miss), and 1 `Configuration build error` + 6 `Configuration
+build warning` lines (bare, key-less; the stack's auth/listener/delivery
+paths are runtime-verified despite them).
+
 ## Platform support
 
 The VM tests gate `stalwart-e2e`/`stalwart-relay-e2e` to **x86_64-linux
@@ -764,7 +796,33 @@ json/yaml/markdown.
     is rejected at connection time, dnsbl.rs:19-57) and need working resolver
     DNS - hence the wrapper's `spamFilter.dnsbl.servers` defaults to `{}`.
     Caps: `spam-filter.dnsbl.max-check.{ip,domain,email,url}` (default "50"
-    parsed, spamfilter.rs:276-286).
+    parsed, spamfilter.rs:276-286). (k) Demo-VM hostfwd "connects but never
+    answers" (root-caused 2026-09-22, live-VM transcripts): the wrapper's
+    firewall list opened only the four mail ports - a NON-loopback `httpBind`
+    ("0.0.0.0:8080") was silently dropped by the guest firewall, so
+    hostfwd/proxy connections opened (the proxy side had already accepted
+    host-side) and then starved: in-guest loopback answered in 1.5 ms while
+    host->18080 hung forever and SMTP ports flowed. Fix: the module opens
+    the httpBind port exactly when the bind is non-loopback (the
+    raw-exposure warning already covers the tradeoff). Lesson: "connects,
+    never answers" behind a port-forward is a FIREWALL signature, not a
+    transport bug. (l) systemd unit scripts do NOT inherit
+    `environment.systemPackages` (demo provisioning transcript 2026-09-22):
+    the oneshot's bare `curl` was "command not found" 120x, the `|| true`s
+    masked it, and the unit exited SUCCESS having provisioned NOTHING. Fix:
+    absolute store paths + `--max-time` in unit scripts, and fail loudly
+    when a readiness gate exhausts. (m) A tripped inbound limiter is a
+    pre-SMTP hangup, observed live 2026-09-22 on the default 5/1s
+    per-remote_ip limiter (demo-VM flood: 12 rapid connections -> exactly 5
+    SMTP banners + 7 empty/pre-banner hangups; matches (i)'s source cite).
+    Assert hangups, never 4xx codes, when probing limiters. (n) Demo
+    spam-filter behavior (transcripts 2026-09-22): unauthenticated external
+    mail (no-SPF sender via slirp) files to Junk Mail (`X-Spam-Status: Yes`,
+    score 13.50); authenticated :587 submission delivers to INBOX
+    (`X-Spam-Status: No`). The spam-filter resource's ASN/GeoIP CSV
+    downloads (cdn.jsdelivr.net, `[asn.urls]` in spam-filter-2.0.5) fail in
+    the slirp NAT -> `Resource error` x3 + `Spam classifier model not
+    found` at boot; non-fatal (lookups just miss).
 
 ## Non-goals
 
@@ -806,6 +864,6 @@ conditions in the module comments and the Pin-advance runbook):
   failed. Fixture adds `Restart = on-failure` to stay deterministic; filed
   2026-09-16 asking for `Restart = lib.mkDefault "on-failure"`.
 - [mjs/imapclient#662](https://github.com/mjs/imapclient/issues/662) -
-  `starttls()` still assigns read-only `IMAP4.file` on python 3.14 (4.0.1 +
-  master). Same root cause as nixpkgs#563652; fixing it upstream retires the
-  py3.13 pin via the Pin-advance runbook.
+  the upstream crash report for the py3.14 `starttls()` bug (same root
+  cause as nixpkgs#563652). CLOSED as fixed via the #663 merge (see the
+  nixpkgs#563652 entry above for the retirement condition).
