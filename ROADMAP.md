@@ -166,13 +166,19 @@ any repo; they are Lars's calls.
    documented end state, (d) upstream feature request for declarative
    server-side filing and revisit on 0.16+. Recommendation: (c) now + (d)
    as the path to (a) later; awaiting the final call.
-7. **Demo VM boundary (2026-09-17 flake-parts session):** a runnable
+7. ~~**Demo VM boundary (2026-09-17 flake-parts session):** a runnable
    throwaway mail VM in THIS repo (`nix run .#vm`, telephony's `apps.vm`
    pattern), or does "boot the stack" belong to the consumer layer
    (SystemNix) with this repo staying tests-only? AGENTS.md assigns
    SystemNix layers to the consumer, but a demo VM is arguably
-   product-side - the line is Lars's call.
-8. **Next release tag cadence:** the flake-parts migration sits in
+   product-side - the line is Lars's call.~~ RESOLVED 2026-09-17: user
+   answered "add the demo VM to THIS repo"; `nixosConfigurations.demo` +
+   `apps.vm` shipped same day. OPEN residue: the VM boots but the
+   host→guest hostfwd/API hang is unfixed (TODO_LIST row; report
+   `docs/status/2026-09-17_21-07_v031-release-and-demo-vm-hostfwd-hang.md`).
+8. ~~**Next release tag cadence:** the flake-parts migration sits in
    CHANGELOG [Unreleased] - cut a fast `v0.3.1` so SystemNix can bump
    and dedupe early, or batch it into the next feature release? Gates
-   the SystemNix pin advance (TODO_LIST).
+   the SystemNix pin advance (TODO_LIST).~~ RESOLVED 2026-09-17: `v0.3.1`
+   cut (git tag exists; CHANGELOG updated). The SystemNix pin advance is
+   now unblocked - actionable work item in TODO_LIST.
