@@ -16,7 +16,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   scope enum ip|domain|email|url, zone/tag emitted as quoted expression
   constants; default `{}` = DNSBL inert - no master switch exists upstream,
   README ledger (j)). Eval-time assertions validate throttle keys and
-  non-empty zones.
+  non-empty zones. RUNTIME EVIDENCE 2026-09-22: stalwart-e2e gains a
+  `flood` node whose wrapper limiter (3/1m per remote_ip) is asserted to
+  TRIP at runtime (exactly 3 banners + 7 pre-banner hangups + still gated
+  after the 1s window - a tripped limiter is connection-gating, ledger
+  (m)); DNSBL runtime evidence deliberately stays eval-only until the D1
+  live host (verdict recorded in ledger (j)).
 - `checks.module-import-eval` on both arches: `nixosSystem` import of the
   full wrapper surface (mail-server + dmarc-monitor in ONE toplevel),
   option-surface contract, M14 default-absence + rendered-shape +
