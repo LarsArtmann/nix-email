@@ -52,6 +52,93 @@ INFO             ->  digest (once daily)
 heartbeat miss   ->  CRITICAL on the channel from a DIFFERENT vantage
 ```
 
+## 5. Consumer check specs (Gatus + dead-man + auth alerts)
+
+These are CONSUMER-layer (SystemNix) specs: this repo verifies the sources,
+the consumer encodes the checks. Everything below assumes the wrapper
+default HTTP bind (127.0.0.1:8080) plus either an SSH tunnel or a
+reverse-proxy route for Prometheus scraping (README doctrine: never expose
+the whole admin listener for metrics).
+
+### 5.1 External reachability (Gatus, from a second vantage)
+
+```yaml
+# STARTTLS on the MX :25 (submission :587 analogous with the relay shape)
+- name: smtp-starttls
+  endpoints:
+    - "tcp://mail.example.test:25"
+  conditions: ["CONNECTED"]
+  # Gatus starttls conditions per its docs; the consumer owns exact syntax.
+
+# Implicit TLS on :993 (IMAPS)
+- name: imaps-tls
+  endpoints: ["tcp://mail.example.test:993"]
+  conditions: ["CONNECTED"]
+
+# Certificate expiry (the same TLS endpoints carry it)
+- name: mail-cert-expiry
+  conditions: ["CERTIFICATE_EXPIRATION > 14d"]
+```
+
+Alert severity mapping: connect failure = CRITICAL; cert < 14 d = WARNING.
+
+### 5.2 Dead-man switch (the monitors are monitored)
+
+- Every Gatus check gets `alerts` on failure AND the whole Gatus instance
+  pushes a heartbeat; the absence of the heartbeat is itself alerted by a
+  second vantage (or Gatus's health endpoint scraped by Prometheus with an
+  `absent()` rule).
+- Prometheus scrape of `/metrics/prometheus`: encode
+  `absent(stalwart_up)`-style rules (exact series names from the
+  stalwart-e2e metrics dump in the build log - transcribe, never guess).
+- parsedmarc liveness: `systemctl is-active parsedmarc` + freshness of the
+  sink (row 7) - a dead poller must page before reports go stale enough to
+  matter.
+
+### 5.3 Failed-auth alerting (row 4 spec)
+
+- Source: the Stalwart journal's tracing auth events (0.15.5 has no
+  separate audit stream - README ledger 2026-09-22). journald-based
+  counting on the consumer host avoids new Stalwart config.
+- Rule: > 5 failed LOGIN/IMAP/SMTP-AUTH attempts for the same remote IP
+  within 5 min = WARNING (dedupe by IP, 30 min window); sustained > 50/h
+  = CRITICAL.
+- Companion knob (wrapper-side, source-verified): rate limiting via
+  `queue.limiter.inbound.<id>` (`key = remote_ip/auth_as`, REQUIRED
+  `rate = N/period`) - the response, not just the alarm.
+
+### 5.4 Queue IR levers (management API, source-verified 2026-09-22)
+
+`crates/http/src/management/queue.rs` routes (basic auth as admin):
+
+| Lever | Call | Effect |
+| ----- | ---- | ------ |
+| Inspect | `GET /api/queue/messages` | list queued messages (id, sender, recipients, status) |
+| Pause delivery | `PATCH /api/queue/status/stop` | queue-wide pause (`QueueEvent::Paused(true)`) |
+| Resume | `PATCH /api/queue/status/start` (any action ≠ "stop") | unpause |
+| Hold/reschedule | `PATCH /api/queue/messages?...&at=<ts>` (+ per-id PATCH) | push retry due to `at` (the hold lever) |
+| Drop | `DELETE /api/queue/messages` (filtered or per-id) | cancel delivery |
+
+Quarantine review in the 0.15.5 reality = inspect queued messages +
+`GET /api/queue/reports` (ingested reports) - the tag-only spam posture
+(ROADMAP Q6) means there is no separate quarantine folder to review.
+
+## 6. Round-trip canary design (row 10, gated on C29)
+
+- Purpose: message-level SLO probe - a mail that proves the WHOLE path
+  (submit -> relay/local MX -> mailbox) works, distinct from TCP/TLS
+  reachability.
+- Vantage options: (a) evo-x2 residential (independent network + DNS;
+  recommended - the outside view a server-side probe can never give),
+  (b) consumer VPS cron, (c) in-guest (rejected: same-host probes cannot
+  see routing/regression).
+- Shape: systemd timer (15 min) on the vantage host sends via the relay
+  path to the canary mailbox, then asserts arrival over IMAP within the
+  SLO (target < 10 min); breach = CRITICAL alert (row 10).
+- Failure alarm must distinguish: send failure (relay path) vs timeout
+  (delivery path) - different on-call reactions.
+
 The channel decision, vantage decision, and any consumer wiring land via
 `docs/planning/decision-batch.md` (C24, C29) - answer there and the
 SPEC ONLY rows graduate into TODO_LIST work items.
+

@@ -579,6 +579,11 @@ in
               "curl -fsS http://127.0.0.1:8080/metrics/prometheus -o /tmp/metrics.prom "
               + "&& grep -qE '^# (HELP|TYPE)' /tmp/metrics.prom"
           )
+          # Transcript-first doctrine (AGENTS.md): queue/auth/capacity alert
+          # rules are written ONLY from observed series names - dump the full
+          # body into the test log so series names are transcribable from
+          # THIS build log (docs/MONITORING.md row 2 feeds off it).
+          machine.succeed("cat /tmp/metrics.prom >&2")
 
       with subtest("journal: exactly the 1 known-benign config-build error"):
           # In this VM exactly ONE "Configuration build error" line is
