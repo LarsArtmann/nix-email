@@ -562,7 +562,7 @@ in {
         })
 
         (lib.mkIf (cfg.spamFilter.dnsbl.servers != {}) {
-          spam-filter.dnsbl.server = lib.mapAttrs (id: srv:
+          spam-filter.dnsbl.server = lib.mapAttrs (_id: srv:
             {
               enable = lib.mkDefault true;
               scope = lib.mkDefault srv.scope;

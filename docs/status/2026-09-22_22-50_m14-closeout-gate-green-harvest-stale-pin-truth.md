@@ -1,12 +1,12 @@
 # Execution Session Closeout — M14 shipped, gate green, harvest done, stale pin-truth fixed
 
-| Field | Value |
-| --- | --- |
-| Date | 2026-09-22 22:50 |
-| Session type | Execution continuation of the 2026-09-22 19-23 Pareto plan session (`docs/planning/2026-09-22_19-23_pareto-master-plan-super-email-monitoring.md`); mandate was "READ, UNDERSTAND, RESEARCH, REFLECT, execute until done" after the 21-10 status report left M14 unwritten |
-| Branch / origin | `master`; nix-email daemon-pushed throughout (working tree only FEATURES.md uncommitted at write time); SystemNix 1 commit ahead of origin (UNPUSHED, C17-gated) |
-| Gate state | `nix flake check` **PASSED** (all 3 VM tests + eval checks), `nix fmt -- . --check` **green**, `module-import-eval` green on **both** arches |
-| Report format note | Skill default is styled HTML; user instruction this run explicitly demanded `.md` — override honored (point-in-time snapshot, will go stale) |
+| Field              | Value                                                                                                                                                                                                                                                                      |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Date               | 2026-09-22 22:50                                                                                                                                                                                                                                                           |
+| Session type       | Execution continuation of the 2026-09-22 19-23 Pareto plan session (`docs/planning/2026-09-22_19-23_pareto-master-plan-super-email-monitoring.md`); mandate was "READ, UNDERSTAND, RESEARCH, REFLECT, execute until done" after the 21-10 status report left M14 unwritten |
+| Branch / origin    | `master`; nix-email daemon-pushed throughout (working tree only FEATURES.md uncommitted at write time); SystemNix 1 commit ahead of origin (UNPUSHED, C17-gated)                                                                                                           |
+| Gate state         | `nix flake check` **PASSED** (all 3 VM tests + eval checks), `nix fmt -- . --check` **green**, `module-import-eval` green on **both** arches                                                                                                                               |
+| Report format note | Skill default is styled HTML; user instruction this run explicitly demanded `.md` — override honored (point-in-time snapshot, will go stale)                                                                                                                               |
 
 Headline: the one in-progress plan item (M14) is now **shipped with a stronger design than planned** — pinned-source research falsified the plan's default-ON premise (v0.15.5 already ships two conservative inbound rate limiters), so both new wrapper options default OFF with the eval contract proving the absence posture. Full gate green. Harvest complete. Four files carried a stale "SystemNix pins v0.2.0" claim that is **provably false** (input floats `?ref=master`) — all fixed.
 
@@ -19,7 +19,7 @@ Headline: the one in-progress plan item (M14) is now **shipped with a stronger d
 3. **README verified-facts ledger (i) + (j)** — rate limiting: upstream `DEFAULT_SETTINGS` ships `queue.limiter.inbound.ip` (`remote_ip`, `5/1s`) and `.sender` (`[sender_domain, rcpt]`, `25/1h`) per boot.rs:85-94; full key vocabulary; `rate` grammar `<digits>/<digits><ms|s|m|h|d>`; "false/none/unlimited" silently disables; limiters STACK (all matching must allow); enforcement is connection-gating (`session.is_allowed()`, spawn.rs:45) — a pre-SMTP hangup, not a 4xx. DNSBL: no master switch (server list IS the switch), required `scope` set, unquoted zone dies in the tokenizer ("Invalid variable or constant", tokenizer.rs:342), content-analysis-only, per-server `enable` default true, max-check caps. All with file:line, dated 2026-09-22.
 4. **MONITORING.md corrections** — row 2 rewritten: transcript-proven that 0.15.5 exposes NO queue-depth/age gauge (40 HELP series, none queue-related); the implementable spec is now a consumer poll of `GET /api/queue/messages` (§5.4 routes). Row 3 aligned to the poll source. §5.3 `auth_as` typo fixed + companion knob updated to the shipped `rateLimits` option.
 5. **Full aggregated gate** — `nix flake check` exit 0 (stalwart-e2e, stalwart-relay-e2e, parsedmarc-e2e all passed; dmarc-eval + module-import-eval eval green; aarch64 covered by the manual builds + eval guards) and `nix fmt -- . --check` green. The relay-e2e pass doubles as M14's behavior proof: default emits zero keys, runtime untouched.
-6. **Harvest** — `CHANGELOG.md` [Unreleased] filled (11 Added / 3 Changed / 1 Fixed incl. the M7 lock-mystery verdict); `TODO_LIST.md` swept (6 DONE rows deleted: pin guard, flake-parts guard, module-import-eval, relay IfBlock follow-ups, lock-mystery investigation, IMAP-LOGIN doc row; upstream-watch row updated — **imapclient #663 MERGED 2026-09-18**; presence-list row reworded for the *next* bump; SystemNix row rewritten); `FEATURES.md` gained the two M14 rows + SystemNix truth fix; `AGENTS.md` stale-pin correction + M14 doctrine note (do not flip defaults ON).
+6. **Harvest** — `CHANGELOG.md` [Unreleased] filled (11 Added / 3 Changed / 1 Fixed incl. the M7 lock-mystery verdict); `TODO_LIST.md` swept (6 DONE rows deleted: pin guard, flake-parts guard, module-import-eval, relay IfBlock follow-ups, lock-mystery investigation, IMAP-LOGIN doc row; upstream-watch row updated — **imapclient #663 MERGED 2026-09-18**; presence-list row reworded for the _next_ bump; SystemNix row rewritten); `FEATURES.md` gained the two M14 rows + SystemNix truth fix; `AGENTS.md` stale-pin correction + M14 doctrine note (do not flip defaults ON).
 7. **Stale-fact corrections (verified live, not from memory)** — SystemNix consumes this flake via `github:LarsArtmann/nix-email?ref=master` (flake.nix:671) and **never pinned v0.2.0**; the flake-parts dedupe follow + relock (nix-email `2659abb`, `nix-email-contract` GREEN) are committed locally. Corrected in: README pin-discipline paragraph (now states the violation + decision gate), FEATURES.md consumer row, AGENTS.md conventions, decision-batch C17, TODO_LIST row.
 8. **`docs/planning/decision-batch.md` C17 rewritten** with the corrected facts (dedupe done locally, unpushed; hard-pin-vs-float surfaced as an explicit call).
 
@@ -68,6 +68,7 @@ Nothing shipped broken — the gate is green, every change is daemon-committed, 
 ## f) 50 things to get done next (brainstorm, impact-sorted; HARVEST must route these into TODO_LIST/ROADMAP, not entomb them here)
 
 **Decisions (minutes each, unblock everything below)**
+
 1. D1 — retire Workspace vs monitoring-only (the master gate).
 2. D2 — VPS placement/size/backup target (rec: CX22, evo-x2 btrfs + StorageBox later).
 3. C24 — alert channel for non-mail rules (rec: Discord via DiscordSync, ntfy fallback).
