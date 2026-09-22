@@ -202,9 +202,11 @@ are batched in `docs/planning/decision-batch.md` (2026-09-22) - answer there.
    SystemNix layers to the consumer, but a demo VM is arguably
    product-side - the line is Lars's call.~~ RESOLVED 2026-09-17: user
    answered "add the demo VM to THIS repo"; `nixosConfigurations.demo` +
-   `apps.vm` shipped same day. OPEN residue: the VM boots but the
-   host→guest hostfwd/API hang is unfixed (TODO_LIST row; report
-   `docs/status/2026-09-17_21-07_v031-release-and-demo-vm-hostfwd-hang.md`).
+   `apps.vm` shipped same day. RESOLVED FULLY 2026-09-22: the hostfwd/API
+   hang root-caused (guest firewall never opened the non-loopback
+   `httpBind` port; module fixed conditionally) plus the provisioning
+   no-op (systemd-PATH `curl`) fixed; end-to-end host smoke green with
+   transcripts (README "Try it in a VM", ledger (k)/(l)).
 8. ~~**Next release tag cadence:** the flake-parts migration sits in
    CHANGELOG [Unreleased] - cut a fast `v0.3.1` so SystemNix can bump
    and dedupe early, or batch it into the next feature release? Gates

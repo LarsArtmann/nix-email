@@ -27,6 +27,19 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
   after external-resource downloads); the same binary boots fine in the VM.
   Use the VM debug loop below instead. Host loops remain fine for pure
   client-side forensics (swaks/SMTP sink, see below).
+- `nix run .#vm` (x86_64) - throwaway demo VM (`nixosConfigurations.demo`,
+  end-to-end host-smoked 2026-09-22, README "Try it in a VM"): web/API
+  host :18080 (admin/demo-admin), SMTP :2525, submission :2587
+  (demo@mail.demo.invalid / demo), IMAPS :2593. Debug pattern that worked:
+  FIFO console (`mkfifo in && cat in | <vm-closure>/bin/run-demo-vm > log`
+  with a `sleep infinity > in` holder) - more reliable than the
+  nixos-test-driver for ad-hoc demo runs, because the driver's
+  wait_for_unit/boot waits wedge when a unit under test never activates.
+  Probe LAYERED: guest service -> guest loopback -> HOST port. "Connects
+  but never answers" behind a forward is a FIREWALL signature, not a
+  transport bug (ledger (k)); the demo disk is CWD-relative ./demo.qcow2 -
+  run from a scratch dir; unit scripts need ABSOLUTE binary paths (ledger
+  (l)).
 - VM debug loop: realize the driver
   (`nix-store -r $(nix-store -q --references $(nix eval --raw
   .#checks.x86_64-linux.stalwart-e2e.drvPath) | grep nixos-test-driver)`)

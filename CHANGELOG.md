@@ -35,6 +35,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - `docs/MONITORING.md`: severity taxonomy, 14-row signal inventory,
   coverage matrix, Gatus/dead-man/failed-auth specs, queue-IR levers,
   canary design, threat-model cross-check.
+- README "Try it in a VM" section + verified-facts ledger (k)-(n):
+  host-side end-to-end smoke of `nix run .#vm` (API 200 via hostfwd,
+  catch-all SMTP accept, AUTH submission -> INBOX, IMAPS login+fetch,
+  external mail -> Junk with `X-Spam-Status: Yes`), the firewall/hangup
+  + systemd-PATH root causes, limiter-trip behavior, and the demo
+  spam-filter/ASN-download posture. FEATURES gains the demo-VM row and
+  the conditional-firewall correction.
 - `docs/planning/decision-batch.md`: every open user decision on one page
   (D1/D2, C24/C29, C18/C19/C20/C22/C34, Q4-Q6, demo-VM g1/g2, C17).
 - README verified-facts ledger entries (a)-(j): metrics/tracing keys,
@@ -72,6 +79,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   lock` does NOT evaluate outputs (throw-in-checks repro), but any
   UNDEFINED VARIABLE in flake.nix fails lock as a parse-time scope
   error. Mechanism documented in the flake.nix guard comment.
+- Demo-VM hostfwd/API hang (open since 2026-09-17) root-caused and fixed:
+  a NON-loopback `httpBind` (`0.0.0.0:8080`) was silently firewalled -
+  connections through the port-forward opened and then starved forever
+  ("connects but never answers"), while in-guest loopback answered in
+  ~1.5 ms and SMTP ports flowed. The module now opens the httpBind port
+  exactly when the bind is non-loopback (README ledger (k)).
+- Demo-VM provisioning silently no-op'd: the oneshot's bare `curl` is
+  "command not found" under systemd's minimal PATH (unit scripts do not
+  inherit `environment.systemPackages`), and `|| true` masked it into a
+  green unit that provisioned nothing. Now absolute store paths +
+  `--max-time`, and the unit FAILS when the API readiness gate exhausts
+  (README ledger (l)). Demo re-smoked end-to-end from the host after both
+  fixes.
 
 ## [0.3.1] - 2026-09-17
 
