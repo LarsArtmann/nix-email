@@ -2,9 +2,7 @@
   "nodes": {
     "flake-parts": {
       "inputs": {
-        "nixpkgs-lib": [
-          "nixpkgs"
-        ]
+        "nixpkgs-lib": "nixpkgs-lib"
       },
       "locked": {
         "lastModified": 1788450739,
@@ -33,6 +31,21 @@
         "owner": "NixOS",
         "repo": "nixpkgs",
         "rev": "6774f7bc253789b113a4f39285dc0fa100abeacc",
+        "type": "github"
+      }
+    },
+    "nixpkgs-lib": {
+      "locked": {
+        "lastModified": 1789871957,
+        "narHash": "sha256-cY6TV3IPWCsvJP+EPLvX2rRJa8YNXuybodVy1mY2L1E=",
+        "owner": "nix-community",
+        "repo": "nixpkgs.lib",
+        "rev": "5bdaa90a7fb7ae9892329e23f1474add69e092fe",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "nixpkgs.lib",
         "type": "github"
       }
     },
