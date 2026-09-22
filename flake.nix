@@ -233,6 +233,8 @@
 
                  The catch-all accepts mail for ANY local part; provisioned
                  by mail-demo-provision.service (journal: systemctl status).
+                 Unauthenticated inbound lands in Junk Mail (spam filter);
+                 authenticated submission lands in INBOX - both verified.
               ==================================================================
               BANNER
             '';
