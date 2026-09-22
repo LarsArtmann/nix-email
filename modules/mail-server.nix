@@ -419,11 +419,12 @@ in {
         }
       ]
       ++ lib.concatLists (lib.mapAttrsToList (id: srv: [
-        {
-          assertion = srv.zone != "";
-          message = "services.mail-server.spamFilter.dnsbl.servers.\"${id}\".zone must be a non-empty DNSBL zone (e.g. zen.spamhaus.org).";
-        }
-      ]) cfg.spamFilter.dnsbl.servers)
+          {
+            assertion = srv.zone != "";
+            message = "services.mail-server.spamFilter.dnsbl.servers.\"${id}\".zone must be a non-empty DNSBL zone (e.g. zen.spamhaus.org).";
+          }
+        ])
+        cfg.spamFilter.dnsbl.servers)
       ++ lib.optionals (cfg.certificate.mode == "acme") [
         {
           assertion = cfg.certificate.acme.contact != [];
@@ -560,20 +561,19 @@ in {
         })
 
         (lib.mkIf (cfg.spamFilter.dnsbl.servers != {}) {
-          spam-filter.dnsbl.server =
-            lib.mapAttrs (id: srv:
-              {
-                enable = lib.mkDefault true;
-                scope = lib.mkDefault srv.scope;
-                # Quoted expression constant: an unquoted zone string dies in
-                # Stalwart's expression tokenizer ("Invalid variable or
-                # constant", v0.15.5) - only 'literal' parses.
-                zone = lib.mkDefault "'${srv.zone}'";
-              }
-              // lib.optionalAttrs (srv.tag != null) {
-                tag = lib.mkDefault "'${srv.tag}'";
-              })
-            cfg.spamFilter.dnsbl.servers;
+          spam-filter.dnsbl.server = lib.mapAttrs (id: srv:
+            {
+              enable = lib.mkDefault true;
+              scope = lib.mkDefault srv.scope;
+              # Quoted expression constant: an unquoted zone string dies in
+              # Stalwart's expression tokenizer ("Invalid variable or
+              # constant", v0.15.5) - only 'literal' parses.
+              zone = lib.mkDefault "'${srv.zone}'";
+            }
+            // lib.optionalAttrs (srv.tag != null) {
+              tag = lib.mkDefault "'${srv.tag}'";
+            })
+          cfg.spamFilter.dnsbl.servers;
         })
 
         (lib.mkIf (cfg.relay != null) {
