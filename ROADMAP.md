@@ -134,7 +134,8 @@ Things deliberately NOT pursued (see README "Non-goals" for the full rationale):
 ## Open questions (user decisions)
 
 These gate large parts of the themes above. None of them is answerable from
-any repo; they are Lars's calls.
+any repo; they are Lars's calls. Recommendations + cost-of-delay per decision
+are batched in `docs/planning/decision-batch.md` (2026-09-22) - answer there.
 
 1. **D1 - Google Workspace fork:** retire Workspace mailboxes for a Stalwart
    VPS, or keep Workspace and run only the parsedmarc/monitoring half? Gates

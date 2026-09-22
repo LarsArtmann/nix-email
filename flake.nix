@@ -7,7 +7,11 @@
     # package exists as stalwart_0_16 but is NOT yet compatible with the
     # module), services.parsedmarc 11.0.1, services.mailpit, swaks
     # 20240103.0, imapsync 2.314 all verified present.
-    nixpkgs.url = "github:NixOS/nixpkgs/eaad089433ca2bb662274377d33df3d0e51ef28b";
+    # ADVANCED 2026-09-22 eaad0894 -> 6774f7bc to track SystemNix's lock
+    # (their nixpkgs floats nixos-unstable; presence list re-verified:
+    # stalwart 0.15.5, parsedmarc 11.0.1, mailpit 1.31.1, swaks 20240103.0,
+    # imapsync 2.314).
+    nixpkgs.url = "github:NixOS/nixpkgs/6774f7bc253789b113a4f39285dc0fa100abeacc";
 
     # flake-parts (SystemNix / nix-international-telephony pattern).
     # nixpkgs-lib follows OUR pinned nixpkgs, so perSystem's `lib` special
@@ -102,14 +106,12 @@
             virtualisation = {
               graphics = false;
               memorySize = 2048;
-              # PIN-SKEW WORKAROUND (drop when nixpkgs moves past eaad089):
-              # this pin's qemu-vm.nix defaults enableSharedMemory to FALSE
-              # (later nixpkgs defaults it to useVirtiofs). Without the memfd
-              # memory backend, vhost-user-fs (the shared nix store) fails
-              # with "vhost_set_vring_kick failed: EIO" and the guest drops
-              # to emergency mode. The VM-test framework sets it itself; a
-              # bare build-vm does not.
-              qemu.enableSharedMemory = true;
+              # (The old pin needed `qemu.enableSharedMemory = true` as a
+              # workaround: its qemu-vm.nix defaulted it to false, dropping
+              # the guest into emergency mode via vhost-user-fs EIO. The
+              # 2026-09-22 pin advance to 6774f7bc retires it - that pin
+              # defaults enableSharedMemory = useVirtiofs = true on linux,
+              # verified by grep of the pin's qemu-vm.nix:756.)
               forwardPorts = [
                 {
                   from = "host";
