@@ -56,6 +56,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- statix W20 (repeated keys) fixed in the VM-test node configs (2026-09-16
+  session): fully-collapsed `services`/`parsedmarc` attrsets in all four
+  flagged nodes - W20 recurses after each collapse, so partial collapses
+  were landmines; AGENTS.md policy reversed from deliberate-non-fix to
+  always-collapse (all three VM suites force-rebuilt green on fresh
+  execution).
 - nixpkgs pin advanced `eaad0894` -> `6774f7bc` (fleet lock rev); the
   qemu `enableSharedMemory` workaround is RETIRED - the new pin's
   `qemu-vm.nix` defaults `useVirtiofs = true`, the 9p pairing that made

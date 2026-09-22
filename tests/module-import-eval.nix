@@ -20,11 +20,13 @@
         # Both wrappers at once: the co-existence proof (an option conflict
         # or broken merge between the two modules fails HERE, on both
         # arches, before any consumer hits it).
-        services.mail-server = {
-          enable = true;
-          hostname = "import-check.invalid";
+        services = {
+          mail-server = {
+            enable = true;
+            hostname = "import-check.invalid";
+          };
+          dmarc-monitor.enable = true;
         };
-        services.dmarc-monitor.enable = true;
       }
     ];
   };
@@ -45,16 +47,20 @@
     modules = [
       ../modules/mail-server.nix
       {
-        services.mail-server = {
-          enable = true;
-          hostname = "import-check.invalid";
-          rateLimits.enable = true;
-          rateLimits.rate = "100/1h";
-          rateLimits.keys = ["sender_domain" "remote_ip"];
-          spamFilter.dnsbl.servers.hardcore = {
-            scope = "ip";
-            zone = "zen.spamhaus.org";
-            tag = "spamhaus-hit";
+        services = {
+          mail-server = {
+            enable = true;
+            hostname = "import-check.invalid";
+            rateLimits = {
+              enable = true;
+              rate = "100/1h";
+              keys = ["sender_domain" "remote_ip"];
+            };
+            spamFilter.dnsbl.servers.hardcore = {
+              scope = "ip";
+              zone = "zen.spamhaus.org";
+              tag = "spamhaus-hit";
+            };
           };
         };
       }
@@ -70,12 +76,16 @@
     modules = [
       ../modules/mail-server.nix
       {
-        services.mail-server = {
-          enable = true;
-          hostname = "import-check.invalid";
-          rateLimits.enable = true;
-          # The plausible-but-wrong spelling (v0.15.5 uses authenticated_as).
-          rateLimits.keys = ["auth_as"];
+        services = {
+          mail-server = {
+            enable = true;
+            hostname = "import-check.invalid";
+            rateLimits = {
+              enable = true;
+              # The plausible-but-wrong spelling (v0.15.5 uses authenticated_as).
+              keys = ["auth_as"];
+            };
+          };
         };
       }
     ];
@@ -87,12 +97,14 @@
     modules = [
       ../modules/mail-server.nix
       {
-        services.mail-server = {
-          enable = true;
-          hostname = "import-check.invalid";
-          spamFilter.dnsbl.servers.empty = {
-            scope = "ip";
-            zone = "";
+        services = {
+          mail-server = {
+            enable = true;
+            hostname = "import-check.invalid";
+            spamFilter.dnsbl.servers.empty = {
+              scope = "ip";
+              zone = "";
+            };
           };
         };
       }

@@ -204,6 +204,14 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
 - Gate commands redirect, never pipe: `nix flake check > /tmp/gate.log 2>&1;
   echo "EXIT:$?" >> /tmp/gate.log`, then read the log. A pipe reports the
   FILTER's exit code - two fake greens shipped that way in one session.
+- An EMPTY `nix build` log means CACHE HIT, not a run (2026-09-16: EXIT 0
+  on three VM checks whose outputs pre-existed 88 min earlier - caught only
+  by grepping the log for execution lines). When execution itself is the
+  claim, force it (`nix build --rebuild`) or grep the log for driver
+  output. Dating store outputs: `nix path-info --json registrationTime`
+  (mtimes are epoch-normalized). BuildFlow's nix-flake-check step is
+  EVAL-ONLY (observed 0 ms, 2026-09-16) - real VM execution is owned by
+  `nix flake check` / CI, never by the buildflow gate.
 - `core.hooksPath` can dangle silently: it pointed at `.githooks/` for the
   hook's whole lifetime while the directory did not exist (2026-09-16) -
   zero symptoms until invoked. When touching hook config, check `git

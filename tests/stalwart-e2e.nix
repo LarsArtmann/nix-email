@@ -334,6 +334,8 @@ in
     nodes.flood = {...}: {
       imports = [../modules/mail-server.nix];
 
+      system.stateVersion = "26.05";
+
       services = {
         mail-server = {
           enable = true;
