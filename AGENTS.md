@@ -77,8 +77,18 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
 - nixpkgs pinned to SystemNix's lock rev (compat doctrine). Bump both
   together; note in README when nixpkgs moves `services.stalwart` past
   0.15.5. The full bump + consumer-pin + workaround-retirement procedure
-  is the README "Pin-advance runbook" (SystemNix's pin references release
-  tags; current: v0.2.0).
+  is the README "Pin-advance runbook". CORRECTED 2026-09-22: SystemNix
+  consumes this flake via floating `?ref=master` (flake.nix:671), NOT a
+  release tag - the old "current: v0.2.0" claim was stale; hard-pinning
+  the URL is an open decision (decision-batch C17).
+- Wrapper hardening options (2026-09-22, M14): `rateLimits` and
+  `spamFilter.dnsbl.servers` default OFF by design - v0.15.5 already
+  ships two conservative inbound limiters via DEFAULT_SETTINGS (boot.rs,
+  README ledger (i)) and DNSBL has no master switch + needs real DNS
+  (ledger (j)). Do NOT "fix" the defaults to ON; the eval test asserts
+  the absence posture (module-import-eval). Limiter key vocabulary:
+  `authenticated_as` (NOT auth_as); dnsbl zone/tag are emitted as QUOTED
+  expression constants.
 - flake-parts input policy (decided 2026-09-17): FLOATING
   `github:hercules-ci/flake-parts`, pinned by flake.lock only - both
   reference flakes (SystemNix, nix-international-telephony) float it too,
