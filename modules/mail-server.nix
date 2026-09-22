@@ -55,6 +55,21 @@
     || httpBindHost == "localhost"
     || httpBindHost == "[::1]"
     || httpBindHost == "::1";
+
+  # v0.15.5 throttle key names (crates/common/src/config/smtp/throttle.rs
+  # parse_queue_rate_limiter_key). Note: "authenticated_as", NOT "auth_as".
+  rateLimiterKeys = [
+    "rcpt"
+    "rcpt_domain"
+    "sender"
+    "sender_domain"
+    "authenticated_as"
+    "listener"
+    "mx"
+    "remote_ip"
+    "local_ip"
+    "helo_domain"
+  ];
 in {
   options.services.mail-server = {
     enable = lib.mkEnableOption "an opinionated Stalwart mail server (all-in-one SMTP/IMAP/JMAP, built-in spam filter, web admin)";
@@ -176,6 +191,92 @@ in {
         before it is provisioned routes that domain's mail to the MX path
         until the TTL expires (the 1h trap in the README ledger). Dev/test
         hosts want this low; leave null to keep the upstream default.
+      '';
+    };
+
+    rateLimits = {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = ''
+          Add ONE wrapper-managed inbound rate limiter (a sustained-volume
+          damper). OFF by default because v0.15.5 ALREADY ships two
+          conservative inbound limiters (README ledger): per remote_ip
+          "5/1s" (burst) and per sender_domain+rcpt "25/1h". Enabling stacks
+          this limiter NEXT to those - every matching limiter must allow a
+          message, so this one only binds on sustained volume.
+        '';
+      };
+      id = lib.mkOption {
+        type = lib.types.str;
+        default = "wrapper-sustained";
+        description = "Identifier of the generated `queue.limiter.inbound` entry.";
+      };
+      rate = lib.mkOption {
+        type = lib.types.strMatching "[0-9]+/(ms|s|m|h|d)";
+        default = "600/1h";
+        description = ''
+          `<requests>/<period>` for `queue.limiter.inbound.<id>.rate`; the
+          period grammar is ms|s|m|h|d (v0.15.5 Duration parser). Stalwart
+          also accepts "false"/"none"/"unlimited" here, which silently
+          DISABLES the limiter (zero-request rate is filtered out) - the
+          type refuses those so enable/rate always mean what they say.
+        '';
+      };
+      keys = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = ["remote_ip"];
+        description = ''
+          Throttle keys (`queue.limiter.inbound.<id>.key`): one bucket per
+          distinct tuple of these values. Valid v0.15.5 names (asserted at
+          eval time): rcpt, rcpt_domain, sender, sender_domain,
+          authenticated_as, listener, mx, remote_ip, local_ip, helo_domain.
+        '';
+      };
+    };
+
+    spamFilter.dnsbl.servers = lib.mkOption {
+      type = lib.types.attrsOf (lib.types.submodule {
+        options = {
+          scope = lib.mkOption {
+            type = lib.types.enum ["ip" "domain" "email" "url"];
+            description = ''
+              Which element is queried against the zone
+              (`spam-filter.dnsbl.server.<id>.scope` - REQUIRED upstream).
+              v0.15.5 also parses header/body/any scopes, but they are
+              unreachable in the DNSBL check path, so the wrapper does not
+              offer them.
+            '';
+          };
+          zone = lib.mkOption {
+            type = lib.types.str;
+            example = "zen.spamhaus.org";
+            description = ''
+              DNSBL zone queried (`...zone`). Emitted as a quoted expression
+              constant: an UNQUOTED zone fails Stalwart's expression parser
+              with "Invalid variable or constant" (v0.15.5 tokenizer).
+              Conditional (IfBlock) zones need the
+              services.stalwart.settings passthrough.
+            '';
+          };
+          tag = lib.mkOption {
+            type = lib.types.nullOr lib.types.str;
+            default = null;
+            description = ''
+              Spam tag added when the element lists (`...tag`, quoted like
+              zone). Default: Stalwart's built-in tag for the server.
+            '';
+          };
+        };
+      });
+      default = {};
+      description = ''
+        DNS blocklist servers for spam analysis
+        (`spam-filter.dnsbl.server.<id>`). EMPTY BY DEFAULT: v0.15.5 has no
+        master switch - the server list IS the switch - DNSBL lookups need
+        working resolver DNS (unavailable in the DNS-less E2E VM; same class
+        as pyzor), and it is content-analysis only: matches add spam tags,
+        nothing is rejected at connection time.
       '';
     };
 
@@ -311,6 +412,18 @@ in {
           message = "services.mail-server.relay: set username AND secretFile together (or neither) - partial SASL credentials would fail at first submission.";
         }
       ]
+      ++ lib.optionals cfg.rateLimits.enable [
+        {
+          assertion = lib.all (k: lib.elem k rateLimiterKeys) cfg.rateLimits.keys;
+          message = "services.mail-server.rateLimits.keys contains an invalid throttle key - Stalwart would drop the whole limiter with a config parse error. Valid v0.15.5 keys: ${lib.concatStringsSep ", " rateLimiterKeys}.";
+        }
+      ]
+      ++ lib.concatLists (lib.mapAttrsToList (id: srv: [
+        {
+          assertion = srv.zone != "";
+          message = "services.mail-server.spamFilter.dnsbl.servers.\"${id}\".zone must be a non-empty DNSBL zone (e.g. zen.spamhaus.org).";
+        }
+      ]) cfg.spamFilter.dnsbl.servers)
       ++ lib.optionals (cfg.certificate.mode == "acme") [
         {
           assertion = cfg.certificate.acme.contact != [];
@@ -436,6 +549,31 @@ in {
 
         (lib.mkIf (cfg.directoryCacheTtlNegative != null) {
           directory."internal".cache.ttl.negative = cfg.directoryCacheTtlNegative;
+        })
+
+        (lib.mkIf cfg.rateLimits.enable {
+          queue.limiter.inbound."${cfg.rateLimits.id}" = {
+            enable = lib.mkDefault true;
+            key = lib.mkDefault cfg.rateLimits.keys;
+            rate = lib.mkDefault cfg.rateLimits.rate;
+          };
+        })
+
+        (lib.mkIf (cfg.spamFilter.dnsbl.servers != {}) {
+          spam-filter.dnsbl.server =
+            lib.mapAttrs (id: srv:
+              {
+                enable = lib.mkDefault true;
+                scope = lib.mkDefault srv.scope;
+                # Quoted expression constant: an unquoted zone string dies in
+                # Stalwart's expression tokenizer ("Invalid variable or
+                # constant", v0.15.5) - only 'literal' parses.
+                zone = lib.mkDefault "'${srv.zone}'";
+              }
+              // lib.optionalAttrs (srv.tag != null) {
+                tag = lib.mkDefault "'${srv.tag}'";
+              })
+            cfg.spamFilter.dnsbl.servers;
         })
 
         (lib.mkIf (cfg.relay != null) {
