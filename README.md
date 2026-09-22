@@ -156,14 +156,36 @@ Options: `enable`, `hostname` (FQDN, asserted to contain a dot), `httpBind`
 (loopback default; a NixOS warning fires on non-loopback binds),
 `stateVersion`, `relay` (outbound smarthost, see below), `metrics.enable`
 (`/metrics/prometheus` on the HTTP listener), `directoryCacheTtlNegative`
-(kills the 1h negative-cache trap on dev/test hosts), and `certificate`
-(`self-signed | acme | manual` tier with completeness assertions). Everything
+(kills the 1h negative-cache trap on dev/test hosts), `certificate`
+(`self-signed | acme | manual` tier with completeness assertions), and the
+M14 hardening options `rateLimits` (opt-in sustained inbound damper - see
+the sizing note below) and `spamFilter.dnsbl.servers` (typed DNS blocklist
+entries, default `{}`). Everything
 else flows through `services.stalwart.settings` (all wrapper values are
 `mkDefault` - consumer settings win). Defaults set: listeners above and the
 self-signed certificate tier so implicit-TLS works out of the box. Firewall:
-the wrapper opens exactly 25/465/587/993 (nixpkgs' `openFirewall` is off -
-it would also open the loopback admin port on every interface); consumer
+the wrapper opens exactly 25/465/587/993, plus the `httpBind` port when the
+bind is non-loopback (nixpkgs' `openFirewall` is off - it would also open
+the loopback admin port on every interface); consumer
 port lists merge additively.
+
+### Rate-limit sizing (`rateLimits`)
+
+The wrapper's `rateLimits` adds ONE inbound limiter NEXT to the two
+upstream defaults (per remote_ip 5/1s + per sender_domain+rcpt 25/1h -
+every matching limiter must allow a message, so yours only binds on
+sustained volume). Sizing for a small fleet: set `rate` to ~2-3x your
+legitimate peak per bucket (the `600/1h` default fits a ~10-user host;
+newsletters or burst senders want their own keyed limiter instead of
+raising the global one). `keys` picks the bucket: `remote_ip` (per-source
+damper), `sender_domain` (per-tenant), `authenticated_as` (per-account
+submission damper). Verify a trip by CONNECTION counts, never SMTP codes -
+a tripped limiter is a pre-SMTP hangup (ledger (m); the e2e flood subtest
+asserts exactly this shape). CONDITIONAL limiters (IfBlock `match`
+expressions, e.g. only for unauthenticated sessions) are passthrough-only:
+write `queue.limiter.inbound.<id>.match` via `services.stalwart.settings` -
+same for conditional DNSBL zones (`spam-filter.dnsbl.server.<id>.zone`
+IfBlocks).
 
 ### Per-account semantics (API-provisioned accounts, VM-verified 2026-09-15)
 

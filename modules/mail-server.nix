@@ -245,6 +245,10 @@ in {
           distinct tuple of these values. Valid v0.15.5 names (asserted at
           eval time): rcpt, rcpt_domain, sender, sender_domain,
           authenticated_as, listener, mx, remote_ip, local_ip, helo_domain.
+          Sizing guidance lives in README "Rate-limit sizing". Conditional
+          limiters (IfBlock `match` expressions) are passthrough-only: write
+          `queue.limiter.inbound.<id>.match` via
+          `services.stalwart.settings`.
         '';
       };
     };
