@@ -219,11 +219,16 @@ in
         # merged into services.parsedmarc.settings. The wrapper's own
         # contributions stay in force: general.output=/var/lib/parsedmarc/reports,
         # heavy sinks off, StateDirectory/ReadWritePaths on the unit.
-        parsedmarc.provision = {
-          geoIp = false;
-          localMail = {
-            enable = true;
-            hostname = "localhost";
+        # Collapsed attrset (statix W20 robustness - a dotted
+        # parsedmarc.<key> pair trips W20 the moment a second one appears,
+        # tests/parsedmarc-e2e.nix tls node + AGENTS.md Working rules).
+        parsedmarc = {
+          provision = {
+            geoIp = false;
+            localMail = {
+              enable = true;
+              hostname = "localhost";
+            };
           };
         };
 

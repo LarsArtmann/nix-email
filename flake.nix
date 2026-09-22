@@ -154,6 +154,10 @@
             # shapes the toplevel for `system.build.vm`. hostName also names
             # the runner script (run-demo-vm, via system.name).
             networking.hostName = "demo";
+            # Explicit NixOS stateVersion: kills the "not set, defaulting
+            # to 26.11" eval warning (fleet convention 26.05, matching the
+            # e2e relay node).
+            system.stateVersion = "26.05";
             imports = [
               (modulesPath + "/virtualisation/qemu-vm.nix")
             ];
