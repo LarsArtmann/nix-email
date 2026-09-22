@@ -282,6 +282,10 @@
         checks =
           {
             dmarc-eval = import ./tests/dmarc-eval.nix {inherit nixpkgs system;};
+            # Export-surface contract (2026-09-22): both arches eval the full
+            # wrapper toplevel - mail-server + dmarc-monitor merged in ONE
+            # nixosSystem (pure check, no VM).
+            module-import-eval = import ./tests/module-import-eval.nix {inherit nixpkgs system;};
           }
           // pkgs.lib.optionalAttrs (system == "x86_64-linux") {
             stalwart-e2e = import ./tests/stalwart-e2e.nix {inherit pkgs;};

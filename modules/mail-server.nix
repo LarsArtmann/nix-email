@@ -298,6 +298,15 @@ in {
           message = "services.mail-server.relay.address must be a DNS-resolvable hostname (got \"${cfg.relay.address}\") - Stalwart resolves relay targets via A lookup and refuses bare IP literals with \"record not found for MX\". Give the smarthost a hostname (e.g. smtp.resend.com).";
         }
         {
+          # The ledger's loopback fact, mechanized at eval time: Stalwart
+          # REFUSES to relay to loopback-resolving targets ("host resolves
+          # loopback address", SSRF guard) - a config pointing the smarthost
+          # at localhost fails at first submission, not at build time, unless
+          # caught here.
+          assertion = builtins.match ".*(localhost|127\\.0\\.0\\.1|::1|0\\.0\\.0\\.0).*" cfg.relay.address == null;
+          message = "services.mail-server.relay.address must not be a loopback name or address (got \"${cfg.relay.address}\") - Stalwart refuses to relay to loopback targets with \"host resolves loopback address\" (SSRF guard, README ledger). Point the relay at the real smarthost hostname.";
+        }
+        {
           assertion = (cfg.relay.username == null) == (cfg.relay.secretFile == null);
           message = "services.mail-server.relay: set username AND secretFile together (or neither) - partial SASL credentials would fail at first submission.";
         }
