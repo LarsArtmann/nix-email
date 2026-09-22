@@ -43,10 +43,12 @@ belongs to the SystemNix consumer wrapper, not this repo (runbook step 7).
 ## Relay SSRF posture
 
 Stalwart REFUSES to relay to loopback-resolving targets ("host resolves
-loopback address" - VERIFIED live spike). The wrapper's relay option
-additionally rejects bare IP literals at eval time (the binary fails them
-at runtime with "record not found for MX"). Net effect: the smarthost path
-cannot be pointed at localhost services.
+loopback address" - VERIFIED live spike). The wrapper mechanizes that half
+since 2026-09-22: `relay.address` = localhost/127.0.0.1/::1/0.0.0.0 is
+rejected at EVAL time (module assertion, negative-tested). The relay
+option additionally rejects bare IP literals at eval time (the binary
+fails them at runtime with "record not found for MX"). Net effect: the
+smarthost path cannot be pointed at localhost services.
 
 ## Transport security tiers
 

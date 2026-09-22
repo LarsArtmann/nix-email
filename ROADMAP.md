@@ -28,7 +28,9 @@ Raw ideas:
 - DKIM keygen automation (`POST /api/dkim`), keys into sops, selector rotation
 - Backup/DR: `stalwart --export` timer + offsite pull + recovery age key in
   the sops key group + MONTHLY restore drill
-- Queue-depth/queue-age alerting off the Prometheus metrics
+- Queue-depth/queue-age alerting via a consumer poll of `GET
+  /api/queue/messages` (0.15.5 exposes NO queue-depth/age Prometheus
+  series - transcript-proven 2026-09-22; MONITORING.md row 2 + §5.4)
 
 ### 2. DNS estate (gated on D1)
 
@@ -78,8 +80,11 @@ the verified-source work (what the wrapper OWNS) is done or specified in
 
 **Alert** (consumer-owned routing, `docs/MONITORING.md` taxonomy):
 
-- Queue-depth/queue-age alerting off the Prometheus metrics (series names
-  transcribe from the stalwart-e2e metrics dump, never guessed)
+- Queue-depth/queue-age alerting via the consumer poll of
+  `GET /api/queue/messages` (0.15.5 ships NO queue-depth/age Prometheus
+  series - transcript-proven 2026-09-22; MONITORING.md row 2 + §5.4;
+  any series that IS used must transcribe from the stalwart-e2e metrics
+  dump, never be guessed)
 - Failed-auth burst alerts from the tracing/journal surface; rate limits
   (`queue.limiter.inbound`) as the mechanized response
 - The non-mail-channel rule: alerts never ride the mail stack (C24)
