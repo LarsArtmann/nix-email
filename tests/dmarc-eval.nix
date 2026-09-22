@@ -30,6 +30,9 @@
     modules = [
       ../modules/dmarc-monitor.nix
       {
+        # Explicit stateVersion: kills the "defaulting to 26.11" eval
+        # warning (fleet convention 26.05).
+        system.stateVersion = "26.05";
         services.dmarc-monitor = {
           enable = true;
           settings = {

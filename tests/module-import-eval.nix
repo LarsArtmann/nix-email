@@ -17,6 +17,9 @@
       ../modules/mail-server.nix
       ../modules/dmarc-monitor.nix
       {
+        # Explicit stateVersion: kills the "defaulting to 26.11" eval
+        # warning (fleet convention 26.05).
+        system.stateVersion = "26.05";
         # Both wrappers at once: the co-existence proof (an option conflict
         # or broken merge between the two modules fails HERE, on both
         # arches, before any consumer hits it).
@@ -47,6 +50,7 @@
     modules = [
       ../modules/mail-server.nix
       {
+        system.stateVersion = "26.05";
         services = {
           mail-server = {
             enable = true;
@@ -76,6 +80,7 @@
     modules = [
       ../modules/mail-server.nix
       {
+        system.stateVersion = "26.05";
         services = {
           mail-server = {
             enable = true;
@@ -97,6 +102,7 @@
     modules = [
       ../modules/mail-server.nix
       {
+        system.stateVersion = "26.05";
         services = {
           mail-server = {
             enable = true;
