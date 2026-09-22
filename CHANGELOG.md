@@ -54,6 +54,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Pin-discipline docs updated to observed reality: SystemNix consumes
   this flake via `?ref=master` (verified 2026-09-22), not a tag pin -
   the runbook/decision docs now say so instead of asserting compliance.
+- Docs-audit fixes (2026-09-22): ROADMAP queue-alerting bullets corrected
+  to the management-API poll (0.15.5 exposes NO queue Prometheus series -
+  transcript-proven), THREAT_MODEL relay-SSRF posture gains the eval-time
+  loopback assertion, FEATURES gains the `module-import-eval` row + the
+  parsedmarc-e2e TLS-RPT subtest note, TODO_LIST line anchors re-verified
+  (`:516-518`->`:529-532`, `:528`->`:542`), the over-quota row swept by
+  verdict (README documents it; no wrapper option owed), unrouted
+  21-10/22-50 harvest rows routed (M14 runtime evidence, consumer
+  ergonomics, failure-report coverage, v0.4.0 tag call, Dependabot
+  branch), and `demo.qcow2` untracked (28 MB VM disk image the
+  auto-commit daemon had committed five times; `*.qcow2` gitignored).
 
 ### Fixed
 

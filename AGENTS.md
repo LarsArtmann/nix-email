@@ -152,6 +152,10 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
   destructure `pkgs` and use `pkgs.lib`, not a bare `lib`, inside
   perSystem). dmarc-eval still receives the raw `nixpkgs` input, so its
   own legacyPackages semantics are unchanged.
+- `nix flake lock` fails on an UNDEFINED VARIABLE in flake.nix (parse-time
+  scope error) but NOT on a `throw` inside outputs/checks (lock forces
+  neither) - the 2026-09-17 lock-mystery verdict, measured (21-10 report
+  a.6; mechanism comment lives in flake.nix).
 - Reference-first for structural migrations: when a sibling repo carries
   the proven pattern, the first draft is its verbatim shape - verify
   green, THEN deviate one step at a time with evidence (2026-09-17: a
