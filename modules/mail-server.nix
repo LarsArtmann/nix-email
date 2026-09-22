@@ -213,11 +213,12 @@ in {
         description = "Identifier of the generated `queue.limiter.inbound` entry.";
       };
       rate = lib.mkOption {
-        type = lib.types.strMatching "[0-9]+/(ms|s|m|h|d)";
+        type = lib.types.strMatching "[0-9]+/[0-9]+(ms|s|m|h|d)";
         default = "600/1h";
         description = ''
           `<requests>/<period>` for `queue.limiter.inbound.<id>.rate`; the
-          period grammar is ms|s|m|h|d (v0.15.5 Duration parser). Stalwart
+          period grammar is `<digits><ms|s|m|h|d>` (v0.15.5 Duration
+          parser). Stalwart
           also accepts "false"/"none"/"unlimited" here, which silently
           DISABLES the limiter (zero-request rate is filtered out) - the
           type refuses those so enable/rate always mean what they say.
