@@ -72,6 +72,11 @@ in {
             host = "mail.example.com";
             port = 993;
             ssl = true;
+            # Stalwart GOTCHA (README ledger): IMAP LOGIN resolves by the
+            # principal NAME, NOT by the principal's email addresses -
+            # a principal named `dmarc` with email `dmarc@example.com`
+            # logs in as `dmarc`, not as the address. Name the account
+            # after its address (or set user = the principal NAME).
             user = "dmarc@example.com";
             # NOTE: _secret must be an absolute path STRING - the nixpkgs
             # ini generator throws on path VALUES (isString gate).
@@ -84,6 +89,11 @@ in {
         Passthrough to services.parsedmarc.settings (parsedmarc.ini).
         At minimum set `imap` (host/user/password with _secret) - see
         https://domainaware.github.io/parsedmarc/#configuration-file
+
+        Stalwart-specific: IMAP LOGIN resolves by principal NAME, not by
+        the principal's email addresses (README ledger, VM-verified) - if
+        login fails with correct credentials, `imap.user` may need the
+        principal NAME rather than the address.
       '';
     };
   };
