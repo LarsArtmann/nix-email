@@ -125,6 +125,11 @@ the verified-source work (what the wrapper OWNS) is done or specified in
 - Split `flake.nix` into `flake-modules/*.nix` (the flake-parts idiom)
   only when it outgrows ~300 lines - it is ~105 after the 2026-09-17
   migration; splitting earlier costs navigation for nothing
+- Arch-diagram content-freshness audit (routed 2026-09-22 from the
+  16_19-16 report): `docs/architecture-understanding/*.d2` renders are
+  label-verified but the CONTENT vs module reality (relay, DKIM
+  dual-sign, flood node) has no standing re-check - audit on the next
+  diagram session
 - Replace the vulnix CVE scan once BuildFlow ships a working scanner
   (NVD retired the legacy JSON feeds that crashed vulnix 1.12.5
   fleet-wide; `.buildflow.yml` carries the skip rationale)

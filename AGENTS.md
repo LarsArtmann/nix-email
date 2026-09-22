@@ -21,7 +21,8 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
 - `nix flake check` - the full gate: eval contract + Stalwart VM E2E test
   (~2-4 min; the SMTP subtest intentionally waits out ~60 s of resolver
   timeouts in the DNS-less VM). NOTE: failed check results are CACHED - a
-  rerun without an input change replays the old verdict.
+  rerun without an input change replays the old verdict. `--no-build`
+  emits the eval warnings fast (cheap triage instrument for eval noise).
 - Host binary spike = DEAD END for Stalwart (2026-09-16): the pinned binary
   boots and parses config on the host but listeners never bind (futex-wait
   after external-resource downloads); the same binary boots fine in the VM.
@@ -203,6 +204,12 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
 - Gate commands redirect, never pipe: `nix flake check > /tmp/gate.log 2>&1;
   echo "EXIT:$?" >> /tmp/gate.log`, then read the log. A pipe reports the
   FILTER's exit code - two fake greens shipped that way in one session.
+- `core.hooksPath` can dangle silently: it pointed at `.githooks/` for the
+  hook's whole lifetime while the directory did not exist (2026-09-16) -
+  zero symptoms until invoked. When touching hook config, check `git
+  config core.hooksPath && ls "$(git config core.hooksPath)"`. It is
+  repo-LOCAL config (verified 2026-09-22): fresh clones must re-set it -
+  CI's fail-closed alejandra step is the real gate.
 - No new test assertion without a transcript: grep the line you assert from
   an existing test log or a debug VM run first. Reading it in upstream source
   is NOT evidence of what the journal/log prints (the `Mailbox over quota.`

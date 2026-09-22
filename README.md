@@ -843,6 +843,14 @@ json/yaml/markdown.
     downloads (cdn.jsdelivr.net, `[asn.urls]` in spam-filter-2.0.5) fail in
     the slirp NAT -> `Resource error` x3 + `Spam classifier model not
     found` at boot; non-fatal (lookups just miss).
+- Management API `POST /api/reload` returns `{"data": <Config>}` and the
+  serialized Config ALWAYS carries an `errors` array (only `keys` is
+  skipped); the core swap is SKIPPED when errors is non-empty
+  (source-verified v0.15.5: `http/src/management/reload.rs`,
+  `utils/src/config/mod.rs`, `common/src/manager/reload.rs`). The e2e
+  reload subtest asserts `.data.errors | length == 0` as a precondition -
+  any config error silently no-ops a reload (the pyzor-disable note in the
+  e2e is the same trap).
 
 ## Non-goals
 
