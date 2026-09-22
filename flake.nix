@@ -245,17 +245,33 @@
                 RemainAfterExit = true;
               };
               script = let
-                api = "curl -fsS -u admin:demo-admin -H 'Content-Type: application/json' -X POST http://127.0.0.1:8080/api/principal -d";
+                # ABSOLUTE curl path + --max-time: systemd services run with
+                # a minimal PATH (NOT environment.systemPackages), so a bare
+                # `curl` is "command not found" and the || true's below
+                # masked it - the oneshot exited SUCCESS having provisioned
+                # NOTHING, and the 120s wait-loop burned on instant
+                # command-not-found failures (transcript 2026-09-22,
+                # unit-log lines 15-17). --max-time keeps a pre-ready API
+                # (listener bound, requests held) from hanging a probe.
+                api = "${pkgs.curl}/bin/curl -fsS --max-time 5 -u admin:demo-admin -H 'Content-Type: application/json' -X POST http://127.0.0.1:8080/api/principal -d";
+                ready = "${pkgs.curl}/bin/curl -fsS --max-time 5 -u admin:demo-admin http://127.0.0.1:8080/api/principal";
               in ''
                 # Wait for the management API: the auth'd GET is the same
                 # request stalwart-e2e asserts works before any POST.
+                ready=0
                 for i in $(seq 1 120); do
-                  if curl -fsS -u admin:demo-admin \
-                      http://127.0.0.1:8080/api/principal >/dev/null 2>&1; then
+                  if ${ready} >/dev/null 2>&1; then
+                    ready=1
                     break
                   fi
                   sleep 1
                 done
+                # Fail loudly rather than lie: a green unit that provisioned
+                # nothing hid exactly this class of bug for five days.
+                if [ "$ready" != "1" ]; then
+                  echo "management API not ready after 120s - demo NOT provisioned" >&2
+                  exit 1
+                fi
                 # Reboot-tolerant: conflicts from already-provisioned
                 # principals are non-fatal; readiness is gated above.
                 ${api} '{"type":"domain","name":"mail.demo.invalid"}' || true
