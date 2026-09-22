@@ -122,8 +122,8 @@
 in
   assert hasMailServer || throw "module-import-eval: services.mail-server option surface missing - the export-surface contract is broken (nixosModules.default no longer carries mail-server.nix).";
   assert hasDmarcMonitor || throw "module-import-eval: services.dmarc-monitor option surface missing - the export-surface contract is broken (nixosModules.default no longer carries dmarc-monitor.nix).";
-  assert !defaultHasQueue || throw "module-import-eval: default settings must not contain queue.* keys - the wrapper's rateLimits default OFF posture is broken and consumers silently diverge from upstream DEFAULT_SETTINGS.";
-  assert !defaultHasDnsbl || throw "module-import-eval: default settings must not contain spam-filter.* keys - the DNSBL default OFF posture (DNS-less E2E lesson) is broken.";
+  assert !rendered.defaultHasQueue || throw "module-import-eval: default settings must not contain queue.* keys - the wrapper's rateLimits default OFF posture is broken and consumers silently diverge from upstream DEFAULT_SETTINGS.";
+  assert !rendered.defaultHasDnsbl || throw "module-import-eval: default settings must not contain spam-filter.* keys - the DNSBL default OFF posture (DNS-less E2E lesson) is broken.";
   assert hardened.queue.limiter.inbound.wrapper-sustained.rate == "100/1h" || throw "module-import-eval: rateLimits.rate did not render into queue.limiter.inbound.<id>.rate.";
   assert hardened.queue.limiter.inbound.wrapper-sustained.key == ["sender_domain" "remote_ip"] || throw "module-import-eval: rateLimits.keys did not render into queue.limiter.inbound.<id>.key.";
   assert hardened.spam-filter.dnsbl.server.hardcore.scope == "ip" || throw "module-import-eval: dnsbl scope did not render.";
