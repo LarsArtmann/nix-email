@@ -34,9 +34,17 @@
     ...
   }: let
     # EVAL-TIME GUARDS (SystemNix flake.nix allEvalGuards pattern):
-    # parsed eagerly via builtins.seq around mkFlake, so ANY flake command
-    # (eval, lock, check, build) fails loudly on a fleet-compat regression
+    # parsed eagerly via builtins.seq around mkFlake, so every
+    # OUTPUTS-FORCING command (nix eval/check/build/`nix run`; CI's
+    # `nix flake check` included) fails loudly on a fleet-compat regression
     # instead of shipping a silently drifted lock to every consumer.
+    # MEASURED 2026-09-22: `nix flake lock` is NOT outputs-forcing - it
+    # neither runs these guards nor forces check leaves (a thrown check
+    # value left lock green; an UNDEFINED VARIABLE anywhere in flake.nix
+    # failed lock, because that is a PARSE-time scope error, which also
+    # solves the 2026-09-17 "lock surfaced the broken checks" mystery as
+    # parse-scope, not eval). Drift that moves the lock behind nix's back
+    # is therefore caught at the next outputs-forcing command, not by lock.
     lockFile = builtins.fromJSON (builtins.readFile ./flake.lock);
 
     # The fleet-verified nixpkgs pin (compat doctrine, AGENTS.md
