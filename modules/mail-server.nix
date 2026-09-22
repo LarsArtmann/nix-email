@@ -56,6 +56,16 @@
     || httpBindHost == "[::1]"
     || httpBindHost == "::1";
 
+  # Port part of httpBind, when the string carries one ("<host>:<port>").
+  # Null when portless - then the firewall cannot know what to open and the
+  # consumer must manage the port itself.
+  httpBindPort = let
+    m = builtins.match ".*:([0-9]+)$" cfg.httpBind;
+  in
+    if m == null
+    then null
+    else lib.toInt (builtins.head m);
+
   # v0.15.5 throttle key names (crates/common/src/config/smtp/throttle.rs
   # parse_queue_rate_limiter_key). Note: "authenticated_as", NOT "auth_as".
   rateLimiterKeys = [
@@ -630,11 +640,21 @@ in {
     # definition when false); `services.openssh.ports` has no such base def,
     # which is why mkDefault works fine THERE. Lists concat: consumer port
     # lists merge additively; mkForce yours to replace.
-    networking.firewall.allowedTCPPorts = [
-      25
-      465
-      587
-      993
-    ];
+    #
+    # The httpBind port joins ONLY on a non-loopback bind (demo-VM hostfwd
+    # root cause, transcript 2026-09-22: `httpBind = "0.0.0.0:8080"` with the
+    # port firewalled makes every remote connection OPEN and then hang
+    # forever - SYN dropped after slirp/proxy already accepted host-side;
+    # in-guest loopback keeps working, SMTP ports flow, so the failure mode
+    # is a near-undebuggable "connects but never answers"). The non-loopback
+    # warning above already flags the raw-exposure tradeoff.
+    networking.firewall.allowedTCPPorts =
+      [
+        25
+        465
+        587
+        993
+      ]
+      ++ lib.optionals (!httpBindIsLoopback && httpBindPort != null) [httpBindPort];
   };
 }
