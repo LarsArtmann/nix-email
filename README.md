@@ -181,10 +181,17 @@ port lists merge additively.
   local part deliverable, which silently disables unknown-recipient 5xx
   rejection for that domain. Catch-all and strict rejection cannot
   coexist on one domain - that is a product-shape decision per domain,
-  not a config bug. Provisioning order also matters: any SMTP probe
-  touching a domain BEFORE it is provisioned poisons the directory
-  negative cache (1 h TTL, see ledger) and routes it to MX instead of
-  local.
+  not a config bug. ORDERING FOOTGUN (verdict 2026-09-22: documented, not
+  asserted - the trap lives in runtime API order, which a module
+  assertion cannot see; a declarative catch-all option belongs to the
+  M22 provisioning work): create the catch-all principal AFTER any
+  unknown-recipient-rejection probe - once it exists, `RCPT
+  TO:<nobody@...>` answers 250 and every rejection assertion fails (the
+  E2E orders them correctly; ledger entry "CATCH-ALL vs
+  unknown-recipient rejection"). Provisioning order also matters more
+  broadly: any SMTP probe touching a domain BEFORE it is provisioned
+  poisons the directory negative cache (1 h TTL, see ledger) and routes
+  it to MX instead of local.
 
 ### Outbound relay (`services.mail-server.relay`)
 
@@ -572,17 +579,24 @@ json/yaml/markdown.
   part deliverable - `RCPT TO:<nobody@example.test>` then answers
   `250 2.1.5 OK` and any "unknown recipient rejected 5xx" assertion fails.
   Create the catch-all principal AFTER the rejection probe (the E2E does).
-- Spam filter DEFAULTS (VM-verified 2026-09-15 via GTUBE experiment): the
-  built-in rule filter scans authenticated submission on 587 too, adds
-  `X-Spam-Status` (GTUBE in the BODY triggers; subject-only text does not
-  match the rule), and STILL delivers to INBOX. There is NO server-side
-  auto-filing into the Junk mailbox in 0.15.5 - routing spam to Junk is a
-  sieve/consumer concern. Journal noise to expect: "Spam classifier model
-  not found" (the statistical classifier has no trained model; the rule
-  engine works without it). IMAP LOGIN resolves by principal NAME, not by
-  the principal's email addresses: a principal named `catchall` with email
-  `catchall@example.test` cannot log in as the email address, only as
-  `catchall` (accounts whose name IS their address never trip this).
+- Spam filter DEFAULTS (GTUBE, VM 2026-09-15): the built-in rule filter
+  scans authenticated submission on 587 too, adds `X-Spam-Status` (GTUBE
+  in the BODY triggers; subject-only text does not match the rule).
+  CORRECTED 2026-09-22 (do not trust the old absolute): "no server-side
+  auto-filing into Junk" no longer holds universally - on the demo VM
+  (live slirp DNS, same 0.15.5 + spam-filter-2.0.5 resource) an
+  unauthenticated external no-SPF message WAS auto-filed to Junk Mail
+  (`X-Spam-Status: Yes`, score 13.50), while GTUBE-tagged submission
+  stayed in INBOX in the DNS-less E2E on the same pin (re-run green
+  2026-09-22). Filing fires under a condition these two experiments do
+  not isolate - the exact threshold/mechanism is UNVERIFIED; assert
+  neither behavior as universal. Journal noise to expect: "Spam
+  classifier model not found" (the statistical classifier has no trained
+  model; the rule engine works without it). IMAP LOGIN resolves by
+  principal NAME, not by the principal's email addresses: a principal
+  named `catchall` with email `catchall@example.test` cannot log in as
+  the email address, only as `catchall` (accounts whose name IS their
+  address never trip this).
 - NIXPKGS BUG (workaround shipped 2026-09-15; filed upstream as
   NixOS/nixpkgs#563651): with
   `provision.elasticsearch = false`, the parsedmarc module's settings
@@ -796,7 +810,13 @@ json/yaml/markdown.
     is rejected at connection time, dnsbl.rs:19-57) and need working resolver
     DNS - hence the wrapper's `spamFilter.dnsbl.servers` defaults to `{}`.
     Caps: `spam-filter.dnsbl.max-check.{ip,domain,email,url}` (default "50"
-    parsed, spamfilter.rs:276-286). (k) Demo-VM hostfwd "connects but never
+    parsed, spamfilter.rs:276-286). RUNTIME-EVIDENCE PATH DECIDED 2026-09-22:
+    documented eval-only (same doctrine as pyzor) - the wrapper's risk
+    surface is the emitted config shape (quoted constants, scope enum),
+    which `module-import-eval` already asserts; runtime lookup behavior is
+    upstream's code against external zones, and the E2E VM is deliberately
+    DNS-less (~60 s resolver-stall doctrine). First live-host run under D1
+    provides the runtime evidence for free. (k) Demo-VM hostfwd "connects but never
     answers" (root-caused 2026-09-22, live-VM transcripts): the wrapper's
     firewall list opened only the four mail ports - a NON-loopback `httpBind`
     ("0.0.0.0:8080") was silently dropped by the guest firewall, so

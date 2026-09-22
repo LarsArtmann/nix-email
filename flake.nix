@@ -133,7 +133,9 @@
       # consumer layers live there). `nix flake check` evaluates this
       # toplevel, so the demo cannot rot silently (nix-international-telephony's
       # pbx-prod pattern). Provisioning recipe mirrors tests/stalwart-e2e.nix
-      # ("roles": ["user"] is REQUIRED; catch-all = the bare "@domain" address).
+      # ("roles": ["user"] is REQUIRED; catch-all = the bare "@domain"
+      # address, created AFTER any rejection probe by nature - the demo
+      # has none, README "Per-account semantics" ordering footgun).
       flake.nixosConfigurations.demo = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [

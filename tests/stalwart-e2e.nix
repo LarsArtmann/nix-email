@@ -324,6 +324,37 @@ in
       virtualisation.memorySize = 2048;
     };
 
+    # Flood-probe node (M14 runtime evidence, 2026-09-22): one
+    # wrapper-managed inbound limiter at a tight 3/1m per-remote_ip rate,
+    # deliberately a SEPARATE node so its bucket cannot perturb the main
+    # subtests' connections. A tripped inbound limiter is
+    # CONNECTION-GATING - a pre-SMTP hangup, never a 4xx code (README
+    # ledger (i) source cite + (m) live observation on the default 5/1s
+    # limiter: 12 rapid connections -> 5 banners + 7 empties).
+    nodes.flood = {...}: {
+      imports = [../modules/mail-server.nix];
+
+      services = {
+        mail-server = {
+          enable = true;
+          hostname = "mail.flood.test";
+          rateLimits = {
+            enable = true;
+            rate = "3/1m";
+          };
+        };
+        stalwart.settings = {
+          authentication.fallback-admin = {
+            user = "admin";
+            secret = "test-admin-secret";
+          };
+          spam-filter.pyzor.enable = false;
+        };
+      };
+
+      virtualisation.memorySize = 1024;
+    };
+
     testScript = ''
       import json
       import re
@@ -803,5 +834,33 @@ in
               "journalctl -u stalwart -b 0 > /tmp/journal-full.log "
               + "&& ! grep -qiE 'panic|fatal error' /tmp/journal-full.log"
           )
+
+      with subtest("wrapper rate limiter trips at runtime (M14 evidence)"):
+          flood.wait_for_unit("stalwart.service", timeout=180)
+          flood.wait_for_open_port(25, timeout=60)
+          # 10 rapid connections from one source IP: the wrapper's 3/1m
+          # remote_ip bucket must allow exactly 3 banners; the rest are
+          # pre-banner hangups (connection gating, ledger (m)). File-based
+          # counting - never a producer|grep pipe (pipe-lint rule).
+          flood.succeed(
+              "rm -f /tmp/flood.log; for i in $(seq 1 10); do "
+              "exec 3<>/dev/tcp/127.0.0.1/25; "
+              "if IFS= read -r -t 10 line <&3; then echo \"$line\" >> /tmp/flood.log; "
+              "else echo HANGUP >> /tmp/flood.log; fi; exec 3<&- 3>&-; done"
+          )
+          banners = flood.succeed("grep -c '^220' /tmp/flood.log || true").strip()
+          hangups = flood.succeed("grep -c HANGUP /tmp/flood.log || true").strip()
+          assert banners == "3", "expected exactly 3 banners (rate 3/1m), got " + banners
+          assert hangups == "7", "expected 7 pre-banner hangups, got " + hangups
+          # The 1m window must NOT refill after 2 s: a fresh connection is
+          # still gated. This distinguishes the wrapper's 1m bucket from the
+          # upstream default 5/1s burst limiter (which would have refilled).
+          flood.succeed("sleep 2")
+          flood.succeed(
+              "exec 3<>/dev/tcp/127.0.0.1/25; "
+              "if IFS= read -r -t 10 line <&3; then echo \"$line\" >> /tmp/flood2.log; "
+              "else echo HANGUP >> /tmp/flood2.log; fi; exec 3<&- 3>&-"
+          )
+          flood.succeed("grep -q HANGUP /tmp/flood2.log")
     '';
   }
