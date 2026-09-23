@@ -40,24 +40,29 @@
     sha256 = "0dq64cj49711kbja27pjl2hy0d3azrjxg91kqrh40x46fkn1dwkx";
   };
 
-  # RFC 6591 DMARC failure (forensic) report fixture: the same upstream
-  # sample parsedmarc's own repo ships (multipart/report carrying a
-  # message/feedback-report part - Feedback-Type auth-failure, Source-IP
-  # 10.10.10.10, Reported-Domain domain.de, Delivery-Result
-  # smg-policy-action - plus a message/rfc822 sample whose Subject header
-  # is the literal string "Subject"). Detection path verified against the
-  # pinned 11.0.1 source: parse_report_email flags the
-  # message/feedback-report part and takes a later message/* part in
-  # EMAIL_SAMPLE_CONTENT_TYPES as the sample (__init__.py:2088-2123);
-  # parse_failure_report REQUIRES source_ip; save_output then writes
+  # RFC 6591 DMARC failure (forensic) report fixture: upstream's own
+  # sample (multipart/report carrying a message/feedback-report part -
+  # Feedback-Type auth-failure, Source-IP 10.10.10.10, Reported-Domain
+  # domain.de, Delivery-Result smg-policy-action - plus a
+  # message/rfc822 sample whose Subject header is the literal string
+  # "Subject"). Pin note: the ORIGINAL samples/forensic/subject.eml
+  # (still present at the aggregate fixture's rev f45ab94e) is
+  # MALFORMED - its blank separator lines contain a single space, so
+  # the stdlib email parser folds them into the previous header and
+  # parse_report_email's payload walk (__init__.py:2088-2123, pinned
+  # 11.0.1) never sees Feedback-Type -> InvalidDMARCReport "is not a
+  # valid report" (reproduced host-side against the pinned package,
+  # 2026-09-23, before any VM run). Upstream repaired those bytes when
+  # renaming forensic->failure (commit ae1e5adb, PR #659); this pins
+  # the repaired artifact verbatim. save_output then writes
   # failure.json/failure.csv and samples/<subject>.eml UNCONDITIONALLY
-  # once output is set (the save_failure flag only gates network sinks,
-  # cli.py:2117-2130), and append_json skips empty inputs - so
+  # once output is set (the save_failure flag only gates network
+  # sinks, cli.py:2117-2130), and append_json skips empty inputs - so
   # failure.json existing at all proves a forensic report was parsed.
   forensicSampleReport = pkgs.fetchurl {
-    name = "forensic-sample-report";
-    url = "https://github.com/domainaware/parsedmarc/raw/f45ab94e0608088e0433557608d9f4e9517d3afe/samples/forensic/subject.eml";
-    sha256 = "13ibxmd1pid5qcfbj97jwbsbh7ynpkgrbs6jhq0sy0vm6dwp1j85";
+    name = "failure-sample-report";
+    url = "https://github.com/domainaware/parsedmarc/raw/ae1e5adb6609946209278b2bf3f633c752a09383/samples/failure/DMARC%20Failure%20Report%20for%20domain.de%20(mail-from=sharepoint@domain.de,%20ip=10.10.10.10).eml";
+    sha256 = "0prhfmph6rr41c1x1m4jy4ga9i6p46l3xf7ymrbfpqx59c2kwj6j";
   };
 
   # RFC 8460 SMTP TLS-RPT fixture (fields mirror RFC 8460 A.2; the parser's
@@ -473,10 +478,18 @@ in
           # through get_filename_safe_string - "Subject.eml" here). The
           # delivery_result assertion proves the normalization path:
           # "smg-policy-action" -> "policy" (parse_failure_report).
-          machine.wait_until_succeeds(
-              "test -s /var/lib/parsedmarc/reports/failure.json",
-              timeout=120,
-          )
+          try:
+              machine.wait_until_succeeds(
+                  "test -s /var/lib/parsedmarc/reports/failure.json",
+                  timeout=120,
+              )
+          except Exception:
+              # Diagnosability: a parse refusal logs only a warning and
+              # the mail is archived to Invalid - the 2026-09-23 red run
+              # left no console evidence and had to be re-derived
+              # host-side. Surface the poller journal on timeout.
+              machine.succeed("journalctl -u parsedmarc -b 0 -o cat >&2")
+              raise
           machine.succeed(
               "jq -e '.[] | select(.feedback_type == \"auth-failure\")' "
               "/var/lib/parsedmarc/reports/failure.json"
