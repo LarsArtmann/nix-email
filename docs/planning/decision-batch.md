@@ -98,6 +98,7 @@ Public README carries go-live runbook detail (migration window, DR design) with 
 
 - **[rec] Approve push** once the pin question below is answered; CI debt list triaged in the same pass.
 - CORRECTED 2026-09-22: there is NO tag pin to bump — SystemNix's input floats `github:LarsArtmann/nix-email?ref=master` (flake.nix:671, verified today; the old "pins v0.2.0" claim was stale). What I did locally (committed by the daemon, UNPUSHED): added the `flake-parts` dedupe follow + relocked (nix-email now 2659abb); `nix-email-contract` check GREEN. Open calls: (a) hard-pin the URL to `?ref=v0.3.1` per this repo's pin-discipline doctrine, or keep floating master; (b) the push itself (~1 commit here + the fleet's ~47-commit CI-debt backlog).
+- UPDATE 2026-09-23: `v0.4.0` is cut, pushed, and CI-green (full `nix flake check` on the tag, 8m32s) — the stable ref C17a was waiting for now EXISTS (`?ref=v0.4.0`). The recommendation above is executed; only the SystemNix-side pin choice and push remain (user-gated, T16-T19 class).
 
 ### C16-adjacent — Resend account actions (not strictly decisions; user actions)
 
