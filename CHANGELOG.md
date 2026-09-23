@@ -92,6 +92,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   ergonomics, failure-report coverage, v0.4.0 tag call, Dependabot
   branch), and `demo.qcow2` untracked (28 MB VM disk image the
   auto-commit daemon had committed five times; `*.qcow2` gitignored).
+- Dependabot PR #2 merged (squash, 2026-09-22): flakehub-cache-action
+  3.22.3 -> 3.22.5 in the actions group - bump verified against the
+  upstream `v3.22.5` tag SHA, all PR checks green incl. the full
+  `nix flake check`; the TODO_LIST "first Dependabot PR" row closed by
+  the merge.
+- dprint md-table alignment pass over the 2026-09-22/23 table edits
+  (buildflow full pass). The pass exposed a destructive edge: rows whose
+  cells carry literal `|` characters (journal transcripts, grep
+  patterns) are re-split at those pipes and the overflow DROPPED - two
+  such rows restored from git with GFM `\|` escaping; table cells that
+  contain pipes must escape them (`\|`) or dprint will eat the row.
 
 ### Fixed
 

@@ -79,6 +79,11 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
 - After editing ONE check, build THAT check first
   (`nix build .#checks.x86_64-linux.<name> -L`), then the full gate - a
   full-gate run just to discover a single subtest's typo costs ~9 min.
+- Markdown tables in this repo are dprint-formatted: a cell containing a
+  literal `|` (journal transcripts, grep patterns) MUST escape it as
+  `\|` - dprint re-splits unescaped pipes into phantom columns and DROPS
+  the overflow content (two status-report rows were eaten and had to be
+  restored from git, 2026-09-23).
 - VM-test fixture traps (2026-09-15, both live-observed): dovecot settings
   values must NOT use the `<path` prefix (that is dovecot's
   read-value-from-file syntax - the NixOS module then inlines file CONTENTS
