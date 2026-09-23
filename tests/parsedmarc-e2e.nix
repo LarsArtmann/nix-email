@@ -2,8 +2,9 @@
 # parsedmarc 11.0.1 binary from nixpkgs (no mocks).
 #
 # WHY: tests/dmarc-eval.nix only proves the rendered configuration; this
-# test proves the service actually COLLECTS: a real DMARC aggregate report
-# is mailed into the provisioned local mailbox, parsedmarc polls it over
+# test proves the service actually COLLECTS: real DMARC reports (RFC 7489
+# aggregate, RFC 8460 SMTP TLS-RPT, RFC 6591 forensic/failure) are mailed
+# into the provisioned local mailbox, parsedmarc polls them over
 # IMAP (the production mechanism), and parsed JSON+CSV land in the
 # wrapper's output directory - the zero-dependency file sink this wrapper
 # exists to provide (no Elasticsearch, no Splunk).
@@ -37,6 +38,26 @@
     name = "dmarc-test-report";
     url = "https://github.com/domainaware/parsedmarc/raw/f45ab94e0608088e0433557608d9f4e9517d3afe/samples/aggregate/estadocuenta1.infonacot.gob.mx!example.com!1536853302!1536939702!2940.xml.zip";
     sha256 = "0dq64cj49711kbja27pjl2hy0d3azrjxg91kqrh40x46fkn1dwkx";
+  };
+
+  # RFC 6591 DMARC failure (forensic) report fixture: the same upstream
+  # sample parsedmarc's own repo ships (multipart/report carrying a
+  # message/feedback-report part - Feedback-Type auth-failure, Source-IP
+  # 10.10.10.10, Reported-Domain domain.de, Delivery-Result
+  # smg-policy-action - plus a message/rfc822 sample whose Subject header
+  # is the literal string "Subject"). Detection path verified against the
+  # pinned 11.0.1 source: parse_report_email flags the
+  # message/feedback-report part and takes a later message/* part in
+  # EMAIL_SAMPLE_CONTENT_TYPES as the sample (__init__.py:2088-2123);
+  # parse_failure_report REQUIRES source_ip; save_output then writes
+  # failure.json/failure.csv and samples/<subject>.eml UNCONDITIONALLY
+  # once output is set (the save_failure flag only gates network sinks,
+  # cli.py:2117-2130), and append_json skips empty inputs - so
+  # failure.json existing at all proves a forensic report was parsed.
+  forensicSampleReport = pkgs.fetchurl {
+    name = "forensic-sample-report";
+    url = "https://github.com/domainaware/parsedmarc/raw/f45ab94e0608088e0433557608d9f4e9517d3afe/samples/forensic/subject.eml";
+    sha256 = "13ibxmd1pid5qcfbj97jwbsbh7ynpkgrbs6jhq0sy0vm6dwp1j85";
   };
 
   # RFC 8460 SMTP TLS-RPT fixture (fields mirror RFC 8460 A.2; the parser's
@@ -145,6 +166,16 @@
 
     with smtplib.SMTP('localhost') as server:
         server.sendmail(sender_email, receiver_email, tls_text)
+        server.quit()
+
+    # RFC 6591 forensic/failure probe: the ruf (forensic) address rides
+    # the SAME poll. Sent VERBATIM (raw upstream .eml bytes) - a real
+    # reporter artifact, not a hand-reconstructed MIME tree.
+    with open("${forensicSampleReport}", "rb") as report:
+        forensic_bytes = report.read()
+
+    with smtplib.SMTP('localhost') as server:
+        server.sendmail(sender_email, receiver_email, forensic_bytes)
         server.quit()
   '';
 
@@ -432,6 +463,48 @@ in
           )
           machine.succeed(
               "test \"$(wc -l < /var/lib/parsedmarc/reports/smtp_tls.csv)\" -ge 2"
+          )
+
+      with subtest("forensic failure report rides the same mailbox poll"):
+          # RFC 6591 ruf reports reach the SAME mailbox; parsedmarc 11
+          # classifies them via the message/feedback-report MIME part and
+          # save_output writes failure.json/csv plus the raw sample into
+          # samples/ (named after the sample's own Subject header run
+          # through get_filename_safe_string - "Subject.eml" here). The
+          # delivery_result assertion proves the normalization path:
+          # "smg-policy-action" -> "policy" (parse_failure_report).
+          machine.wait_until_succeeds(
+              "test -s /var/lib/parsedmarc/reports/failure.json",
+              timeout=120,
+          )
+          machine.succeed(
+              "jq -e '.[] | select(.feedback_type == \"auth-failure\")' "
+              "/var/lib/parsedmarc/reports/failure.json"
+          )
+          machine.succeed(
+              "jq -e '.[] | select(.reported_domain == \"domain.de\")' "
+              "/var/lib/parsedmarc/reports/failure.json"
+          )
+          machine.succeed(
+              "jq -e '.[] | select(.source.ip_address == \"10.10.10.10\")' "
+              "/var/lib/parsedmarc/reports/failure.json"
+          )
+          machine.succeed(
+              "jq -e '.[] | select(.delivery_result == \"policy\")' "
+              "/var/lib/parsedmarc/reports/failure.json"
+          )
+          machine.succeed(
+              "jq -e '.[] | select(.parsed_sample.subject == \"Subject\")' "
+              "/var/lib/parsedmarc/reports/failure.json"
+          )
+          machine.succeed(
+              "test -s '/var/lib/parsedmarc/reports/samples/Subject.eml'"
+          )
+          machine.succeed(
+              "test \"$(wc -l < /var/lib/parsedmarc/reports/failure.csv)\" -ge 2"
+          )
+          machine.succeed(
+              "grep -q 'domain.de' /var/lib/parsedmarc/reports/failure.csv"
           )
 
       with subtest("no file-output errors: StateDirectory fix holds"):
