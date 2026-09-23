@@ -91,9 +91,9 @@ session's addition, both eval checks both arches, statix 0 findings.
    - Candidate causes (untested): IMAP fetch/mailsuite decode path for
      nested `message/*` parts; poller classification of multipart/report;
      a parse error line present but not matching my grep patterns.
-   NOT yet done: root-cause, fix, green rerun, FEATURES/TODO row updates.
-   Remember: failed check results are CACHED — any rerun needs the fixed file
-   (which the fix will provide).
+     NOT yet done: root-cause, fix, green rerun, FEATURES/TODO row updates.
+     Remember: failed check results are CACHED — any rerun needs the fixed file
+     (which the fix will provide).
 2. **Close-out (planned)** — TODO_LIST Dependabot row deletion, buildflow row
    sweep, CHANGELOG residue consolidation: located in plan, not executed
    (sequenced behind T12/T15/Final by design).
@@ -166,6 +166,7 @@ session's addition, both eval checks both arches, statix 0 findings.
 ## f) Next things to get done (impact-sorted; ~40)
 
 **Unblock the red tree (now):**
+
 1. Diagnose T12 red: `nix log` the failed drv for the full parsedmarc journal
    (look for skip/error lines around the forensic mail).
 2. Host-side dry-run: run pinned `parsedmarc.parse_report_email()` on
@@ -266,6 +267,6 @@ not forgotten):**
 
 ---
 
-*Report written 2026-09-23 03:21–03:25 from session evidence: resume summary,
+_Report written 2026-09-23 03:21–03:25 from session evidence: resume summary,
 `/tmp/t12-parsedmarc-e2e.log` (EXIT:1), pinned parsedmarc 11.0.1 source reads,
-`git status` (ahead 20). Now waiting for instructions.*
+`git status` (ahead 20). Now waiting for instructions._

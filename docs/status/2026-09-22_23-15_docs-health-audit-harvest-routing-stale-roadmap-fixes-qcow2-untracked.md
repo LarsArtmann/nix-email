@@ -1,12 +1,12 @@
 # Docs-Health Audit Session — Status Report
 
-| Field              | Value                                                                                                                                                                    |
-| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Date               | 2026-09-22 23:15 CEST                                                                                                                                                   |
-| Session type       | docs-health AUDIT ("review all" over TODO_LIST paste → full docs review): inventory → HARVEST (3 recent reports) → VERIFY vs code → fix → gate → inline health report    |
-| Repo state         | `master`, **ahead 2 of origin** (daemon committed the audit; push NOT confirmed - daemon cadence owns it)                                                                |
-| Gate state         | `nix fmt -- . --check` GREEN; full `nix flake check` GREEN ("all checks passed!", incl. all 3 VM tests on the changed source set after the demo.qcow2 untrack)           |
-| Inherited tree     | 6 files carried uncommitted changes at session start (parallel session: md-table realignment + `modules/mail-server.nix` `_id` deadnix fix) - read, judged safe, left untouched; daemon committed them alongside |
+| Field          | Value                                                                                                                                                                                                            |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Date           | 2026-09-22 23:15 CEST                                                                                                                                                                                            |
+| Session type   | docs-health AUDIT ("review all" over TODO_LIST paste → full docs review): inventory → HARVEST (3 recent reports) → VERIFY vs code → fix → gate → inline health report                                            |
+| Repo state     | `master`, **ahead 2 of origin** (daemon committed the audit; push NOT confirmed - daemon cadence owns it)                                                                                                        |
+| Gate state     | `nix fmt -- . --check` GREEN; full `nix flake check` GREEN ("all checks passed!", incl. all 3 VM tests on the changed source set after the demo.qcow2 untrack)                                                   |
+| Inherited tree | 6 files carried uncommitted changes at session start (parallel session: md-table realignment + `modules/mail-server.nix` `_id` deadnix fix) - read, judged safe, left untouched; daemon committed them alongside |
 
 ## What did you forget? / What could you have done better? / What could you still improve?
 
@@ -69,6 +69,7 @@
 ## f) Up to 50 things to get done next (session-sourced, honest count: 18)
 
 **User decisions (minutes each)**
+
 1. Cut `v0.4.0` now vs batch (decision-batch entry ready; rec: now).
 2. Purge demo.qcow2 blobs from git history (force-push + daemon coordination).
 3. Overrule-or-confirm: over-quota row sweep + dropped FEATURES honesty pass.

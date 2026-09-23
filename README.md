@@ -402,12 +402,12 @@ mail-server stack, a provisioned `demo@mail.demo.invalid` account, and a
 catch-all. All state dies with the process. Host-side endpoints (bound to
 127.0.0.1 only):
 
-| Host port | Guest | What it is |
-| --------- | ----- | ---------- |
-| 18080 | 8080 | web admin / JMAP / REST API (`admin` / `demo-admin`) |
-| 2525 | 25 | SMTP (unauthenticated inbound; catch-all accepts ANY local part) |
-| 2587 | 587 | submission, STARTTLS + AUTH (`demo@mail.demo.invalid` / `demo`) |
-| 2593 | 993 | IMAPS (`demo@mail.demo.invalid` / `demo`) |
+| Host port | Guest | What it is                                                       |
+| --------- | ----- | ---------------------------------------------------------------- |
+| 18080     | 8080  | web admin / JMAP / REST API (`admin` / `demo-admin`)             |
+| 2525      | 25    | SMTP (unauthenticated inbound; catch-all accepts ANY local part) |
+| 2587      | 587   | submission, STARTTLS + AUTH (`demo@mail.demo.invalid` / `demo`)  |
+| 2593      | 993   | IMAPS (`demo@mail.demo.invalid` / `demo`)                        |
 
 Verified from the host in one session (transcripts in the 2026-09-22 demo
 session log): `GET /api/principal` answers `200` in ~0.01 s; external mail
