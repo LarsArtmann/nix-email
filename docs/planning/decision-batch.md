@@ -112,11 +112,11 @@ endpoint setup for outbound bounce/complaint telemetry (MONITORING.md row 14).
 
 Gated on D1 (rotation-due check before live enablement). **No recommendation needed** — it executes as part of M22/M26 when D1 lands.
 
-### Next release tag — cut `v0.4.0` now or batch? (new 2026-09-22)
+### Next release tag — cut `v0.4.0` now or batch? (new 2026-09-22) — RESOLVED 2026-09-23
 
 `[Unreleased]` carries a release-worthy payload: M14 hardening options, fleet eval guards, `module-import-eval`, TLS-RPT e2e, the nixpkgs pin advance (+ workaround retirement).
 
-- **[rec] Cut `v0.4.0` now** — checkpoints the pin advance for the fleet and gives SystemNix's hard-pin call (C17a) a stable ref to pin to.
+- **[rec] Cut `v0.4.0` now** — checkpoints the pin advance for the fleet and gives SystemNix's hard-pin call (C17a) a stable ref to pin to. ~~RESOLVED: user approved 2026-09-23; v0.4.0 cut, pushed, tag CI green, GitHub release published (Latest).~~
 
 ## What is NOT a decision
 
