@@ -106,6 +106,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- CI red on master since 2026-09-22 (three runs): the lockstep guard and
+  the aarch64 shape guard in ci.yml still expected the pre-M14
+  four-check set - `module-import-eval` (added with M14, both arches)
+  was never registered in the CI lists. Both expected lists updated and
+  verified locally with the exact CI assertions (the local full gate
+  does not run these CI-side guards - that is why three pushes shipped
+  red unnoticed).
 - The 2026-09-17 "lock evaluates outputs" mystery SOLVED: `nix flake
   lock` does NOT evaluate outputs (throw-in-checks repro), but any
   UNDEFINED VARIABLE in flake.nix fails lock as a parse-time scope

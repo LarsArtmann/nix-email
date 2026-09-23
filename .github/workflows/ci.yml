@@ -89,7 +89,7 @@ jobs:
           # No pipes on gate commands (repo rule): nix eval writes a file,
           # jq reads the file; any upstream failure fails the step directly.
           nix eval .#checks.x86_64-linux --json --apply 'builtins.attrNames' > /tmp/actual-checks.json
-          expected='["dmarc-eval","parsedmarc-e2e","stalwart-e2e","stalwart-relay-e2e"]'
+          expected='["dmarc-eval","module-import-eval","parsedmarc-e2e","stalwart-e2e","stalwart-relay-e2e"]'
           if ! jq -e --argjson expected "$expected" 'sort == ($expected | sort)' /tmp/actual-checks.json > /dev/null; then
             echo "FATAL: flake checks and CI expected-checks list diverged."
             echo "--- flake declares: $(cat /tmp/actual-checks.json)"
@@ -104,7 +104,7 @@ jobs:
           # aarch64 strip script - "platform mismatch" on the x86_64 runner;
           # the deep eval is verified locally with emulation, 2026-09-15).
           # Catches wiring regressions in the flake's system gating.
-          test "$(nix eval .#checks.aarch64-linux --apply 'builtins.attrNames')" = '[ "dmarc-eval" ]'
+          test "$(nix eval .#checks.aarch64-linux --apply 'builtins.attrNames')" = '[ "dmarc-eval" "module-import-eval" ]'
 
       - name: Run nix flake check (eval contract + VM tests)
         run: nix flake check --print-build-logs

@@ -79,6 +79,12 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
 - After editing ONE check, build THAT check first
   (`nix build .#checks.x86_64-linux.<name> -L`), then the full gate - a
   full-gate run just to discover a single subtest's typo costs ~9 min.
+- Adding/removing a flake check requires updating BOTH ci.yml guard lists
+  (the x86_64 lockstep `expected=` list AND the aarch64 shape-guard
+  `test ... = ...`) in the same change - the local `nix flake check`
+  does NOT run these CI-side guards, so a miss ships red CI (2026-09-23:
+  module-import-eval missing there caused three red master runs before
+  anyone noticed).
 - Markdown tables in this repo are dprint-formatted: a cell containing a
   literal `|` (journal transcripts, grep patterns) MUST escape it as
   `\|` - dprint re-splits unescaped pipes into phantom columns and DROPS
