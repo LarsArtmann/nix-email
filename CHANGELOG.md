@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+### Changed
+
+### Fixed
+
+## [0.4.0] - 2026-09-23
+
+### Added
+
 - Wrapper hardening options (M14): `services.mail-server.rateLimits`
   (opt-in sustained inbound limiter, default OFF - v0.15.5 already ships
   two conservative limiters, README ledger (i)) and
