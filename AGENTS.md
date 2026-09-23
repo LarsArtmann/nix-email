@@ -201,7 +201,19 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
   `{...}` in tests/*.nix coexists intentionally (commit ba7645c was a
   manual edit, no formatter involved: alejandra 4.0.0 preserves `{ ... }`
   on round-trip and dprint has no nix plugin - do not normalize either
-  style).
+  style). nix-checker port-collision ERRORS (4 findings, 2 pairs, surfaced
+  2026-09-23 when buildflow first ran over the demo-VM changes) are
+  cross-context false positives: flake.nix demo-VM hostfwd GUEST ports
+  (587/993 inside a throwaway QEMU VM) vs tests/stalwart-relay-e2e.nix
+  relay.port 587 (a DIFFERENT VM test's client connect target) vs
+  modules/dmarc-monitor.nix example-block port 993 (docs prose inside
+  literalExpression) - no shared runtime exists; the rule is a
+  context-blind regex over all files (BuildFlow
+  modules/nix-checker/check_port_collisions.go). These are the ONLY
+  error-severity gate trips in a full buildflow run (exit 69); do NOT
+  skip the nix-checker step to go green (it also owns stale-hash/input
+  drift checks with real signal) and do NOT contort the Nix to dodge the
+  regex. Root fix routed in TODO_LIST (upstream BuildFlow change).
 - statix W20 is FIXED, not tolerated (2026-09-16, reversing the earlier
   deliberate non-fix per user decision): VM-test node configs use fully
   collapsed `services = { ... }` blocks. The warning fires when a
