@@ -1,0 +1,89 @@
+# Status Report: Pareto Execution — Demo-VM Fix, Annotate/Archive Sweeps, Flood Subtest (interrupted mid-T12)
+
+- **Date:** 2026-09-23 02:58 CEST (`date` CLI)
+- **Session scope:** Execute the Pareto backlog-burn master plan (`docs/planning/2026-09-22_23-25_pareto-backlog-burn-master-plan.md`) under the user's "GET SHIT DONE — THE WHOLE TODO LIST" mandate: T03→T04 (demo chain), T05-T15, T20 in Level-B order, user-gated items untouched.
+- **Session verdict:** 10 of 14 in-scope tasks FULLY done and gate-verified, including the plan's 1% agent item (demo-VM hostfwd root-cause — TWO real product bugs found and fixed). Interrupted mid-T12 (forensic-fixture source research complete, fixture not yet written).
+- **Format note:** Markdown per explicit user instruction (sections a)-g)), overriding the status-report skill's HTML default — same override as the three prior reports.
+- **Tree state:** `master` ahead 18 of origin (all daemon auto-commits of this session's green-verified work; nothing pushed by me). Targeted gates all green on the final tree (stalwart-e2e incl. flood node EXIT:0, parsedmarc-e2e EXIT:0, module-import-eval + dmarc-eval both arches EXIT:0, `nix fmt -- . --check` EXIT:0, statix zero findings, eval warnings zero) — the AGGREGATED `nix flake check` has NOT yet been run on the final tree (it is next-task #3).
+
+---
+
+## a) FULLY DONE
+
+| # | Item | Evidence |
+| - | ---- | -------- |
+| a1 | **T14 upstream re-check**: mjs/imapclient#663 MERGED 2026-09-18 and released in imapclient 4.1.0 (maintainer comment on nixpkgs#563652); #662 CLOSED; nixpkgs #563651/#563777 still open, no comments; pinned rev `6774f7bc` ships 4.0.1 on py3.13 AND py3.14 (`nix eval`) → the dmarc-monitor py3.13 pin retires at the next bump carrying >= 4.1.0. Drift fixed in TODO_LIST row, README upstream section, and the module's compatibility-pin comment (its "3.1.0" claim was stale) | `gh` transcripts 2026-09-22; `modules/dmarc-monitor.nix` |
+| a2 | **T20 Dependabot**: PR #2 (flakehub-cache-action 3.22.3→3.22.5) verified against the upstream `v3.22.5` tag SHA (`gh api git/ref/tags`), all PR checks green incl. `nix flake check` 8m36s — squash-merged + branch deleted; local master synced via merge commit `d1ea05a` | `gh pr view 2` = MERGED |
+| a3 | **T03 demo-VM hostfwd/API hang ROOT-CAUSED (the 1% item)** — root cause 1: the guest firewall (`nixos-fw`) opened only 25/465/587/993; a NON-loopback `httpBind` (`0.0.0.0:8080`) was silently dropped → connections through hostfwd OPEN (slirp accepted host-side) and then starved forever. Live transcript matrix: in-guest loopback 200 in 1.5 ms while host→18080 timed out at 45 s AND SMTP 2525 banner was instant (same slirp). **Fix**: module opens the `httpBind` port exactly when the bind is non-loopback (eval-verified: demo list = `25 465 587 993 8080`; e2e unaffected — loopback default) | README ledger (k); `modules/mail-server.nix` allowedTCPPorts |
+| a4 | **T03 root cause 2**: the demo provisioning oneshot's bare `curl` was "command not found" under systemd's minimal PATH — `|| true` masked it and the unit exited SUCCESS having provisioned NOTHING (journal: `line 15/16/17: curl: command not found`; the 120 s wait loop burned on instant failures). **Fix**: absolute store paths + `--max-time 5` + LOUD FAIL when the readiness gate exhausts. Post-fix transcript: unit active in ~2 min→seconds, `{"data":1..3}` POST successes, "demo ready" | README ledger (l); `flake.nix` mail-demo-provision |
+| a5 | **T04 layered re-smoke, all transcripts**: host 18080 `GET /api/principal` → 200 in 0.01 s (was infinite hang); SMTP 2525 banner instant; catch-all 250-accepts a random local part; authenticated submission via 2587 (STARTTLS, demo/demo) delivers to INBOX (`X-Spam-Status: No`); IMAPS 2593 login + fetch works; external unauthenticated mail files to **Junk Mail** (`X-Spam-Status: Yes`, score 13.50) — the spam filter visibly works | `/tmp/demo-t03/smoke-final.txt` + session log |
+| a6 | **T04 withheld docs landed** (transcript-backed, repo rule honored): README "Try it in a VM" section (ports table + both delivery paths + cosmetic-noise disclosure), ledger entries (k)-(n), FEATURES demo-VM row + firewall-row correction + e2e flood note, CHANGELOG Added/Fixed entries, AGENTS demo debug loop + FIFO-console pattern, ROADMAP Q7 fully-resolved note, demo banner Junk/INBOX honesty | all five living docs updated |
+| a7 | **Ledger correction (found during T04)**: the 2026-09-15 "NO server-side auto-filing into Junk" claim was too absolute — the demo (live slirp DNS, same 0.15.5 + spam-filter-2.0.5) DID auto-file at score 13.50 while GTUBE stayed in INBOX in the DNS-less e2e on the same pin. Both observations recorded; the filing condition is UNVERIFIED; assert neither behavior as universal | README GTUBE ledger entry, corrected 2026-09-22 |
+| a8 | **T05 flood subtest (M14 runtime evidence)**: new `flood` node in stalwart-e2e (wrapper `rateLimits` at 3/1m per remote_ip) + subtest asserting EXACTLY 3 SMTP banners + 7 pre-banner hangups + a still-gated connection 2 s later (distinguishes the wrapper's 1m bucket from the upstream 5/1s default). Targeted `nix build .#checks.x86_64-linux.stalwart-e2e -L` EXIT:0; subtest verified EXECUTED ("finished: subtest: wrapper rate limiter trips at runtime (M14 evidence), in 2.18 seconds"). Live default-limiter transcript captured first (12 rapid conns → 5 banners + 7 empties) | `tests/stalwart-e2e.nix`; README ledger (m) |
+| a9 | **T06 DNSBL evidence-path verdict**: documented eval-only (same doctrine as pyzor — the wrapper's risk surface is the emitted shape, already asserted by module-import-eval; runtime lookups are upstream code needing resolver DNS; D1 live host provides it free). Recorded in ledger (j) + FEATURES row | README ledger (j) closing paragraph |
+| a10 | **T13 catch-all ordering**: doc verdict (a module assertion CANNOT see runtime API order; a declarative catch-all belongs to M22). README "Per-account semantics" gained the explicit ORDERING FOOTGUN (catch-all AFTER rejection probes, ledger-linked); flake.nix demo comment references it | README; `flake.nix` |
+| a11 | **T07 annotate sweep (16_19-16)**: every section resolved inline (a table 7 rows, b manually — unnumbered, c/d/e/f/g prose; 35 of 50 f-items, the 15 still-live backlog items intentionally unmarked). Fix-on-sight during the sweep: README `.data.errors` reload-response ledger bullet (owed since 09-16!), AGENTS `core.hooksPath`-can-dangle gotcha + `--no-build` instrument note + daemon-pushes note, ROADMAP d2 content-audit routing | check-rows: complete |
+| a12 | **T08 annotate+archive (16_20-49 → ARCHIVED, 17_15-11 + 17_17-28 annotated)**: 16_20-49 fully resolved + `git mv` to `docs/status/archived/` (archive gate `grep -rLn '~~'` green). Fix-on-sight: CHANGELOG W20 entry (never recorded), AGENTS cache-hit/`--rebuild` + `registrationTime` + buildflow-eval-only lessons, parsedmarc machine-node W20 collapse (behavior-green), **CONTRIBUTING "Release procedure" runbook** (never existed — b2/c7/e3/f2/f3 of 17_15-11 all resolved by it). Discovered statix DRIFT: `module-import-eval.nix` (born 09-22, after the W20 cleanup) carried 12 findings — collapsed to zero, eval green both arches | check-rows complete ×3; `buildflow -s statix` 0 findings |
+| a13 | **stateVersion eval warnings eliminated**: set on the demo config, flood node, dmarc-eval, and all four module-import-eval contexts (fleet convention 26.05) — `nix flake check --no-build` warning count 2 → **0** | `/tmp/wc4.log` |
+| a14 | **T09 annotate (17_21-07)**: the demo-hang report resolved inline — b1 carries the full root-cause + fix story; c3/f12 (dmarc-in-demo scope) intentionally open pending the user's g2 call. `nix flake show` re-run green incl. `apps.vm` (f7's ask) | check-rows: only intentional opens flagged |
+| a15 | **T10 annotate (21-10 M14 items)**: b/1, b/2, b/3, b/4, b/6, c/1, c/2, f/16, f/37, f/38, f/39, f/40 all resolved with evidence (M14 shipped + runtime-proven, gate green, MONITORING fixed, harvests shipped, demo hang fixed, annotate passes done, sizing note landed) | annotate-prose transcripts |
+| a16 | **T11 consumer ergonomics**: README "Rate-limit sizing" section (~2-3x legitimate peak; bucket-choice guidance; verify trips by connection counts; conditional limiters/zones are passthrough-only) + module `keys` description extended + B11c eval-verification green (render risk N/A for inert strings; dmarc-eval render assertions still green) | README; `modules/mail-server.nix` |
+| a17 | **Process debt paid**: buildflow skill loaded FIRST (this session's own mandate — the top process failure of the 23-15 session), buildflow used for statix verification; every `.nix` touch followed by `nix fmt .` + `-- --check` (green each time); eval guards run after every structural write | session transcript |
+
+## b) PARTIALLY DONE
+
+| # | Item | What remains | Blocker |
+| - | ---- | ------------ | ------- |
+| b1 | **T12 forensic/failure-report coverage** | Source research COMPLETE: parsedmarc 11.0.1 routes `message/feedback-report` + a sample part (EMAIL_SAMPLE_CONTENT_TYPES: message/rfc822, text/rfc822-headers, …) → `parse_feedback_report` → `report_type: "failure"`; REQUIRED field `source_ip` (+ arrival-date fallback to msg date); output knobs `save_failure`/`forensic_json_filename` (defaults unverified). NOT done: the e2e fixture email + assertion (mirror the TLS-RPT sendEmail pattern) | Interrupted by this report request — ~40 min of work remain |
+| b2 | **T15 buildflow full pass** | statix leg DONE (0 findings after the module-import-eval re-collapse); the dprint md-table alignment pass over today's MANY table edits (FEATURES/CHANGELOG/README/sweeps) NOT yet run | Ordered last by design (after all md edits); ~15 min |
+| b3 | **T02 v0.4.0 cut** | All prerequisites in place (CHANGELOG [Unreleased] thick; release runbook now EXISTS in CONTRIBUTING); not yet executed — planned after the final full gate | Sequencing (and see g/1) |
+
+## c) NOT STARTED
+
+| # | Item | Why |
+| - | ---- | --- |
+| c1 | Final aggregated `nix flake check` on the end-state tree | Was sequenced after T12/T15; every individual check is green on the current tree |
+| c2 | TODO_LIST close-out edits (buildflow row, annotate-21-10 row, archive-sweep row, Dependabot row delete + CHANGELOG line) | Deliberately batched for session close |
+| c3 | Session-close verification (git status, daemon push, CI green) | End of session |
+| c4 | T16/T17/T18/T19/T21/T22/T23 (SystemNix push, Resend smoke, SystemNix CI debt, qcow2 purge, D1 build-out, verdict filings, standing pin-bump row) | User-gated by design (C17 approval, API key, force-push verdict, D1/D2 answers, upstream verdicts) — untouched, per the plan's gates |
+
+## d) TOTALLY FUCKED UP (all self-caught, all fixed in-session)
+
+| # | What went wrong | Cost | Fix |
+| - | --------------- | ---- | --- |
+| d1 | Three failed driver approaches before the FIFO pivot: `create_machine(startCommand=)` TypeError (snake_case `start_command`), `wait_for_unit(420s)` wedged while the unit under test stayed activating, `wait_for_console_text` never matched a present prompt | ~15 min + 3 VM boots | FIFO console (`mkfifo` + `cat` + `sleep infinity` holder) — now AGENTS doctrine |
+| d2 | Flood node first placed OUTSIDE the `nodes` attrset → `error: The option 'flood' does not exist` | 1 build cycle | `nodes.flood` |
+| d3 | multiedit anchor-clobber: the AGENTS hooksPath insertion REPLACED the "gate commands redirect, never pipe" rule instead of extending it | Seconds (grep-verified) | Rule restored immediately; both verified present |
+| d4 | Imprecise marker written BEFORE verification: "statix held at zero" — then `buildflow -s statix` reported 12 findings (module-import-eval drift) | Marker rework | Marker corrected to tell the honest story; the drift itself fixed (re-collapse, eval green both arches) |
+| d5 | annotate batching friction: `$(for…printf)` quoting garbage ("bad row id"); two atomic batch aborts on already-annotated items; two stale-file multiedit rejections (tools wrote between read and edit) | ~10 min total | Explicit specs; re-view-then-edit; single-item re-runs |
+
+## e) WHAT WE SHOULD IMPROVE
+
+1. **Run the instrument before claiming its output** — the "held at zero" marker (d4) was written from memory of a 6-day-old gate; the fresh statix run falsified it within a minute. Every "X is still Y" claim gets a fresh command.
+2. **The nixos-test-driver is the wrong tool for units that never reach "active"** — its boot/unit waits wedge on exactly the pathological states you debug. The FIFO console gives full interactive control at zero abstraction; keep it the default for ad-hoc VM debugging (now in AGENTS).
+3. **Fresh-file drift is invisible between buildflow runs** — module-import-eval.nix shipped 09-22 with 12 W20 findings because nobody ran buildflow between sessions. T15's buildflow-at-session-close discipline covers this; a CI statix step would mechanize it (candidate, not filed).
+4. **Atomic annotation batches die on one pre-annotated item** — grep the section for existing `~~` markers before composing the batch (or annotate section-by-section).
+5. **The edit/multiedit "modified since last read" race with the annotate tools** — always re-view immediately before editing a file the tools touched.
+
+## f) Top #25 things we should get done next
+
+| # | Task | Impact | Effort |
+| - | ---- | ------ | ------ |
+| 1 | Finish T12: forensic fixture email (message/feedback-report + message/rfc822 sample with `Source-IP` etc.) into the parsedmarc-e2e watch mailbox; verify/decode the `save_failure` default (set it explicitly if off); assert the forensic JSON/CSV lands; targeted build; FEATURES row note | Med | 40m |
+| 2 | T15: `buildflow` full pass (dprint md-table alignment over today's table edits + any repairs), review the diff before accepting | Med | 15m |
+| 3 | Final aggregated `nix flake check` (redirect log; expect ~8-9 min) on the end-state tree | High | 12m |
+| 4 | T02: cut v0.4.0 per the CONTRIBUTING runbook (CHANGELOG date+version → gates → annotated tag → push → tag-CI verify → `gh release create --latest` with pin-evidence footer) | High | 30m |
+| 5 | TODO_LIST close-out: delete the Dependabot row (done — CHANGELOG line), update the buildflow/archive-sweep/annotate-21-10 rows to DONE-swept, keep user-blocked rows intact | Med | 10m |
+| 6 | CHANGELOG consolidation for today's residue (annotates/archives, release runbook, stateVersion fix, statix re-collapse, sizing note, ledger corrections) — fold into the existing [Unreleased] entries | Med | 15m |
+| 7 | Session-close verification: `git status -sb`, fmt check, daemon push confirmation, `gh run list` green | High | 5m |
+| 8 | Drop the debug GC roots (`/tmp/demo-t03/vm-root`, `vm-fixed*`, `driver-root`) once no further demo debugging is planned | Low | 1m |
+| 9 | (User-gated, unchanged) C17 SystemNix push; Resend smoke (API key); qcow2 history-purge verdict; D1/D2 build-out; C19/C20/C22/Q6 verdict filings; T23 standing row | — | — |
+| 10 | Consider a CI statix step (mechanize the "fresh-file drift" class the module-import-eval incident proved) | Low | 30m |
+
+## g) Top #1 question I can NOT figure out myself
+
+**The v0.4.0 release cut.** The plan gates T02 on your T01 approval ("cut v0.4.0 now or batch?"); the decision-batch recommends "cut now", and your blanket "GET SHIT DONE — THE WHOLE TODO LIST" mandate is my working reading of that approval (a pushed tag is reversible, nothing consumes tags yet — SystemNix floats `?ref=master`). **Confirm: cut and push `v0.4.0` after the final gate — yes/no?** If yes I execute the CONTRIBUTING runbook verbatim; if no, [Unreleased] keeps accumulating and only tasks 1-3, 5-8 above run.
+
+---
+
+_Point-in-time snapshot (2026-09-23 02:58 CEST). Section (f) is HARVEST input per docs-health. NOW WAITING FOR INSTRUCTIONS — no further work until you respond._
