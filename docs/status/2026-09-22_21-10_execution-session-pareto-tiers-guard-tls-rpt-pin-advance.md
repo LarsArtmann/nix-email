@@ -33,16 +33,16 @@
 
 ## b) PARTIALLY DONE
 
-1. **M14 rate-limit + DNSBL wrapper options** - verdicts locked (rate limiter shape verified safe-to-default: no DNS dependency; DNSBL keys verified but must default OFF - the DNS-less E2E lesson, same class as pyzor). Design decided: `rateLimits` submodule option with one conservative per-remote-ip default + `spamFilter.dnsbl.enable = false` default + eval assertions. **Code NOT written** - I was reading the module's option surface when the report was requested.
-2. **Full gate** - every check built green INDIVIDUALLY this session (dmarc-eval ×2, module-import-eval both arches, stalwart-relay-e2e, parsedmarc-e2e with the new TLS-RPT subtest, stalwart-e2e with the metrics dump), but the aggregated `nix flake check` was never executed - it is the next command, and it also re-evals the demo toplevel on the new pin.
-3. **MONITORING.md row 2 correction** - the transcript now proves stock metrics have no queue-depth/age series; the row still describes the aspired rule and must be rewritten to the management-API-poll alternative. Transcript exists; edit pending.
-4. **Harvest into living docs** - TODO_LIST row sweeps (C03/C04/C05/C06/C07/C09/C10/C23/C24-spec/C28-spec/C31-33/C36/C37/C56/C57 done; C15 partial; C16 doc-verified) + CHANGELOG [Unreleased] entries for: guards, pin advance, workaround retirement, module-import check, loopback assertion, TLS-RPT e2e, MONITORING.md, SystemNix dedupe. NOT yet written - the session ran out of road before the closing harvest.
+1. ~~**M14 rate-limit + DNSBL wrapper options** - verdicts locked (rate limiter shape verified safe-to-default: no DNS dependency; DNSBL keys verified but must default OFF - the DNS-less E2E lesson, same class as pyzor). Design decided: `rateLimits` submodule option with one conservative per-remote-ip default + `spamFilter.dnsbl.enable = false` default + eval assertions. **Code NOT written** - I was reading the module's option surface when the report was requested.~~ done (M14 SHIPPED 2026-09-22 (22-50 session): rateLimits + spamFilter.dnsbl.servers options with the decided defaults + module-import-eval assertions; runtime-trip proof added same day (stalwart-e2e flood node - ledger (m)))
+2. ~~**Full gate** - every check built green INDIVIDUALLY this session (dmarc-eval ×2, module-import-eval both arches, stalwart-relay-e2e, parsedmarc-e2e with the new TLS-RPT subtest, stalwart-e2e with the metrics dump), but the aggregated `nix flake check` was never executed - it is the next command, and it also re-evals the demo toplevel on the new pin.~~ done (full gate green in the 22-50 closeout (all 3 VM tests + evals - EXIT:0))
+3. ~~**MONITORING.md row 2 correction** - the transcript now proves stock metrics have no queue-depth/age series; the row still describes the aspired rule and must be rewritten to the management-API-poll alternative. Transcript exists; edit pending.~~ done (MONITORING row 2 corrected 2026-09-22 (23-15 audit - management-API poll))
+4. ~~**Harvest into living docs** - TODO_LIST row sweeps (C03/C04/C05/C06/C07/C09/C10/C23/C24-spec/C28-spec/C31-33/C36/C37/C56/C57 done; C15 partial; C16 doc-verified) + CHANGELOG [Unreleased] entries for: guards, pin advance, workaround retirement, module-import check, loopback assertion, TLS-RPT e2e, MONITORING.md, SystemNix dedupe. NOT yet written - the session ran out of road before the closing harvest.~~ done (harvest shipped by the 22-50/23-15 sessions (TODO sweeps + CHANGELOG entries))
 5. **M17/M19** - resolved at the VERDICT level (expiry: defaults already active, doc-only; audit: knob does not exist, tracing is the surface; autoconfig: rides the HTTP listener, doc-only) and captured in the ledger + MONITORING rows, but no CHANGELOG/TODO sweep yet, and M17's "capacity metrics" row still needs the management-API-based spec once row 2 is corrected.
-6. **TODO evidence updates** - imapclient #663 merge (M8 finding) and the SystemNix-row rewrite (it no longer describes reality: no v0.2.0 pin exists) are known-needed TODO_LIST edits, not yet applied.
+6. ~~**TODO evidence updates** - imapclient #663 merge (M8 finding) and the SystemNix-row rewrite (it no longer describes reality: no v0.2.0 pin exists) are known-needed TODO_LIST edits, not yet applied.~~ done (done - imapclient #663 evidence updated + SystemNix row rewritten (23-15; #663 evidence refreshed again 2026-09-22))
 
 ## c) NOT STARTED
 
-1. **The demo-VM hostfwd/API hang** (now a TODO_LIST High row) - root-cause work needs the VM debug loop (GC root, custom test script, guest-side curl first). Zero progress this session beyond recording it properly.
+1. ~~**The demo-VM hostfwd/API hang** (now a TODO_LIST High row) - root-cause work needs the VM debug loop (GC root, custom test script, guest-side curl first). Zero progress this session beyond recording it properly.~~ done (ROOT-CAUSED + FIXED 2026-09-22: firewall never opened the non-loopback httpBind port + provisioning systemd-PATH no-op; host smoke green end-to-end (README ledger (k)/(l)))
 2. **docs-status ANNOTATE passes** (C11 real task) - five reports need inline `~~item~~ done at <hash>` resolution before any `git mv` to archived/; not begun (only the eligibility check ran).
 3. **D1-gated cluster M22-M26** (provisioning+DKIM, backup/DR, Terraform DNS, migration+cutover, DMARC-live+OIDC) - untouched by design; hard-gated on the user's D1/D2 answers.
 4. **User-gated filings** - mailsuite issue (C20, draft ready), Stalwart upstream Junk-filing request (C21, gated on Q6), Renovate (C19), Discussions (C22), webmail (C34).
@@ -85,7 +85,7 @@
 
 **In-repo technical (next session):**
 
-16. Finish M14: `rateLimits` + `spamFilter.dnsbl` options with the decided defaults + module-import-eval assertions + relay-e2e re-run.
+16. ~~Finish M14: `rateLimits` + `spamFilter.dnsbl` options with the decided defaults + module-import-eval assertions + relay-e2e re-run.~~ done (M14 finished (22-50) + runtime evidence (flood node - 2026-09-22))
 17. Fix MONITORING.md row 2 (no queue-depth gauge in 0.15.5 - spec the `GET /api/queue/messages` consumer poll instead).
 18. Run the aggregated `nix flake check` (all checks at once, demo toplevel on the new pin) - the one gate not yet executed this session.
 19. Harvest: TODO_LIST sweeps + CHANGELOG [Unreleased] entries (guards, pin advance, workaround retirement, module-import check, loopback assertion, TLS-RPT e2e, MONITORING.md).
@@ -106,10 +106,10 @@
 34. Add a freshness Gatus spec refinement to MONITORING (dedupe note vs consumer `backup.maxAgeHours` - already flagged, needs the final wording).
 35. Capacity spec (row 11): transcribe store_/server_memory series from today's build log into concrete thresholds.
 36. Canary design: turn MONITORING §6 into an actionable TODO row (post-C29).
-37. Rate-limiter tuning note: document how consumers should size `queue.limiter.inbound` (after M14 lands).
-38. Threat-model: add the new loopback eval-assertion to the SSRF row (it strengthens the existing entry).
-39. FEATURES.md: add rows for the eval guards, module-import check, TLS-RPT collection (FULLY_FUNCTIONAL), monitoring taxonomy (PARTIALLY - specs vs consumer wiring).
-40. Cross-check dmarc-eval's rendered-settings greps still pass after M14 (they will - mkDefault additions don't move existing keys - but the check is the proof).
+37. ~~Rate-limiter tuning note: document how consumers should size `queue.limiter.inbound` (after M14 lands).~~ done (sizing note landed 2026-09-22 (README Rate-limit sizing + option description))
+38. ~~Threat-model: add the new loopback eval-assertion to the SSRF row (it strengthens the existing entry).~~ done (THREAT_MODEL relay-SSRF row gained the eval-time loopback assertion (23-15))
+39. ~~FEATURES.md: add rows for the eval guards, module-import check, TLS-RPT collection (FULLY_FUNCTIONAL), monitoring taxonomy (PARTIALLY - specs vs consumer wiring).~~ done (FEATURES rows landed (module-import-eval row + TLS-RPT note - 23-15))
+40. ~~Cross-check dmarc-eval's rendered-settings greps still pass after M14 (they will - mkDefault additions don't move existing keys - but the check is the proof).~~ done (dmarc-eval green post-M14 (re-verified 2026-09-22 - option-description edits too))
 
 **Consumer/cross-repo (post-approval):**
 
