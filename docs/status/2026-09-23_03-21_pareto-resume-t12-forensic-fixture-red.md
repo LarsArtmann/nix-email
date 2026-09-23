@@ -253,17 +253,23 @@ not forgotten):**
 
 ## g) Questions I can NOT figure out myself
 
-1. **v0.4.0 (g/1, now blocking twice over)**: cut the release once T12 is
+1. ~~**v0.4.0 (g/1, now blocking twice over)**: cut the release once T12 is
    green and the full gate passes — yes or no? (Recommendation on record:
-   cut now; tag push is reversible, nothing consumes tags yet.)
-2. **Push authorization for the release**: may I push `master` + the
+   cut now; tag push is reversible, nothing consumes tags yet.)~~ ANSWERED
+   2026-09-23: yes — v0.4.0 cut, pushed, tag CI green, GitHub release
+   published (Latest).
+2. ~~**Push authorization for the release**: may I push `master` + the
    annotated tag and create the GitHub release when T02 runs? The harness
    forbids pushes without an explicit ask, so I need this in writing even
-   if v0.4.0 is approved.
-3. **Red-tree exposure policy**: if the daemon pushes the currently-red tree
+   if v0.4.0 is approved.~~ ANSWERED 2026-09-23: authorized via the
+   structured question prompt; push executed.
+3. ~~**Red-tree exposure policy**: if the daemon pushes the currently-red tree
    to origin before the T12 fix lands, do you want me to treat flipping that
    red CI run as the immediate top priority (pause everything else), or
-   proceed in order and fix within the session regardless?
+   proceed in order and fix within the session regardless?~~ MOOT 2026-09-23:
+   the T12 fix landed before the next daemon push; master CI green since
+   b88969f (which also repaired the stale CI check-inventory guards found
+   during push verification).
 
 ---
 
