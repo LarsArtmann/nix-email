@@ -85,6 +85,19 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
   into dovecot.conf and doveconf dies parsing the first PEM line as a
   path); the parsedmarc ini generator renders bools Python-style
   (`ssl=True`, NOT `ssl=true`) - grep assertions must match `True`.
+- HOST-SIDE PARSER DRY-RUN before any VM test that feeds a fixture to a
+  python service (2026-09-23, paid for itself same day): the service's
+  package lives in the host store, so `nix-store -q --references <drv>` +
+  a PYTHONPATH of each ref's site-packages runs the PINNED parser on the
+  fixture in ~30 s (use the closure's own python3.13 binary). This
+  reproduced a VM red (upstream's forensic sample had space-only blank
+  lines that fold into headers, defeating payload-walk detection) in
+  seconds instead of a ~5 min VM build - and proved fixture vs
+  harness blame before the IMAP path was ever suspected. Related trap:
+  upstream "sample" artifacts can be malformed and later repaired
+  (upstream repaired theirs in commit ae1e5adb/PR #659) - when a fixture
+  fails to parse, diff the newest upstream copy before blaming the parser
+  or hand-building a replacement.
 
 ## Conventions
 

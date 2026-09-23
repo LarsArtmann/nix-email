@@ -34,6 +34,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   report (`application/tlsrpt+json`) and asserts `smtp_tls.json`/`csv`
   land in the output dir (parser routing verified against parsedmarc
   11.0.1 source, README ledger (h)).
+- Forensic/failure end-to-end: the parsedmarc E2E now mails upstream's
+  repaired RFC 6591 sample (pinned at `ae1e5adb`, PR #659) and asserts
+  `failure.json`/`csv` plus `samples/Subject.eml` land in the output
+  dir, including the `smg-policy-action`→`policy` delivery-result
+  normalization. The original upstream sample
+  (`samples/forensic/subject.eml` at the aggregate fixture's rev) is
+  malformed - space-only blank lines fold into headers and defeat
+  pinned-11.0.1 payload-walk detection; reproduced host-side against
+  the store package before any VM run (AGENTS.md lesson).
 - Relay loopback assertion: `relay.address` pointing at
   localhost/127.0.0.1/::1/0.0.0.0 is rejected at eval time (Stalwart's
   SSRF guard would refuse it at first submission).
