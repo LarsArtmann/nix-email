@@ -54,7 +54,7 @@ Sources: **T** = TODO_LIST row, **S** = session gap (status report 19-07), **R**
 | C12 | dmarc-monitor live validation (real rua mailbox)                         | T   | **D1**                  |
 | C13 | Migration tooling compare (vandelay vs imapsync, R6)                     | T   | **D1**                  |
 | C14 | Rotate 3 placeholder secrets (SystemNix)                                 | T   | **D1**                  |
-| ~~C15~~ | ~~SystemNix pin bump v0.2.0 → v0.3.1 (+ flake-parts dedupe)~~ PREMISE CORRECTED 2026-09-22: there is NO pin to bump - SystemNix floats `?ref=master`; the dedupe half landed locally (flake-parts follow + relock, contract GREEN), push is C17-gated | ~~T~~   | ~~tag exists — actionable~~ |
+| C15 | SystemNix pin bump v0.2.0 → v0.3.1 (+ flake-parts dedupe) _(premise corrected 2026-09-22: NO pin exists - SystemNix floats `?ref=master`; the dedupe half landed locally, push is C17-gated - see Resolution)_ | T   | tag exists — actionable |
 | C16 | Resend SASL shape + real :587 smoke                                      | T   | Resend account          |
 | C17 | SystemNix: push ~47 commits + CI debt + cache sweep                      | T   | approval                |
 | C18 | Branch-protection bypass: keep or strict                                 | T   | **user**                |
@@ -309,7 +309,7 @@ Sources: **T** = TODO_LIST row, **S** = session gap (status report 19-07), **R**
 
 | #    | Micro-task                                                    | Min |
 | ---- | ------------------------------------------------------------- | --- |
-| ~~21.1~~ | ~~Bump nix-email pin v0.2.0 → v0.3.1 + flake-parts input dedupe~~ PREMISE CORRECTED: no pin exists (SystemNix floats `?ref=master`); dedupe + relock landed locally 2026-09-22, push C17-gated | ~~20~~  |
+| 21.1 | Bump nix-email pin v0.2.0 → v0.3.1 + flake-parts input dedupe _(premise corrected: no pin exists - SystemNix floats `?ref=master`; dedupe + relock landed locally 2026-09-22, push C17-gated)_ | 20  |
 | 21.2 | Push ~47 unpushed commits; triage CI debt list                | 30  |
 | 21.3 | Rotate 3 placeholder secrets + sops-key-audit rotation check  | 25  |
 | 21.4 | Consumer eval guards green (incl. new pin-identity guard)     | 25  |
