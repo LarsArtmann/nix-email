@@ -8,31 +8,20 @@
 > Long-term vision and user decisions live in ROADMAP.md.
 > Items are ranked by impact. Status is verified, not assumed.
 >
-> Last verification sweep: **2026-09-22 (execution session, Pareto plan
-> docs/planning/2026-09-22_19-23)** - drift fixed: ROADMAP Q7/Q8 closed
-> (v0.3.1 tag exists; demo VM landed in this repo 2026-09-17), pin-bump
-> row unblocked, demo-VM hostfwd-hang bug recorded, archive-sweep
-> eligibility corrected (zero reports eligible until annotate passes run).
-> Second pass same day (M14 closeout): DONE rows swept out - pin +
-> flake-parts eval guards, module-import-eval check, relay IfBlock
-> follow-ups, lock-mystery investigation, IMAP-LOGIN doc row; upstream
-> watch row updated (imapclient #663 MERGED 2026-09-18); SystemNix row
-> rewritten (input floats ?ref=master - the "pins v0.2.0" claim was
-> stale; dedupe follow landed locally, push still approval-gated).
-> Previous sweep 2026-09-17 (docs-health HARVEST of the
-> flake-parts migration report) - the 17-28 report's open items were
-> verified against the tree and routed here / into ROADMAP; the migration
-> itself is on master, pushed, CI-green, and sits in CHANGELOG
-> [Unreleased]; DONE rows swept out (outcomes live in CHANGELOG 0.3.0,
-> the two no-action verdicts moved to the README runbook and AGENTS.md).
+> Last verification sweep: **2026-09-29 (docs-health AUDIT over every
+> docs/status + docs/planning 2026-0* file)** - the unannotated reports
+> and both Pareto plans got inline strikethrough verdicts; the
+> flake-parts migration report archived (fully resolved); the stale
+> ergonomics row deleted (deliverable landed - README "Rate-limit
+> sizing"); unharvested report items routed here (CI pipe-table lint,
+> pre-push lockstep mirror, host-parse-fixture helper, parsedmarc sample
+> breadth, CI statix step, v0.4.0 tag smoke) and the flake.nix split
+> graduated from ROADMAP (the ~300-line trigger fired at 356 lines);
+> master verified in sync with origin, CI green. Prior sweeps 2026-09-17
+> and 2026-09-22 (three passes): DONE-row sweeps, queue-metrics drift
+> fix, 21-10/22-50 harvest routing, demo.qcow2 untracked, ROADMAP Q7/Q8
+> closed - details in git history and CHANGELOG.
 > The D1/D2/Q6 user decisions gate everything in ROADMAP, not here.
-> Third pass 2026-09-22 (docs-health AUDIT): stale ROADMAP queue-metrics
-> bullets fixed (transcript-proven no queue series in 0.15.5), THREAT_MODEL
-> loopback-assertion note + FEATURES module-import-eval/TLS-RPT rows added,
-> README line anchors re-verified (:516-518→:529-532, :528→:542), unrouted
-> 21-10/22-50 harvest rows routed (M14 runtime evidence, ergonomics docs,
-> failure-report coverage, v0.4.0 tag call, Dependabot branch), demo.qcow2
-> untracked (28 MB VM disk the auto-commit daemon had eaten, 5 commits).
 
 ## Status legend
 
@@ -48,16 +37,22 @@
 | Task                                                                                                                                                                                                                                                                                                           | Status    | Impact | Effort | Evidence                                                                                                                                                                                                                                                                                                                  |
 | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- | ------ | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Watch the four upstream filings for maintainer responses: nixpkgs #563651, #563652, #563777 - the root fix for #563652 SHIPPED upstream (mjs/imapclient#663 MERGED 2026-09-18, released in 4.1.0), so the nixpkgs side now needs the imapclient 4.1.0 version bump; #563651/#563777 module fixes still pending | 🔴 `TODO` | Med    | 10m    | `gh` re-check 2026-09-22: #563651 + #563777 OPEN with no maintainer comments; #563652 OPEN with maintainer comment "merged and released in 4.1.0"; pinned rev `6774f7bc` still ships imapclient 4.0.1 on py3.13 AND py3.14 (`nix eval` 2026-09-22), so the dmarc-monitor py3.13 pin retires at the bump carrying >= 4.1.0 |
+| Split `flake.nix` into `flake-modules/*.nix` (the flake-parts idiom) - the ROADMAP trigger FIRED: the file outgrew its ~300-line threshold (356 lines after the demo VM, eval guards, and M14 work) | 🔴 `TODO` | Med | 2h | `flake.nix` (356 lines, `wc -l` 2026-09-29); ROADMAP §5 split trigger; AGENTS.md flake-parts rules (perSystem pkgs destructure, outputs-lambda ellipsis) |
 
 ## Low Impact (hygiene)
 
 | Task                                                                                                                                                                                                                                                                                                                                                                                                                               | Status    | Impact | Effort | Evidence                                                                |
 | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- | ------ | ------ | ----------------------------------------------------------------------- |
 | At the next pin bump, re-verify the imapsync/mailpit/swaks presence list in the `flake.nix` inputs comment against the new nixpkgs (NOTE: the 2026-09-22 pin advance `eaad0894`→`6774f7bc` already rode the full gate - all five checks green on the new rev is the transitive presence proof for the tools the VM tests use; this row is for the NEXT bump)                                                                       | 🔴 `TODO` | Low    | 15m    | `flake.nix:5-9`; migration report §f/29; CHANGELOG Unreleased pin entry |
-| `docs/status/` archive sweep - ANNOTATE passes DONE for all five candidates (16_19-16, 17_15-11, 17_17-28, 17_21-07 annotated; 16_20-49 fully resolved + ARCHIVED 2026-09-22). Remaining: `git mv` each report to `docs/status/archived/` once its live items close - 17_15-11/17_21-07 carry g2-gated opens, 16_19-16 carries 15 routed backlog items; re-check with the `grep -rLn '~~' docs/status/archived/` completeness gate | 🔴 `TODO` | Low    | 30m    | 02-58 status report a11/a12/a14; AGENTS.md Documentation map            |
+| `docs/status/` archive sweep - ANNOTATE passes DONE for all five candidates (16_19-16, 17_15-11, 17_17-28, 17_21-07 annotated; 16_20-49 fully resolved + ARCHIVED 2026-09-22). Remaining queue: `git mv` each report once its live items close - 17_15-11 and 17_21-07 carry user-gated opens (SystemNix C17 set, demo g2), 16_19-16 carries its standing backlog/watch items; the 2026-09-29 pass archived 17_17-28 and inline-annotated 16_18-41, 19-07, 21-10, 22-50, 23-15, 02-58, 03-21, 05-55 plus both Pareto plans; re-check with the `grep -rLn '~~' docs/status/archived/` completeness gate | 🔴 `TODO` | Low    | 30m    | 02-58 status report a11/a12/a14; AGENTS.md Documentation map            |
 
-| `rateLimits`/DNSBL consumer ergonomics: sizing note (how to pick rates/keys for a small fleet) + `match`-expression passthrough documentation (conditional zones/keys ship passthrough-only today) | 🔴 `TODO` | Low | 30m | 22-50 report §b/7 + §f/37-38; option descriptions in `modules/mail-server.nix` |
 | BuildFlow `nix-checker` port-collision rule is context-blind (regex over ALL nix files, error severity, no suppression mechanism): it fires on standard mail ports across distinct machines/docs - 4 error findings here (demo-VM hostfwd guest ports 587/993 vs a VM-test relay client port vs a module docs example; AGENTS.md known-noise entry documents why they are false positives). Upstream fix in the BuildFlow repo: same-config scoping, well-known-port downgrade, or finding-level suppression; then retire the AGENTS.md note and the standing gate exit 69 | 🔴 `TODO` | Med | 2h | AGENTS.md known-noise entry; BuildFlow `modules/nix-checker/check_port_collisions.go`; 2026-09-23 T15 transcript |
+| CI: fail-closed lint for unescaped `\|` inside markdown table cells (odd pipe-count per row vs header) - dprint re-splits unescaped pipes and DROPS the overflow (two status rows eaten 2026-09-23, restored from git) | 🔴 `TODO` | Low | 30m | 05-55 report f/7 + e/3; AGENTS.md dprint pipe rule; CHANGELOG 0.4.0 dprint entry |
+| Pre-push hook: mirror the CI check-inventory guards (x86_64 lockstep attrNames list + aarch64 shape) so drift fails BEFORE origin sees it - the daemon pushes mid-session and the CI guards fired only after three red master runs | 🔴 `TODO` | Low | 45m | 05-55 report f/8 + e/4 + a/5; ci.yml lockstep/shape guards |
+| Host-side parser dry-run helper (`scripts/host-parse-fixture.py` or a flake app: PYTHONPATH from the check drv closure, run the pinned parser on a fixture) - makes the AGENTS dry-run rule a one-liner instead of prose | 🔴 `TODO` | Low | 1h | 05-55 report f/9 + e/1; 03-21 report f/28; AGENTS.md HOST-SIDE PARSER DRY-RUN lesson |
+| parsedmarc-e2e breadth: pin upstream's newer failure samples (Netease, LinkedIn `.crlf` variant - host-dry-run first) and assert `arrival_date_utc` (+0200 → UTC) from the existing fixture | 🔴 `TODO` | Low | 1h | 05-55 report f/10-f/11; tests/parsedmarc-e2e.nix forensic subtest |
+| CI statix step (mechanize the fresh-file W20 drift class: module-import-eval.nix shipped with 12 findings because no buildflow ran between sessions) | 🔴 `TODO` | Low | 30m | 02-58 report f/10 + e/3 + a/12 statix-drift story |
+| Post-release tag smoke for `v0.4.0` specifically: `nix flake show` + one `nix run .#vm` boot on a tag worktree (the local gates ran on the tree, not the tag object) | 🔴 `TODO` | Low | 20m | 05-55 report f/25 |
 
 ## Gated on D1 (live enablement)
 
@@ -80,3 +75,4 @@
 | Stalwart upstream feature request: declarative server-side Junk filing (only if ROADMAP Q6 lands on option d)                                                                                                                                                                                                                                                                                                                                                                  | 🔵 `BLOCKED` (ROADMAP Q6 verdict)                         | Low    | 30m    | 19-52 report §f/7; the sieve-wall ledger entry is the evidence base                                                                                                 |
 | GitHub: enable Discussions or keep issues-only                                                                                                                                                                                                                                                                                                                                                                                                                                 | 🔵 `BLOCKED` (user preference)                            | Low    | 5m     | 06-48 report §f/40                                                                                                                                                  |
 | Purge the five `demo.qcow2` blobs (~140 MB) from git history (git-filter-repo + daemon-pause window + `--force-with-lease`) or record the accept-clone-weight verdict                                                                                                                                                                                                                                                                                                          | 🔵 `BLOCKED` (user verdict; history rewrite)              | Low    | 45m    | 23-15 report §g/1; untracking landed 2026-09-22 but history still carries the blobs                                                                                 |
+| parsedmarc unit Restart policy: nixpkgs' parsedmarc unit ships no `Restart=` (our TLS-node boot-race handling lives in the test node) - decide whether to upstream a Restart proposal (verify-before-filing gates apply) or drop the idea                                                                                                                                                                                                                                       | 🔵 `BLOCKED` (user decision: file-or-skip)                | Low    | 30m    | 03-21 report f/33; tests/parsedmarc-e2e.nix TLS node                                                                |
