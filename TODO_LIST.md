@@ -53,6 +53,7 @@
 | parsedmarc-e2e breadth: pin upstream's newer failure samples (Netease, LinkedIn `.crlf` variant - host-dry-run first) and assert `arrival_date_utc` (+0200 → UTC) from the existing fixture | 🔴 `TODO` | Low | 1h | 05-55 report f/10-f/11; tests/parsedmarc-e2e.nix forensic subtest |
 | CI statix step (mechanize the fresh-file W20 drift class: module-import-eval.nix shipped with 12 findings because no buildflow ran between sessions) | 🔴 `TODO` | Low | 30m | 02-58 report f/10 + e/3 + a/12 statix-drift story |
 | Post-release tag smoke for `v0.4.0` specifically: `nix flake show` + one `nix run .#vm` boot on a tag worktree (the local gates ran on the tree, not the tag object) | 🔴 `TODO` | Low | 20m | 05-55 report f/25 |
+| Docs freshness audits: `docs/TELEMETRY.md` unverified keys (webhooks/alert-objects/series names - core keys were source-verified 2026-09-22) + a full per-claim pass over `CONTRIBUTING.md` | 🔴 `TODO` | Low | 1h | 16_18-41 report f/21-f/22 + b/1; 19-07 report e/6; README ledger (a)-(h) |
 
 ## Gated on D1 (live enablement)
 

@@ -72,17 +72,17 @@ unpushed — user-gated). PR #1 confirmed MERGED (16:08 UTC). CI on HEAD
 
 ## b) PARTIALLY DONE
 
-1. **TELEMETRY.md + CONTRIBUTING.md freshness** — light pass only
+~~1. **TELEMETRY.md + CONTRIBUTING.md freshness** — light pass only~~ routed - TODO_LIST docs-freshness-audits row (added 2026-09-29; TELEMETRY core keys were source-verified 2026-09-22, webhooks/alert-objects + the CONTRIBUTING per-claim pass remain)
    (structure, provenance caveat, d2 regen command, AGENTS pointers
    verified). Not a per-claim audit of every link/number in either file.
-2. **SVG currency** — 08-08 §f/14 said "re-render at the next docs
+~~2. **SVG currency** — 08-08 §f/14 said "re-render at the next docs~~ routed - ROADMAP §5 arch-diagram content-freshness audit (covers render + content on the next diagram session)
    touch"; this WAS a docs touch and I routed it to a TODO row instead
    (render churn mid-docs-pass felt wrong; tradeoff stated, not hidden).
 3. **§a done-tables unverified as records** — I trusted each report's
    own verification claims plus later-session corroboration, per the
    established house pattern; not a fresh re-verification of all ~60
    table rows.
-4. **Health-report presentation** — I folded fixed findings into the
+~~4. **Health-report presentation** — I folded fixed findings into the~~ done(superseded) - the skill's math-discipline rules (visible substitution, count-first) now govern the format
    per-doc table as "(n fixed)" notes instead of strict before/after
    tables; the math stayed honest but the format was a compromise.
 5. **Commit hygiene** — everything landed via 5 daemon heuristic commits;
@@ -160,68 +160,68 @@ Session-specific additions/observations below; do not double-harvest._
 
 **Immediate self-serve (verified-needed)**
 
-1. Release 0.3.0: CHANGELOG cut, tag `v0.3.0`, notes with lock
+~~1. Release 0.3.0: CHANGELOG cut, tag `v0.3.0`, notes with lock~~ done - v0.3.0 AND v0.3.1 tagged 2026-09-17 (v0.4.0 since)
    rev/narHash — gate CLEARED tonight (PR #1 merged).
-2. `stalwart-e2e`: direct `jq -e '.data.errors | length == 0'` on the
+~~2. `stalwart-e2e`: direct `jq -e '.data.errors | length == 0'` on the~~ done - the `.data.errors` precondition assertion (16_19-16 a/1)
    reload response (TODO_LIST Medium row).
-3. Git pre-push hook running `nix fmt -- . --check`
+~~3. Git pre-push hook running `nix fmt -- . --check`~~ done - `.githooks/pre-push` fmt check + CONTRIBUTING section (16_19-16 a/2)
    (repo-shipped + `core.hooksPath` + CONTRIBUTING note).
-4. Push this repo's 5 unpushed daemon commits (docs-only + renames).
-5. SVG re-render (`d2 --layout=elk`) + full 36-label d2↔SVG re-diff.
-6. Investigate the nixpkgs `dovecot2.protocols` rename warning in our
+~~4. Push this repo's 5 unpushed daemon commits (docs-only + renames).~~ done - pushed long since; master in sync with origin (verified 2026-09-29)
+~~5. SVG re-render (`d2 --layout=elk`) + full 36-label d2↔SVG re-diff.~~ done - both SVGs re-rendered + label-diffed (16_19-16 a/5)
+~~6. Investigate the nixpkgs `dovecot2.protocols` rename warning in our~~ done - root-caused: nixpkgs-internal noise (16_19-16 a/3)
    check evals (ours or noise?).
-7. Root-cause the `{ ... }`→`{...}` formatter mystery in `tests/*.nix`.
+~~7. Root-cause the `{ ... }`→`{...}` formatter mystery in `tests/*.nix`.~~ done - manual edit in ba7645c, no formatter involved (16_19-16 a/4)
 
 **User decisions (minutes each)**
-8. Branch protection: keep the "Bypassed rule violations" daemon bypass
+~~8. Branch protection: keep the "Bypassed rule violations" daemon bypass~~ still open - decision-batch C18
 or go strict (TODO_LIST policy row).
-9. Renovate: install the app or drop `renovate.json` (it never ran;
+~~9. Renovate: install the app or drop `renovate.json` (it never ran;~~ still open - decision-batch C19
 its actions scope duplicates Dependabot).
-10. mailsuite auto-STARTTLS issue: file the staged draft or skip
+~~10. mailsuite auto-STARTTLS issue: file the staged draft or skip~~ still open - decision-batch C20
 (all 5 verify-before-filing gates passed).
-11. D1 (Workspace fork / rua mailbox) — gates the D1 rows + ROADMAP spine.
-12. D2 (VPS placement/budget).
-13. Q6 junk-filing verdict (c+d recommended; FR row pre-staged).
-14. GitHub Discussions vs issues-only.
-15. Resend account/API key → unblocks the SASL smoke.
+~~11. D1 (Workspace fork / rua mailbox) — gates the D1 rows + ROADMAP spine.~~ still open - decision-batch D1
+~~12. D2 (VPS placement/budget).~~ still open - decision-batch D2
+~~13. Q6 junk-filing verdict (c+d recommended; FR row pre-staged).~~ still open - decision-batch Q6
+~~14. GitHub Discussions vs issues-only.~~ still open - decision-batch C22
+~~15. Resend account/API key → unblocks the SASL smoke.~~ still open - TODO_LIST blocked row (SASL smoke)
 
 **SystemNix side (one TODO_LIST row)**
-16. Push ~47+ commits; 17. Clear CI debt (statix sweep, `syn_` policy,
+~~16. Push ~47+ commits; 17. Clear CI debt (statix sweep, `syn_` policy,~~ still open - TODO_LIST blocked rows (C17 set)
 2 pin flips, gitleaks allowlist); 18. Sweep worktree caches
 (`.cache/signoz-src`, `.cache/gatus-src`, `nixos.qcow2`); 19. Spot
 -check the v0.2.0 pin still evals against this flake; 20. Ask
 whether SystemNix wants upstream devShells.
 
 **Docs follow-ups (this pass's residue)**
-21. Full per-claim freshness audit of `docs/TELEMETRY.md` (upgrade from
+~~21. Full per-claim freshness audit of `docs/TELEMETRY.md` (upgrade from~~ routed - TODO_LIST docs-freshness-audits row (2026-09-29)
 tonight's light pass).
-22. Full freshness audit of `CONTRIBUTING.md`.
-23. Link-rot policy decision for archived docs (see e/4).
-24. Upstream the docs-health skill: `routed` marker kind + w-marker
+~~22. Full freshness audit of `CONTRIBUTING.md`.~~ routed - TODO_LIST docs-freshness-audits row (2026-09-29)
+~~23. Link-rot policy decision for archived docs (see e/4).~~ declined - accepted noise (e/4's current state held: historical files keep their truth; no allowlist built)
+~~24. Upstream the docs-health skill: `routed` marker kind + w-marker~~ out of scope here - skill-repo work, not this repo
 contradiction lint (skill-repo, out of repo scope).
-25. Watch mjs/imapclient#663 to merge (retires the py3.13 pin via the
+~~25. Watch mjs/imapclient#663 to merge (retires the py3.13 pin via the~~ done - MERGED 2026-09-18, released in 4.1.0 (02-58 a/1); the py3.13 pin retires at the bump carrying >= 4.1.0
 Pin-advance runbook).
-26. Watch #563651/#563652/#563777 for maintainer movement (TODO row).
-27. aarch64: occasional local `nix flake check --all-systems`.
-28. treefmt-vs-minimal-alejandra decision (ROADMAP §5).
-29. Reload-smoke ops step when a live host uses management-API settings
+~~26. Watch #563651/#563652/#563777 for maintainer movement (TODO row).~~ standing - TODO_LIST watch row (re-checked 2026-09-22)
+~~27. aarch64: occasional local `nix flake check --all-systems`.~~ standing - ROADMAP §5 residue (habit, not a row)
+~~28. treefmt-vs-minimal-alejandra decision (ROADMAP §5).~~ done - REJECTED 2026-09-17 (AGENTS Conventions; treefmt would swap alejandra for nixfmt and break the CI contract)
+~~29. Reload-smoke ops step when a live host uses management-API settings~~ routed - ROADMAP §4 Respond (D1-conditional)
 (ROADMAP §4, D1-conditional).
-30. Gatus external-view checks (ROADMAP §4, D1-conditional).
-31. Post-0.3.0: retire-or-keep documentation for the Resend-only path.
-32. Consider a TODO_LIST row-count lint (grep-verified count vs claimed
+~~30. Gatus external-view checks (ROADMAP §4, D1-conditional).~~ done(spec) - MONITORING §5.1 templates (21-10 a/9); implementation consumer-side
+~~31. Post-0.3.0: retire-or-keep documentation for the Resend-only path.~~ routed - ROADMAP §5
+~~32. Consider a TODO_LIST row-count lint (grep-verified count vs claimed~~ Won't implement - YAGNI (the count-first discipline + docs-health VERIFY cover the class; no lint built)
 count) — cheap mechanization of tonight's d/1 sin; assess honestly,
 likely YAGNI.
 
 ## g) QUESTIONS (cannot resolve myself)
 
-1. **Push approval**: this session added 5 daemon commits (docs-only:
+~~1. **Push approval**: this session added 5 daemon commits (docs-only:~~ done - pushed; master in sync with origin, CI green (verified 2026-09-29)
    living-doc rebuild, annotations, 7 renames, this report) to unpushed
    master. Push nix-email now?
-2. **Release 0.3.0 tonight?** The gate cleared with the PR #1 merge and
+~~2. **Release 0.3.0 tonight?** The gate cleared with the PR #1 merge and~~ done - v0.3.0 cut 2026-09-17 (v0.3.1 same evening)
    `[Unreleased]` is thick (relay, native ingestion, DKIM dual-sign,
    pipe-lint, devShell, two docs-health passes). Cut now, or batch with
    more changes? Precedent says self-serve; your call on timing.
-3. **Strict required-checks vs daemon bypass**: pushes currently bypass
+~~3. **Strict required-checks vs daemon bypass**: pushes currently bypass~~ still open - decision-batch C18 (unchanged)
    the required `nix flake check` (remote says so verbatim). Keep the
    bypass for daemon velocity, or tighten and accept rejected daemon
    pushes until CI-green? (Flagged twice by earlier sessions; still
