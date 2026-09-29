@@ -38,65 +38,65 @@ questions). Hence the leverage ordering below.
 
 Sources: **T** = TODO_LIST row, **S** = session gap (status report 19-07), **R** = ROADMAP, **D** = drift found 2026-09-22.
 
-| ID  | Todo                                                                     | Src | Gate                    |
-| --- | ------------------------------------------------------------------------ | --- | ----------------------- |
-| C01 | Eval guard: nixpkgs pin identity vs SystemNix                            | T   | –                       |
-| C02 | Eval guard: flake-parts `nixpkgs-lib` follows                            | T   | –                       |
-| C03 | `checks`: `nixosModules.default` imports both arches                     | T   | –                       |
-| C04 | Relay `queue.route` IfBlock hardening                                    | T   | –                       |
-| C05 | Over-quota surface (doc/warning decision + write)                        | T   | –                       |
-| C06 | Catch-all ordering footgun assertion/doc                                 | T   | –                       |
-| C07 | `nix flake lock` evals-checks mystery                                    | T   | –                       |
-| C08 | Watch 4 upstream filings (#563651/#563652/#563777, imapclient #662/#663) | T   | –                       |
-| C09 | IMAP-LOGIN-resolves-by-NAME → option descriptions                        | T   | –                       |
-| C10 | Presence-list re-verify at next pin bump                                 | T   | –                       |
-| C11 | docs/status archive sweep                                                | T   | –                       |
-| C12 | dmarc-monitor live validation (real rua mailbox)                         | T   | **D1**                  |
-| C13 | Migration tooling compare (vandelay vs imapsync, R6)                     | T   | **D1**                  |
-| C14 | Rotate 3 placeholder secrets (SystemNix)                                 | T   | **D1**                  |
+| ID  | Todo                                                                                                                                                                                                           | Src | Gate                    |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --- | ----------------------- |
+| C01 | Eval guard: nixpkgs pin identity vs SystemNix                                                                                                                                                                  | T   | –                       |
+| C02 | Eval guard: flake-parts `nixpkgs-lib` follows                                                                                                                                                                  | T   | –                       |
+| C03 | `checks`: `nixosModules.default` imports both arches                                                                                                                                                           | T   | –                       |
+| C04 | Relay `queue.route` IfBlock hardening                                                                                                                                                                          | T   | –                       |
+| C05 | Over-quota surface (doc/warning decision + write)                                                                                                                                                              | T   | –                       |
+| C06 | Catch-all ordering footgun assertion/doc                                                                                                                                                                       | T   | –                       |
+| C07 | `nix flake lock` evals-checks mystery                                                                                                                                                                          | T   | –                       |
+| C08 | Watch 4 upstream filings (#563651/#563652/#563777, imapclient #662/#663)                                                                                                                                       | T   | –                       |
+| C09 | IMAP-LOGIN-resolves-by-NAME → option descriptions                                                                                                                                                              | T   | –                       |
+| C10 | Presence-list re-verify at next pin bump                                                                                                                                                                       | T   | –                       |
+| C11 | docs/status archive sweep                                                                                                                                                                                      | T   | –                       |
+| C12 | dmarc-monitor live validation (real rua mailbox)                                                                                                                                                               | T   | **D1**                  |
+| C13 | Migration tooling compare (vandelay vs imapsync, R6)                                                                                                                                                           | T   | **D1**                  |
+| C14 | Rotate 3 placeholder secrets (SystemNix)                                                                                                                                                                       | T   | **D1**                  |
 | C15 | SystemNix pin bump v0.2.0 → v0.3.1 (+ flake-parts dedupe) _(premise corrected 2026-09-22: NO pin exists - SystemNix floats `?ref=master`; the dedupe half landed locally, push is C17-gated - see Resolution)_ | T   | tag exists — actionable |
-| C16 | Resend SASL shape + real :587 smoke                                      | T   | Resend account          |
-| C17 | SystemNix: push ~47 commits + CI debt + cache sweep                      | T   | approval                |
-| C18 | Branch-protection bypass: keep or strict                                 | T   | **user**                |
-| C19 | Renovate: install app or drop config                                     | T   | **user**                |
-| C20 | mailsuite STARTTLS issue: file or skip (draft ready)                     | T   | **user**                |
-| C21 | Stalwart upstream Junk-filing feature request                            | T   | **Q6**                  |
-| C22 | GitHub Discussions: enable or not                                        | T   | **user**                |
-| C23 | TLS-RPT consumption via parsedmarc → dmarc-monitor                       | S   | evidence-backed         |
-| C24 | Alert taxonomy + routing (non-mail channel rule)                         | S   | channel = **user**      |
-| C25 | Resend outbound telemetry (webhooks → bounce/complaint)                  | S   | Resend account          |
-| C26 | Inbound RBL usage in Stalwart filters                                    | S   | keys verify (M9)        |
-| C27 | Rate-limit / auth-failure ban knobs                                      | S   | keys verify (M9)        |
-| C28 | Failed-auth alerting rule                                                | S   | needs C24/C37           |
-| C29 | Round-trip canary (send→receive SLO)                                     | S   | vantage = **user**      |
-| C30 | Dead-man switch on the monitors                                          | S   | –                       |
-| C31 | Capacity metrics (disk, per-mailbox quota)                               | S   | series verify (M9)      |
-| C32 | Auto-expiry of Junk/Trash                                                | S   | keys verify (M9)        |
-| C33 | Client autoconfig (RFC 6186 / autoconfig XML)                            | S   | support verify (M9)     |
-| C34 | Webmail: goal or non-goal (new open question)                            | S   | **user**                |
-| C35 | IR runbook: queue hold + quarantine review                               | S   | –                       |
-| C36 | Admin audit trail (logging, retention, shipping)                         | S   | keys verify (M9)        |
-| C37 | Stalwart telemetry wiring per docs/TELEMETRY.md                          | S/R | keys verify (M9)        |
-| C38 | Queue-depth/queue-age alert rules off /metrics                           | R   | needs C37               |
-| C39 | Gatus external checks (starttls :25, tls :993, cert)                     | R   | consumer layer          |
-| C40 | Monitoring coverage matrix doc (today/planned/gap)                       | S   | –                       |
-| C41 | ROADMAP theme-4 reorg (detect→alert→respond→verify)                      | S   | –                       |
-| C42 | Cross-check gaps vs THREAT_MODEL + TELEMETRY                             | S   | –                       |
-| C43 | OIDC (Pocket ID) admin-UI wiring                                         | R   | **D1**                  |
-| C44 | Provisioning oneshot (POST /api/principal → unit)                        | R   | **D1**                  |
-| C45 | DKIM keygen automation → sops + rotation                                 | R   | **D1**                  |
-| C46 | Backup/DR: export timer + offsite + monthly drill                        | R   | **D1**                  |
-| C47 | Terraform DNS module (MX/SPF/DKIM/DMARC/MTA-STS/TLS-RPT/TLSA)            | R   | **D1**                  |
-| C48 | rDNS automation via Hetzner API                                          | R   | **D1**                  |
-| C49 | Canary-domain cutover runbook                                            | R   | **D1**                  |
-| C50 | Post-cutover parity checks                                               | R   | **D1**                  |
-| C51 | DMARC ladder none→quarantine→reject                                      | R   | **D1**                  |
-| C52 | Paperless off app passwords; smartd decoupling                           | R   | cross-repo              |
-| C53 | InboxClean JMAP/IMAP spike                                               | R   | cross-repo              |
-| C54 | vulnix replacement tracker (BuildFlow-dependent)                         | R   | external                |
-| C55 | nixpkgs-workaround retirement re-check ritual                            | R   | per bump                |
-| C56 | Drift sweep: close Q8, fix stale pin-bump row (v0.3.1 exists)            | D   | –                       |
-| C57 | Demo-VM hostfwd-hang state reconciliation                                | D   | –                       |
+| C16 | Resend SASL shape + real :587 smoke                                                                                                                                                                            | T   | Resend account          |
+| C17 | SystemNix: push ~47 commits + CI debt + cache sweep                                                                                                                                                            | T   | approval                |
+| C18 | Branch-protection bypass: keep or strict                                                                                                                                                                       | T   | **user**                |
+| C19 | Renovate: install app or drop config                                                                                                                                                                           | T   | **user**                |
+| C20 | mailsuite STARTTLS issue: file or skip (draft ready)                                                                                                                                                           | T   | **user**                |
+| C21 | Stalwart upstream Junk-filing feature request                                                                                                                                                                  | T   | **Q6**                  |
+| C22 | GitHub Discussions: enable or not                                                                                                                                                                              | T   | **user**                |
+| C23 | TLS-RPT consumption via parsedmarc → dmarc-monitor                                                                                                                                                             | S   | evidence-backed         |
+| C24 | Alert taxonomy + routing (non-mail channel rule)                                                                                                                                                               | S   | channel = **user**      |
+| C25 | Resend outbound telemetry (webhooks → bounce/complaint)                                                                                                                                                        | S   | Resend account          |
+| C26 | Inbound RBL usage in Stalwart filters                                                                                                                                                                          | S   | keys verify (M9)        |
+| C27 | Rate-limit / auth-failure ban knobs                                                                                                                                                                            | S   | keys verify (M9)        |
+| C28 | Failed-auth alerting rule                                                                                                                                                                                      | S   | needs C24/C37           |
+| C29 | Round-trip canary (send→receive SLO)                                                                                                                                                                           | S   | vantage = **user**      |
+| C30 | Dead-man switch on the monitors                                                                                                                                                                                | S   | –                       |
+| C31 | Capacity metrics (disk, per-mailbox quota)                                                                                                                                                                     | S   | series verify (M9)      |
+| C32 | Auto-expiry of Junk/Trash                                                                                                                                                                                      | S   | keys verify (M9)        |
+| C33 | Client autoconfig (RFC 6186 / autoconfig XML)                                                                                                                                                                  | S   | support verify (M9)     |
+| C34 | Webmail: goal or non-goal (new open question)                                                                                                                                                                  | S   | **user**                |
+| C35 | IR runbook: queue hold + quarantine review                                                                                                                                                                     | S   | –                       |
+| C36 | Admin audit trail (logging, retention, shipping)                                                                                                                                                               | S   | keys verify (M9)        |
+| C37 | Stalwart telemetry wiring per docs/TELEMETRY.md                                                                                                                                                                | S/R | keys verify (M9)        |
+| C38 | Queue-depth/queue-age alert rules off /metrics                                                                                                                                                                 | R   | needs C37               |
+| C39 | Gatus external checks (starttls :25, tls :993, cert)                                                                                                                                                           | R   | consumer layer          |
+| C40 | Monitoring coverage matrix doc (today/planned/gap)                                                                                                                                                             | S   | –                       |
+| C41 | ROADMAP theme-4 reorg (detect→alert→respond→verify)                                                                                                                                                            | S   | –                       |
+| C42 | Cross-check gaps vs THREAT_MODEL + TELEMETRY                                                                                                                                                                   | S   | –                       |
+| C43 | OIDC (Pocket ID) admin-UI wiring                                                                                                                                                                               | R   | **D1**                  |
+| C44 | Provisioning oneshot (POST /api/principal → unit)                                                                                                                                                              | R   | **D1**                  |
+| C45 | DKIM keygen automation → sops + rotation                                                                                                                                                                       | R   | **D1**                  |
+| C46 | Backup/DR: export timer + offsite + monthly drill                                                                                                                                                              | R   | **D1**                  |
+| C47 | Terraform DNS module (MX/SPF/DKIM/DMARC/MTA-STS/TLS-RPT/TLSA)                                                                                                                                                  | R   | **D1**                  |
+| C48 | rDNS automation via Hetzner API                                                                                                                                                                                | R   | **D1**                  |
+| C49 | Canary-domain cutover runbook                                                                                                                                                                                  | R   | **D1**                  |
+| C50 | Post-cutover parity checks                                                                                                                                                                                     | R   | **D1**                  |
+| C51 | DMARC ladder none→quarantine→reject                                                                                                                                                                            | R   | **D1**                  |
+| C52 | Paperless off app passwords; smartd decoupling                                                                                                                                                                 | R   | cross-repo              |
+| C53 | InboxClean JMAP/IMAP spike                                                                                                                                                                                     | R   | cross-repo              |
+| C54 | vulnix replacement tracker (BuildFlow-dependent)                                                                                                                                                               | R   | external                |
+| C55 | nixpkgs-workaround retirement re-check ritual                                                                                                                                                                  | R   | per bump                |
+| C56 | Drift sweep: close Q8, fix stale pin-bump row (v0.3.1 exists)                                                                                                                                                  | D   | –                       |
+| C57 | Demo-VM hostfwd-hang state reconciliation                                                                                                                                                                      | D   | –                       |
 
 ## 3. TABLE A — Comprehensive plan: 27 medium tasks (30–100 min each), sorted by impact
 
@@ -307,12 +307,12 @@ Sources: **T** = TODO_LIST row, **S** = session gap (status report 19-07), **R**
 
 ### M21 — SystemNix ops (100 min)
 
-| #    | Micro-task                                                    | Min |
-| ---- | ------------------------------------------------------------- | --- |
+| #    | Micro-task                                                                                                                                                                                     | Min |
+| ---- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --- |
 | 21.1 | Bump nix-email pin v0.2.0 → v0.3.1 + flake-parts input dedupe _(premise corrected: no pin exists - SystemNix floats `?ref=master`; dedupe + relock landed locally 2026-09-22, push C17-gated)_ | 20  |
-| 21.2 | Push ~47 unpushed commits; triage CI debt list                | 30  |
-| 21.3 | Rotate 3 placeholder secrets + sops-key-audit rotation check  | 25  |
-| 21.4 | Consumer eval guards green (incl. new pin-identity guard)     | 25  |
+| 21.2 | Push ~47 unpushed commits; triage CI debt list                                                                                                                                                 | 30  |
+| 21.3 | Rotate 3 placeholder secrets + sops-key-audit rotation check                                                                                                                                   | 25  |
+| 21.4 | Consumer eval guards green (incl. new pin-identity guard)                                                                                                                                      | 25  |
 
 ### M22 — Provisioning + DKIM (100 min)
 
@@ -451,28 +451,28 @@ Per-task outcomes for Table A (execution evidence: the 21-10 / 22-50 / 23-15 / 0
 05-55 status reports, CHANGELOG 0.4.0, and the living docs). The C15/M21.1 pin-bump premise was
 corrected inline above (no pin exists; SystemNix floats `?ref=master`).
 
-| Task | Verdict | Where it lives now |
-| ---- | ------- | ------------------ |
-| M1 docs-truth sweep | done (21-10: Q7/Q8 closed, drift rows fixed) | CHANGELOG 0.4.0 |
-| M2 decision package | done (`docs/planning/decision-batch.md`, 21-10) | decision-batch (answers still pending) |
-| M3 fleet eval guards | done (21-10 a/1: pin + follows guards, negative-tested) | `flake.nix`; CHANGELOG 0.4.0 |
-| M4 module-import check | done (21-10 a/4; both arches) | `tests/module-import-eval.nix` |
-| M5 relay + catch-all hardening | done at verdict level (C04/C06 pre-done + README ordering footgun, 02-58 a/10) | README ledger; 21-10 a/5 |
-| M6 over-quota surface | swept by verdict (README documents it; no option owed, 21-10 a/18) | README Per-account semantics |
-| M7 lock mystery | SOLVED (21-10 a/6: lock parse-time scope) | CHANGELOG 0.4.0; AGENTS.md |
-| M8 chores bundle | done (21-10 a/14-a/16: upstream re-check, LOGIN doc, presence list) | 21-10 report |
-| M9 research/verify pass | done (README ledger (a)-(h), 21-10 a/7) | README verified-facts ledger |
-| M10 TLS-RPT consumption | done (e2e green first attempt, 21-10 a/8) | `tests/parsedmarc-e2e.nix`; CHANGELOG 0.4.0 |
-| M11 alert taxonomy | spec done (`docs/MONITORING.md`, 21-10 a/9); encoding C24-gated | MONITORING.md |
-| M12 telemetry + queue alerts | metrics transcript done; 0.15.5 has NO queue series - spec is the consumer poll (22-50 a/4) | MONITORING.md row 2 + §5.4 |
-| M13 Gatus + dead-man | spec done (MONITORING §5.1/§5.2); implementation consumer-gated | MONITORING.md |
-| M14 RBL + rate-limit | done, stronger than planned (defaults OFF; flood-node runtime trip, 22-50 + 02-58 a/8) | `modules/mail-server.nix`; CHANGELOG 0.4.0 |
-| M15 failed-auth alerting | spec done (MONITORING §5.3); encoding C24-gated | MONITORING.md |
-| M16 Resend smoke + telemetry | SASL shape doc-verified; live :587 smoke + webhooks user-gated (API key) | TODO_LIST blocked rows; decision-batch C16 |
-| M17 expiry + capacity | verdicts done (auto-expunge defaults ledger (d); no queue series - capacity via API poll) | README ledger; MONITORING.md |
-| M18 canary + IR | spec done (MONITORING §5.4 + §6); implementation C29-gated | MONITORING.md |
-| M19 audit + autoconfig | verdicts done (audit NOT AVAILABLE in 0.15.5; autoconfig routes exist - ledger (e)/(f)) | README ledger |
-| M20 docs closeout | done (21-10 a/11: theme-4 reorg; threat-model cross-check in MONITORING) | ROADMAP §4; MONITORING.md |
-| M21 SystemNix ops | partial: dedupe + relock done locally; push + CI debt C17-gated; secrets D1-gated | TODO_LIST blocked rows |
-| M22-M26 D1-gated build-out | not started (hard-gated on D1/D2 by design) | ROADMAP themes 1-3; decision-batch |
-| M27 cross-repo + filings | not started (user-gated: C18/C19/C20/C22 verdicts) | decision-batch; TODO_LIST |
+| Task                           | Verdict                                                                                     | Where it lives now                          |
+| ------------------------------ | ------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| M1 docs-truth sweep            | done (21-10: Q7/Q8 closed, drift rows fixed)                                                | CHANGELOG 0.4.0                             |
+| M2 decision package            | done (`docs/planning/decision-batch.md`, 21-10)                                             | decision-batch (answers still pending)      |
+| M3 fleet eval guards           | done (21-10 a/1: pin + follows guards, negative-tested)                                     | `flake.nix`; CHANGELOG 0.4.0                |
+| M4 module-import check         | done (21-10 a/4; both arches)                                                               | `tests/module-import-eval.nix`              |
+| M5 relay + catch-all hardening | done at verdict level (C04/C06 pre-done + README ordering footgun, 02-58 a/10)              | README ledger; 21-10 a/5                    |
+| M6 over-quota surface          | swept by verdict (README documents it; no option owed, 21-10 a/18)                          | README Per-account semantics                |
+| M7 lock mystery                | SOLVED (21-10 a/6: lock parse-time scope)                                                   | CHANGELOG 0.4.0; AGENTS.md                  |
+| M8 chores bundle               | done (21-10 a/14-a/16: upstream re-check, LOGIN doc, presence list)                         | 21-10 report                                |
+| M9 research/verify pass        | done (README ledger (a)-(h), 21-10 a/7)                                                     | README verified-facts ledger                |
+| M10 TLS-RPT consumption        | done (e2e green first attempt, 21-10 a/8)                                                   | `tests/parsedmarc-e2e.nix`; CHANGELOG 0.4.0 |
+| M11 alert taxonomy             | spec done (`docs/MONITORING.md`, 21-10 a/9); encoding C24-gated                             | MONITORING.md                               |
+| M12 telemetry + queue alerts   | metrics transcript done; 0.15.5 has NO queue series - spec is the consumer poll (22-50 a/4) | MONITORING.md row 2 + §5.4                  |
+| M13 Gatus + dead-man           | spec done (MONITORING §5.1/§5.2); implementation consumer-gated                             | MONITORING.md                               |
+| M14 RBL + rate-limit           | done, stronger than planned (defaults OFF; flood-node runtime trip, 22-50 + 02-58 a/8)      | `modules/mail-server.nix`; CHANGELOG 0.4.0  |
+| M15 failed-auth alerting       | spec done (MONITORING §5.3); encoding C24-gated                                             | MONITORING.md                               |
+| M16 Resend smoke + telemetry   | SASL shape doc-verified; live :587 smoke + webhooks user-gated (API key)                    | TODO_LIST blocked rows; decision-batch C16  |
+| M17 expiry + capacity          | verdicts done (auto-expunge defaults ledger (d); no queue series - capacity via API poll)   | README ledger; MONITORING.md                |
+| M18 canary + IR                | spec done (MONITORING §5.4 + §6); implementation C29-gated                                  | MONITORING.md                               |
+| M19 audit + autoconfig         | verdicts done (audit NOT AVAILABLE in 0.15.5; autoconfig routes exist - ledger (e)/(f))     | README ledger                               |
+| M20 docs closeout              | done (21-10 a/11: theme-4 reorg; threat-model cross-check in MONITORING)                    | ROADMAP §4; MONITORING.md                   |
+| M21 SystemNix ops              | partial: dedupe + relock done locally; push + CI debt C17-gated; secrets D1-gated           | TODO_LIST blocked rows                      |
+| M22-M26 D1-gated build-out     | not started (hard-gated on D1/D2 by design)                                                 | ROADMAP themes 1-3; decision-batch          |
+| M27 cross-repo + filings       | not started (user-gated: C18/C19/C20/C22 verdicts)                                          | decision-batch; TODO_LIST                   |

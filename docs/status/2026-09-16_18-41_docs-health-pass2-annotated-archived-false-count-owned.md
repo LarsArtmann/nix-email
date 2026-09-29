@@ -73,21 +73,21 @@ unpushed — user-gated). PR #1 confirmed MERGED (16:08 UTC). CI on HEAD
 ## b) PARTIALLY DONE
 
 ~~1. **TELEMETRY.md + CONTRIBUTING.md freshness** — light pass only~~ routed - TODO_LIST docs-freshness-audits row (added 2026-09-29; TELEMETRY core keys were source-verified 2026-09-22, webhooks/alert-objects + the CONTRIBUTING per-claim pass remain)
-   (structure, provenance caveat, d2 regen command, AGENTS pointers
-   verified). Not a per-claim audit of every link/number in either file.
+(structure, provenance caveat, d2 regen command, AGENTS pointers
+verified). Not a per-claim audit of every link/number in either file.
 ~~2. **SVG currency** — 08-08 §f/14 said "re-render at the next docs~~ routed - ROADMAP §5 arch-diagram content-freshness audit (covers render + content on the next diagram session)
-   touch"; this WAS a docs touch and I routed it to a TODO row instead
-   (render churn mid-docs-pass felt wrong; tradeoff stated, not hidden).
+touch"; this WAS a docs touch and I routed it to a TODO row instead
+(render churn mid-docs-pass felt wrong; tradeoff stated, not hidden).
 3. **§a done-tables unverified as records** — I trusted each report's
-   own verification claims plus later-session corroboration, per the
-   established house pattern; not a fresh re-verification of all ~60
-   table rows.
+own verification claims plus later-session corroboration, per the
+established house pattern; not a fresh re-verification of all ~60
+table rows.
 ~~4. **Health-report presentation** — I folded fixed findings into the~~ done(superseded) - the skill's math-discipline rules (visible substitution, count-first) now govern the format
-   per-doc table as "(n fixed)" notes instead of strict before/after
-   tables; the math stayed honest but the format was a compromise.
+per-doc table as "(n fixed)" notes instead of strict before/after
+tables; the math stayed honest but the format was a compromise.
 5. **Commit hygiene** — everything landed via 5 daemon heuristic commits;
-   no explicit per-task commits (no commit authorization this session —
-   defensible, but history readability paid).
+no explicit per-task commits (no commit authorization this session —
+defensible, but history readability paid).
 
 ## c) NOT STARTED (correctly parked; canonical list = TODO_LIST)
 
@@ -161,15 +161,15 @@ Session-specific additions/observations below; do not double-harvest._
 **Immediate self-serve (verified-needed)**
 
 ~~1. Release 0.3.0: CHANGELOG cut, tag `v0.3.0`, notes with lock~~ done - v0.3.0 AND v0.3.1 tagged 2026-09-17 (v0.4.0 since)
-   rev/narHash — gate CLEARED tonight (PR #1 merged).
+rev/narHash — gate CLEARED tonight (PR #1 merged).
 ~~2. `stalwart-e2e`: direct `jq -e '.data.errors | length == 0'` on the~~ done - the `.data.errors` precondition assertion (16_19-16 a/1)
-   reload response (TODO_LIST Medium row).
+reload response (TODO_LIST Medium row).
 ~~3. Git pre-push hook running `nix fmt -- . --check`~~ done - `.githooks/pre-push` fmt check + CONTRIBUTING section (16_19-16 a/2)
-   (repo-shipped + `core.hooksPath` + CONTRIBUTING note).
+(repo-shipped + `core.hooksPath` + CONTRIBUTING note).
 ~~4. Push this repo's 5 unpushed daemon commits (docs-only + renames).~~ done - pushed long since; master in sync with origin (verified 2026-09-29)
 ~~5. SVG re-render (`d2 --layout=elk`) + full 36-label d2↔SVG re-diff.~~ done - both SVGs re-rendered + label-diffed (16_19-16 a/5)
 ~~6. Investigate the nixpkgs `dovecot2.protocols` rename warning in our~~ done - root-caused: nixpkgs-internal noise (16_19-16 a/3)
-   check evals (ours or noise?).
+check evals (ours or noise?).
 ~~7. Root-cause the `{ ... }`→`{...}` formatter mystery in `tests/*.nix`.~~ done - manual edit in ba7645c, no formatter involved (16_19-16 a/4)
 
 **User decisions (minutes each)**
@@ -215,17 +215,17 @@ likely YAGNI.
 ## g) QUESTIONS (cannot resolve myself)
 
 ~~1. **Push approval**: this session added 5 daemon commits (docs-only:~~ done - pushed; master in sync with origin, CI green (verified 2026-09-29)
-   living-doc rebuild, annotations, 7 renames, this report) to unpushed
-   master. Push nix-email now?
+living-doc rebuild, annotations, 7 renames, this report) to unpushed
+master. Push nix-email now?
 ~~2. **Release 0.3.0 tonight?** The gate cleared with the PR #1 merge and~~ done - v0.3.0 cut 2026-09-17 (v0.3.1 same evening)
-   `[Unreleased]` is thick (relay, native ingestion, DKIM dual-sign,
-   pipe-lint, devShell, two docs-health passes). Cut now, or batch with
-   more changes? Precedent says self-serve; your call on timing.
+`[Unreleased]` is thick (relay, native ingestion, DKIM dual-sign,
+pipe-lint, devShell, two docs-health passes). Cut now, or batch with
+more changes? Precedent says self-serve; your call on timing.
 ~~3. **Strict required-checks vs daemon bypass**: pushes currently bypass~~ still open - decision-batch C18 (unchanged)
-   the required `nix flake check` (remote says so verbatim). Keep the
-   bypass for daemon velocity, or tighten and accept rejected daemon
-   pushes until CI-green? (Flagged twice by earlier sessions; still
-   open.)
+the required `nix flake check` (remote says so verbatim). Keep the
+bypass for daemon velocity, or tighten and accept rejected daemon
+pushes until CI-green? (Flagged twice by earlier sessions; still
+open.)
 
 ---
 

@@ -4,9 +4,9 @@
 - **Session type:** docs-health AUDIT under the user's "view ALL \*\*/2026-0\* files, annotate inline,
   archive fully-done" mandate: skill + 8 references loaded first → read all 37 `2026-0*` matches
   (12 active status reports, 2 active planning docs, archived set gate-checked, `.d2`/`.svg` noted)
-  + all six living docs → VERIFY against code/git → HARVEST → ANNOTATE → ARCHIVE → living-doc
-  rebuild → gates → inline health report (delivered in-session: Accuracy 8.25 → 9.5, Fitness
-  7.75 → 10, math shown there).
+  - all six living docs → VERIFY against code/git → HARVEST → ANNOTATE → ARCHIVE → living-doc
+    rebuild → gates → inline health report (delivered in-session: Accuracy 8.25 → 9.5, Fitness
+    7.75 → 10, math shown there).
 - **Session verdict:** every active 2026-0* doc now carries per-item resolution verdicts
   (~350 new inline strikethroughs across 10 files), the flake-parts migration report is
   ARCHIVED (completeness gate green), eight unharvested report items were routed into
@@ -182,7 +182,7 @@
 5. `scripts/host-parse-fixture.py` (PYTHONPATH from the check drv closure) — makes the AGENTS
    dry-run rule a one-liner.
 6. parsedmarc-e2e breadth: Netease + LinkedIn `.crlf` failure samples (host-dry-run first)
-   + `arrival_date_utc` assertion.
+   - `arrival_date_utc` assertion.
 7. CI statix step (fresh-file W20 drift class).
 8. v0.4.0 tag smoke: `nix flake show` + one `nix run .#vm` boot on a tag worktree.
 9. Docs freshness audits: TELEMETRY webhooks/alert-objects keys + CONTRIBUTING per-claim.

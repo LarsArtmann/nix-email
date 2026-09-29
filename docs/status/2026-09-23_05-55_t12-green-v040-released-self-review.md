@@ -72,33 +72,33 @@ transcripts (`/tmp/t12-*`, `/tmp/t15-*`, `/tmp/t02-*`, `/tmp/gate-final.log`),
 ## b) PARTIALLY DONE
 
 ~~1. **3 docs-only commits unpushed** (TODO row deletions, decision-batch~~ done - pushed; master in sync with origin, CI green (verified 2026-09-29)
-   and 03-21 annotations, this report will join them). Polled ~10 min;
-   the daemon had committed but not pushed. No user-facing risk
-   (markdown only; master CI already green on the release head febb1e4),
-   but "push verification" for the absolute final head is pending the
-   daemon's next cycle.
+and 03-21 annotations, this report will join them). Polled ~10 min;
+the daemon had committed but not pushed. No user-facing risk
+(markdown only; master CI already green on the release head febb1e4),
+but "push verification" for the absolute final head is pending the
+daemon's next cycle.
 ~~2. **Buildflow gate amber by design** (exit 69) on the 4 documented~~ still open - gated on the BuildFlow upstream fix (TODO_LIST row)
-   port-collision FPs — resolved only when the upstream BuildFlow fix
-   lands (row exists; not started, see c).
+port-collision FPs — resolved only when the upstream BuildFlow fix
+lands (row exists; not started, see c).
 ~~3. **dprint pipe-truncation guard**: the escaping rule is documented,~~ routed - TODO_LIST CI pipe-table lint row (2026-09-29)
-   but nothing MECHANICAL stops the next unescaped-pipe row from being
-   eaten (see e/3, f/5).
+but nothing MECHANICAL stops the next unescaped-pipe row from being
+eaten (see e/3, f/5).
 
 ## c) NOT STARTED (user-gated or routed; deliberately untouched)
 
 ~~1. T16–T18 SystemNix work: C17a pin choice (now unblocked — `?ref=v0.4.0`~~ still open - TODO_LIST blocked rows (C17 set + Resend)
-   exists), the ~47-commit push + CI debt, Resend API key.
+exists), the ~47-commit push + CI debt, Resend API key.
 ~~2. T19 qcow2 blob purge verdict (history rewrite).~~ still open - TODO_LIST blocked row
 ~~3. T21–T23 / D1–D2 live enablement chain; DNSBL runtime evidence waits~~ still open - D1/D2-gated (TODO_LIST + ROADMAP)
-   on D1.
+on D1.
 ~~4. Upstream verdict filings still pending (nixpkgs #563651/#563777;~~ still open - TODO_LIST watch row (nixpkgs trio)
-   imapclient 4.1.0 bump via #563652).
+imapclient 4.1.0 bump via #563652).
 ~~5. Standing user decisions in TODO_LIST: Renovate install-or-drop,~~ still open - decision-batch (unchanged)
-   Discussions enable-or-not, mailsuite STARTTLS draft file-or-skip,
-   ROADMAP Q6, demo g1/g2.
+Discussions enable-or-not, mailsuite STARTTLS draft file-or-skip,
+ROADMAP Q6, demo g1/g2.
 ~~6. BuildFlow upstream fixes (port-collision context-awareness or~~ still open - TODO_LIST BuildFlow row (not started)
-   suppression; dprint-style table normalization that escapes/refuses
-   pipes).
+suppression; dprint-style table normalization that escapes/refuses
+pipes).
 
 ## d) TOTALLY FUCKED UP (honest: errors, misfires, near-misses)
 
@@ -116,24 +116,24 @@ transcripts (`/tmp/t12-*`, `/tmp/t15-*`, `/tmp/t02-*`, `/tmp/gate-final.log`),
    shipped three red master runs unnoticed. Plausible-cause acceptance
    would have left master red after the T12 fix. (Counterpart rule
    added to e/2.)
-~~3. **One stale TODO row left in the living tracker.** The~~ done - the ergonomics row DELETED 2026-09-29 (its deliverable had landed: README Rate-limit sizing)
+   ~~3. **One stale TODO row left in the living tracker.** The~~ done - the ergonomics row DELETED 2026-09-29 (its deliverable had landed: README Rate-limit sizing)
    `rateLimits`/DNSBL ergonomics row survived my close-out pass even
    though its deliverable ("sizing note") demonstrably landed in README
    (T11/a16) — I read the row this session and did not reconcile it.
    Caught while writing this report (README grep). Not yet fixed:
    intentionally, because this report session was told to report, not
    act — first action candidate on resume.
-4. **A false "my edit was lost" alarm.** After dprint settled, I grep'd
+3. **A false "my edit was lost" alarm.** After dprint settled, I grep'd
    for `v0.4.0 is cut` (no backticks) and briefly suspected the
    decision-batch edit had been destroyed. The text was there; my grep
    pattern was wrong. Sentinel checks must anchor on text that cannot
    be re-wrapped or re-marked.
-5. **dprint ate evidence rows and I almost shipped it.** The handoff's
+4. **dprint ate evidence rows and I almost shipped it.** The handoff's
    "review diff before accepting" instruction is the only reason two
    status-report rows were not silently truncated into phantom columns.
    Without that mandate, a "formatting-only" pass would have destroyed
    transcript evidence in archived-adjacent docs.
-6. Small mechanical misfires (recovered in-line, cost only seconds):
+5. Small mechanical misfires (recovered in-line, cost only seconds):
    first TODO_LIST edit failed on trailing-whitespace exact-match (fixed
    via python line surgery); a python JSON parse of nix-checker output
    crashed on non-JSON wrapper lines (recovered with grep); ran
@@ -143,105 +143,105 @@ transcripts (`/tmp/t12-*`, `/tmp/t15-*`, `/tmp/t02-*`, `/tmp/gate-final.log`),
 ## e) WHAT WE SHOULD IMPROVE
 
 ~~1. **Make the host-side dry-run a first-class tool, not a trick.** The~~ routed - TODO_LIST host-parse-fixture helper row (2026-09-29)
-   PYTHONPATH-from-drv-closure technique lives only in AGENTS.md prose.
-   A `scripts/host-parse-fixture.py` (or a flake app) would make
-   "validate every VM fixture host-side first" a one-liner.
+PYTHONPATH-from-drv-closure technique lives only in AGENTS.md prose.
+A `scripts/host-parse-fixture.py` (or a flake app) would make
+"validate every VM fixture host-side first" a one-liner.
 ~~2. **Cause-attribution discipline for red CI.** Rule candidate: NEVER~~ done - AGENTS.md working rule landed 2026-09-29 (never close a red run without reading --log-failed)
-   close a red run as "the known one" without reading the failing STEP
-   name from `gh run view --log-failed`. Two distinct causes can stack;
-   they did.
+close a red run as "the known one" without reading the failing STEP
+name from `gh run view --log-failed`. Two distinct causes can stack;
+they did.
 ~~3. **Mechanical guard for the dprint pipe trap.** The awk pipe-lint~~ routed - TODO_LIST CI pipe-table lint row (2026-09-29)
-   class in CI could gain a sibling check: unescaped `|` inside a
-   markdown table cell (heuristic: odd pipe-count per row vs header).
-   Cheap, fail-closed, saves the next eaten row.
+class in CI could gain a sibling check: unescaped `|` inside a
+markdown table cell (heuristic: odd pipe-count per row vs header).
+Cheap, fail-closed, saves the next eaten row.
 ~~4. **The lockstep "same commit" rule is unenforceable under the~~ routed - TODO_LIST pre-push lockstep-mirror row (2026-09-29)
-   auto-commit daemon** — the guard fired exactly as designed, but only
-   AFTER three red pushes. Move (or mirror) the attrNames-vs-list check
-   into the local pre-push hook so it fails before origin ever sees it.
+auto-commit daemon** — the guard fired exactly as designed, but only
+AFTER three red pushes. Move (or mirror) the attrNames-vs-list check
+into the local pre-push hook so it fails before origin ever sees it.
 ~~5. **BuildFlow upstream owes us two fixes** (routed, TODO rows exist):~~ still open - TODO_LIST BuildFlow row
-   port-collision context-blindness (no suppression mechanism exists at
-   all today — verified in the BuildFlow source) and a markdown table
-   normalizer that escapes or refuses pipes rather than truncating.
+port-collision context-blindness (no suppression mechanism exists at
+all today — verified in the BuildFlow source) and a markdown table
+normalizer that escapes or refuses pipes rather than truncating.
 ~~6. **Stale-row sweep needs a cheaper trigger.** This session found one~~ still open - candidate; the 2026-09-29 sweep re-verified every TODO row's evidence column manually
-   stale TODO row by accident (d/3). A "row deliverable grep" pass
-   during close-out (one grep per evidence column) would mechanize it.
+stale TODO row by accident (d/3). A "row deliverable grep" pass
+during close-out (one grep per evidence column) would mechanize it.
 ~~7. **Daemon push cadence is opaque.** Three docs commits sat >10 min;~~ still open - user process preference (g/3)
-   nothing broke, but the session's "push verification" step cannot
-   fully close. Accept as a known daemon property (documented here),
-   or decide a session-end flush policy (g/3).
+nothing broke, but the session's "push verification" step cannot
+fully close. Accept as a known daemon property (documented here),
+or decide a session-end flush policy (g/3).
 
 ## f) Up to 50 things we should get done next (ranked; not a commitment list)
 
 ~~1. Delete/rewrite the stale `rateLimits`/DNSBL ergonomics TODO row~~ done - row deleted 2026-09-29
-   (deliverable landed; evidence grep done — 1 min).
+(deliverable landed; evidence grep done — 1 min).
 ~~2. Verify the daemon shipped the 3–4 docs commits; confirm CI green on~~ done - verified 2026-09-29 (in sync, CI green)
-   the true final head.
+the true final head.
 ~~3. Decide C17a: pin SystemNix to `?ref=v0.4.0` or keep floating master~~ still open - decision-batch C17 (unblocked: the v0.4.0 ref exists)
-   (USER — now unblocked by the tag).
+(USER — now unblocked by the tag).
 ~~4. Execute the SystemNix push + CI-debt sweep once C17a is decided~~ still open - TODO_LIST blocked rows
-   (USER-gated, T16–T18).
+(USER-gated, T16–T18).
 ~~5. BuildFlow upstream: port-collision context-awareness (same-config~~ still open - TODO_LIST BuildFlow row
-   scoping, example-block skip) or finding-level suppression; retire the
-   AGENTS note + gate exit 69 when landed.
+scoping, example-block skip) or finding-level suppression; retire the
+AGENTS note + gate exit 69 when landed.
 ~~6. BuildFlow upstream: markdown-table normalizer must escape/refuse~~ still open - TODO_LIST BuildFlow row
-   pipes, never truncate.
+pipes, never truncate.
 ~~7. CI: add the unescaped-pipe-in-table-cell lint (e/3).~~ routed - TODO_LIST row (2026-09-29)
 ~~8. Pre-push hook: mirror the lockstep attrNames-vs-list check locally~~ routed - TODO_LIST row (2026-09-29)
-   (e/4).
+(e/4).
 ~~9. `scripts/host-parse-fixture.py` or flake app for fixture dry-runs~~ routed - TODO_LIST row (2026-09-29)
-   (e/1).
+(e/1).
 ~~10. parsedmarc e2e: add upstream's newer failure samples (Netease,~~ routed - TODO_LIST row (2026-09-29)
-    LinkedIn `.crlf` variant) for parser breadth — each dry-run host-
-    side first per the new rule.
+LinkedIn `.crlf` variant) for parser breadth — each dry-run host-
+side first per the new rule.
 ~~11. parsedmarc e2e: assert `arrival_date_utc` (+0200 → UTC~~ routed - TODO_LIST row (2026-09-29, shared with f/10)
-    normalization) — free signal from the existing fixture.
+normalization) — free signal from the existing fixture.
 ~~12. Watch nixpkgs #563651/#563777; recheck #563652's imapclient 4.1.0~~ standing - TODO_LIST watch row
-    bump status at the next pin advance.
+bump status at the next pin advance.
 ~~13. Next pin bump: re-verify imapsync/mailpit/swaks presence list~~ standing - TODO_LIST row (fires on the NEXT bump)
-    (existing TODO row).
+(existing TODO row).
 ~~14. Archive sweep: re-check 16_19-16 (15 routed items) and the other~~ done - re-checked in the 2026-09-29 pass: its backlog/watch items remain live (stays unarchived)
-    annotated reports for full resolution as backlog lands (existing
-    row, rewritten this session).
+annotated reports for full resolution as backlog lands (existing
+row, rewritten this session).
 ~~15. Annotate+archive 17_15-11/17_21-07 once the g2-gated items resolve.~~ standing - gated on their user-gated opens (g2 / C17 set); 17_17-28 archived 2026-09-29 instead
 ~~16. Demo g1/g2 decisions (dmarc-in-demo scope) — USER.~~ still open - decision-batch
 ~~17. D1 live-enablement decision — USER; unlocks DNSBL runtime evidence,~~ still open - decision-batch D1
-    pyzor verdict, Gatus wiring on the consumer side.
+pyzor verdict, Gatus wiring on the consumer side.
 ~~18. D2 spam→Junk policy decision — USER.~~ still open - decision-batch Q6
 ~~19. qcow2 blob purge verdict (filter-repo + `--force-with-lease` window)~~ still open - TODO_LIST blocked row
-   — USER.
+— USER.
 ~~20. Renovate install-or-drop — USER.~~ still open - decision-batch C19
 ~~21. GitHub Discussions enable-or-issues-only — USER.~~ still open - decision-batch C22
 ~~22. mailsuite STARTTLS draft: file or skip — USER (draft ready).~~ still open - decision-batch C20
 ~~23. ROADMAP Q6 (declarative Junk filing) verdict → possible Stalwart~~ still open - decision-batch Q6
-    upstream feature request.
+upstream feature request.
 ~~24. Release hygiene: confirm `[Unreleased]` stays a single~~ done - [Unreleased] reset to empty Added/Changed/Fixed at the 0.4.0 cut; discipline holds
-   Added/Changed/Fixed triple as the daemon appends in parallel.
+Added/Changed/Fixed triple as the daemon appends in parallel.
 ~~25. Post-release sanity: `nix flake show` + `nix run .#vm` boot smoke on~~ routed - TODO_LIST row (2026-09-29)
-   the v0.4.0 tag specifically (local gates ran on the tree, not the
-   tag object).
+the v0.4.0 tag specifically (local gates ran on the tree, not the
+tag object).
 ~~26. CHANGELOG: the 0.4.0 "Fixed" section leads with the CI-guard repair~~ Won't implement - YAGNI until CI-infra notes actually accumulate
-   — fine; consider folding future CI-infra notes into a Maintenance
-   heading if they accumulate.
+— fine; consider folding future CI-infra notes into a Maintenance
+heading if they accumulate.
 ~~27. Consider documenting the daemon-race commit pattern (edit+commit in~~ for non-CHANGELOG files	done - AGENTS.md already generalizes it ("release-critical files - edit and commit in the SAME tool call")
-   one tool call) for non-CHANGELOG release-critical files too — it is
-   currently only spelled out for CHANGELOG.
+one tool call) for non-CHANGELOG release-critical files too — it is
+currently only spelled out for CHANGELOG.
 ~~28. AGENTS.md: the fixture-trap bullet now spans five sub-lessons;~~ now spans five sub-lessons	done - split into sub-bullets 2026-09-29
-   consider splitting lint-noise vs fixture-traps vs editing-traps into
-   sub-bullets for scanability.
+consider splitting lint-noise vs fixture-traps vs editing-traps into
+sub-bullets for scanability.
 
 ## g) Questions I can NOT figure out myself
 
 ~~1. **C17a — SystemNix pin choice, now actionable**: hard-pin~~ still open - decision-batch C17 (unblocked by the v0.4.0 tag)
-   `github:LarsArtmann/nix-email?ref=v0.4.0` (pin-discipline doctrine,
-   reproducible consumer lock) or keep floating `?ref=master` (fleet
-   posture, rides fixes immediately)? Both defensible; it is your
-   doctrine call and it gates the SystemNix push (f/3, f/4).
+`github:LarsArtmann/nix-email?ref=v0.4.0` (pin-discipline doctrine,
+reproducible consumer lock) or keep floating `?ref=master` (fleet
+posture, rides fixes immediately)? Both defensible; it is your
+doctrine call and it gates the SystemNix push (f/3, f/4).
 ~~2. **BuildFlow upstream fixes scheduling**: should the port-collision~~ still open - TODO_LIST BuildFlow row
-   and dprint-pipe fixes (f/5, f/6) be a dedicated BuildFlow-repo
-   session soon — I can author both — or stay routed-as-TODO until
-   BuildFlow's own cycle? Your prioritization across repos.
+and dprint-pipe fixes (f/5, f/6) be a dedicated BuildFlow-repo
+session soon — I can author both — or stay routed-as-TODO until
+BuildFlow's own cycle? Your prioritization across repos.
 ~~3. **Daemon flush policy at session end**: when the tree is~~ still open - user process preference
-   done-but-ahead on docs-only commits, do you want an explicit
-   "wait-for-daemon-push" block (adds up to ~10 min per session), or is
-   riding the daemon's next cycle acceptable as it did here? (e/7; a
-   process preference only you can set.)
+done-but-ahead on docs-only commits, do you want an explicit
+"wait-for-daemon-push" block (adds up to ~10 min per session), or is
+riding the daemon's next cycle acceptable as it did here? (e/7; a
+process preference only you can set.)
