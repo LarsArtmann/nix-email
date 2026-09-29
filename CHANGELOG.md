@@ -11,6 +11,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- Docs-health audit pass (2026-09-29) over every `docs/status` and
+  `docs/planning` 2026-0* file: the seven unannotated reports plus both
+  Pareto plans got inline strikethrough verdicts (~350 new resolution
+  markers; per-item evidence cited against commits, CHANGELOG 0.4.0, and
+  the living docs), the flake-parts migration report was archived (last
+  open item verified pre-existing), unharvested report items were routed
+  into TODO_LIST (CI pipe-table lint, pre-push lockstep mirror,
+  host-parse-fixture helper, parsedmarc sample breadth, CI statix step,
+  v0.4.0 tag smoke, docs freshness audits, parsedmarc unit Restart
+  decision), the flake.nix split graduated from ROADMAP to TODO_LIST
+  (the ~300-line trigger fired at 356 lines), the stale rateLimits/DNSBL
+  ergonomics TODO row was deleted (deliverable landed), the 19-23 plan's
+  two false "SystemNix pin bump v0.2.0 -> v0.3.1" claims were corrected
+  inline, AGENTS.md gained the red-CI cause-attribution rule and a
+  fixture-traps restructure, and FEATURES.md split the Renovate+Dependabot
+  row honestly (Dependabot works; the Renovate app was never installed).
+
 ### Fixed
 
 ## [0.4.0] - 2026-09-23

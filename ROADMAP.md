@@ -122,9 +122,10 @@ the verified-source work (what the wrapper OWNS) is done or specified in
 - Retire the two in-repo nixpkgs workarounds once upstream fixes land (host-less
   `[elasticsearch]` emission; imapclient on python 3.14) - re-check on every
   nixpkgs bump; the module comments carry the revert conditions
-- Split `flake.nix` into `flake-modules/*.nix` (the flake-parts idiom)
-  only when it outgrows ~300 lines - it is ~105 after the 2026-09-17
-  migration; splitting earlier costs navigation for nothing
+- Split `flake.nix` into `flake-modules/*.nix` (the flake-parts idiom):
+  the ~300-line trigger FIRED (356 lines after the demo VM, eval guards,
+  and M14 work, 2026-09-29) - GRADUATED to a TODO_LIST Medium row; do the
+  split there, not ad hoc
 - Arch-diagram content-freshness audit (routed 2026-09-22 from the
   16_19-16 report): `docs/architecture-understanding/*.d2` renders are
   label-verified but the CONTENT vs module reality (relay, DKIM
