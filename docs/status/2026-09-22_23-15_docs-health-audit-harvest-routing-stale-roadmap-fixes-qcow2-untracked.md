@@ -39,16 +39,16 @@
 
 ## b) PARTIALLY DONE
 
-1. **Stale-claim sweep** - living docs swept clean (no live `v0.2.0` rot); `docs/planning/2026-09-22_19-23` master-plan still says "pin bump v0.2.0 → v0.3.1" (left alone deliberately: same-day snapshot, superseded by decision-batch C17 correction; recorded here so the verdict is not chat-only).
-2. **dprint table alignment** - not verified: dprint is not in the devShell and buildflow was not invoked (see d/1); CI does not enforce dprint, so no gate is red, but my added table rows are stylistically unaligned until a buildflow/dprint pass runs.
-3. **FEATURES post-edit verification** - done late (closeout) instead of immediately after the re-indent warning.
+~~1. **Stale-claim sweep** - living docs swept clean (no live `v0.2.0` rot); `docs/planning/2026-09-22_19-23` master-plan still says "pin bump v0.2.0 → v0.3.1" (left alone deliberately: same-day snapshot, superseded by decision-batch C17 correction; recorded here so the verdict is not chat-only).~~ done - the 2026-09-29 pass swept the planning docs: the 19-23 plan's two v0.2.0→v0.3.1 pin-claims corrected inline; living docs grep-clean
+~~2. **dprint table alignment** - not verified: dprint is not in the devShell and buildflow was not invoked (see d/1); CI does not enforce dprint, so no gate is red, but my added table rows are stylistically unaligned until a buildflow/dprint pass runs.~~ done - the T15 buildflow pass ran over the 2026-09-22/23 table edits (05-55 a/3)
+~~3. **FEATURES post-edit verification** - done late (closeout) instead of immediately after the re-indent warning.~~ done - verified in the closeout (as the row records) and re-verified by the later audits
 
 ## c) NOT STARTED
 
-1. **22-50 §f/49: annotate the 21-10 report's M14 items as resolved** (missed during routing - now routed into the annotate-pass work; the five-candidate list in the TODO row predates 21-10/22-50 becoming annotatable).
-2. **Git history purge of the five demo.qcow2 blobs** (~140 MB across history) - destructive rewrite + daemon-push interference; user-gated (see g/1).
-3. **FEATURES honesty-phrasing standardization** (22-50 §b/6 + §e/5) - DROPPED with reason: M14 rows already carry eval-only qualifiers and the certificate-row precedent stood; overridable (see g/3).
-4. **buildflow run** over this session's changes (the wrapper's own repairs/verify loop was bypassed).
+~~1. **22-50 §f/49: annotate the 21-10 report's M14 items as resolved** (missed during routing - now routed into the annotate-pass work; the five-candidate list in the TODO row predates 21-10/22-50 becoming annotatable).~~ done - M14 items annotated 2026-09-22 (02-58 a/15); the remaining rows closed in the 2026-09-29 pass
+~~2. **Git history purge of the five demo.qcow2 blobs** (~140 MB across history) - destructive rewrite + daemon-push interference; user-gated (see g/1).~~ still open - user-gated (TODO_LIST blocked row)
+~~3. **FEATURES honesty-phrasing standardization** (22-50 §b/6 + §e/5) - DROPPED with reason: M14 rows already carry eval-only qualifiers and the certificate-row precedent stood; overridable (see g/3).~~ Won't implement - DROPPED with reason in-file; stood unchallenged (M14 rows carry explicit evidence qualifiers - 22-50 b/6)
+~~4. **buildflow run** over this session's changes (the wrapper's own repairs/verify loop was bypassed).~~ done - the T15 buildflow full pass (05-55 a/3)
 
 ## d) TOTALLY FUCKED UP
 
@@ -70,32 +70,32 @@
 
 **User decisions (minutes each)**
 
-1. Cut `v0.4.0` now vs batch (decision-batch entry ready; rec: now).
-2. Purge demo.qcow2 blobs from git history (force-push + daemon coordination).
-3. Overrule-or-confirm: over-quota row sweep + dropped FEATURES honesty pass.
-4. The standing decision batch: D1, D2, C24, C29, C17 (+hard-pin vs float), C18, C19, C20, C22, C34, Q4-Q6, g1/g2.
+~~1. Cut `v0.4.0` now vs batch (decision-batch entry ready; rec: now).~~ done - v0.4.0 cut, pushed, tag CI green, GitHub release Latest (05-55 a/7)
+~~2. Purge demo.qcow2 blobs from git history (force-push + daemon coordination).~~ still open - user-gated (TODO_LIST blocked row)
+~~3. Overrule-or-confirm: over-quota row sweep + dropped FEATURES honesty pass.~~ resolved - no overrule received; both verdicts (over-quota sweep, dropped honesty pass) stood through the 05-55 closeout
+~~4. The standing decision batch: D1, D2, C24, C29, C17 (+hard-pin vs float), C18, C19, C20, C22, C34, Q4-Q6, g1/g2.~~ still open - decision-batch (D1/D2/C24/C29/C17-C22/C34/Q4-Q6/g1-g2 unanswered)
 
 **Repo work (no decisions needed)**
-5. Annotate 21-10 report M14 items (new; this session's miss).
-6. demo-VM hostfwd/API hang root-cause (C57) + layered re-smoke + withheld docs (existing High row).
-7. M14 runtime evidence: flood-probe subtest + DNSBL evidence path (new row).
-8. rateLimits/DNSBL consumer ergonomics docs (new row).
-9. parsedmarc failure-report coverage (new row).
-10. docs-status ANNOTATE passes over the five candidates, then archive sweep.
-11. Run buildflow over this session's changes (dprint alignment + wrapper repairs).
-12. Dependabot branch review/merge (user-gated).
-13. Upstream filings re-check (#563651/#563652/#563777).
-14. Catch-all assertion-or-doc row (existing).
-15. Next-pin-bump presence-list re-verify (existing Low row).
-16. aarch64 eval-shape guard after any source-set change (habit; not run this session).
-17. Re-check daemon push posture (ahead 2 at closeout).
-18. Consider documenting the "planning snapshots keep stale claims by design" verdict in AGENTS Documentation map (one line).
+~~5. Annotate 21-10 report M14 items (new; this session's miss).~~ done - 02-58 a/15 + the 2026-09-29 pass (remaining rows)
+~~6. demo-VM hostfwd/API hang root-cause (C57) + layered re-smoke + withheld docs (existing High row).~~ done - 02-58 a/3-a/4 (guest firewall + systemd-PATH curl)
+~~7. M14 runtime evidence: flood-probe subtest + DNSBL evidence path (new row).~~ done - flood-node subtest (02-58 a/8; ledger (m))
+~~8. rateLimits/DNSBL consumer ergonomics docs (new row).~~ done - README Rate-limit sizing + match passthrough (02-58 a/16)
+~~9. parsedmarc failure-report coverage (new row).~~ done - T12 green (05-55 a/1)
+~~10. docs-status ANNOTATE passes over the five candidates, then archive sweep.~~ done - 02-58 a/11-a/14 (five candidates) + the 2026-09-29 pass (17_17-28 archived)
+~~11. Run buildflow over this session's changes (dprint alignment + wrapper repairs).~~ done - T15 (05-55 a/3)
+~~12. Dependabot branch review/merge (user-gated).~~ done - PR #2 squash-merged (02-58 a/2)
+~~13. Upstream filings re-check (#563651/#563652/#563777).~~ standing - TODO_LIST watch row (re-checked 2026-09-22, 02-58 a/1)
+~~14. Catch-all assertion-or-doc row (existing).~~ done - README ordering-footgun doc verdict (02-58 a/10)
+~~15. Next-pin-bump presence-list re-verify (existing Low row).~~ standing - TODO_LIST row (fires on the NEXT bump)
+~~16. aarch64 eval-shape guard after any source-set change (habit; not run this session).~~ standing habit - runs after source-set changes (plan guardrails; no new artifact owed)
+~~17. Re-check daemon push posture (ahead 2 at closeout).~~ done - pushed; master in sync with origin, CI green (verified 2026-09-29)
+~~18. Consider documenting the "planning snapshots keep stale claims by design" verdict in AGENTS Documentation map (one line).~~ done - already documented in the AGENTS Documentation map ("point-in-time session snapshots")
 
 ## g) Three questions I cannot answer myself
 
-1. **Purge the demo.qcow2 blobs from history?** ~140 MB across five daemon commits; a purge needs a history rewrite + force-push while the auto-commit daemon is live (it will fight a rewritten master). Worth it for a personal repo, or let the blobs rot in history and accept clone weight?
-2. **Cut `v0.4.0` now or batch?** [Unreleased] carries M14 options, eval guards, module-import-eval, TLS-RPT e2e, pin advance. A tag also gives SystemNix's hard-pin call (C17a) a stable ref. Your release call (21-10 §g/3 asked; still unanswered).
-3. **Confirm my two judgment calls:** (a) over-quota TODO row swept on 21-10's "row sweepable" verdict without your sign-off, (b) FEATURES honesty-phrasing pass dropped (eval-only qualifiers already present). Overrule either?
+~~1. **Purge the demo.qcow2 blobs from history?** ~140 MB across five daemon commits; a purge needs a history rewrite + force-push while the auto-commit daemon is live (it will fight a rewritten master). Worth it for a personal repo, or let the blobs rot in history and accept clone weight?~~ still open - TODO_LIST blocked row (user verdict)
+~~2. **Cut `v0.4.0` now or batch?** [Unreleased] carries M14 options, eval guards, module-import-eval, TLS-RPT e2e, pin advance. A tag also gives SystemNix's hard-pin call (C17a) a stable ref. Your release call (21-10 §g/3 asked; still unanswered).~~ done - ANSWERED 2026-09-23: cut approved and executed (05-55 a/7)
+~~3. **Confirm my two judgment calls:** (a) over-quota TODO row swept on 21-10's "row sweepable" verdict without your sign-off, (b) FEATURES honesty-phrasing pass dropped (eval-only qualifiers already present). Overrule either?~~ resolved - no overrule received; both verdicts stood (see f/3)
 
 ---
 

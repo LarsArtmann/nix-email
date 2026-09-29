@@ -74,7 +74,7 @@ session's addition, both eval checks both arches, statix 0 findings.
 
 ## b) PARTIALLY DONE
 
-1. **T12 — parsedmarc forensic/failure-report coverage.** Everything in a)/3-5
+~~1. **T12 — parsedmarc forensic/failure-report coverage.** Everything in a)/3-5~~ done - T12 GREEN 2026-09-23 (05-55 a/1: malformed upstream sample root-caused host-side; repaired artifact pinned; all subtests green)
    is done; verification is RED (see d). The failure is ISOLATED: in the red
    run, every pre-existing subtest stayed green (unit/ini contract, aggregate
    identity, CSV, SMTP TLS-RPT, StateDirectory journal greps) — the new
@@ -94,24 +94,24 @@ session's addition, both eval checks both arches, statix 0 findings.
      NOT yet done: root-cause, fix, green rerun, FEATURES/TODO row updates.
      Remember: failed check results are CACHED — any rerun needs the fixed file
      (which the fix will provide).
-2. **Close-out (planned)** — TODO_LIST Dependabot row deletion, buildflow row
+~~2. **Close-out (planned)** — TODO_LIST Dependabot row deletion, buildflow row~~ done - 05-55 a/8-a/9
    sweep, CHANGELOG residue consolidation: located in plan, not executed
    (sequenced behind T12/T15/Final by design).
 
 ## c) NOT STARTED
 
-1. **T12 root-cause/diagnosis** of the red subtest (only first-run evidence
+~~1. **T12 root-cause/diagnosis** of the red subtest (only first-run evidence~~ done - host-side dry-run root cause: malformed upstream sample (05-55 a/1)
    gathered so far).
-2. **T15** — buildflow full pass (dprint md-table alignment over the
+~~2. **T15** — buildflow full pass (dprint md-table alignment over the~~ done - buildflow full pass (05-55 a/3)
    2026-09-22 table edits + repairs), then `nix fmt -- . --check`.
-3. **Final aggregated gate** — `nix flake check` has NEVER run on the final
+~~3. **Final aggregated gate** — `nix flake check` has NEVER run on the final~~ done - full `nix flake check` EXIT:0 on the fixed tree (05-55 a/6)
    tree (every constituent green individually as of the prior session; the
    new red subtest now makes it definitively red until T12 lands).
-4. **T02 — cut v0.4.0** (user-gated: the 02:58 report's g/1 question is still
+~~4. **T02 — cut v0.4.0** (user-gated: the 02:58 report's g/1 question is still~~ done - v0.4.0 shipped 2026-09-23 (05-55 a/7)
    unanswered; recommendation on record: cut now).
-5. **Close-out rows** (Dependabot deletion + CHANGELOG line, buildflow row,
+~~5. **Close-out rows** (Dependabot deletion + CHANGELOG line, buildflow row,~~ done (05-55 a/8)
    21-10 annotate row, archive-sweep row).
-6. **Cleanup** — `/tmp/demo-t03/*` GC roots (vm-root, vm-fixed, vm-fixed2,
+~~6. **Cleanup** — `/tmp/demo-t03/*` GC roots (vm-root, vm-fixed, vm-fixed2,~~ done - GC roots dropped (05-55 a/9)
    driver-root, console.log, smoke-final.txt) still pinned.
 
 ## d) TOTALLY FUCKED UP!
@@ -167,88 +167,88 @@ session's addition, both eval checks both arches, statix 0 findings.
 
 **Unblock the red tree (now):**
 
-1. Diagnose T12 red: `nix log` the failed drv for the full parsedmarc journal
+~~1. Diagnose T12 red: `nix log` the failed drv for the full parsedmarc journal~~ done (05-55 a/1)
    (look for skip/error lines around the forensic mail).
-2. Host-side dry-run: run pinned `parsedmarc.parse_report_email()` on
+~~2. Host-side dry-run: run pinned `parsedmarc.parse_report_email()` on~~ done - this dry-run produced the root cause (05-55 a/1)
    `/tmp/forensic-subject.eml` — proves whether detection/parse works at all
    outside the IMAP path.
-3. If detection is fine host-side: inspect the IMAP/mailbox path (mailsuite
+~~3. If detection is fine host-side: inspect the IMAP/mailbox path (mailsuite~~ done(moot) - detection itself was the failure (malformed sample bytes); no IMAP-path bug existed
    fetch → classification) — likely the real gap.
-4. Add journal dump to the forensic subtest failure path (diagnosability).
-5. Re-run targeted `nix build .#checks.x86_64-linux.parsedmarc-e2e -L` (file
+~~4. Add journal dump to the forensic subtest failure path (diagnosability).~~ done - journal-dump diagnosability branch added to the subtest timeout path (05-55 a/1)
+~~5. Re-run targeted `nix build .#checks.x86_64-linux.parsedmarc-e2e -L` (file~~ done - targeted check GREEN, all subtests (05-55 a/1)
    changed → cache bypassed) until GREEN.
-6. Update FEATURES.md:58 + TODO_LIST.md:60 from the GREEN transcript only.
-7. Check `git status -sb` + whether the daemon already pushed the red tree;
+~~6. Update FEATURES.md:58 + TODO_LIST.md:60 from the GREEN transcript only.~~ done - FEATURES row extended from the green transcript (05-55 a/2)
+~~7. Check `git status -sb` + whether the daemon already pushed the red tree;~~ done - daemon pushed; master CI green since b88969f (05-55 a/5; re-verified 2026-09-29)
    if pushed, note the red CI run and let the fix flip it.
 
 **Plan remainder (order per master plan):**
 
-8. T15: `buildflow` full pass (dprint table alignment over 2026-09-22 edits);
+~~8. T15: `buildflow` full pass (dprint table alignment over 2026-09-22 edits);~~ done (05-55 a/3)
    review diff before accepting; `nix fmt -- . --check`.
-9. Final aggregated gate: `nix flake check > /tmp/gate-final.log 2>&1;
+~~9. Final aggregated gate: `nix flake check > /tmp/gate-final.log 2>&1;~~ done (05-55 a/6)
    echo "EXIT:$?"` (~8-9 min) — must be green before T02.
-10. CHANGELOG: fold the T12 forensic-coverage entry into [Unreleased].
-11. Close-out: delete TODO_LIST Dependabot row + CHANGELOG line (PR #2 merged
+~~10. CHANGELOG: fold the T12 forensic-coverage entry into [Unreleased].~~ done (05-55 a/8)
+~~11. Close-out: delete TODO_LIST Dependabot row + CHANGELOG line (PR #2 merged~~ done (05-55 a/8)
     last session).
-12. Close-out: buildflow row sweep + 21-10 annotate row + archive-sweep row
+~~12. Close-out: buildflow row sweep + 21-10 annotate row + archive-sweep row~~ done (05-55 a/8)
     (only 16_20-49 archivable so far).
-13. Close-out: CHANGELOG residue consolidation (annotates/archives, release
+~~13. Close-out: CHANGELOG residue consolidation (annotates/archives, release~~ done (05-55 a/8)
     runbook, stateVersion, statix re-collapse, sizing note).
-14. Cleanup: drop `/tmp/demo-t03/*` GC roots (AGENTS debug-loop hygiene).
-15. `gh run list` green verification at the very end.
+~~14. Cleanup: drop `/tmp/demo-t03/*` GC roots (AGENTS debug-loop hygiene).~~ done (05-55 a/9)
+~~15. `gh run list` green verification at the very end.~~ done - master CI green (verified again 2026-09-29)
 
 **User-gated (cannot proceed without input):**
 
-16. g/1 (STILL OPEN since 02:58): cut v0.4.0 now? Recommendation: yes.
-17. Push authorization for T02 (master + tag + `gh release create`) — harness
+~~16. g/1 (STILL OPEN since 02:58): cut v0.4.0 now? Recommendation: yes.~~ done - ANSWERED (see g/1)
+~~17. Push authorization for T02 (master + tag + `gh release create`) — harness~~ done - authorized + executed (see g/2)
     default forbids pushes without explicit ask.
-18. T16/C17: SystemNix push approval (dedupe+relock green locally).
-19. T17: Resend API key for the live :587 SASL smoke.
-20. T18: SystemNix CI-debt triage (gated on T16).
-21. T19 verdict: demo.qcow2 history purge (~140 MB, needs force-push —
+~~18. T16/C17: SystemNix push approval (dedupe+relock green locally).~~ still open - TODO_LIST blocked row (C17 push approval + pin-policy call)
+~~19. T17: Resend API key for the live :587 SASL smoke.~~ still open - TODO_LIST blocked row
+~~20. T18: SystemNix CI-debt triage (gated on T16).~~ still open - TODO_LIST blocked row (gated on T16)
+~~21. T19 verdict: demo.qcow2 history purge (~140 MB, needs force-push —~~ still open - TODO_LIST blocked row (user verdict)
     forbidden without approval) vs accept-clone-weight.
-22. T21/D1+D2: production build-out slices (M22 provisioning, M23 backup/DR,
+~~22. T21/D1+D2: production build-out slices (M22 provisioning, M23 backup/DR,~~ still open - D1/D2-gated (TODO_LIST + ROADMAP)
     M24 DNS, M25 migration, M26 DMARC+OIDC, C12 rua live, C14 secrets).
-23. T22 verdicts: mailsuite STARTTLS issue file-or-skip (draft ready),
+~~23. T22 verdicts: mailsuite STARTTLS issue file-or-skip (draft ready),~~ still open - decision-batch (C20/Q6-d/C19/C22)
     Stalwart Junk upstream request, Renovate install-or-drop, Discussions
     toggle.
-24. T23 standing: next-pin-bump presence re-verify (fires on NEXT bump).
+~~24. T23 standing: next-pin-bump presence re-verify (fires on NEXT bump).~~ standing - TODO_LIST row (fires on the NEXT bump)
 
 **Improvements noticed this session (candidates, most → AGENTS/TODO routing):**
 
-25. AGENTS.md working rule: host-side dry-run of pinned parsers before VM
+~~25. AGENTS.md working rule: host-side dry-run of pinned parsers before VM~~ done - AGENTS.md HOST-SIDE PARSER DRY-RUN lesson (2026-09-23)
     fixture burns (lesson above).
-26. Subtest diagnosability: journal-dump-on-timeout pattern for async
+~~26. Subtest diagnosability: journal-dump-on-timeout pattern for async~~ done - journal-dump branch in the forensic subtest (05-55 a/1)
     wait_until_succeeds subtests.
 27. Anti-pattern note: empty grep output is not verification (grep-of-grep).
-28. Consider a tiny host-side eval of `parse_failure_report` on the fixture
+~~28. Consider a tiny host-side eval of `parse_failure_report` on the fixture~~ routed - TODO_LIST host-parse-fixture helper row (2026-09-29)
     as a permanent fast regression layer (seconds vs minutes) — maybe a
     `runCommand` check beside the VM test.
-29. Re-verify `.data.errors` / GTUBE / catch-all ledger claims stay accurate
+~~29. Re-verify `.data.errors` / GTUBE / catch-all ledger claims stay accurate~~ done(moot) - T12 never touched README; the ledger claims re-verified in the 2026-09-29 docs pass
     when T12 work touches README (docs drift guard).
-30. TODO_LIST freshness sweep after T12 lands (row 60 wording says "check
+~~30. TODO_LIST freshness sweep after T12 lands (row 60 wording says "check~~ done - the T12 row deleted at close-out (05-55 a/8)
     parsedmarc's failure-report sample" — done; rewrite as done+evidence).
 
 **Standing backlog visible in TODO_LIST during this session (not started,
 not forgotten):**
 
-31. dmarc-monitor live validation against a real IMAP mailbox (BLOCKED: D1).
-32. mailsuite auto-STARTTLS upstream filing (BLOCKED: user file-or-skip).
-33. TLS-node boot-race Restart policy upstreaming decision (nixpkgs parsedmarc
+~~31. dmarc-monitor live validation against a real IMAP mailbox (BLOCKED: D1).~~ still open - D1-gated (TODO_LIST)
+~~32. mailsuite auto-STARTTLS upstream filing (BLOCKED: user file-or-skip).~~ still open - decision-batch C20
+~~33. TLS-node boot-race Restart policy upstreaming decision (nixpkgs parsedmarc~~ routed - TODO_LIST blocked row (file-or-skip, 2026-09-29)
     unit ships no Restart).
-34. Renovate/Dependabot cadence policy (C19) — first Dependabot PR was merged;
+~~34. Renovate/Dependabot cadence policy (C19) — first Dependabot PR was merged;~~ routed - decision-batch C19; the first Dependabot PR merged 2026-09-22 (02-58 a/2)
     decide automation stance.
-35. `nixpkgs-lib.follows` eval guard (TODO_LIST-tracked from flake-parts
+~~35. `nixpkgs-lib.follows` eval guard (TODO_LIST-tracked from flake-parts~~ done - shipped in flake.nix (21-10 a/1)
     migration).
-36. Upstream workaround-retirement triggers (nixpkgs PRs #563651/#563652/
+~~36. Upstream workaround-retirement triggers (nixpkgs PRs #563651/#563652/~~ done - standing re-check procedure (README runbook) + evidence refreshed 2026-09-22 (02-58 a/1)
     #563777 — re-checked green last session; keep evidence fresh on next bump).
-37. README "Try it in a VM" port-forwarding table: keep in sync with any
+~~37. README "Try it in a VM" port-forwarding table: keep in sync with any~~ declined - accepted watch: the table documents the module's current defaults; a default change is a module PR that touches the demo config anyway
     future httpBind default change.
-38. Statix W20 recursion guard: any new dotted-key group in tests must be
+~~38. Statix W20 recursion guard: any new dotted-key group in tests must be~~ done - doctrine in AGENTS.md (collapse at introduction); proven by the module-import-eval re-collapse (02-58 a/12)
     collapsed at introduction (not retroactively).
-39. Vulnix replacement decision (NVD feed retired; skip documented in
+~~39. Vulnix replacement decision (NVD feed retired; skip documented in~~ routed - ROADMAP §5 (.buildflow.yml carries the skip rationale)
     .buildflow.yml) — revisit when a maintained scanner lands in nixpkgs.
-40. Change Log discipline: every gate-green change this session (T12 edits)
+~~40. Change Log discipline: every gate-green change this session (T12 edits)~~ done - practiced: the T12/T15/CI-guard changes all carry CHANGELOG 0.4.0 entries
     needs its CHANGELOG line at close-out, not at release time.
 
 ## g) Questions I can NOT figure out myself

@@ -85,17 +85,22 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
   does NOT run these CI-side guards, so a miss ships red CI (2026-09-23:
   module-import-eval missing there caused three red master runs before
   anyone noticed).
+- A red CI run is NEVER "the known one" without reading the failing STEP
+  name from `gh run view --log-failed` - two distinct causes stacked once
+  (2026-09-23: the T12 red masked a lockstep-guard red that had already
+  shipped three unnoticed master runs).
 - Markdown tables in this repo are dprint-formatted: a cell containing a
   literal `|` (journal transcripts, grep patterns) MUST escape it as
   `\|` - dprint re-splits unescaped pipes into phantom columns and DROPS
   the overflow content (two status-report rows were eaten and had to be
   restored from git, 2026-09-23).
-- VM-test fixture traps (2026-09-15, both live-observed): dovecot settings
-  values must NOT use the `<path` prefix (that is dovecot's
-  read-value-from-file syntax - the NixOS module then inlines file CONTENTS
-  into dovecot.conf and doveconf dies parsing the first PEM line as a
-  path); the parsedmarc ini generator renders bools Python-style
-  (`ssl=True`, NOT `ssl=true`) - grep assertions must match `True`.
+- VM-test fixture traps (2026-09-15, both live-observed):
+  - dovecot settings values must NOT use the `<path` prefix (that is
+    dovecot's read-value-from-file syntax - the NixOS module then inlines
+    file CONTENTS into dovecot.conf and doveconf dies parsing the first
+    PEM line as a path);
+  - the parsedmarc ini generator renders bools Python-style (`ssl=True`,
+    NOT `ssl=true`) - grep assertions must match `True`.
 - HOST-SIDE PARSER DRY-RUN before any VM test that feeds a fixture to a
   python service (2026-09-23, paid for itself same day): the service's
   package lives in the host store, so `nix-store -q --references <drv>` +
