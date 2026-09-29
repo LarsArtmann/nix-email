@@ -37,19 +37,19 @@
 2. ~~**Full gate** - every check built green INDIVIDUALLY this session (dmarc-eval ×2, module-import-eval both arches, stalwart-relay-e2e, parsedmarc-e2e with the new TLS-RPT subtest, stalwart-e2e with the metrics dump), but the aggregated `nix flake check` was never executed - it is the next command, and it also re-evals the demo toplevel on the new pin.~~ done (full gate green in the 22-50 closeout (all 3 VM tests + evals - EXIT:0))
 3. ~~**MONITORING.md row 2 correction** - the transcript now proves stock metrics have no queue-depth/age series; the row still describes the aspired rule and must be rewritten to the management-API-poll alternative. Transcript exists; edit pending.~~ done (MONITORING row 2 corrected 2026-09-22 (23-15 audit - management-API poll))
 4. ~~**Harvest into living docs** - TODO_LIST row sweeps (C03/C04/C05/C06/C07/C09/C10/C23/C24-spec/C28-spec/C31-33/C36/C37/C56/C57 done; C15 partial; C16 doc-verified) + CHANGELOG [Unreleased] entries for: guards, pin advance, workaround retirement, module-import check, loopback assertion, TLS-RPT e2e, MONITORING.md, SystemNix dedupe. NOT yet written - the session ran out of road before the closing harvest.~~ done (harvest shipped by the 22-50/23-15 sessions (TODO sweeps + CHANGELOG entries))
-5. **M17/M19** - resolved at the VERDICT level (expiry: defaults already active, doc-only; audit: knob does not exist, tracing is the surface; autoconfig: rides the HTTP listener, doc-only) and captured in the ledger + MONITORING rows, but no CHANGELOG/TODO sweep yet, and M17's "capacity metrics" row still needs the management-API-based spec once row 2 is corrected.
+~~5. **M17/M19** - resolved at the VERDICT level (expiry: defaults already active, doc-only; audit: knob does not exist, tracing is the surface; autoconfig: rides the HTTP listener, doc-only) and captured in the ledger + MONITORING rows, but no CHANGELOG/TODO sweep yet, and M17's "capacity metrics" row still needs the management-API-based spec once row 2 is corrected.~~ done - the sweep landed (CHANGELOG 0.4.0 docs-audit entry) and the capacity row was corrected to the API-poll spec (MONITORING row 11, 22-50 a/4)
 6. ~~**TODO evidence updates** - imapclient #663 merge (M8 finding) and the SystemNix-row rewrite (it no longer describes reality: no v0.2.0 pin exists) are known-needed TODO_LIST edits, not yet applied.~~ done (done - imapclient #663 evidence updated + SystemNix row rewritten (23-15; #663 evidence refreshed again 2026-09-22))
 
 ## c) NOT STARTED
 
 1. ~~**The demo-VM hostfwd/API hang** (now a TODO_LIST High row) - root-cause work needs the VM debug loop (GC root, custom test script, guest-side curl first). Zero progress this session beyond recording it properly.~~ done (ROOT-CAUSED + FIXED 2026-09-22: firewall never opened the non-loopback httpBind port + provisioning systemd-PATH no-op; host smoke green end-to-end (README ledger (k)/(l)))
-2. **docs-status ANNOTATE passes** (C11 real task) - five reports need inline `~~item~~ done at <hash>` resolution before any `git mv` to archived/; not begun (only the eligibility check ran).
-3. **D1-gated cluster M22-M26** (provisioning+DKIM, backup/DR, Terraform DNS, migration+cutover, DMARC-live+OIDC) - untouched by design; hard-gated on the user's D1/D2 answers.
-4. **User-gated filings** - mailsuite issue (C20, draft ready), Stalwart upstream Junk-filing request (C21, gated on Q6), Renovate (C19), Discussions (C22), webmail (C34).
-5. **Resend live smoke (C16)** - SASL shape doc-verified; the real :587 probe still needs an API key from Lars. Outbound webhook telemetry (C25) similarly gated.
-6. **Secret rotation (C14)** - gated on D1 by design.
-7. **Release tag** - nothing cut this session; guards + TLS-RPT + pin advance are sitting in CHANGELOG-less [Unreleased] purgatory until the harvest.
-8. **Fleet eval-guard PROPOGATION** - SystemNix/telephony do not yet benefit from THIS repo's pin-guard learnings (SystemNix has its own tarball/URL guards; the nixpkgs-pin-identity constant idea could be adopted there - cross-repo suggestion, not started).
+2. ~~**docs-status ANNOTATE passes** (C11 real task) - five reports need inline `~~item~~ done at <hash>` resolution before any `git mv` to archived/; not begun (only the eligibility check ran).~~ done — the passes ran 2026-09-22 (02-58 a/11-a/14) and continued 2026-09-29 (16_18-41, 19-07, 22-50, 23-15, 02-58, 03-21, 05-55 annotated; 17_17-28 archived)
+~~3. **D1-gated cluster M22-M26** (provisioning+DKIM, backup/DR, Terraform DNS, migration+cutover, DMARC-live+OIDC) - untouched by design; hard-gated on the user's D1/D2 answers.~~ still open - TODO_LIST D1-gated rows (unchanged; hard-gated by design)
+~~4. **User-gated filings** - mailsuite issue (C20, draft ready), Stalwart upstream Junk-filing request (C21, gated on Q6), Renovate (C19), Discussions (C22), webmail (C34).~~ still open - TODO_LIST blocked rows + decision-batch (C20/C21/C19/C22/C34 unchanged)
+~~5. **Resend live smoke (C16)** - SASL shape doc-verified; the real :587 probe still needs an API key from Lars. Outbound webhook telemetry (C25) similarly gated.~~ still open - TODO_LIST blocked row (needs API key from Lars)
+~~6. **Secret rotation (C14)** - gated on D1 by design.~~ still open - TODO_LIST D1-gated row (unchanged)
+~~7. **Release tag** - nothing cut this session; guards + TLS-RPT + pin advance are sitting in CHANGELOG-less [Unreleased] purgatory until the harvest.~~ done - v0.4.0 cut, pushed, tag CI green, GitHub release Latest (2026-09-23; 05-55 a/7) - superseded the v0.3.2 idea
+~~8. **Fleet eval-guard PROPOGATION** - SystemNix/telephony do not yet benefit from THIS repo's pin-guard learnings (SystemNix has its own tarball/URL guards; the nixpkgs-pin-identity constant idea could be adopted there - cross-repo suggestion, not started).~~ still open - cross-repo suggestion for a SystemNix session (f/42)
 
 ## d) TOTALLY FUCKED UP (own failures, root-caused)
 
@@ -86,26 +86,26 @@
 **In-repo technical (next session):**
 
 16. ~~Finish M14: `rateLimits` + `spamFilter.dnsbl` options with the decided defaults + module-import-eval assertions + relay-e2e re-run.~~ done (M14 finished (22-50) + runtime evidence (flood node - 2026-09-22))
-17. Fix MONITORING.md row 2 (no queue-depth gauge in 0.15.5 - spec the `GET /api/queue/messages` consumer poll instead).
-18. Run the aggregated `nix flake check` (all checks at once, demo toplevel on the new pin) - the one gate not yet executed this session.
-19. Harvest: TODO_LIST sweeps + CHANGELOG [Unreleased] entries (guards, pin advance, workaround retirement, module-import check, loopback assertion, TLS-RPT e2e, MONITORING.md).
-20. Update TODO evidence: imapclient #663 merged (upstream-watch row), SystemNix pin row rewrite (no v0.2.0 pin exists - it floats master).
-21. Demo-VM hostfwd hang: guest-side `curl -v 127.0.0.1:8080` first, read the 6 "Configuration build warning" lines, check the "Downloading external resource" loop (fresh-session budget).
-22. Then the layered demo re-smoke (guest loopback → host 18080 → swaks catch-all → IMAPS login) with transcripts.
-23. Then land the withheld demo docs (README "Try it in a VM", FEATURES row, AGENTS `nix run .#vm`).
+~~17. Fix MONITORING.md row 2 (no queue-depth gauge in 0.15.5 - spec the `GET /api/queue/messages` consumer poll instead).~~ done - row 2 rewritten to the consumer poll of GET /api/queue/messages (22-50 a/4)
+~~18. Run the aggregated `nix flake check` (all checks at once, demo toplevel on the new pin) - the one gate not yet executed this session.~~ done - full gate EXIT:0 in the 22-50 closeout (all 3 VM tests + evals) and again post-T12 (05-55 a/6)
+~~19. Harvest: TODO_LIST sweeps + CHANGELOG [Unreleased] entries (guards, pin advance, workaround retirement, module-import check, loopback assertion, TLS-RPT e2e, MONITORING.md).~~ done - shipped by the 22-50 (a/6) and 23-15 (a/1, a/5) sessions
+~~20. Update TODO evidence: imapclient #663 merged (upstream-watch row), SystemNix pin row rewrite (no v0.2.0 pin exists - it floats master).~~ done - imapclient #663 + SystemNix row rewritten (22-50 a/6; 23-15 a/5)
+~~21. Demo-VM hostfwd hang: guest-side `curl -v 127.0.0.1:8080` first, read the 6 "Configuration build warning" lines, check the "Downloading external resource" loop (fresh-session budget).~~ done - ROOT-CAUSED + FIXED 2026-09-22 (02-58 a/3: firewall + systemd-PATH curl; ledger (k)/(l))
+~~22. Then the layered demo re-smoke (guest loopback → host 18080 → swaks catch-all → IMAPS login) with transcripts.~~ done - layered transcripts green (02-58 a/5: API, catch-all, 587-auth INBOX, IMAPS)
+~~23. Then land the withheld demo docs (README "Try it in a VM", FEATURES row, AGENTS `nix run .#vm`).~~ done - README Try-it-in-a-VM + ledger (k)-(n) + FEATURES + AGENTS (02-58 a/6)
 24. Optional after demo is green: dmarc-monitor in the demo against a local Mailpit sink (g2).
-25. Investigate the demo journal's "Configuration build warning" content even if benign.
-26. Decide the demo's external-resource download posture (identify URLs; disable-or-allow; ledger the E2E-vs-demo delta).
-27. docs-status ANNOTATE pass #1 (report 16_19-16) then `git mv` if fully resolved.
-28. ANNOTATE pass #2 (16_20-49) + archive move.
-29. ANNOTATE pass #3 (17_15-11 v0.3.0 release report) + archive move.
-30. ANNOTATE pass #4 (17_17-28 flake-parts migration) + archive move (its open items are already harvested/routed).
-31. ANNOTATE pass #5 (17_21-07) LAST (hostfwd items still open - only after task 21-23 close it).
-32. `nix flake lock` mechanism note: add the parse-time-scope finding to AGENTS.md working rules (one line; prevents future sessions from re-deriving).
-33. Extend parsedmarc-e2e failure-report coverage? (forensic/failure reports currently untested - only aggregate + smtp_tls are) - check parsedmarc's failure-report sample and decide.
-34. Add a freshness Gatus spec refinement to MONITORING (dedupe note vs consumer `backup.maxAgeHours` - already flagged, needs the final wording).
-35. Capacity spec (row 11): transcribe store_/server_memory series from today's build log into concrete thresholds.
-36. Canary design: turn MONITORING §6 into an actionable TODO row (post-C29).
+~~25. Investigate the demo journal's "Configuration build warning" content even if benign.~~ done - benign startup noise, documented in the README demo section (02-58 a/6; ledger (n))
+~~26. Decide the demo's external-resource download posture (identify URLs; disable-or-allow; ledger the E2E-vs-demo delta).~~ done - ASN/GeoIP CSVs from cdn.jsdelivr.net identified, non-fatal (ledger (n); 17_21-07 f/11)
+~~27. docs-status ANNOTATE pass #1 (report 16_19-16) then `git mv` if fully resolved.~~ done - every section resolved inline (02-58 a/11)
+~~28. ANNOTATE pass #2 (16_20-49) + archive move.~~ done - fully resolved + archived (02-58 a/12)
+~~29. ANNOTATE pass #3 (17_15-11 v0.3.0 release report) + archive move.~~ done - annotated (02-58 a/12); archive still gated on its user-gated opens
+~~30. ANNOTATE pass #4 (17_17-28 flake-parts migration) + archive move (its open items are already harvested/routed).~~ done - annotated (02-58 a/12) + ARCHIVED 2026-09-29 (last open item verified pre-done)
+~~31. ANNOTATE pass #5 (17_21-07) LAST (hostfwd items still open - only after task 21-23 close it).~~ done - annotated after the hostfwd fix (02-58 a/14); archive gated on the g2 call
+~~32. `nix flake lock` mechanism note: add the parse-time-scope finding to AGENTS.md working rules (one line; prevents future sessions from re-deriving).~~ done - AGENTS.md working rule (23-15 a/9)
+~~33. Extend parsedmarc-e2e failure-report coverage? (forensic/failure reports currently untested - only aggregate + smtp_tls are) - check parsedmarc's failure-report sample and decide.~~ done - T12 shipped: upstream repaired RFC 6591 sample, failure.json/csv + samples asserted (05-55 a/1)
+~~34. Add a freshness Gatus spec refinement to MONITORING (dedupe note vs consumer `backup.maxAgeHours` - already flagged, needs the final wording).~~ done(spec) - MONITORING row 7 carries the SPEC-ONLY freshness probe with the backup.maxAgeHours dedupe note (22-50 a/4); encoding C24-gated
+~~35. Capacity spec (row 11): transcribe store_/server_memory series from today's build log into concrete thresholds.~~ done(spec) - MONITORING row 11 SPEC-ONLY with thresholds (disk/quota > 80%); series verdict = no queue gauge, API poll (22-50 a/4); encoding C24-gated
+~~36. Canary design: turn MONITORING §6 into an actionable TODO row (post-C29).~~ routed - decision-batch C29 gates it (open)
 37. ~~Rate-limiter tuning note: document how consumers should size `queue.limiter.inbound` (after M14 lands).~~ done (sizing note landed 2026-09-22 (README Rate-limit sizing + option description))
 38. ~~Threat-model: add the new loopback eval-assertion to the SSRF row (it strengthens the existing entry).~~ done (THREAT_MODEL relay-SSRF row gained the eval-time loopback assertion (23-15))
 39. ~~FEATURES.md: add rows for the eval guards, module-import check, TLS-RPT collection (FULLY_FUNCTIONAL), monitoring taxonomy (PARTIALLY - specs vs consumer wiring).~~ done (FEATURES rows landed (module-import-eval row + TLS-RPT note - 23-15))
@@ -113,16 +113,16 @@
 
 **Consumer/cross-repo (post-approval):**
 
-41. SystemNix: push the dedupe + lock (C17) + triage its CI debt list.
-42. SystemNix: consider adopting the fleet-pin-constant guard (its nixpkgs floats - the constant+ritual pattern from M3 ports directly).
-43. SystemNix: papdashboard flake-parts dedupe (same pattern as nix-email's).
-44. Rotate the 3 placeholder secrets (C14) - only when D1 lands.
-45. Resend: API key from Lars → live :587 smoke (C16) → close the last unverifiable relay claim.
-46. Resend: webhook endpoint for bounce/complaint telemetry (C25) - consumer-side, post-D1.
-47. File mailsuite draft (C20) if approved - the draft is voice-checked and 5-gates-passed.
-48. Stalwart upstream feature request (C21) if Q6 lands on (d).
-49. InboxClean JMAP/IMAP spike ticket (cross-repo, post-migration).
-50. Paperless app-passwords + smartd decoupling plan (cross-repo, ROADMAP theme 4).
+~~41. SystemNix: push the dedupe + lock (C17) + triage its CI debt list.~~ still open - TODO_LIST blocked row (C17 push approval + pin-policy call)
+~~42. SystemNix: consider adopting the fleet-pin-constant guard (its nixpkgs floats - the constant+ritual pattern from M3 ports directly).~~ still open - cross-repo suggestion (SystemNix session)
+~~43. SystemNix: papdashboard flake-parts dedupe (same pattern as nix-email's).~~ still open - cross-repo suggestion (SystemNix session)
+~~44. Rotate the 3 placeholder secrets (C14) - only when D1 lands.~~ still open - TODO_LIST D1-gated row
+~~45. Resend: API key from Lars → live :587 smoke (C16) → close the last unverifiable relay claim.~~ still open - TODO_LIST blocked row
+~~46. Resend: webhook endpoint for bounce/complaint telemetry (C25) - consumer-side, post-D1.~~ routed - decision-batch C16-adjacent (user action, post-D1)
+~~47. File mailsuite draft (C20) if approved - the draft is voice-checked and 5-gates-passed.~~ still open - decision-batch C20 (draft ready)
+~~48. Stalwart upstream feature request (C21) if Q6 lands on (d).~~ still open - gated on ROADMAP Q6 verdict
+~~49. InboxClean JMAP/IMAP spike ticket (cross-repo, post-migration).~~ routed - ROADMAP §4 (cross-repo, post-migration)
+~~50. Paperless app-passwords + smartd decoupling plan (cross-repo, ROADMAP theme 4).~~ routed - ROADMAP §4 (cross-repo)
 
 ## g) THREE QUESTIONS I CANNOT ANSWER MYSELF
 
