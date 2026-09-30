@@ -111,7 +111,9 @@ the verified-source work (what the wrapper OWNS) is done or specified in
 - Round-trip canary (MONITORING.md §6; vantage = C29)
 - Paperless mail accounts off Gmail app passwords onto own IMAP; smartd
   remote-alert path decoupled from the mail relay (circular-dependency risk);
-  InboxClean JMAP/IMAP spike post-migration
+  InboxClean JMAP adapter post-migration - DECIDED 2026-09-30 (InboxClean
+  ADR-023: JMAP-first provider abstraction, this stack is the target; IMAP
+  only on a real legacy-provider need)
 
 ### 5. Repo excellence
 
