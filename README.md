@@ -301,16 +301,18 @@ Gatus checks for the VPS (on evo-x2, external viewpoint):
    case-by-case approval. Port 587 is never blocked (Resend relay
    unaffected). Plan the go-live AFTER the unblock is granted.
 2. Stalwart admin bootstrap: set `authentication.fallback-admin`
-  (`user` + `secret` - VERIFIED to work with an empty internal directory,
-  no first-run wizard needed) or use the web wizard over an SSH tunnel to
-  the loopback httpBind: create accounts/domains, DKIM keys. On the VPS the
-  secret must come from a credential file: `services.stalwart.credentials`
-  - `%{file:/run/credentials/stalwart.service/<key>%}` macro in settings
+   (`user` + `secret` - VERIFIED to work with an empty internal directory,
+   no first-run wizard needed) or use the web wizard over an SSH tunnel to
+   the loopback httpBind: create accounts/domains, DKIM keys. On the VPS the
+   secret must come from a credential file: `services.stalwart.credentials`
+
+- `%{file:/run/credentials/stalwart.service/<key>%}` macro in settings
   (sops on the consumer side). Remote admin access plan (2026-09-30): the
   NetBird VPN on the pbx box replaces ad-hoc SSH tunnels as the standard
   path — see SystemNix
   `docs/brainstorming/2026-09-30_netbird-larsartmann-cloud-selfhosted-vpn.md`
   (Phase 3); SSH tunnels stay the break-glass fallback.
+
 3. Terraform (`domains` repo): new `stalwart-mail` module - MX, SPF
    (`v=spf1 mx -all`), DKIM txt, DMARC with `rua=mailto:dmarc@<domain>`,
    MTA-STS + `_smtp._tls` TLS-RPT records; point `rua` mailboxes at the VPS.

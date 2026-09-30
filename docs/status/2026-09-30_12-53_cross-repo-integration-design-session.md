@@ -30,7 +30,7 @@ decisions.
    (`~/projects/InboxClean/flake.nix:5-23`: nixpkgs, systems, flake-parts,
    treefmt-nix, git-hooks-nix, art-dupl only); nix-email README:8 says
    "consumed by SystemNix (upstream-flake pattern, **like**
-   InboxClean/DiscordSync)" - the shared thing is the consumption *pattern*,
+   InboxClean/DiscordSync)" - the shared thing is the consumption _pattern_,
    not a dependency edge. Delivered as a comparison table.
 2. **Pin-discipline asymmetry verified.** SystemNix consumes nix-email via
    floating `?ref=master` (VIOLATION, decision-gated C17/C18) but the same
@@ -77,19 +77,19 @@ decisions.
 
 ## c) NOT STARTED
 
-| Item | Why not started | Priority |
-| --- | --- | --- |
-| Live JMAP probe on the demo VM | Advisory session; probe was proposed, owner has not pulled the trigger | Critical - unblocks everything below |
-| Shared JMAP contract doc (nix-email side) + ADR-023 back-link | Blocked on probe transcript (evidence-first) | High |
-| JMAP E2E assertions in `stalwart-e2e` (contract test seam) | Blocked on probe + contract doc | High |
-| InboxClean `contracts.MailClient` extraction (row 172) | Their build order starts here; zero interface code exists (confirmed 12:19, unchanged) | Critical (InboxClean-side) |
-| Go JMAP client library evaluation (row 173) | Nothing vetted - per verify-external-claims, do not assume a library exists | High |
-| Local corpus + SQLite/FTS5 index (row 174) | No schema (migration v11 territory), no Maildir layout spec | High |
-| Corpus-backed web reads (row 175) | `handlers.go:289`/`:1338` still call live Gmail; depends on 174 | High |
-| Event-bus consumers: CRM (Ledger) feed, CV classifier (row 176) | Transport decision (in-process/webhook/MCP) owner-gated | Medium |
-| MCP server mode owner decision (#156) | Memo ready, awaiting owner call | Medium |
-| `DB_SYNCHRONOUS` / corpus durability decision | Owner-gated, escalated by corpus-as-backup | High (decision) |
-| Deployment topology decision (where InboxClean + corpus live) | See section g, Q1 | High (decision) |
+| Item                                                            | Why not started                                                                        | Priority                             |
+| --------------------------------------------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------ |
+| Live JMAP probe on the demo VM                                  | Advisory session; probe was proposed, owner has not pulled the trigger                 | Critical - unblocks everything below |
+| Shared JMAP contract doc (nix-email side) + ADR-023 back-link   | Blocked on probe transcript (evidence-first)                                           | High                                 |
+| JMAP E2E assertions in `stalwart-e2e` (contract test seam)      | Blocked on probe + contract doc                                                        | High                                 |
+| InboxClean `contracts.MailClient` extraction (row 172)          | Their build order starts here; zero interface code exists (confirmed 12:19, unchanged) | Critical (InboxClean-side)           |
+| Go JMAP client library evaluation (row 173)                     | Nothing vetted - per verify-external-claims, do not assume a library exists            | High                                 |
+| Local corpus + SQLite/FTS5 index (row 174)                      | No schema (migration v11 territory), no Maildir layout spec                            | High                                 |
+| Corpus-backed web reads (row 175)                               | `handlers.go:289`/`:1338` still call live Gmail; depends on 174                        | High                                 |
+| Event-bus consumers: CRM (Ledger) feed, CV classifier (row 176) | Transport decision (in-process/webhook/MCP) owner-gated                                | Medium                               |
+| MCP server mode owner decision (#156)                           | Memo ready, awaiting owner call                                                        | Medium                               |
+| `DB_SYNCHRONOUS` / corpus durability decision                   | Owner-gated, escalated by corpus-as-backup                                             | High (decision)                      |
+| Deployment topology decision (where InboxClean + corpus live)   | See section g, Q1                                                                      | High (decision)                      |
 
 ## d) TOTALLY FUCKED UP
 
