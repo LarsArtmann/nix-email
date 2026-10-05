@@ -227,21 +227,26 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
   manual edit, no formatter involved: alejandra 4.0.0 preserves `{ ... }`
   on round-trip and dprint has no nix plugin - do not normalize either
   style). nix-checker port-collision ERRORS (4 findings, 2 pairs, surfaced
-  2026-09-23 when buildflow first ran over the demo-VM changes) are
+  2026-09-23 when buildflow first ran over the demo-VM changes) WERE
   cross-context false positives: demo-VM hostfwd GUEST ports (587/993
   inside a throwaway QEMU VM; flake-modules/demo-vm.nix since the
   2026-10-05 split, flake.nix before it) vs tests/stalwart-relay-e2e.nix
   relay.port 587 (a DIFFERENT VM test's client connect target) vs
   modules/dmarc-monitor.nix example-block port 993 (docs prose inside
-  literalExpression) - no shared runtime exists; the rule is a
-  context-blind regex over all files (BuildFlow
-  modules/nix-checker/check_port_collisions.go). These are the ONLY
-  error-severity gate trips in a full buildflow run (exit 69); the
-  hardcoded-hash findings on the parsedmarc-e2e fetchurl pins are
-  WARNINGS and documented wrong-about-fixtures (see above); do NOT
-  skip the nix-checker step to go green (it also owns stale-hash/input
-  drift checks with real signal) and do NOT contort the Nix to dodge the
-  regex. Root fix routed in TODO_LIST (upstream BuildFlow change).
+  literalExpression) - no shared runtime exists. ROOT-FIXED upstream
+  2026-10-05 (BuildFlow commit 15ea141d2): the checker now masks
+  strings/comments before extraction (the docs-prose FP class) and
+  downgrades privileged-port (<1024) collisions to warnings, so a full
+  buildflow run exits 0 again - VERIFIED with a locally built binary
+  against this repo (EXIT:0, zero error findings; the 587 pair survives
+  as an annotated warning). CAVEAT: the installed `buildflow`
+  (home-manager nix-profile, store rev 3bb229e) predates the fix - until
+  the profile flips to a BuildFlow build >= 15ea141d2, the gate still
+  exits 69 with the same 4 known findings; do NOT "fix" this repo's Nix
+  for them and do NOT skip the nix-checker step (it also owns
+  stale-hash/input drift checks with real signal). The hardcoded-hash
+  findings on the parsedmarc-e2e fetchurl pins are
+  WARNINGS and documented wrong-about-fixtures (see above).
 - Workflow edits need a LOCAL actionlint run WITH shellcheck on PATH:
   CI's actionlint runs WITH shellcheck (preinstalled on runners), but a
   shellcheck-less local machine is blind to shellcheck findings

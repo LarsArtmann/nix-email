@@ -97,6 +97,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   shellcheck-less local machine - fixed via a quoted-delimiter heredoc
   fixture + explicit disable; AGENTS records the gate-parity lesson (run
   `nix run nixpkgs#actionlint` before pushing workflow edits).
+- Cross-repo upstream fix: the BuildFlow nix-checker port-collision noise
+  class is retired (strings/comments masked before extraction;
+  privileged-port <1024 collisions downgraded to warnings, unprivileged
+  stay errors - BuildFlow commit 15ea141d2). Verified against this repo
+  with a locally built binary (nix-checker step EXIT:0, zero error
+  findings); the standing EXIT:69 posture here ends once the
+  home-manager profile buildflow flips to a build >= 15ea141d2.
 
 ## [0.4.0] - 2026-09-23
 
