@@ -1,4 +1,8 @@
-# Draft — NOT filed (user-gated: "mailsuite file-or-skip")
+# Draft — FILED as [seanthegeek/mailsuite#65](https://github.com/seanthegeek/mailsuite/issues/65) (2026-10-05)
+
+> The text below is the filed draft, kept for the record. Gates were
+> re-verified same day (master `imap.py` byte-identical at the quoted
+> lines; no duplicate issue). The canonical thread is upstream.
 
 Repo: seanthegeek/mailsuite
 Title: `ssl=False` cannot opt out of automatic STARTTLS

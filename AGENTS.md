@@ -337,3 +337,7 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
   stalw.art docs fetched 2026-09-15; carries an upstream-object-model vs
   pinned-0.15.5 version-skew caveat - verify keys against the binary
   before wiring). `docs/THREAT_MODEL.md` - threat model.
+- `docs/INBOXCLEAN.md` - the InboxClean JMAP integration contract
+  (pinned-version facts, auth/host-rewrite rules, label mapping,
+  re-verification procedure); raw probe transcripts live under
+  `docs/probes/<date-topic>/` with their own README manifests.
