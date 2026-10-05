@@ -102,10 +102,13 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
   - the parsedmarc ini generator renders bools Python-style (`ssl=True`,
     NOT `ssl=true`) - grep assertions must match `True`.
 - HOST-SIDE PARSER DRY-RUN before any VM test that feeds a fixture to a
-  python service (2026-09-23, paid for itself same day): the service's
-  package lives in the host store, so `nix-store -q --references <drv>` +
-  a PYTHONPATH of each ref's site-packages runs the PINNED parser on the
-  fixture in ~30 s (use the closure's own python3.13 binary). This
+  python service (2026-09-23, paid for itself same day; mechanized
+  2026-10-05): `python3 scripts/host-parse-fixture.py <fixture> --check
+  parsedmarc-e2e` runs the PINNED parser on the fixture in ~30 s (it walks
+  the check closure with `nix-store -qR --include-outputs`, puts the pinned
+  minor's site-packages dirs on PYTHONPATH, and calls the pinned
+  `parse_report_file(offline=True)`; realize the check first if the
+  closure is missing). This
   reproduced a VM red (upstream's forensic sample had space-only blank
   lines that fold into headers, defeating payload-walk detection) in
   seconds instead of a ~5 min VM build - and proved fixture vs
