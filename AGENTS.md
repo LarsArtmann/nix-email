@@ -189,7 +189,13 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
   tool cascaded red). A named-but-unused `self` is not an option either -
   deadnix flags it every run and BuildFlow's deadnix auto-fix strips it
   (deadnix alone is report-only by default; the removal path is BuildFlow's
-  edit mode). The ellipsis is the only shape that survives both.
+  edit mode). The ellipsis is the only shape that survives both. Since the
+  2026-10-05 module split, `flake.nix` is a thin shell (inputs + guards +
+  mkFlake `imports`) and the outputs live in `flake-modules/*.nix`
+  (flake-parts modules: nixos-modules, demo-vm, checks, devshells,
+  lock-guards); module files take `inputs`/`self` as module args, and only
+  `flake-parts` stays in the outputs destructure (named-but-unused
+  patterns trip deadnix + statix - the ellipsis still carries self).
 - flake-parts perSystem (2026-09-17 migration): `pkgs` comes from
   flake-parts' built-in nixpkgs module (`inputs'.nixpkgs.legacyPackages`) -
   do NOT redefine `_module.args.pkgs` inside perSystem (verified 2026-09-17

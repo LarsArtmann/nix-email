@@ -27,14 +27,14 @@
       {
         dmarc-eval = import ../tests/dmarc-eval.nix {
           inherit system;
-          nixpkgs = inputs.nixpkgs;
+          inherit (inputs) nixpkgs;
         };
         # Export-surface contract (2026-09-22): both arches eval the full
         # wrapper toplevel - mail-server + dmarc-monitor merged in ONE
         # nixosSystem (pure check, no VM).
         module-import-eval = import ../tests/module-import-eval.nix {
           inherit system;
-          nixpkgs = inputs.nixpkgs;
+          inherit (inputs) nixpkgs;
         };
       }
       // pkgs.lib.optionalAttrs (system == "x86_64-linux") {
