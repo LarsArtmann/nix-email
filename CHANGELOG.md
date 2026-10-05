@@ -9,7 +9,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- JMAP seam (2026-10-05 execution session): `stalwart-e2e` gains a JMAP
+  subtest (session document as a `roles:["user"]` principal, Mailbox
+  query/get asserting `inbox`+`junk` roles, the delivered e2e needle
+  visible via `Email/query`+`Email/get`; file-based `jq -e` assertions).
+  Pin facts verified on the way: `/.well-known/jmap` answers 307 (curl
+  needs `-L`), the account id must come from the session's
+  `primaryAccounts`, and EventSource push works LIVE (`StateChange` ~5 s
+  after a real SMTP delivery; `{closeafter}`/`{ping}` are rejected by
+  0.15.5).
+- `docs/INBOXCLEAN.md`, the InboxClean integration contract (pinned
+  version, endpoint + auth model, capability URNs, label mapping,
+  host-rewrite rules, re-verification procedure), plus six probe
+  transcripts under `docs/probes/2026-10-05-jmap-demo-vm/` and the README
+  JMAP quickstart.
+- parsedmarc-e2e breadth: Netease + LinkedIn `.crlf` failure fixtures
+  (pinned at the repaired rev `ae1e5adb`) with `arrival_date_utc`
+  timezone conversions (+0200/+0800/+0000) and breadth-field assertions
+  (CSV >= 4 records).
+- `scripts/host-parse-fixture.py`: the host-side parser dry-run
+  mechanized to one command (closure walk, pinned-minor PYTHONPATH,
+  `parse_report_file(offline=True)`); verified on both pinned fixtures.
+- CI hardening: `scripts/check-md-table-pipes.sh` (unescaped-pipe-in-table
+  lint with four in-CI self-tests) and a lock-pinned statix CI step;
+  `.githooks/pre-push` now mirrors the CI check-inventory guards via
+  `scripts/check-inventory.sh`.
+
 ### Changed
+
 
 - Docs-health audit pass (2026-09-29) over every `docs/status` and
   `docs/planning` 2026-0* file: the seven unannotated reports plus both
@@ -42,8 +69,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   ledger), TODO_LIST defects fixed (broken header emphasis, a blank line
   splitting the Low-impact table), and decision-batch reorganized with a
   cross-repo-integration section.
+- flake.nix split into `flake-modules/{lock-guards,nixos-modules,demo-vm,
+  checks,devshells}.nix` flake-parts modules; flake.nix reduced to inputs
+  + eager guards (`nix flake show` surface byte-identical pre/post; both
+  eval guards + full `nix flake check` green).
+- README runbook step 2 rewritten as a re-verify presence list (nixpkgs
+  PR #566282 renames `provision.elasticsearch` to `provision.opensearch`,
+  which breaks the `mkDefault` + `ExecStartPre` guard at the first pin
+  past it); upstream watch updated (imapclient fix released in 4.1.0;
+  mailsuite STARTTLS issue filed upstream as seanthegeek/mailsuite#65;
+  the parsedmarc-Restart and Stalwart-Junk asks DROPPED at the verify
+  gates with recorded verdicts).
+- Docs freshness pass: TELEMETRY webhook/alert caveat binary-verified
+  against the pinned 0.15.5; CONTRIBUTING fresh-clone `core.hooksPath`
+  caveat + three-VM-test fix; FEATURES stalwart-e2e row; AGENTS
+  format-before-archive + sub-bullet strike rules and post-split
+  known-noise locations; the three early-archive files repaired to pass
+  check-rows (25 cell-wise strikes, one dprint-eaten row restored).
+- SystemNix consumption (cross-repo): the nix-email input hard-pinned
+  `?ref=v0.4.0` (contract check green against the tag) plus a full-tree
+  statix sweep.
 
 ### Fixed
+
+- CI red (run 37281593175): shellcheck findings (SC2016 backtick-printf,
+  trap quoting) in the pipe-lint step were invisible to a
+  shellcheck-less local machine - fixed via a quoted-delimiter heredoc
+  fixture + explicit disable; AGENTS records the gate-parity lesson (run
+  `nix run nixpkgs#actionlint` before pushing workflow edits).
 
 ## [0.4.0] - 2026-09-23
 
