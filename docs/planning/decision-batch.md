@@ -184,7 +184,13 @@ here stay OPEN owner calls.
   daemon raced several commits; nothing was suppressed or force-flushed.
 - **Q6 (spam→Junk)** — the "upstream ask" half is MOOT (Gate-2 verdict:
   auto-move exists upstream since 0.5.0; see the TODO row); the
-  "tag-only now" half stays as recorded.
+  "tag-only now" half stays as recorded. RESIDUE RESOLVED 2026-10-05:
+  there IS no 0.15.5 setting name - the auto-move is hard-coded in
+  crates/email/src/message/ingest.rs:344 (INBOX-targeted deliveries of
+  spam-verdict messages go to JUNK_ID), gated only by
+  `spam-filter.enable` + the score thresholds (README ledger). A wrapper
+  `junkFiling` option is therefore NOT implementable as a Stalwart
+  setting; Q6 can be closed on the facts, owner ratification pending.
 
 Explicitly still blocked, for the record: T17 (needs the real Resend
 API key), T19 (needs explicit force-push approval), T20 (D1/D2 +

@@ -732,6 +732,23 @@ json/yaml/markdown.
     scripts (crates/email/src/sieve/ingest.rs:187), not entry points.
   - `X-Spam-Status` is added at ingest from the SMTP-session spam verdict
     (crates/email/src/message/ingest.rs:319).
+  - Q6 RESIDUE RESOLVED (2026-10-05, source-verified against upstream ref
+    v0.15.5): the "auto-move-to-Junk" has NO setting name - it is
+    HARD-CODED in crates/email/src/message/ingest.rs:344 (`if is_spam &&
+    params.mailbox_ids == [INBOX_ID] { params.mailbox_ids[0] = JUNK_ID;
+    params.keywords.push(Keyword::Junk); }`), inside the
+    `self.core.spam.enabled` block of the Smtp ingest arm; classification
+    itself only runs for UNAUTHENTICATED sessions (crates/smtp/src/inbound/
+    spam.rs: `if !self.is_authenticated()`). The only knobs are
+    `spam-filter.enable`, the score thresholds
+    (`spam-filter.score.spam`/`.reject`/`.discard`), and the
+    card-is-ham/trusted-reply overrides. Upstream CHANGELOG 0.5.0 (2023):
+    "Messages marked as spam by the spam filter can now be automatically
+    moved to the account's Junk Mail folder" - the behavior ships
+    unconditionally, no key ever existed (which is why the 2026-09-23
+    binary-strings sweep found none). Consequence for Q6: a wrapper
+    `junkFiling` option CANNOT exist as a Stalwart setting; the (c)
+    tag-only posture stands.
   - No OSS management-API endpoint sets an account's active sieve script
     (JMAP per-account, or the enterprise webadmin) - the OSS CLI has no
     sieve subcommand either.
