@@ -31,3 +31,16 @@ canonically routed; routed user-gated decisions live in
 
 Earlier archives (2026-09-14 → 2026-09-17, 25 files): single-file moves whose
 manifests live in the moving session's commit messages.
+
+## Check-rows verdict — 2026-10-05 (T23)
+
+The three pre-gate files below failed the cell-uniformity gate (rows left
+unstruck that are today canonically routed). FIXED same day: cell-wise
+strikes completed with dated `routed/resolved` markers pointing at the
+canonical home (decision-batch/TODO_LIST/ROADMAP); `2026-09-14_17-05`
+f-row 2 had lost its Impact/Effort/Cat cells to the 2026-09-23 dprint
+pipe-eating drop - cells restored; `2026-09-16_08-08` b-table separator
+had a single-dash cell that the `-{2,}` separator rule could not recognize
+- normalized. Both files now pass `check-rows.py`; the fourth early file
+(2026-09-15_04-42) needed only 3 resolved-markers. Verdict: fix, not
+leave - the gate now reads the whole archived corpus green.
