@@ -37,7 +37,7 @@ nix-review skill (checklist + both references) + buildflow skill loaded first. A
 
 Nothing in the repo is broken by this session (read-only, gates green, `git status` clean). The fuck-ups were **methodological, in my own reporting**:
 
-1. **Assert-then-verify-later (3x)** — I published the stale-binary explanation sourced from a *commit title*, accepted the upstream-hardening comment without opening the pinned module, and called MemoryMax "undocumented" without grepping the living docs. All three happened to be correct — verified only under this self-review's pressure. Had any failed, my review report would have contained a fabricated causal claim. This is exactly the repo's own "reading it in source is NOT evidence" lesson, applied to my own output.
+1. **Assert-then-verify-later (3x)** — I published the stale-binary explanation sourced from a _commit title_, accepted the upstream-hardening comment without opening the pinned module, and called MemoryMax "undocumented" without grepping the living docs. All three happened to be correct — verified only under this self-review's pressure. Had any failed, my review report would have contained a fabricated causal claim. This is exactly the repo's own "reading it in source is NOT evidence" lesson, applied to my own output.
 2. **Concurrent gate runs** — I started `nix flake check` and `buildflow` as simultaneous background jobs; the observed `nix-build` timing regression (+581%) is almost certainly contention noise from my own parallel run, and I hand-waved it as such in passing instead of preventing or cleanly attributing it. Muddied measurement, then under-flagged it.
 3. **Skipped the documented cheap instruments** — `nix flake check --no-build` (AGENTS.md's eval-noise triage) and reading the ci.yml guard lists (AGENTS.md warns about them explicitly) were both one-command cheap and both skipped in favor of the heavyweight cached check.
 
@@ -54,6 +54,7 @@ Nothing in the repo is broken by this session (read-only, gates green, `git stat
 Items 1-25 are the real work list; 26+ are brainstorm/ROADMAP fuel (per docs-health HARVEST rigor, extra items are not commitments).
 
 **From this session's findings (harvest-ready):**
+
 1. Decide the MemoryMax policy for both wrapped services — wrapper-level `mkDefault` default vs SystemNix consumer-layer ownership — and document it (module header or THREAT_MODEL.md).
 2. Rebuild/reinstall the BuildFlow binary (`nix build . && nix run .#reinstall` in the BuildFlow repo) — port-collision fix `15ea141d2` postdates the installed binary.
 3. Re-run `buildflow` after the upgrade; expect exit 0 — then retire the port-collision paragraph from AGENTS.md "Known lint noise" (keep the vulnix one).
