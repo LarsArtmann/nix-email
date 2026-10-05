@@ -790,6 +790,74 @@ in
               "imap-absent-probe report-consumed-needle-9d2f reports@example.test testpass 30"
           )
 
+      with subtest("JMAP: session, mailboxes, and the delivered needle over the API"):
+          # The JMAP surface rides the same HTTP listener (contract doc:
+          # docs/INBOXCLEAN.md; live-verified on the demo VM 2026-10-05,
+          # transcripts docs/probes/2026-10-05-jmap-demo-vm/). user2 is a
+          # roles:["user"] principal - exactly the adapter's auth shape.
+          # All assertions are file-based (dump to /tmp, grep/jq the file)
+          # and transcribed from those probe transcripts, never from
+          # expected output.
+          machine.succeed(
+              "curl -fsS -u user2@example.test:testpass "
+              "http://127.0.0.1:8080/.well-known/jmap -o /tmp/jmap-session.json"
+          )
+          machine.succeed("cat /tmp/jmap-session.json >&2")
+          machine.succeed("grep -q 'user2@example.test' /tmp/jmap-session.json")
+          machine.succeed("grep -q 'urn:ietf:params:jmap:mail' /tmp/jmap-session.json")
+          machine.succeed("grep -q 'eventSourceUrl' /tmp/jmap-session.json")
+          machine.succeed(
+              "jq -j '.primaryAccounts[\"urn:ietf:params:jmap:mail\"]' "
+              "/tmp/jmap-session.json > /tmp/jmap-acct.txt"
+          )
+          machine.succeed(
+              "jq -n --rawfile acct /tmp/jmap-acct.txt "
+              "'{using:[\"urn:ietf:params:jmap:core\",\"urn:ietf:params:jmap:mail\"],"
+              "methodCalls:[[\"Mailbox/query\",{accountId:$acct},\"a\"],"
+              "[\"Mailbox/get\",{accountId:$acct,"
+              "\"#ids\":{resultOf:\"a\",name:\"Mailbox/query\",path:\"/ids\"}},\"b\"]]}"
+              " > /tmp/jmap-mb-req.json"
+          )
+          machine.succeed(
+              "curl -fsS -u user2@example.test:testpass "
+              "-H 'Content-Type: application/json' "
+              "http://127.0.0.1:8080/jmap/ -o /tmp/jmap-mailboxes.json "
+              "-d @/tmp/jmap-mb-req.json"
+          )
+          machine.succeed("cat /tmp/jmap-mailboxes.json >&2")
+          machine.succeed(
+              "jq -e '.methodResponses[] | select(.[0] == \"Mailbox/get\") "
+              "| .[1].list[] | select(.role == \"inbox\")' "
+              "/tmp/jmap-mailboxes.json > /dev/null"
+          )
+          machine.succeed(
+              "jq -e '.methodResponses[] | select(.[0] == \"Mailbox/get\") "
+              "| .[1].list[] | select(.role == \"junk\")' "
+              "/tmp/jmap-mailboxes.json > /dev/null"
+          )
+          machine.succeed(
+              "jq -n --rawfile acct /tmp/jmap-acct.txt "
+              "'{using:[\"urn:ietf:params:jmap:core\",\"urn:ietf:params:jmap:mail\"],"
+              "methodCalls:[[\"Email/query\",{accountId:$acct,"
+              "filter:{text:\"needle-576a4565b70f5a4c\"}},\"a\"],"
+              "[\"Email/get\",{accountId:$acct,"
+              "\"#ids\":{resultOf:\"a\",name:\"Email/query\",path:\"/ids\"},"
+              "properties:[\"subject\",\"mailboxIds\"]},\"b\"]]}"
+              " > /tmp/jmap-email-req.json"
+          )
+          machine.succeed(
+              "curl -fsS -u user2@example.test:testpass "
+              "-H 'Content-Type: application/json' "
+              "http://127.0.0.1:8080/jmap/ -o /tmp/jmap-email.json "
+              "-d @/tmp/jmap-email-req.json"
+          )
+          machine.succeed("cat /tmp/jmap-email.json >&2")
+          machine.succeed(
+              "jq -e '.methodResponses[] | select(.[0] == \"Email/get\") "
+              "| .[1].list[] | select(.subject == \"e2e-needle\")' "
+              "/tmp/jmap-email.json > /dev/null"
+          )
+
       with subtest("restart persistence: INBOX survives, admin stays locked"):
           machine.succeed("systemctl restart stalwart.service")
           machine.wait_for_unit("stalwart.service", timeout=120)
