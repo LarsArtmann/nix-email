@@ -348,20 +348,23 @@ inside nixpkgs are invisible to it, so the checks below are manual):
 1. **Bump both locks together** (compat doctrine): `nixpkgs` input in THIS
    flake and in SystemNix's - same rev, same commit. Never land one without
    the other.
-2. **Re-check the two shipped workarounds** (module comments carry the code
-   side; this is the procedure side):
+2. **Re-check the shipped workarounds - the presence list** (module comments
+   carry the code side; this is the procedure side; every bullet is a fact
+   the module depends on, re-verify each against the new pin):
    - `[elasticsearch]` emission: rerun `nix build .#checks.x86_64-linux.dmarc-eval`
-     and the `parsedmarc-e2e` VM test. If nixpkgs stops materializing the
-     host-less section (check `nixos/modules/services/monitoring/parsedmarc.nix`
-     for a fixed `filterAttrsRecursive`/option shape), delete the guarded
-     `ExecStartPre` strip in `modules/dmarc-monitor.nix` and the matching
-     `dmarc-eval`/`parsedmarc-e2e` assertions in the same change.
+     and the `parsedmarc-e2e` VM test. KNOWN INCOMING (2026-10-05): nixpkgs
+     PR #566282 replaces `services.parsedmarc.provision.elasticsearch` with
+     `provision.opensearch` and throws on elasticsearch provisioning - the
+     first pin past it breaks our `provision.elasticsearch = mkDefault false`
+     and the `ExecStartPre` guard that reads the option. Port both to the
+     new option shape and retire the strip-guard if the host-less section
+     stops materializing (check `nixos/modules/services/monitoring/parsedmarc.nix`).
    - imapclient/python pin: check the NixOS python scope's `imapclient`
      version. Revert `parsedmarcPackage` in `modules/dmarc-monitor.nix` (and
-     the `dmarc-eval` pin assertion) when nixpkgs ships an imapclient whose
-     `starttls()` no longer assigns `imaplib.IMAP4.file` on python 3.14
-     (imapclient 4.x fixed the plain connect path but NOT starttls as of
-     2026-09-15 - README ledger).
+     the `dmarc-eval` pin assertion) when the pin ships imapclient >= 4.1.0:
+     upstream fixed `starttls()` there (mjs/imapclient#663 merged, released
+     2026-09-18, confirmed by the maintainer on nixpkgs #563652); the nixpkgs
+     bump itself is pending inside PR #566282 (imapclient 4.0.1 -> 4.1.0).
    - Watch for `services.stalwart` passing 0.15.5: the wrapper's verified key
      set (relay IfBlocks, certificate tiers) must be re-verified against the
      new source before riding the bump.
