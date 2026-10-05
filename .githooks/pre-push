@@ -1,11 +1,21 @@
 #!/bin/sh
-# Fail the push when any .nix file is unformatted (alejandra, same check CI
-# enforces). Guards against the "unformatted push, public red CI" class
-# (see CONTRIBUTING.md and AGENTS.md fmt-before-yield rule).
+# Pre-push guards, mirroring what CI enforces on master:
+# 1. nix fmt -- . --check (alejandra, fail-closed) - the "unformatted
+#    push, public red CI" class (2026-09-16, two reds, ~13 min).
+# 2. Check-inventory lockstep (scripts/check-inventory.sh) - the flake's
+#    declared checks must match CI's expected lists; a drift commit
+#    fails HERE instead of shipping unnoticed master reds (the
+#    2026-09-23 class: three reds before anyone looked).
 #
-# Bypass with `git push --no-verify` (discouraged; CI will still run the check).
+# Bypass with `git push --no-verify` (discouraged; CI still enforces).
+# NOTE for fresh clones: `core.hooksPath` is repo-LOCAL config - run
+# `git config core.hooksPath .githooks` after cloning or none of this
+# runs (it dangles silently by design; CI is the real gate).
 
 set -eu
 
 echo "pre-push: nix fmt -- . --check"
 nix fmt -- . --check
+
+echo "pre-push: check-inventory lockstep"
+bash scripts/check-inventory.sh

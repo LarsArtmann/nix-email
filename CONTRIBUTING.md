@@ -108,11 +108,16 @@ commit in the SAME tool call that edits them, before drafting anything else.
 ## Formatting gate (pre-push)
 
 CI fail-closes on `nix fmt -- . --check` (alejandra). A local `pre-push`
-hook in `.githooks/` (`core.hooksPath` already points there) runs the same
-check before every push, so an unformatted tree fails locally instead of
-going red on master (which happened twice on 2026-09-16, ~13 min public
-red). Bypassing with `git push --no-verify` is discouraged - CI still
-enforces it. If the hook fires, run `nix fmt -- .` and re-push.
+hook in `.githooks/` runs the same check before every push, plus the
+check-inventory lockstep (`scripts/check-inventory.sh` - the flake's
+declared checks must match CI's expected lists), so an unformatted tree or
+a drifted check inventory fails locally instead of going red on master
+(which happened twice on 2026-09-16 for formatting, and three unnoticed
+times on 2026-09-23 for inventory drift). Bypassing with
+`git push --no-verify` is discouraged - CI still enforces everything. If
+the hook fires, run `nix fmt -- .` and re-push. Fresh clones must re-set
+`git config core.hooksPath .githooks` - hooksPath is repo-LOCAL config and
+the hook directory dangles silently without it (CI is the real gate).
 
 ## Architecture diagrams
 
