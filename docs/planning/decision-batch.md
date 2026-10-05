@@ -108,6 +108,41 @@ The SASL shape is now DOC-VERIFIED (resend.com/docs/send-with-smtp, 2026-09-22):
 (a) an API key for the one live :587 smoke (TODO row), (b) webhook
 endpoint setup for outbound bounce/complaint telemetry (MONITORING.md row 14).
 
+## Cross-repo integration (2026-09-30 InboxClean JMAP session; harvested 2026-10-05)
+
+### C35 — JMAP spike sequencing: start now on the demo VM, or hold until D1/D2 land?
+
+The demo VM is a complete test bed (host-smoked 2026-09-22; JMAP rides the
+already-forwarded HTTP listener on :18080), so the spike is technically
+unblocked today; the real mailbox it will eventually serve appears only
+after the production cutover.
+
+- **[rec] Start now** (S/M effort, de-risks the adapter early; production enablement stays D1-gated regardless). Unblocks the four JMAP-seam TODO rows.
+
+### C36 — Deployment topology: where do InboxClean + the corpus live?
+
+evo-x2 at home, or the VPS beside Stalwart? Decides where THE backup
+physically lives, its DR design, row-175 deployment, and the auth path
+(LAN/tunnel vs public).
+
+- **[rec] evo-x2** (corpus-as-backup wants a failure domain independent of the VPS; the Gatus section already treats evo-x2 as the always-on home box). Final call can ride the D1/D2 sitting.
+
+### C37 — InboxClean build order: adapter-first (row 173) or corpus-first (row 174)?
+
+The corpus does NOT depend on JMAP (it can be built and fed from the Gmail
+adapter alone) — ADR-023's build order is a choice, not a constraint.
+Corpus-first delivers "backup ALL emails" sooner; adapter-first de-risks
+the Stalwart dependency sooner.
+
+- **[rec] Corpus-first**, with the JMAP spike running in parallel (it is S/M and demo-VM-bound, so it does not compete for the same block).
+
+### C38 — Daemon flush policy at session end (recurring; from the 17-15-11 and 09-29 reports)
+
+Wait-for-push before yielding (verifiable CI-green handoff) or keep riding
+the auto-commit daemon's own cycle?
+
+- **[rec] Keep riding the cycle** (zero friction; the sync + CI-green state is verifiable at the NEXT session start — as verified 2026-10-05). Answering retires the recurring "push posture unknown at yield" note.
+
 ### C14 — Rotate the 3 placeholder secrets (SystemNix `nix-email.yaml`)
 
 Gated on D1 (rotation-due check before live enablement). **No recommendation needed** — it executes as part of M22/M26 when D1 lands.

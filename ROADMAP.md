@@ -113,7 +113,9 @@ the verified-source work (what the wrapper OWNS) is done or specified in
   remote-alert path decoupled from the mail relay (circular-dependency risk);
   InboxClean JMAP adapter post-migration - DECIDED 2026-09-30 (InboxClean
   ADR-023: JMAP-first provider abstraction, this stack is the target; IMAP
-  only on a real legacy-provider need)
+  only on a real legacy-provider need); the bounded seam work (demo-VM
+  probe, push test, contract doc, e2e subtest) is routed to TODO_LIST,
+  sequencing gated by decision C35, topology by C36
 
 ### 5. Repo excellence
 

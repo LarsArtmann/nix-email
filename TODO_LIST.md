@@ -8,19 +8,16 @@
 > Long-term vision and user decisions live in ROADMAP.md.
 > Items are ranked by impact. Status is verified, not assumed.
 >
-> Last verification sweep: __2026-09-29 (docs-health AUDIT over every
-> docs/status + docs/planning 2026-0_ file)_* - the unannotated reports
-> and both Pareto plans got inline strikethrough verdicts; the
-> flake-parts migration report archived (fully resolved); the stale
-> ergonomics row deleted (deliverable landed - README "Rate-limit
-> sizing"); unharvested report items routed here (CI pipe-table lint,
-> pre-push lockstep mirror, host-parse-fixture helper, parsedmarc sample
-> breadth, CI statix step, v0.4.0 tag smoke) and the flake.nix split
-> graduated from ROADMAP (the ~300-line trigger fired at 356 lines);
-> master verified in sync with origin, CI green. Prior sweeps 2026-09-17
-> and 2026-09-22 (three passes): DONE-row sweeps, queue-metrics drift
-> fix, 21-10/22-50 harvest routing, demo.qcow2 untracked, ROADMAP Q7/Q8
-> closed - details in git history and CHANGELOG.
+> Last verification sweep: 2026-10-05 (docs-health AUDIT): the 2026-09-30
+> cross-repo session HARVESTed (four JMAP-seam rows below; decisions C35-C37
+> batched), the daemon-flush question batched as C38, the archive sweep
+> EXECUTED (all 13 active docs/status reports annotated + archived; policy
+> line added to the AGENTS.md Documentation map; manifest in
+> docs/status/archived/README.md), the signed-tags and PROXY-protocol opens
+> verified resolved (v0.4.0 carries a good ED25519 tag signature; README
+> ledger verdict), master in sync + CI green. Prior sweeps 2026-09-17/22/29
+> (DONE-row sweeps, M14 harvest routing, ~350 annotation verdicts, flake.nix
+> split graduation): details in git history and CHANGELOG.
 > The D1/D2/Q6 user decisions gate everything in ROADMAP, not here.
 
 ## Status legend
@@ -38,6 +35,15 @@
 | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- | ------ | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Watch the four upstream filings for maintainer responses: nixpkgs #563651, #563652, #563777 - the root fix for #563652 SHIPPED upstream (mjs/imapclient#663 MERGED 2026-09-18, released in 4.1.0), so the nixpkgs side now needs the imapclient 4.1.0 version bump; #563651/#563777 module fixes still pending | 🔴 `TODO` | Med    | 10m    | `gh` re-check 2026-09-22: #563651 + #563777 OPEN with no maintainer comments; #563652 OPEN with maintainer comment "merged and released in 4.1.0"; pinned rev `6774f7bc` still ships imapclient 4.0.1 on py3.13 AND py3.14 (`nix eval` 2026-09-22), so the dmarc-monitor py3.13 pin retires at the bump carrying >= 4.1.0 |
 | Split `flake.nix` into `flake-modules/*.nix` (the flake-parts idiom) - the ROADMAP trigger FIRED: the file outgrew its ~300-line threshold (356 lines after the demo VM, eval guards, and M14 work)                                                                                                            | 🔴 `TODO` | Med    | 2h     | `flake.nix` (356 lines, `wc -l` 2026-09-29); ROADMAP §5 split trigger; AGENTS.md flake-parts rules (perSystem pkgs destructure, outputs-lambda ellipsis)                                                                                                                                                                  |
+
+## High Impact (JMAP seam - InboxClean integration, decided 2026-09-30)
+
+| Task                                                                                                                                                                                                                                                                                                               | Status    | Impact | Effort | Evidence                                                                                      |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- | ------ | ------ | -------------------------------------------------------------------------------------------- |
+| JMAP probe transcript on the demo VM: boot `nix run .#vm`, `curl http://localhost:18080/.well-known/jmap` as `admin`/`demo-admin` AND as a non-admin principal (`roles: ["user"]` - the adapter runs as a mailbox owner, not admin), save the transcript, record the 0.15.5 capability URNs (core/mail/submission/push), add the README "Try it in a VM" JMAP quickstart | 🔴 `TODO` | High   | 1h     | 09-30 report f/1-f/3 + f/14; flake.nix:201-203 (host.port 18080); modules/mail-server.nix:104 (JMAP rides the HTTP listener); C35 [rec] start-now                                         |
+| JMAP EventSource/push test on the 0.15.5 demo (decides the InboxClean sync model: poll vs push)                                                                                                                                                                                                                     | 🔴 `TODO` | High   | 2h     | 09-30 report f/4; runs after the probe row                                                                                                                                                |
+| JMAP contract doc (`docs/INBOXCLEAN.md` or a README section): pinned Stalwart version, endpoint + auth model, capability list, test-account recipe, demo-VM quickstart, TLS posture delta (demo plain-HTTP vs production ACME), InboxClean-label to JMAP-keyword mapping, the no-assertion-without-transcript rule across the contract boundary, reverse-proxy posture (8080 stays loopback/proxied); back-link from InboxClean ADR-023 + TODO row 173; home convention: the upstream repo owns its surface docs (README pin-discipline precedent) | 🔴 `TODO` | High   | 2h     | 09-30 report f/5-f/8 + f/10 + f/15 + f/16; blocked on the probe transcript (evidence-first)                                                                                               |
+| `stalwart-e2e` JMAP subtest: session GET + mailbox query/get on a seeded `roles: ["user"]` principal, file-based assertions per repo rules; if JMAP becomes its own flake check, update BOTH ci.yml guard lists in the same commit                                                                                   | 🔴 `TODO` | High   | 3h     | 09-30 report f/11-f/13; AGENTS.md ci-guard lists rule; blocked on probe + contract doc                                                                                                  |
 
 ## Low Impact (hygiene)
 

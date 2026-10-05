@@ -296,6 +296,13 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
 - `CHANGELOG.md` - what changed. `docs/{status,planning,reviews}/` -
   point-in-time session snapshots; `archived/` subdirectories hold the
   snapshots whose items are fully resolved or routed into the living docs.
+- Archive policy (2026-10-05): a snapshot is ARCHIVED (`git mv` to
+  `<dir>/archived/`) once every forward-looking item (sections b/c/f/g) is
+  closed OR canonically routed - the verdict cites the TODO_LIST row,
+  decision-batch entry, or ROADMAP idea that now owns it; a user-gated
+  decision counts as routed once it sits in `decision-batch.md` with a
+  [rec]. Sections a/d/e stay historical records (unstruck by design).
+  Bulk archives carry a manifest (`docs/status/archived/README.md`).
 - `docs/TELEMETRY.md` - Stalwart telemetry best-practices guide (from
   stalw.art docs fetched 2026-09-15; carries an upstream-object-model vs
   pinned-0.15.5 version-skew caveat - verify keys against the binary
