@@ -23,6 +23,18 @@ fit together, and a recommended baseline that avoids the known footguns.
 > retention stores) and any series names - transcribe those from a live
 > `/metrics/prometheus` dump (the stalwart-e2e build log carries one)
 > before writing rules.
+>
+> **UPDATE 2026-10-05: webhook + alert support is now binary-verified
+> present in 0.15.5** (`strings` over the pinned
+> `/nix/store/nzdwhgmch2d8xvrbab3418mh1gqmr4ff-stalwart-0.15.5/bin/stalwart`):
+> tracer type token `webhook`, webhook fields `signature-key` and
+> `discard-after`, config type `WebhookTracer`, symbols
+> `spawn_webhook_tracer`/`spawn_webhook_handler`/`post_webhook_events`,
+> event types `telemetry.webhook-error` + `telemetry.alert`, and runtime
+> strings `No events enabled for webhook` / `An alert was triggered` /
+> `An error occurred with the webhook collector`. Still UNVERIFIED: the
+> exact TOML nesting for webhook/alert objects - transcribe from a live
+> config write (or the 0.15.5 source tarball) before wiring.
 
 ## 1. Mental model: one stream, many consumers
 

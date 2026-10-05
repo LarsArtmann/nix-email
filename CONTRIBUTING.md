@@ -52,8 +52,9 @@ the ini generator renders booleans Python-style (`True`/`False`, not
 
 ## The gate
 
-`nix flake check` is the full gate: eval contracts + both NixOS VM tests
-(~2-4 min each; the SMTP subtests intentionally wait out ~60 s of resolver
+`nix flake check` is the full gate: eval contracts + three NixOS VM tests
+(`stalwart-e2e`, `stalwart-relay-e2e`, `parsedmarc-e2e`; ~2-4 min each; the
+SMTP subtests intentionally wait out ~60 s of resolver
 timeouts in the DNS-less VM). Failed check results are CACHED - a rerun
 without an input change replays the old verdict.
 
