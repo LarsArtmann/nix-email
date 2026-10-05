@@ -71,25 +71,25 @@ Work that is verifiably complete this session, with evidence.
 
 ## b) PARTIALLY DONE
 
-| #  | Item | What works                      | What remains                                                   | Blocker                                                                                                                                    | Effort                            |
-| -- | ---- | ------------------------------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------- |
-| ~~ | ~~1~~ | ~~Gap analysis → living docs~~ | ~~Analysis delivered (10 items, in section f below)~~ | ~~0 of 10 routed into `TODO_LIST.md`/`ROADMAP.md`; HARVEST deliberately NOT run (user said WAIT FOR INSTRUCTIONS)~~ | ~~User go-ahead~~ |
-| ~~ | ~~2~~ | ~~Verification debt on gap claims~~ | ~~Gaps labeled with verify-need~~ | ~~parsedmarc TLS-RPT support unverified; THREAT_MODEL/TELEMETRY overlap unchecked; Stalwart 0.15.5 knobs for items 15/16/21/22/25 unverified~~ | ~~None — but must precede wiring~~ |
-| ~~ | ~~3~~ | ~~Repo-state anchoring~~ | ~~Tags/HEAD/log/tree checked this turn~~ | ~~Whether SystemNix actually bumped its pin past v0.2.0 (consumer repo — out of scope by instruction, flagged only)~~ | ~~Scope instruction~~ |
-| ~~ | ~~4~~ | ~~Drift findings~~ | ~~Observed directly (`git tag` contradicts TODO_LIST/ROADMAP Q8)~~ | ~~Not yet swept into corrections; not deep-verified (e.g. whether the 21-07 demo-VM hostfwd hang is still open)~~ | ~~User go-ahead (item #4/#5)~~ |
-| ~~ | ~~5~~ | ~~This report~~ | ~~Complete below~~ | ~~HARVEST of section (f) into TODO_LIST/ROADMAP pending~~ | ~~Explicit user instruction to wait~~ |
+| #  | Item  | What works                          | What remains                                                       | Blocker                                                                                                                                        | Effort                                |
+| -- | ----- | ----------------------------------- | ------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- |
+| ~~ | ~~1~~ | ~~Gap analysis → living docs~~      | ~~Analysis delivered (10 items, in section f below)~~              | ~~0 of 10 routed into `TODO_LIST.md`/`ROADMAP.md`; HARVEST deliberately NOT run (user said WAIT FOR INSTRUCTIONS)~~                            | ~~User go-ahead~~                     |
+| ~~ | ~~2~~ | ~~Verification debt on gap claims~~ | ~~Gaps labeled with verify-need~~                                  | ~~parsedmarc TLS-RPT support unverified; THREAT_MODEL/TELEMETRY overlap unchecked; Stalwart 0.15.5 knobs for items 15/16/21/22/25 unverified~~ | ~~None — but must precede wiring~~    |
+| ~~ | ~~3~~ | ~~Repo-state anchoring~~            | ~~Tags/HEAD/log/tree checked this turn~~                           | ~~Whether SystemNix actually bumped its pin past v0.2.0 (consumer repo — out of scope by instruction, flagged only)~~                          | ~~Scope instruction~~                 |
+| ~~ | ~~4~~ | ~~Drift findings~~                  | ~~Observed directly (`git tag` contradicts TODO_LIST/ROADMAP Q8)~~ | ~~Not yet swept into corrections; not deep-verified (e.g. whether the 21-07 demo-VM hostfwd hang is still open)~~                              | ~~User go-ahead (item #4/#5)~~        |
+| ~~ | ~~5~~ | ~~This report~~                     | ~~Complete below~~                                                 | ~~HARVEST of section (f) into TODO_LIST/ROADMAP pending~~                                                                                      | ~~Explicit user instruction to wait~~ |
 
 ## c) NOT STARTED
 
 Everything in section (f) is unstarted — grouped by WHY, since "not started" without a reason is noise:
 
-| Group                                                  | Items                  | Why not started                                                                         |
-| ------------------------------------------------------ | ---------------------- | --------------------------------------------------------------------------------------- |
-| ~~Verified bounded backlog (pre-existing TODO_LIST rows)~~ routed - the rows live in TODO_LIST (canonical) | ~~#1–3, #6–10~~ | ~~Session was advisory; execution never requested~~ routed with their TODO rows |
-| ~~Session-discovered gaps~~ routed - each gap carries its own f-list verdict below | ~~#11–17, #19–26, #28–31~~ | ~~Discovered THIS session; analysis only~~ routed per-item (f-list verdicts) |
-| ~~Drift repairs~~ done - fixed by the 2026-09-22 23-15 docs-health pass (CHANGELOG 0.4.0 docs-audit fixes) | ~~#4–5~~ | ~~Noticed this turn during report state-check; awaiting go~~ done |
-| ~~D1-gated (live enablement)~~ routed - TODO_LIST Gated-on-D1 section + ROADMAP themes 1-3 | ~~#32–45~~ | ~~Hard-gated on the D1/D2 user decisions (ROADMAP open questions 1–2)~~ routed (decision-batch D1/D2) |
-| ~~User-decision gates~~ routed - decision-batch (Q6, C18/C19/C20, Q7 resolved 2026-09-17) | ~~#23, #46–50~~ | ~~Q6/Q7/bypass/Renovate/mailsuite — Lars's calls, drafts/recommendations already recorded~~ routed |
+| Group                                                                                                      | Items                      | Why not started                                                                                       |
+| ---------------------------------------------------------------------------------------------------------- | -------------------------- | ----------------------------------------------------------------------------------------------------- |
+| ~~Verified bounded backlog (pre-existing TODO_LIST rows)~~ routed - the rows live in TODO_LIST (canonical) | ~~#1–3, #6–10~~            | ~~Session was advisory; execution never requested~~ routed with their TODO rows                       |
+| ~~Session-discovered gaps~~ routed - each gap carries its own f-list verdict below                         | ~~#11–17, #19–26, #28–31~~ | ~~Discovered THIS session; analysis only~~ routed per-item (f-list verdicts)                          |
+| ~~Drift repairs~~ done - fixed by the 2026-09-22 23-15 docs-health pass (CHANGELOG 0.4.0 docs-audit fixes) | ~~#4–5~~                   | ~~Noticed this turn during report state-check; awaiting go~~ done                                     |
+| ~~D1-gated (live enablement)~~ routed - TODO_LIST Gated-on-D1 section + ROADMAP themes 1-3                 | ~~#32–45~~                 | ~~Hard-gated on the D1/D2 user decisions (ROADMAP open questions 1–2)~~ routed (decision-batch D1/D2) |
+| ~~User-decision gates~~ routed - decision-batch (Q6, C18/C19/C20, Q7 resolved 2026-09-17)                  | ~~#23, #46–50~~            | ~~Q6/Q7/bypass/Renovate/mailsuite — Lars's calls, drafts/recommendations already recorded~~ routed    |
 
 ## d) TOTALLY FUCKED UP
 
@@ -114,15 +114,15 @@ Radical honesty. Nothing this session BROKE (zero mutations), but these are fuck
 
 ## e) WHAT WE SHOULD IMPROVE
 
-| #  | Improvement                         | Pain today                                          | Concrete fix                                                                                            |
-| -- | ----------------------------------- | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| ~~ | ~~1~~ | ~~Route-as-you-go for roadmap-fuel~~ | ~~Analyses die in chat/scrollback~~ |
-| ~~ | ~~2~~ | ~~Epistemic labels on advisory claims~~ kept - never mechanized; rides session discipline (re-raised in the 09-30 report e/1) | ~~Follow-up sessions can't tell verified from assumed~~ | ~~Convention: tag every factual claim `[verified: source]` / `[assumed]` / `[verify-needed: how]`~~ kept |
-| ~~ | ~~3~~ | ~~Freshness anchor before advising~~ done in practice - TODO sweep headers carry the pass date; sessions open with tag/log/sweep checks | ~~Advice inherits stale docs (v0.3.1 drift proved it)~~ | ~~3-command ritual at advisory-session start: `git tag -l`, `git log --oneline -5`, TODO sweep-date check~~ done |
-| ~~ | ~~4~~ | ~~Single monitoring-coverage matrix~~ | ~~Gap state scattered across ROADMAP bullets + chat~~ |
-| ~~ | ~~5~~ | ~~ROADMAP theme 4 structure~~ | ~~Monitoring ideas accrete as an unstructured pile~~ |
-| ~~ | ~~6~~ | ~~TELEMETRY skew debt~~ | ~~`docs/TELEMETRY.md` keys unverified against pinned 0.15.5; blocks items #26/#27~~ |
-| ~~ | ~~7~~ | ~~Threat-model ↔ roadmap consistency~~ | ~~Gap lists can duplicate or contradict THREAT_MODEL~~ |
+| #  | Improvement | Pain today                                                                                                                              | Concrete fix                                                                        |
+| -- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| ~~ | ~~1~~       | ~~Route-as-you-go for roadmap-fuel~~                                                                                                    | ~~Analyses die in chat/scrollback~~                                                 |
+| ~~ | ~~2~~       | ~~Epistemic labels on advisory claims~~ kept - never mechanized; rides session discipline (re-raised in the 09-30 report e/1)           | ~~Follow-up sessions can't tell verified from assumed~~                             |
+| ~~ | ~~3~~       | ~~Freshness anchor before advising~~ done in practice - TODO sweep headers carry the pass date; sessions open with tag/log/sweep checks | ~~Advice inherits stale docs (v0.3.1 drift proved it)~~                             |
+| ~~ | ~~4~~       | ~~Single monitoring-coverage matrix~~                                                                                                   | ~~Gap state scattered across ROADMAP bullets + chat~~                               |
+| ~~ | ~~5~~       | ~~ROADMAP theme 4 structure~~                                                                                                           | ~~Monitoring ideas accrete as an unstructured pile~~                                |
+| ~~ | ~~6~~       | ~~TELEMETRY skew debt~~                                                                                                                 | ~~`docs/TELEMETRY.md` keys unverified against pinned 0.15.5; blocks items #26/#27~~ |
+| ~~ | ~~7~~       | ~~Threat-model ↔ roadmap consistency~~                                                                                                  | ~~Gap lists can duplicate or contradict THREAT_MODEL~~                              |
 
 ## f) Top 50 things to get done next
 
@@ -132,73 +132,73 @@ not a commitment list — HARVEST routing rigor applies (extra items → ROADMAP
 
 ### Tier 1 — Quick, verified, no gates (do first)
 
-| #  | Task | Source                                                                                                                   | Impact | Effort | Category |
-| -- | ---- | ------------------------------------------------------------------------------------------------------------------------ | ------ | ------ | -------- |
-| ~~ | ~~1~~ | ~~Eval guard asserting our pinned nixpkgs rev equals SystemNix's pin (mechanize the compat doctrine)~~ | ~~T~~ | ~~High~~ | ~~M~~ |
-| ~~ | ~~2~~ | ~~Eval guard asserting `flake-parts/nixpkgs-lib` still `follows = "nixpkgs"` in the lock~~ | ~~T~~ | ~~Med~~ | ~~S~~ |
-| ~~ | ~~3~~ | ~~`checks` entry: `nixosModules.default` imports cleanly via `nixosSystem` on both arches~~ | ~~T~~ | ~~Med~~ | ~~M~~ |
-| ~~ | ~~4~~ | ~~Docs-drift sweep: close ROADMAP Q8 ("cut v0.3.1?") and fix the TODO pin-bump blocker row — `v0.3.1` exists per `git tag`~~ | ~~D~~ | ~~High~~ | ~~S~~ |
-| ~~ | ~~5~~ | ~~Reconcile demo-VM/hostfwd-hang state from the 21-07 report into TODO_LIST (row exists or explicit done)~~ | ~~D~~ | ~~Med~~ | ~~S~~ |
-| ~~ | ~~6~~ | ~~Relay `queue.route` IfBlock hardening (indexed keys, resolvable hostnames)~~ | ~~T~~ | ~~Med~~ | ~~M~~ |
-| ~~ | ~~7~~ | ~~Over-quota surface: decide + write the consumer warning/doc (accept-at-RCPT, retry-forever behavior)~~ | ~~T~~ | ~~Med~~ | ~~M~~ |
-| ~~ | ~~8~~ | ~~Catch-all ordering footgun: module-level assertion or ledger-linked doc note~~ | ~~T~~ | ~~Med~~ | ~~S~~ |
-| ~~ | ~~9~~ | ~~Investigate why `nix flake lock` evaluates `checks` far enough to die on a broken flake~~ | ~~T~~ | ~~Med~~ | ~~S~~ |
-| ~~ | ~~10~~ | ~~Watch the four upstream filings (nixpkgs #563651/#563652/#563777, mjs/imapclient #662/#663)~~ | ~~T~~ | ~~Med~~ | ~~S~~ |
+| #  | Task   | Source                                                                                                                       | Impact | Effort   | Category |
+| -- | ------ | ---------------------------------------------------------------------------------------------------------------------------- | ------ | -------- | -------- |
+| ~~ | ~~1~~  | ~~Eval guard asserting our pinned nixpkgs rev equals SystemNix's pin (mechanize the compat doctrine)~~                       | ~~T~~  | ~~High~~ | ~~M~~    |
+| ~~ | ~~2~~  | ~~Eval guard asserting `flake-parts/nixpkgs-lib` still `follows = "nixpkgs"` in the lock~~                                   | ~~T~~  | ~~Med~~  | ~~S~~    |
+| ~~ | ~~3~~  | ~~`checks` entry: `nixosModules.default` imports cleanly via `nixosSystem` on both arches~~                                  | ~~T~~  | ~~Med~~  | ~~M~~    |
+| ~~ | ~~4~~  | ~~Docs-drift sweep: close ROADMAP Q8 ("cut v0.3.1?") and fix the TODO pin-bump blocker row — `v0.3.1` exists per `git tag`~~ | ~~D~~  | ~~High~~ | ~~S~~    |
+| ~~ | ~~5~~  | ~~Reconcile demo-VM/hostfwd-hang state from the 21-07 report into TODO_LIST (row exists or explicit done)~~                  | ~~D~~  | ~~Med~~  | ~~S~~    |
+| ~~ | ~~6~~  | ~~Relay `queue.route` IfBlock hardening (indexed keys, resolvable hostnames)~~                                               | ~~T~~  | ~~Med~~  | ~~M~~    |
+| ~~ | ~~7~~  | ~~Over-quota surface: decide + write the consumer warning/doc (accept-at-RCPT, retry-forever behavior)~~                     | ~~T~~  | ~~Med~~  | ~~M~~    |
+| ~~ | ~~8~~  | ~~Catch-all ordering footgun: module-level assertion or ledger-linked doc note~~                                             | ~~T~~  | ~~Med~~  | ~~S~~    |
+| ~~ | ~~9~~  | ~~Investigate why `nix flake lock` evaluates `checks` far enough to die on a broken flake~~                                  | ~~T~~  | ~~Med~~  | ~~S~~    |
+| ~~ | ~~10~~ | ~~Watch the four upstream filings (nixpkgs #563651/#563652/#563777, mjs/imapclient #662/#663)~~                              | ~~T~~  | ~~Med~~  | ~~S~~    |
 
 ### Tier 2 — Session-gap work: observability & defense (verify keys on 0.15.5 before wiring each)
 
-| #  | Task | Source                                                                                                                                            | Impact | Effort | Category |
-| -- | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ------ | -------- |
-| ~~ | ~~11~~ | ~~Verify parsedmarc (pinned nixpkgs) TLS-RPT report support; if present, extend `dmarc-monitor` to consume TLS reports — closes the DNS-estate loop~~ | ~~S~~ | ~~High~~ | ~~M~~ |
-| ~~ | ~~12~~ | ~~Alert taxonomy + routing design; hard rule: alert channel must not depend on the monitored mail stack~~ | ~~S~~ | ~~High~~ | ~~S~~ |
-| ~~ | ~~13~~ | ~~Resend outbound telemetry spike: webhooks/events (deliveries, bounces, complaints) → ingestion decision~~ | ~~S~~ | ~~High~~ | ~~M~~ |
-| ~~ | ~~14~~ | ~~Resend SASL shape verification + one real smtp.resend.com:587 smoke (proves `relay.secretFile`)~~ | ~~T~~ | ~~High~~ | ~~S~~ |
-| ~~ | ~~15~~ | ~~Inbound RBL usage in Stalwart filters (verify 0.15.5 config keys; document default policy)~~ | ~~S~~ | ~~High~~ | ~~M~~ |
-| ~~ | ~~16~~ | ~~Rate-limiting + auth-failure ban: verify 0.15.5 knobs, wire via settings passthrough + eval assertion~~ | ~~S~~ | ~~High~~ | ~~M~~ |
-| ~~ | ~~17~~ | ~~Failed-auth alerting rule from Stalwart telemetry/journal (consumer-side rule definition)~~ | ~~S~~ | ~~High~~ | ~~M~~ |
-| ~~ | ~~18~~ | ~~Round-trip canary design: periodic send→receive probe, message-level SLO (vantage = open question g-2)~~ | ~~S~~ | ~~Med~~ | ~~S design~~ |
-| ~~ | ~~19~~ | ~~Dead-man switch/heartbeat on the monitors themselves (Gatus, Prometheus scrape, parsedmarc freshness)~~ | ~~S~~ | ~~Med~~ | ~~M~~ |
-| ~~ | ~~20~~ | ~~Capacity metrics: disk growth + per-mailbox quota series from `/metrics` (verify series exist)~~ | ~~S~~ | ~~Med~~ | ~~M~~ |
-| ~~ | ~~21~~ | ~~Stalwart auto-expiry (Junk/Trash retention): verify 0.15.5 knobs, wire wrapper options + E2E assertion~~ | ~~S~~ | ~~Med~~ | ~~M~~ |
-| ~~ | ~~22~~ | ~~Client autoconfiguration: verify RFC 6186 SRV/autoconfig support; else document manual setup / DNS records~~ | ~~S~~ | ~~Low~~ | ~~S~~ |
-| ~~ | ~~23~~ | ~~Webmail goal/non-goal: add as a ROADMAP open question (Roundcube/SnappyMail vs JMAP-only)~~ | ~~S~~ | ~~Med~~ | ~~S~~ |
-| ~~ | ~~24~~ | ~~IR runbook: queue hold/pause switch + quarantine review workflow~~ | ~~S~~ | ~~Med~~ | ~~M~~ |
-| ~~ | ~~25~~ | ~~Admin audit trail: verify Stalwart audit logging on 0.15.5; retention + shipping decision~~ | ~~S~~ | ~~Med~~ | ~~M~~ |
-| ~~ | ~~26~~ | ~~Stalwart telemetry wiring per `docs/TELEMETRY.md` AFTER the 0.15.5 key-verification pass (skew caveat)~~ | ~~R~~ | ~~High~~ | ~~M–L~~ |
-| ~~ | ~~27~~ | ~~Queue-depth/queue-age alert rules off the Prometheus endpoint~~ | ~~R~~ | ~~High~~ | ~~M~~ |
-| ~~ | ~~28~~ | ~~Gatus external-view checks (starttls :25, tls :993, cert expiry) in the SystemNix consumer~~ | ~~R~~ | ~~High~~ | ~~M~~ |
-| ~~ | ~~29~~ | ~~Monitoring coverage matrix doc (today/planned/gap × metrics/logs/alerts/DR) beside `docs/TELEMETRY.md`~~ | ~~S~~ | ~~Med~~ | ~~M~~ |
-| ~~ | ~~30~~ | ~~Reorganize ROADMAP theme 4 into detect → alert → respond → verify~~ | ~~S~~ | ~~Low~~ | ~~S~~ |
-| ~~ | ~~31~~ | ~~Cross-check the 10 session gaps against `docs/THREAT_MODEL.md` + `docs/TELEMETRY.md` for overlap/contradiction~~ | ~~S~~ | ~~Med~~ | ~~S~~ |
+| #  | Task   | Source                                                                                                                                                | Impact | Effort   | Category     |
+| -- | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | -------- | ------------ |
+| ~~ | ~~11~~ | ~~Verify parsedmarc (pinned nixpkgs) TLS-RPT report support; if present, extend `dmarc-monitor` to consume TLS reports — closes the DNS-estate loop~~ | ~~S~~  | ~~High~~ | ~~M~~        |
+| ~~ | ~~12~~ | ~~Alert taxonomy + routing design; hard rule: alert channel must not depend on the monitored mail stack~~                                             | ~~S~~  | ~~High~~ | ~~S~~        |
+| ~~ | ~~13~~ | ~~Resend outbound telemetry spike: webhooks/events (deliveries, bounces, complaints) → ingestion decision~~                                           | ~~S~~  | ~~High~~ | ~~M~~        |
+| ~~ | ~~14~~ | ~~Resend SASL shape verification + one real smtp.resend.com:587 smoke (proves `relay.secretFile`)~~                                                   | ~~T~~  | ~~High~~ | ~~S~~        |
+| ~~ | ~~15~~ | ~~Inbound RBL usage in Stalwart filters (verify 0.15.5 config keys; document default policy)~~                                                        | ~~S~~  | ~~High~~ | ~~M~~        |
+| ~~ | ~~16~~ | ~~Rate-limiting + auth-failure ban: verify 0.15.5 knobs, wire via settings passthrough + eval assertion~~                                             | ~~S~~  | ~~High~~ | ~~M~~        |
+| ~~ | ~~17~~ | ~~Failed-auth alerting rule from Stalwart telemetry/journal (consumer-side rule definition)~~                                                         | ~~S~~  | ~~High~~ | ~~M~~        |
+| ~~ | ~~18~~ | ~~Round-trip canary design: periodic send→receive probe, message-level SLO (vantage = open question g-2)~~                                            | ~~S~~  | ~~Med~~  | ~~S design~~ |
+| ~~ | ~~19~~ | ~~Dead-man switch/heartbeat on the monitors themselves (Gatus, Prometheus scrape, parsedmarc freshness)~~                                             | ~~S~~  | ~~Med~~  | ~~M~~        |
+| ~~ | ~~20~~ | ~~Capacity metrics: disk growth + per-mailbox quota series from `/metrics` (verify series exist)~~                                                    | ~~S~~  | ~~Med~~  | ~~M~~        |
+| ~~ | ~~21~~ | ~~Stalwart auto-expiry (Junk/Trash retention): verify 0.15.5 knobs, wire wrapper options + E2E assertion~~                                            | ~~S~~  | ~~Med~~  | ~~M~~        |
+| ~~ | ~~22~~ | ~~Client autoconfiguration: verify RFC 6186 SRV/autoconfig support; else document manual setup / DNS records~~                                        | ~~S~~  | ~~Low~~  | ~~S~~        |
+| ~~ | ~~23~~ | ~~Webmail goal/non-goal: add as a ROADMAP open question (Roundcube/SnappyMail vs JMAP-only)~~                                                         | ~~S~~  | ~~Med~~  | ~~S~~        |
+| ~~ | ~~24~~ | ~~IR runbook: queue hold/pause switch + quarantine review workflow~~                                                                                  | ~~S~~  | ~~Med~~  | ~~M~~        |
+| ~~ | ~~25~~ | ~~Admin audit trail: verify Stalwart audit logging on 0.15.5; retention + shipping decision~~                                                         | ~~S~~  | ~~Med~~  | ~~M~~        |
+| ~~ | ~~26~~ | ~~Stalwart telemetry wiring per `docs/TELEMETRY.md` AFTER the 0.15.5 key-verification pass (skew caveat)~~                                            | ~~R~~  | ~~High~~ | ~~M–L~~      |
+| ~~ | ~~27~~ | ~~Queue-depth/queue-age alert rules off the Prometheus endpoint~~                                                                                     | ~~R~~  | ~~High~~ | ~~M~~        |
+| ~~ | ~~28~~ | ~~Gatus external-view checks (starttls :25, tls :993, cert expiry) in the SystemNix consumer~~                                                        | ~~R~~  | ~~High~~ | ~~M~~        |
+| ~~ | ~~29~~ | ~~Monitoring coverage matrix doc (today/planned/gap × metrics/logs/alerts/DR) beside `docs/TELEMETRY.md`~~                                            | ~~S~~  | ~~Med~~  | ~~M~~        |
+| ~~ | ~~30~~ | ~~Reorganize ROADMAP theme 4 into detect → alert → respond → verify~~                                                                                 | ~~S~~  | ~~Low~~  | ~~S~~        |
+| ~~ | ~~31~~ | ~~Cross-check the 10 session gaps against `docs/THREAT_MODEL.md` + `docs/TELEMETRY.md` for overlap/contradiction~~                                    | ~~S~~  | ~~Med~~  | ~~S~~        |
 
 ### Tier 3 — D1/D2-gated (unblocked the day the decisions land)
 
-| #  | Task | Source                                                                                          | Impact | Effort | Category |
-| -- | ---- | ----------------------------------------------------------------------------------------------- | ------ | ------ | -------- |
-| ~~ | ~~32~~ | ~~dmarc-monitor live validation against the real rua mailbox (first poll, JSON/CSV lands)~~ | ~~T~~ | ~~High~~ | ~~S~~ |
-| ~~ | ~~33~~ | ~~Migration tooling compare: stalwart-vandelay vs imapsync on scratch mailboxes (R6)~~ | ~~T~~ | ~~Med~~ | ~~M~~ |
-| ~~ | ~~34~~ | ~~Rotate the three placeholder secrets in SystemNix `nix-email.yaml` + sops-key-audit check~~ | ~~T~~ | ~~Med~~ | ~~S~~ |
-| ~~ | ~~35~~ | ~~Stalwart OIDC (Pocket ID) admin-UI wiring via settings passthrough~~ | ~~R~~ | ~~Med~~ | ~~M~~ |
-| ~~ | ~~36~~ | ~~Unattended provisioning oneshot: verified `POST /api/principal` recipe → systemd unit~~ | ~~R~~ | ~~High~~ | ~~M~~ |
-| ~~ | ~~37~~ | ~~DKIM keygen automation (`POST /api/dkim`), keys into sops, selector rotation~~ | ~~R~~ | ~~High~~ | ~~M~~ |
-| ~~ | ~~38~~ | ~~Backup/DR build-out: `--export` timer + offsite pull + recovery-age key + MONTHLY restore drill~~ | ~~R~~ | ~~High~~ | ~~M–L~~ |
-| ~~ | ~~39~~ | ~~`stalwart-mail` Terraform DNS module: MX, SPF, DKIM, DMARC+rua, MTA-STS, TLS-RPT, TLSA~~ | ~~R~~ | ~~High~~ | ~~L~~ |
-| ~~ | ~~40~~ | ~~rDNS automation via Hetzner API (or documented manual step)~~ | ~~R~~ | ~~Low~~ | ~~S–M~~ |
-| ~~ | ~~41~~ | ~~Canary-domain cutover runbook: TTL lowering, dual-MX window, rollback steps~~ | ~~R~~ | ~~Med~~ | ~~M~~ |
-| ~~ | ~~42~~ | ~~Post-cutover parity checks: SPF/DKIM/DMARC alignment, mail-tester, per-account parity~~ | ~~R~~ | ~~Med~~ | ~~S~~ |
-| ~~ | ~~43~~ | ~~DMARC policy ladder (none → quarantine → reject) driven by parsedmarc data~~ | ~~R~~ | ~~Med~~ | ~~M~~ |
-| ~~ | ~~44~~ | ~~Paperless mail accounts off Gmail app passwords onto own IMAP; smartd alert decoupling~~ | ~~R~~ | ~~Med~~ | ~~M~~ |
-| ~~ | ~~45~~ | ~~InboxClean JMAP/IMAP spike post-migration~~ | ~~R~~ | ~~Low~~ | ~~M~~ |
+| #  | Task   | Source                                                                                              | Impact | Effort   | Category |
+| -- | ------ | --------------------------------------------------------------------------------------------------- | ------ | -------- | -------- |
+| ~~ | ~~32~~ | ~~dmarc-monitor live validation against the real rua mailbox (first poll, JSON/CSV lands)~~         | ~~T~~  | ~~High~~ | ~~S~~    |
+| ~~ | ~~33~~ | ~~Migration tooling compare: stalwart-vandelay vs imapsync on scratch mailboxes (R6)~~              | ~~T~~  | ~~Med~~  | ~~M~~    |
+| ~~ | ~~34~~ | ~~Rotate the three placeholder secrets in SystemNix `nix-email.yaml` + sops-key-audit check~~       | ~~T~~  | ~~Med~~  | ~~S~~    |
+| ~~ | ~~35~~ | ~~Stalwart OIDC (Pocket ID) admin-UI wiring via settings passthrough~~                              | ~~R~~  | ~~Med~~  | ~~M~~    |
+| ~~ | ~~36~~ | ~~Unattended provisioning oneshot: verified `POST /api/principal` recipe → systemd unit~~           | ~~R~~  | ~~High~~ | ~~M~~    |
+| ~~ | ~~37~~ | ~~DKIM keygen automation (`POST /api/dkim`), keys into sops, selector rotation~~                    | ~~R~~  | ~~High~~ | ~~M~~    |
+| ~~ | ~~38~~ | ~~Backup/DR build-out: `--export` timer + offsite pull + recovery-age key + MONTHLY restore drill~~ | ~~R~~  | ~~High~~ | ~~M–L~~  |
+| ~~ | ~~39~~ | ~~`stalwart-mail` Terraform DNS module: MX, SPF, DKIM, DMARC+rua, MTA-STS, TLS-RPT, TLSA~~          | ~~R~~  | ~~High~~ | ~~L~~    |
+| ~~ | ~~40~~ | ~~rDNS automation via Hetzner API (or documented manual step)~~                                     | ~~R~~  | ~~Low~~  | ~~S–M~~  |
+| ~~ | ~~41~~ | ~~Canary-domain cutover runbook: TTL lowering, dual-MX window, rollback steps~~                     | ~~R~~  | ~~Med~~  | ~~M~~    |
+| ~~ | ~~42~~ | ~~Post-cutover parity checks: SPF/DKIM/DMARC alignment, mail-tester, per-account parity~~           | ~~R~~  | ~~Med~~  | ~~S~~    |
+| ~~ | ~~43~~ | ~~DMARC policy ladder (none → quarantine → reject) driven by parsedmarc data~~                      | ~~R~~  | ~~Med~~  | ~~M~~    |
+| ~~ | ~~44~~ | ~~Paperless mail accounts off Gmail app passwords onto own IMAP; smartd alert decoupling~~          | ~~R~~  | ~~Med~~  | ~~M~~    |
+| ~~ | ~~45~~ | ~~InboxClean JMAP/IMAP spike post-migration~~                                                       | ~~R~~  | ~~Low~~  | ~~M~~    |
 
 ### Tier 4 — User-decision gates (5-minute calls that unblock hours)
 
-| #  | Task | Source                                                                                       | Impact | Effort | Category |
-| -- | ---- | -------------------------------------------------------------------------------------------- | ------ | ------ | -------- |
-| ~~ | ~~46~~ | ~~Q6 spam→Junk verdict (recorded recommendation: tag-only now + upstream feature request path)~~ | ~~R~~ | ~~Med~~ | ~~S~~ |
-| ~~ | ~~47~~ | ~~Q7 demo-VM boundary verdict (product-side vs consumer-side)~~ | ~~R~~ | ~~Med~~ | ~~S~~ |
-| ~~ | ~~48~~ | ~~Branch-protection bypass policy: keep daemon velocity or enforce the required check~~ | ~~T~~ | ~~Med~~ | ~~S~~ |
-| ~~ | ~~49~~ | ~~Renovate: install the GitHub app or drop `renovate.json` (app has NEVER run on this repo)~~ | ~~T~~ | ~~Med~~ | ~~S~~ |
-| ~~ | ~~50~~ | ~~mailsuite auto-STARTTLS issue: file the verified draft or skip it~~ | ~~T~~ | ~~Low~~ | ~~S~~ |
+| #  | Task   | Source                                                                                           | Impact | Effort  | Category |
+| -- | ------ | ------------------------------------------------------------------------------------------------ | ------ | ------- | -------- |
+| ~~ | ~~46~~ | ~~Q6 spam→Junk verdict (recorded recommendation: tag-only now + upstream feature request path)~~ | ~~R~~  | ~~Med~~ | ~~S~~    |
+| ~~ | ~~47~~ | ~~Q7 demo-VM boundary verdict (product-side vs consumer-side)~~                                  | ~~R~~  | ~~Med~~ | ~~S~~    |
+| ~~ | ~~48~~ | ~~Branch-protection bypass policy: keep daemon velocity or enforce the required check~~          | ~~T~~  | ~~Med~~ | ~~S~~    |
+| ~~ | ~~49~~ | ~~Renovate: install the GitHub app or drop `renovate.json` (app has NEVER run on this repo)~~    | ~~T~~  | ~~Med~~ | ~~S~~    |
+| ~~ | ~~50~~ | ~~mailsuite auto-STARTTLS issue: file the verified draft or skip it~~                            | ~~T~~  | ~~Low~~ | ~~S~~    |
 
 ## g) Questions I cannot figure out myself
 

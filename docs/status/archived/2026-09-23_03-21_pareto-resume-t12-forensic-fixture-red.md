@@ -83,21 +83,21 @@ Diagnostic facts already established from the run:
 
 ~~- fetchurl fixture built fine (3971 bytes downloaded, hash verified);~~ done - diagnostic record; superseded by the same-day root cause (see the Candidate-causes strike)
 ~~- `send-email >&2` SUCCEEDED in 1.45 s → all three sends left the script,~~ done - diagnostic record; superseded by the same-day root cause
-  postfix accepted the forensic mail (envelope `dmarc@localhost`);
+postfix accepted the forensic mail (envelope `dmarc@localhost`);
 ~~- `failure.json` never appeared within the 120 s bound;~~ done - diagnostic record; the repaired fixture lands failure.json (T12 green, shipped v0.4.0)
 ~~- no "Unable to parse"/"skipping" lines matched in the captured build log —~~ done - diagnostic record; superseded by the same-day root cause
-  the poller either silently skipped the message or errored with wording my
-  greps missed; the FULL journal is retrievable via
-  `nix log /nix/store/4rj9gk39xwh646dwgy2vn7yhdd0vla58-vm-test-run-parsedmarc-e2e.drv`.
+the poller either silently skipped the message or errored with wording my
+greps missed; the FULL journal is retrievable via
+`nix log /nix/store/4rj9gk39xwh646dwgy2vn7yhdd0vla58-vm-test-run-parsedmarc-e2e.drv`.
 ~~- Candidate causes (untested): IMAP fetch/mailsuite decode path for~~ done - root cause: upstream forensic sample malformed (space-only blank lines fold into headers); repaired copy pinned at ae1e5adb; T12 green, shipped v0.4.0 (05-55 report; CHANGELOG)
-  nested `message/*` parts; poller classification of multipart/report;
-  a parse error line present but not matching my grep patterns.
-  NOT yet done: root-cause, fix, green rerun, FEATURES/TODO row updates.
-  Remember: failed check results are CACHED — any rerun needs the fixed file
-  (which the fix will provide).
-  ~~2. **Close-out (planned)** — TODO_LIST Dependabot row deletion, buildflow row~~ done - 05-55 a/8-a/9
-  sweep, CHANGELOG residue consolidation: located in plan, not executed
-  (sequenced behind T12/T15/Final by design).
+nested `message/*` parts; poller classification of multipart/report;
+a parse error line present but not matching my grep patterns.
+NOT yet done: root-cause, fix, green rerun, FEATURES/TODO row updates.
+Remember: failed check results are CACHED — any rerun needs the fixed file
+(which the fix will provide).
+~~2. **Close-out (planned)** — TODO_LIST Dependabot row deletion, buildflow row~~ done - 05-55 a/8-a/9
+sweep, CHANGELOG residue consolidation: located in plan, not executed
+(sequenced behind T12/T15/Final by design).
 
 ## c) NOT STARTED
 

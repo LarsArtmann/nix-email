@@ -93,7 +93,7 @@
     ~~21. Demo-VM hostfwd hang: guest-side `curl -v 127.0.0.1:8080` first, read the 6 "Configuration build warning" lines, check the "Downloading external resource" loop (fresh-session budget).~~ done - ROOT-CAUSED + FIXED 2026-09-22 (02-58 a/3: firewall + systemd-PATH curl; ledger (k)/(l))
     ~~22. Then the layered demo re-smoke (guest loopback → host 18080 → swaks catch-all → IMAPS login) with transcripts.~~ done - layered transcripts green (02-58 a/5: API, catch-all, 587-auth INBOX, IMAPS)
     ~~23. Then land the withheld demo docs (README "Try it in a VM", FEATURES row, AGENTS `nix run .#vm`).~~ done - README Try-it-in-a-VM + ledger (k)-(n) + FEATURES + AGENTS (02-58 a/6)
-~~17. Optional after demo is green: dmarc-monitor in the demo against a local Mailpit sink (g2).~~ routed - decision-batch Demo-VM residue g2 ([rec] yes)
+    ~~17. Optional after demo is green: dmarc-monitor in the demo against a local Mailpit sink (g2).~~ routed - decision-batch Demo-VM residue g2 ([rec] yes)
     ~~25. Investigate the demo journal's "Configuration build warning" content even if benign.~~ done - benign startup noise, documented in the README demo section (02-58 a/6; ledger (n))
     ~~26. Decide the demo's external-resource download posture (identify URLs; disable-or-allow; ledger the E2E-vs-demo delta).~~ done - ASN/GeoIP CSVs from cdn.jsdelivr.net identified, non-fatal (ledger (n); 17_21-07 f/11)
     ~~27. docs-status ANNOTATE pass #1 (report 16_19-16) then `git mv` if fully resolved.~~ done - every section resolved inline (02-58 a/11)
@@ -106,10 +106,10 @@
     ~~34. Add a freshness Gatus spec refinement to MONITORING (dedupe note vs consumer `backup.maxAgeHours` - already flagged, needs the final wording).~~ done(spec) - MONITORING row 7 carries the SPEC-ONLY freshness probe with the backup.maxAgeHours dedupe note (22-50 a/4); encoding C24-gated
     ~~35. Capacity spec (row 11): transcribe store_/server_memory series from today's build log into concrete thresholds.~~ done(spec) - MONITORING row 11 SPEC-ONLY with thresholds (disk/quota > 80%); series verdict = no queue gauge, API poll (22-50 a/4); encoding C24-gated
     ~~36. Canary design: turn MONITORING §6 into an actionable TODO row (post-C29).~~ routed - decision-batch C29 gates it (open)
-18. ~~Rate-limiter tuning note: document how consumers should size `queue.limiter.inbound` (after M14 lands).~~ done (sizing note landed 2026-09-22 (README Rate-limit sizing + option description))
-19. ~~Threat-model: add the new loopback eval-assertion to the SSRF row (it strengthens the existing entry).~~ done (THREAT_MODEL relay-SSRF row gained the eval-time loopback assertion (23-15))
-20. ~~FEATURES.md: add rows for the eval guards, module-import check, TLS-RPT collection (FULLY_FUNCTIONAL), monitoring taxonomy (PARTIALLY - specs vs consumer wiring).~~ done (FEATURES rows landed (module-import-eval row + TLS-RPT note - 23-15))
-21. ~~Cross-check dmarc-eval's rendered-settings greps still pass after M14 (they will - mkDefault additions don't move existing keys - but the check is the proof).~~ done (dmarc-eval green post-M14 (re-verified 2026-09-22 - option-description edits too))
+17. ~~Rate-limiter tuning note: document how consumers should size `queue.limiter.inbound` (after M14 lands).~~ done (sizing note landed 2026-09-22 (README Rate-limit sizing + option description))
+18. ~~Threat-model: add the new loopback eval-assertion to the SSRF row (it strengthens the existing entry).~~ done (THREAT_MODEL relay-SSRF row gained the eval-time loopback assertion (23-15))
+19. ~~FEATURES.md: add rows for the eval guards, module-import check, TLS-RPT collection (FULLY_FUNCTIONAL), monitoring taxonomy (PARTIALLY - specs vs consumer wiring).~~ done (FEATURES rows landed (module-import-eval row + TLS-RPT note - 23-15))
+20. ~~Cross-check dmarc-eval's rendered-settings greps still pass after M14 (they will - mkDefault additions don't move existing keys - but the check is the proof).~~ done (dmarc-eval green post-M14 (re-verified 2026-09-22 - option-description edits too))
 
 **Consumer/cross-repo (post-approval):**
 

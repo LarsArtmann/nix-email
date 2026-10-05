@@ -73,36 +73,36 @@
 ## b) PARTIALLY DONE
 
 ~~1. **Push verification** — the daemon committed everything (9 ahead) but the push happens on~~ done - daemon flushed; master in sync + CI green on the pushed head (verified 2026-10-05, latest run success)
-   its own cadence; CI-green on the pushed head is inherited evidence, not a check of these
-   9 commits. Docs-only delta, same posture the 05-55 session accepted.
+its own cadence; CI-green on the pushed head is inherited evidence, not a check of these
+9 commits. Docs-only delta, same posture the 05-55 session accepted.
 ~~2. **Archive queue** — 16_19-16, 17_15-11, 17_21-07 deliberately remain unarchived: they~~ superseded - 2026-10-05 archive policy (AGENTS.md Documentation map): routed-bar adopted; the queued trio annotated + archived
-   carry genuinely-live user-gated items (C17 SystemNix set, demo g2, standing watch rows).
-   Annotated (by prior passes) and re-verified this session, but "fully done" they are not.
+carry genuinely-live user-gated items (C17 SystemNix set, demo g2, standing watch rows).
+Annotated (by prior passes) and re-verified this session, but "fully done" they are not.
 ~~3. **README ledger re-verification** — the 26 Stalwart-0.15.5 claims were NOT re-grepped~~ record - carried forward on the unchanged pin (6774f7bc since 2026-09-22); next re-grep rides the next pin advance
-   against the binary this pass; carried forward on the unchanged pin (`6774f7bc` since
-   2026-09-22). Stated in the health report rather than silently assumed.
+against the binary this pass; carried forward on the unchanged pin (`6774f7bc` since
+2026-09-22). Stated in the health report rather than silently assumed.
 ~~4. **AGENTS.md hash-anchor deviation** — the file keeps 4 commit-hash evidence anchors and~~ record - deliberate house deviation, documented and accepted
-   dated lessons (house style: lesson provenance); the generic verify-checklist flags hashes.
-   Deliberate, but it IS a standing deviation from the generic rubric.
+dated lessons (house style: lesson provenance); the generic verify-checklist flags hashes.
+Deliberate, but it IS a standing deviation from the generic rubric.
 ~~5. **This report's own annotation depth** — sections (a)-(c) of the OLDER reports (FULLY DONE~~ record - the 2026-10-05 pass follows the same precedent (a/d/e stay historical)
-   records) were left as historical records per house precedent; only forward-looking items
-   (b/c/f/g + open bullets) got verdicts. A maximalist pass would also re-verify every §a
-   evidence cell; the 18-41 pass explicitly did not either.
+records) were left as historical records per house precedent; only forward-looking items
+(b/c/f/g + open bullets) got verdicts. A maximalist pass would also re-verify every §a
+evidence cell; the 18-41 pass explicitly did not either.
 
 ## c) NOT STARTED (correctly parked; canonical list = TODO_LIST)
 
 ~~1. The nine newly routed TODO rows (pipe lint, pre-push mirror, host-parse-fixture,~~ routed - TODO_LIST carries all nine rows (open, canonical)
-   parsedmarc breadth, CI statix step, tag smoke, docs-freshness audits, parsedmarc Restart
-   decision, flake.nix split) — routed this session, executed by none.
+parsedmarc breadth, CI statix step, tag smoke, docs-freshness audits, parsedmarc Restart
+decision, flake.nix split) — routed this session, executed by none.
 ~~2. The entire user-gated set, unchanged: decision batch (D1/D2, C24/C29, C18/C19/C20/C22/~~ routed - decision-batch.md (the canonical decision surface)
-   C34, Q4-Q6, demo g1/g2), C17 SystemNix push + C17a pin choice, Resend API-key smoke,
-   qcow2 history purge, mailsuite/Junk/Renovate/Discussions filings.
+C34, Q4-Q6, demo g1/g2), C17 SystemNix push + C17a pin choice, Resend API-key smoke,
+qcow2 history purge, mailsuite/Junk/Renovate/Discussions filings.
 ~~3. BuildFlow upstream fixes (port-collision context-blindness; dprint pipe-truncation) —~~ routed - TODO_LIST BuildFlow nix-checker row
-   TODO row exists, not started.
+TODO row exists, not started.
 ~~4. The remaining archive moves (17_15-11/17_21-07/16_19-16) — gated on their live items.~~ done - executed 2026-10-05 (all 13 active reports archived; completeness gate green)
 ~~5. Monitoring encoding (C24/C29-gated), D1 build-out slices (M22-M26), TELEMETRY~~ routed - ROADMAP theme-4 rows (C24/C29-gated)
-   webhooks/alert-objects key verification, CONTRIBUTING per-claim audit — all routed rows,
-   none executed here.
+webhooks/alert-objects key verification, CONTRIBUTING per-claim audit — all routed rows,
+none executed here.
 
 ## d) TOTALLY FUCKED UP (all self-caught this session; none reached a gate red)
 
@@ -176,20 +176,20 @@
 
 ~~1. Verify the daemon pushed the 9-commit docs batch and CI stays green on the true head.~~ done - verified 2026-10-05: master...origin/master in sync, latest CI run success
 ~~2. Execute the flake.nix split (`flake-modules/*.nix`) — TODO Medium row; trigger already~~ routed - TODO_LIST Medium row (356 lines, trigger fired)
-   fired at 356 lines. Highest-value in-repo engineering item.
+fired at 356 lines. Highest-value in-repo engineering item.
 ~~3. CI: unescaped-pipe-in-table-cell lint (odd pipe-count vs header, fail-closed).~~ routed - TODO_LIST CI pipe-table lint row
 ~~4. Pre-push hook: mirror the CI check-inventory guards (lockstep list + aarch64 shape).~~ routed - TODO_LIST pre-push lockstep-mirror row
 ~~5. `scripts/host-parse-fixture.py` (PYTHONPATH from the check drv closure) — makes the AGENTS~~ routed - TODO_LIST host-parse-fixture row
-   dry-run rule a one-liner.
+dry-run rule a one-liner.
 ~~6. parsedmarc-e2e breadth: Netease + LinkedIn `.crlf` failure samples (host-dry-run first)~~ routed - TODO_LIST parsedmarc-breadth row
-~~   - `arrival_date_utc` assertion.~~ routed with f/6 above - TODO_LIST parsedmarc-breadth row carries it
+~~ - `arrival_date_utc` assertion.~~ routed with f/6 above - TODO_LIST parsedmarc-breadth row carries it
 ~~7. CI statix step (fresh-file W20 drift class).~~ routed - TODO_LIST CI statix row
 ~~8. v0.4.0 tag smoke: `nix flake show` + one `nix run .#vm` boot on a tag worktree.~~ routed - TODO_LIST tag-smoke row
 ~~9. Docs freshness audits: TELEMETRY webhooks/alert-objects keys + CONTRIBUTING per-claim.~~ routed - TODO_LIST docs-freshness row
 ~~10. Add the archive-policy line to AGENTS Documentation map (e/7) — 5 minutes, prevents the~~ done - AGENTS.md Documentation map gained the policy line 2026-10-05
-    next judgment call.
+next judgment call.
 ~~11. Decided-against candidates to sweep with verdicts: none new — but re-check 16_19-16's 15~~ done - re-checked 2026-10-05: all 16_19-16 opens routed (see its strikes); archive executed
-    open items at the next decision batch (archive sweep row).
+open items at the next decision batch (archive sweep row).
 
 **User decisions (minutes each; the standing batch, unchanged):**
 
@@ -197,13 +197,13 @@
 ~~13. D2 (VPS placement/budget) — gates sizing.~~ routed - decision-batch D2
 ~~14. C24 alert channel + C29 canary vantage — gates all MONITORING encoding rows.~~ routed - decision-batch C24/C29
 ~~15. C17 SystemNix push approval + C17a pin choice (hard-pin `?ref=v0.4.0` vs float master) —~~ routed - decision-batch C17 (+ C17a pin choice)
-    the fleet-pin gate; unblocked since the v0.4.0 tag exists.
+the fleet-pin gate; unblocked since the v0.4.0 tag exists.
 ~~16. C18 branch-protection bypass policy.~~ routed - decision-batch C18
 ~~17. C19 Renovate install-or-drop (app never ran; its actions scope duplicates Dependabot).~~ routed - decision-batch C19
 ~~18. C20 mailsuite STARTTLS issue file-or-skip (draft ready, 5 gates passed).~~ routed - decision-batch C20
 ~~19. C22 Discussions; C34 webmail; Q4 README detail level; Q5 provisioning philosophy.~~ routed - decision-batch C22/C34/Q4/Q5
 ~~20. Q6 spam→Junk ownership verdict (rec: tag-only now + upstream path) — gates the Stalwart~~ routed - decision-batch Q6
-    upstream filing.
+upstream filing.
 ~~21. Demo g1/g2 (dmarc-in-demo) — g2 gates the 17_21-07 archive.~~ routed - decision-batch Demo-VM residue g1/g2
 ~~22. qcow2 history-purge verdict (~140 MB, force-push window) vs accept-clone-weight.~~ routed - TODO_LIST user-blocked qcow2 row
 ~~23. Daemon flush policy at session end (wait-for-push block vs ride-the-cycle).~~ routed - decision-batch C38 (batched 2026-10-05)
@@ -214,25 +214,25 @@
 ~~25. SystemNix push + CI-debt triage + cache sweep (C17 payload).~~ routed - TODO_LIST user-blocked SystemNix row
 ~~26. parsedmarc unit Restart-policy upstream proposal (file-or-skip; new TODO row).~~ routed - TODO_LIST user-blocked Restart row
 ~~27. Watch nixpkgs #563651/#563777; the imapclient 4.1.0 bump retires the py3.13 pin at the~~ routed - TODO_LIST standing watch row
-    next pin advance carrying >= 4.1.0.
+next pin advance carrying >= 4.1.0.
 ~~28. Next-pin-bump presence-list re-verify (standing row; fires on the NEXT bump).~~ routed - TODO_LIST standing presence-list row
 ~~29. Archive moves for 17_15-11/17_21-07/16_19-16 once their gated opens close~~ done - executed 2026-10-05 (completeness gate re-run green)
-    (+ completeness gate re-run).
+(+ completeness gate re-run).
 ~~30. Monitoring encoding rows 2-14 per MONITORING.md the moment C24/C29 land (queue poll,~~ routed - ROADMAP theme-4 + MONITORING.md (C24/C29-gated)
-    failed-auth, dead-man, Gatus templates, capacity, canary).
+failed-auth, dead-man, Gatus templates, capacity, canary).
 ~~31. D1-gated build-out slices M22-M26 / C12 / C14 (re-slice at unlock).~~ routed - decision-batch D1 unblocks (re-slice at unlock)
 ~~32. BuildFlow upstream session: port-collision context-awareness/suppression + markdown-table~~ routed - TODO_LIST BuildFlow upstream row
-    pipe handling; then retire the AGENTS known-noise entry and the exit-69 posture.
+pipe handling; then retire the AGENTS known-noise entry and the exit-69 posture.
 
 **Improvement candidates (from e/, cheap, unfiled where noted):**
 
 ~~33. Annotate-script hardening: refuse tabs in verdicts (skill-asset change; out of repo).~~ out of repo - docs-health skill asset (its own repo owns the hardening)
 ~~34. Check-rows as a yield-time reflex after any hand-strike inside big tables (process; could~~ process note - rides the docs-health skill; no repo artifact owed
-    ride the docs-health skill notes).
+ride the docs-health skill notes).
 ~~35. Consider a `docs/status/README.md` index (status live-index rot is a VERIFY checklist row;~~ moot - the 2026-10-05 archive leaves zero active reports; revisit if the active set exceeds ~10 again
-    currently checked by diffing `ls` vs nothing — 11 files is manageable, 15+ would not be).
+currently checked by diffing `ls` vs nothing — 11 files is manageable, 15+ would not be).
 ~~36. Host-side dry-run tool work (see 5) doubles as the first flake `apps.` candidate if a flake~~ routed - TODO_LIST host-parse-fixture row (notes the flake-app option)
-    app is preferred over `scripts/`.
+app is preferred over `scripts/`.
 
 **Deliberately NOT re-listed (already canonical elsewhere):** the D1 production theme ideas,
 ROADMAP §5 raw ideas, monitoring taxonomy work — they live in ROADMAP/decision-batch; listing
@@ -241,15 +241,15 @@ them here again would be the entombment this skill exists to kill.
 ## g) Questions I can NOT figure out myself
 
 ~~1. **The decision batch itself** — D1/D2, C24/C29, C17+C17a, C18/C19/C20/C22/C34, Q4-Q6,~~ routed - decision-batch.md IS the surface; answering stays with the user
-   g1/g2 have been pending since 2026-09-22 with recommendations staged in
-   `docs/planning/decision-batch.md`. Is a single 30-minute sitting realistic this week, or
-   should I stop surfacing it in every report until you initiate?
+g1/g2 have been pending since 2026-09-22 with recommendations staged in
+`docs/planning/decision-batch.md`. Is a single 30-minute sitting realistic this week, or
+should I stop surfacing it in every report until you initiate?
 ~~2. **Archive policy** — is "every item closed OR canonically routed" an acceptable archive~~ answered 2026-10-05 - user mandate: fully-annotated snapshots archive; routed-bar adopted (AGENTS.md policy line)
-   bar (the 17_17-28 precedent I followed), or must every item be CLOSED with routed-open
-   reports staying active? It changes whether ~4 more reports move now or wait.
+bar (the 17_17-28 precedent I followed), or must every item be CLOSED with routed-open
+reports staying active? It changes whether ~4 more reports move now or wait.
 ~~3. **BuildFlow upstream session** — should the port-collision + dprint-pipe fixes be a~~ routed - TODO_LIST BuildFlow upstream row (open)
-   dedicated BuildFlow-repo session soon (I can author both; the gate keeps exiting 69 until
-   then), or stay routed-as-TODO until BuildFlow's own cycle picks them up?
+dedicated BuildFlow-repo session soon (I can author both; the gate keeps exiting 69 until
+then), or stay routed-as-TODO until BuildFlow's own cycle picks them up?
 
 ---
 

@@ -94,8 +94,8 @@ defensible, but history readability paid).
 ~~- Release 0.3.0 cut (unblocked tonight by the PR #1 merge).~~ done - v0.3.0 tagged 2026-09-17 (+ v0.3.1 same day)
 ~~- Reload-precondition jq assertion; pre-push fmt hook; the 3 hygiene rows.~~ done - shipped in v0.3.0 (CHANGELOG: pre-push hook + reload assertion entries)
 ~~- All user-gated rows: SystemNix push (~47+ commits + CI debt + cache~~ routed - TODO_LIST rows (Blocked-on-user + D1-gated sections) and decision-batch (C17-C20, C22, D1/D2, Q6)
-  sweep), Renovate install-or-drop, mailsuite file-or-skip, Resend SASL
-  smoke, Discussions, branch-protection policy, D1/D2/Q6 verdicts.
+sweep), Renovate install-or-drop, mailsuite file-or-skip, Resend SASL
+smoke, Discussions, branch-protection policy, D1/D2/Q6 verdicts.
 ~~- Push of this session's 5 unpushed daemon commits.~~ done - daemon flushed long since; master in sync + CI green (verified 2026-10-05)
 
 ## d) TOTALLY FUCKED UP

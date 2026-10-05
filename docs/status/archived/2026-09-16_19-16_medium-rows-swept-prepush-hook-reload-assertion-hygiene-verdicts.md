@@ -40,10 +40,10 @@ into sections (d) and (e) — both skills triggered, one file.
 From TODO_LIST as of this session (priority order):
 
 1. ~~**Cut release 0.3.0** — High, 1h. UNBLOCKED since 16:08 UTC (dependabot PR #1 merged). `[Unreleased]` is thick (relay, native ingestion, DKIM dual-sign, pipe-lint, devShell — now plus this session's hook + assertion).~~ done (v0.3.0 AND v0.3.1 tagged 2026-09-17)
-~~2. **Watch the four upstream filings** (nixpkgs #563651/#563652/#563777, mjs/imapclient #662/#663) — Med, 10m.~~ routed - TODO_LIST standing watch row (upstream filings)
-~~3. All **D1-gated** rows (dmarc live validation, migration compare, secret rotation) — blocked on the rua-mailbox decision.~~ routed - TODO_LIST Gated-on-D1 section
-~~4. All **user-blocked** rows (Resend smoke, SystemNix push, branch-protection policy, Renovate install-or-drop, mailsuite issue file-or-skip, Junk-filing Q6, Discussions) — blocked on user decisions, minutes each.~~ routed - TODO_LIST Blocked-on-the-user section + decision-batch
-5. ~~Not researched this session per the no-research constraint: whether any NEW blockers appeared on those rows today.~~ **Won't implement — moot - superseded by the later sweep reports.**
+   ~~2. **Watch the four upstream filings** (nixpkgs #563651/#563652/#563777, mjs/imapclient #662/#663) — Med, 10m.~~ routed - TODO_LIST standing watch row (upstream filings)
+   ~~3. All **D1-gated** rows (dmarc live validation, migration compare, secret rotation) — blocked on the rua-mailbox decision.~~ routed - TODO_LIST Gated-on-D1 section
+   ~~4. All **user-blocked** rows (Resend smoke, SystemNix push, branch-protection policy, Renovate install-or-drop, mailsuite issue file-or-skip, Junk-filing Q6, Discussions) — blocked on user decisions, minutes each.~~ routed - TODO_LIST Blocked-on-the-user section + decision-batch
+2. ~~Not researched this session per the no-research constraint: whether any NEW blockers appeared on those rows today.~~ **Won't implement — moot - superseded by the later sweep reports.**
 
 ## d) TOTALLY FUCKED UP (radical honesty)
 
