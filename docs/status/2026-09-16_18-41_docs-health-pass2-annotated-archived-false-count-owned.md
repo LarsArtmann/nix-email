@@ -78,25 +78,25 @@ verified). Not a per-claim audit of every link/number in either file.
 ~~2. **SVG currency** — 08-08 §f/14 said "re-render at the next docs~~ routed - ROADMAP §5 arch-diagram content-freshness audit (covers render + content on the next diagram session)
 touch"; this WAS a docs touch and I routed it to a TODO row instead
 (render churn mid-docs-pass felt wrong; tradeoff stated, not hidden).
-3. **§a done-tables unverified as records** — I trusted each report's
+~~3. **§a done-tables unverified as records** — I trusted each report's~~ superseded by house policy - the 09-29 pass (its b/5) keeps §a historical by design; maximalist re-verification deliberately not owed
 own verification claims plus later-session corroboration, per the
 established house pattern; not a fresh re-verification of all ~60
 table rows.
 ~~4. **Health-report presentation** — I folded fixed findings into the~~ done(superseded) - the skill's math-discipline rules (visible substitution, count-first) now govern the format
 per-doc table as "(n fixed)" notes instead of strict before/after
 tables; the math stayed honest but the format was a compromise.
-5. **Commit hygiene** — everything landed via 5 daemon heuristic commits;
+~~5. **Commit hygiene** — everything landed via 5 daemon heuristic commits;~~ record - daemon heuristic commits are the accepted house pattern (daemon section, global AGENTS); no action
 no explicit per-task commits (no commit authorization this session —
 defensible, but history readability paid).
 
 ## c) NOT STARTED (correctly parked; canonical list = TODO_LIST)
 
-- Release 0.3.0 cut (unblocked tonight by the PR #1 merge).
-- Reload-precondition jq assertion; pre-push fmt hook; the 3 hygiene rows.
-- All user-gated rows: SystemNix push (~47+ commits + CI debt + cache
+~~- Release 0.3.0 cut (unblocked tonight by the PR #1 merge).~~ done - v0.3.0 tagged 2026-09-17 (+ v0.3.1 same day)
+~~- Reload-precondition jq assertion; pre-push fmt hook; the 3 hygiene rows.~~ done - shipped in v0.3.0 (CHANGELOG: pre-push hook + reload assertion entries)
+~~- All user-gated rows: SystemNix push (~47+ commits + CI debt + cache~~ routed - TODO_LIST rows (Blocked-on-user + D1-gated sections) and decision-batch (C17-C20, C22, D1/D2, Q6)
   sweep), Renovate install-or-drop, mailsuite file-or-skip, Resend SASL
   smoke, Discussions, branch-protection policy, D1/D2/Q6 verdicts.
-- Push of this session's 5 unpushed daemon commits.
+~~- Push of this session's 5 unpushed daemon commits.~~ done - daemon flushed long since; master in sync + CI green (verified 2026-10-05)
 
 ## d) TOTALLY FUCKED UP
 

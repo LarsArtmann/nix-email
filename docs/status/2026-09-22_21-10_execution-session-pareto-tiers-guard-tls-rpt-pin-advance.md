@@ -74,14 +74,14 @@
 
 **Decisions (the 1% - unblocks 19 gated todos):**
 
-1. D1 verdict (Workspace fork) - gates M22-M26, C12, C14, C43-C51.
-2. D2 verdict (VPS placement/budget) - gates M23/M24 sizing.
-3. C24 alert channel + C29 canary vantage - unblocks M11 routing table + M18 implementation.
-4. C17 SystemNix push approval - ships today's dedupe + lock advance (local work is DONE and green).
-5. C18 branch-protection bypass: keep or strict.
-6. C19 Renovate: install or drop (note: Dependabot opened its first branch `dependabot/github_actions/actions-b7aede57ad` this week).
-7. C20 mailsuite issue: file the verified draft or skip.
-8. C22 Discussions; 9. C34 webmail goal/non-goal; 10. Q4 README detail level; 11. Q5 declarative provisioning; 12. Q6 spam ownership (recommends c-now+d-upstream); 13. demo-VM g1 port call; 14. demo-VM g2 dmarc-in-demo call; 15. cut a tag (`v0.3.2`?) checkpointing guards+TLS-RPT+pin-advance for the fleet.
+~~1. D1 verdict (Workspace fork) - gates M22-M26, C12, C14, C43-C51.~~ routed - decision-batch D1 ([rec] retire)
+~~2. D2 verdict (VPS placement/budget) - gates M23/M24 sizing.~~ routed - decision-batch D2
+~~3. C24 alert channel + C29 canary vantage - unblocks M11 routing table + M18 implementation.~~ routed - decision-batch C24/C29
+~~4. C17 SystemNix push approval - ships today's dedupe + lock advance (local work is DONE and green).~~ routed - decision-batch C17 (+ C17a pin choice; v0.4.0 ref exists)
+~~5. C18 branch-protection bypass: keep or strict.~~ routed - decision-batch C18
+~~6. C19 Renovate: install or drop (note: Dependabot opened its first branch `dependabot/github_actions/actions-b7aede57ad` this week).~~ routed - decision-batch C19
+~~7. C20 mailsuite issue: file the verified draft or skip.~~ routed - decision-batch C20
+~~8. C22 Discussions; 9. C34 webmail goal/non-goal; 10. Q4 README detail level; 11. Q5 declarative provisioning; 12. Q6 spam ownership (recommends c-now+d-upstream); 13. demo-VM g1 port call; 14. demo-VM g2 dmarc-in-demo call; 15. cut a tag (`v0.3.2`?) checkpointing guards+TLS-RPT+pin-advance for the fleet.~~ routed - decision-batch C22/C34/Q4/Q5 (items 8-11 all batched)
 
 **In-repo technical (next session):**
 
@@ -93,7 +93,7 @@
     ~~21. Demo-VM hostfwd hang: guest-side `curl -v 127.0.0.1:8080` first, read the 6 "Configuration build warning" lines, check the "Downloading external resource" loop (fresh-session budget).~~ done - ROOT-CAUSED + FIXED 2026-09-22 (02-58 a/3: firewall + systemd-PATH curl; ledger (k)/(l))
     ~~22. Then the layered demo re-smoke (guest loopback → host 18080 → swaks catch-all → IMAPS login) with transcripts.~~ done - layered transcripts green (02-58 a/5: API, catch-all, 587-auth INBOX, IMAPS)
     ~~23. Then land the withheld demo docs (README "Try it in a VM", FEATURES row, AGENTS `nix run .#vm`).~~ done - README Try-it-in-a-VM + ledger (k)-(n) + FEATURES + AGENTS (02-58 a/6)
-17. Optional after demo is green: dmarc-monitor in the demo against a local Mailpit sink (g2).
+~~17. Optional after demo is green: dmarc-monitor in the demo against a local Mailpit sink (g2).~~ routed - decision-batch Demo-VM residue g2 ([rec] yes)
     ~~25. Investigate the demo journal's "Configuration build warning" content even if benign.~~ done - benign startup noise, documented in the README demo section (02-58 a/6; ledger (n))
     ~~26. Decide the demo's external-resource download posture (identify URLs; disable-or-allow; ledger the E2E-vs-demo delta).~~ done - ASN/GeoIP CSVs from cdn.jsdelivr.net identified, non-fatal (ledger (n); 17_21-07 f/11)
     ~~27. docs-status ANNOTATE pass #1 (report 16_19-16) then `git mv` if fully resolved.~~ done - every section resolved inline (02-58 a/11)
@@ -126,9 +126,9 @@
 
 ## g) THREE QUESTIONS I CANNOT ANSWER MYSELF
 
-1. **D1 + D2 (the fork and the budget):** retire Google Workspace mailboxes for the Stalwart VPS, and if yes - which Hetzner project/location, CX22-class?, backup target (evo-x2 btrfs pool now, StorageBox later)? Everything in tiers "D1-gated production" (M22-M26, 15+ todos) waits on this single answer; my recommendation and the full option set are in `docs/planning/decision-batch.md`.
-2. **Alert channel + canary vantage (C24 + C29):** do alerts go to Discord via the existing SystemNix layer (my recommendation, non-mail rule satisfied), or ntfy/something else? And does the round-trip canary run from evo-x2 (my recommendation - independent residential path), or do you want a different vantage? I cannot know whether evo-x2 is guaranteed-resident or whether Discord is actually monitored by you at 3 a.m.
-3. **Push + bypass + tag cadence (C17 + C18 + new-tag):** may I push SystemNix's local dedupe + lock advance (the work is green there: contract check passed)? Keep the branch-protection bypass for daemon velocity, or go strict? And do you want a `v0.3.2` tag cut NOW to checkpoint today's guards + pin advance + TLS-RPT for the fleet, or batch into the next feature release?
+~~1. **D1 + D2 (the fork and the budget):** retire Google Workspace mailboxes for the Stalwart VPS, and if yes - which Hetzner project/location, CX22-class?, backup target (evo-x2 btrfs pool now, StorageBox later)? Everything in tiers "D1-gated production" (M22-M26, 15+ todos) waits on this single answer; my recommendation and the full option set are in `docs/planning/decision-batch.md`.~~ routed - decision-batch The-big-two section
+~~2. **Alert channel + canary vantage (C24 + C29):** do alerts go to Discord via the existing SystemNix layer (my recommendation, non-mail rule satisfied), or ntfy/something else? And does the round-trip canary run from evo-x2 (my recommendation - independent residential path), or do you want a different vantage? I cannot know whether evo-x2 is guaranteed-resident or whether Discord is actually monitored by you at 3 a.m.~~ routed - decision-batch C24/C29
+~~3. **Push + bypass + tag cadence (C17 + C18 + new-tag):** may I push SystemNix's local dedupe + lock advance (the work is green there: contract check passed)? Keep the branch-protection bypass for daemon velocity, or go strict? And do you want a `v0.3.2` tag cut NOW to checkpoint today's guards + pin advance + TLS-RPT for the fleet, or batch into the next feature release?~~ routed - decision-batch C17 + C18; the new-tag part RESOLVED (v0.4.0 cut 2026-09-23, signed, CI-green)
 
 ---
 

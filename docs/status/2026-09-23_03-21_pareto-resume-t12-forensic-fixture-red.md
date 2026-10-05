@@ -81,15 +81,15 @@ identity, CSV, SMTP TLS-RPT, StateDirectory journal greps) — the new
 subtest is purely additive, so existing coverage is not regressed.
 Diagnostic facts already established from the run:
 
-- fetchurl fixture built fine (3971 bytes downloaded, hash verified);
-- `send-email >&2` SUCCEEDED in 1.45 s → all three sends left the script,
+~~- fetchurl fixture built fine (3971 bytes downloaded, hash verified);~~ done - diagnostic record; superseded by the same-day root cause (see the Candidate-causes strike)
+~~- `send-email >&2` SUCCEEDED in 1.45 s → all three sends left the script,~~ done - diagnostic record; superseded by the same-day root cause
   postfix accepted the forensic mail (envelope `dmarc@localhost`);
-- `failure.json` never appeared within the 120 s bound;
-- no "Unable to parse"/"skipping" lines matched in the captured build log —
+~~- `failure.json` never appeared within the 120 s bound;~~ done - diagnostic record; the repaired fixture lands failure.json (T12 green, shipped v0.4.0)
+~~- no "Unable to parse"/"skipping" lines matched in the captured build log —~~ done - diagnostic record; superseded by the same-day root cause
   the poller either silently skipped the message or errored with wording my
   greps missed; the FULL journal is retrievable via
   `nix log /nix/store/4rj9gk39xwh646dwgy2vn7yhdd0vla58-vm-test-run-parsedmarc-e2e.drv`.
-- Candidate causes (untested): IMAP fetch/mailsuite decode path for
+~~- Candidate causes (untested): IMAP fetch/mailsuite decode path for~~ done - root cause: upstream forensic sample malformed (space-only blank lines fold into headers); repaired copy pinned at ae1e5adb; T12 green, shipped v0.4.0 (05-55 report; CHANGELOG)
   nested `message/*` parts; poller classification of multipart/report;
   a parse error line present but not matching my grep patterns.
   NOT yet done: root-cause, fix, green rerun, FEATURES/TODO row updates.
@@ -221,7 +221,7 @@ toggle.
 fixture burns (lesson above).
 ~~26. Subtest diagnosability: journal-dump-on-timeout pattern for async~~ done - journal-dump branch in the forensic subtest (05-55 a/1)
 wait_until_succeeds subtests.
-27. Anti-pattern note: empty grep output is not verification (grep-of-grep).
+~~27. Anti-pattern note: empty grep output is not verification (grep-of-grep).~~ kept - process lesson preserved in this report e/3 (historical); no repo artifact owed
 ~~28. Consider a tiny host-side eval of `parse_failure_report` on the fixture~~ routed - TODO_LIST host-parse-fixture helper row (2026-09-29)
 as a permanent fast regression layer (seconds vs minutes) — maybe a
 `runCommand` check beside the VM test.

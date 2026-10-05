@@ -85,11 +85,11 @@ Everything in section (f) is unstarted — grouped by WHY, since "not started" w
 
 | Group                                                  | Items                  | Why not started                                                                         |
 | ------------------------------------------------------ | ---------------------- | --------------------------------------------------------------------------------------- |
-| Verified bounded backlog (pre-existing TODO_LIST rows) | #1–3, #6–10            | Session was advisory; execution never requested                                         |
-| Session-discovered gaps                                | #11–17, #19–26, #28–31 | Discovered THIS session; analysis only                                                  |
-| Drift repairs                                          | #4–5                   | Noticed this turn during report state-check; awaiting go                                |
-| D1-gated (live enablement)                             | #32–45                 | Hard-gated on the D1/D2 user decisions (ROADMAP open questions 1–2)                     |
-| User-decision gates                                    | #23, #46–50            | Q6/Q7/bypass/Renovate/mailsuite — Lars's calls, drafts/recommendations already recorded |
+| ~~Verified bounded backlog (pre-existing TODO_LIST rows)~~ routed - the rows live in TODO_LIST (canonical) | ~~#1–3, #6–10~~ | ~~Session was advisory; execution never requested~~ routed with their TODO rows |
+| ~~Session-discovered gaps~~ routed - each gap carries its own f-list verdict below | ~~#11–17, #19–26, #28–31~~ | ~~Discovered THIS session; analysis only~~ routed per-item (f-list verdicts) |
+| ~~Drift repairs~~ done - fixed by the 2026-09-22 23-15 docs-health pass (CHANGELOG 0.4.0 docs-audit fixes) | ~~#4–5~~ | ~~Noticed this turn during report state-check; awaiting go~~ done |
+| ~~D1-gated (live enablement)~~ routed - TODO_LIST Gated-on-D1 section + ROADMAP themes 1-3 | ~~#32–45~~ | ~~Hard-gated on the D1/D2 user decisions (ROADMAP open questions 1–2)~~ routed (decision-batch D1/D2) |
+| ~~User-decision gates~~ routed - decision-batch (Q6, C18/C19/C20, Q7 resolved 2026-09-17) | ~~#23, #46–50~~ | ~~Q6/Q7/bypass/Renovate/mailsuite — Lars's calls, drafts/recommendations already recorded~~ routed |
 
 ## d) TOTALLY FUCKED UP
 

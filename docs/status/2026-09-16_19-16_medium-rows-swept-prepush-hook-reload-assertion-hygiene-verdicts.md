@@ -40,9 +40,9 @@ into sections (d) and (e) — both skills triggered, one file.
 From TODO_LIST as of this session (priority order):
 
 1. ~~**Cut release 0.3.0** — High, 1h. UNBLOCKED since 16:08 UTC (dependabot PR #1 merged). `[Unreleased]` is thick (relay, native ingestion, DKIM dual-sign, pipe-lint, devShell — now plus this session's hook + assertion).~~ done (v0.3.0 AND v0.3.1 tagged 2026-09-17)
-2. **Watch the four upstream filings** (nixpkgs #563651/#563652/#563777, mjs/imapclient #662/#663) — Med, 10m.
-3. All **D1-gated** rows (dmarc live validation, migration compare, secret rotation) — blocked on the rua-mailbox decision.
-4. All **user-blocked** rows (Resend smoke, SystemNix push, branch-protection policy, Renovate install-or-drop, mailsuite issue file-or-skip, Junk-filing Q6, Discussions) — blocked on user decisions, minutes each.
+~~2. **Watch the four upstream filings** (nixpkgs #563651/#563652/#563777, mjs/imapclient #662/#663) — Med, 10m.~~ routed - TODO_LIST standing watch row (upstream filings)
+~~3. All **D1-gated** rows (dmarc live validation, migration compare, secret rotation) — blocked on the rua-mailbox decision.~~ routed - TODO_LIST Gated-on-D1 section
+~~4. All **user-blocked** rows (Resend smoke, SystemNix push, branch-protection policy, Renovate install-or-drop, mailsuite issue file-or-skip, Junk-filing Q6, Discussions) — blocked on user decisions, minutes each.~~ routed - TODO_LIST Blocked-on-the-user section + decision-batch
 5. ~~Not researched this session per the no-research constraint: whether any NEW blockers appeared on those rows today.~~ **Won't implement — moot - superseded by the later sweep reports.**
 
 ## d) TOTALLY FUCKED UP (radical honesty)
@@ -88,16 +88,16 @@ Sorted by impact then effort. Category / Impact / Effort. (HARVEST note: items 1
 
 **Standing High/Medium (from TODO_LIST, re-verified 2026-09-16):**
 8. ~~Cut release 0.3.0: cut `[Unreleased]` (now includes pre-push hook + reload assertion + SVG refresh), tag `v0.3.0`, release notes with the nixpkgs lock `rev`/`narHash`. — Feature / High / M~~ done (v0.3.0 tagged 2026-09-17 (then v0.3.1 same day))
-9. Re-check the four upstream filings (nixpkgs #563651, #563652, #563777, mjs/imapclient #662/#663 merge state). — Watch / Med / S
-10. Decide + implement branch-protection strictness (pushes currently bypass `nix flake check` — "Bypassed rule violations"); the hook makes strict mode cheaper to live with. — Policy/Infra / High / S (user decision first)
-11. Resend SASL smoke (needs API key from you). — Verification / High / S (blocked)
-12. SystemNix: push the ≈47 unpushed commits + clear that repo's CI debt. — Infra / Med / L (blocked on approval)
-13. Renovate: install the GitHub app or drop `renovate.json`. — Infra / Med / S (user decision)
-14. mailsuite STARTTLS issue: file the staged draft or skip it. — Upstream / Low / S (user decision)
-15. Stalwart upstream: declarative Junk filing request (only if ROADMAP Q6 lands on option d). — Upstream / Low / M (blocked)
-16. Discussions enable-or-issues-only. — Infra / Low / S (user decision)
-17. D1 rua-mailbox decision → unblocks the three D1 rows (live dmarc validation, migration compare, secret rotation). — Decision / High / S (user)
-18. If D1 lands: rotate the three placeholder secrets in SystemNix `nix-email.yaml` and confirm sops-key-audit flags them. — Security / Med / M
+~~9. Re-check the four upstream filings (nixpkgs #563651, #563652, #563777, mjs/imapclient #662/#663 merge state). — Watch / Med / S~~ routed - TODO_LIST standing watch row (same home as c/2)
+~~10. Decide + implement branch-protection strictness (pushes currently bypass `nix flake check` — "Bypassed rule violations"); the hook makes strict mode cheaper to live with. — Policy/Infra / High / S (user decision first)~~ routed - decision-batch C18 ([rec] keep bypass)
+~~11. Resend SASL smoke (needs API key from you). — Verification / High / S (blocked)~~ routed - TODO_LIST user-blocked Resend row
+~~12. SystemNix: push the ≈47 unpushed commits + clear that repo's CI debt. — Infra / Med / L (blocked on approval)~~ routed - TODO_LIST user-blocked SystemNix row + decision-batch C17
+~~13. Renovate: install the GitHub app or drop `renovate.json`. — Infra / Med / S (user decision)~~ routed - decision-batch C19 ([rec] drop)
+~~14. mailsuite STARTTLS issue: file the staged draft or skip it. — Upstream / Low / S (user decision)~~ routed - decision-batch C20 ([rec] file)
+~~15. Stalwart upstream: declarative Junk filing request (only if ROADMAP Q6 lands on option d). — Upstream / Low / M (blocked)~~ routed - TODO_LIST Junk-filing row (Q6-gated) + decision-batch Q6
+~~16. Discussions enable-or-issues-only. — Infra / Low / S (user decision)~~ routed - decision-batch C22
+~~17. D1 rua-mailbox decision → unblocks the three D1 rows (live dmarc validation, migration compare, secret rotation). — Decision / High / S (user)~~ routed - decision-batch D1
+~~18. If D1 lands: rotate the three placeholder secrets in SystemNix `nix-email.yaml` and confirm sops-key-audit flags them. — Security / Med / M~~ routed - TODO_LIST D1-gated secrets-rotation row
 
 **Hygiene / quality (this session's neighborhood):**
 19. ~~Normalize brace style repo-wide (`{ ... }:` vs `{...}:` both pass the gate — pick one, apply once via alejandra-consistent input, note it in CONTRIBUTING). — Cleanup / Low / S~~ **Won't implement — deliberate non-fix - AGENTS.md Working rules record the intentional coexistence.**
@@ -113,17 +113,17 @@ Sorted by impact then effort. Category / Impact / Effort. (HARVEST note: items 1
 27. ~~Consider a `checks.<system>.fmt` derivation so `nix flake check` itself fails-closed on formatting (today only CI's alejandra step does; hook is local-only). — Quality / Med / M~~ **Won't implement — CI enforces fail-closed; local equivalent is nix fmt -- . --check.**
 28. ~~Evaluate `-o /tmp/out-link` hygiene rules for check builds in AGENTS.md (when to keep GC roots vs drop). — Docs / Low / S~~ **Won't implement — AGENTS.md debug loop documents GC-root keep/drop.**
 29. ~~Audit whether any OTHER repo-level config points at missing paths (the hooksPath pattern: `git config -l | grep -i path` + existence check). — Cleanup / Med / S~~ **Won't implement — no further instances found since.**
-30. Add `vulnerability` scan replacement decision for the retired-vulnix gap (currently skipped via .buildflow.yml; nothing scans Nix store paths for CVEs). — Security / Med / M
-31. Keep an eye on nixpkgs `services.stalwart` version movement past 0.15.5 (README pin-advance runbook trigger). — Watch / Med / S
-32. Re-verify the relay `queue.route` IfBlock gotchas still apply after any Stalwart bump (README ledger entries age with the pin). — Watch / Low / S
+~~30. Add `vulnerability` scan replacement decision for the retired-vulnix gap (currently skipped via .buildflow.yml; nothing scans Nix store paths for CVEs). — Security / Med / M~~ routed - ROADMAP §5 vulnix-replacement idea (+ .buildflow.yml skip rationale)
+~~31. Keep an eye on nixpkgs `services.stalwart` version movement past 0.15.5 (README pin-advance runbook trigger). — Watch / Med / S~~ routed - README Pin-advance runbook owns the watch
+~~32. Re-verify the relay `queue.route` IfBlock gotchas still apply after any Stalwart bump (README ledger entries age with the pin). — Watch / Low / S~~ routed - README Pin-advance runbook step (re-verify ledger keys on bump)
 33. ~~Add the `errors.AsType`/error-modernization sweep… n/a for Nix-only repo — drop; listed to keep the 50 honest about pruning. — (removed from consideration)~~ **Won't implement — self-marked removed.**
 34. ~~Write a one-page "how to debug stalwart-e2e in the VM" runbook from AGENTS.md's debug loop (it is dense prose; a checklist would cut the next session's ramp). — Docs / Low / M~~ done (AGENTS.md Commands carries the VM debug loop + demo FIFO pattern (2026-09-22))
 35. ~~Snapshot-test the pre-push hook's stdin parsing against git's actual pre-push stdin format (ref lines with multiple updates). — Quality / Low / S~~ **Won't implement — superseded - CI fmt step.**
 36. ~~Consider `git push --no-verify` audit trail: CI-side annotation when a push arrives unformatted-bypassed (ties to #10 strict mode). — Infra / Low / M~~ **Won't implement — superseded - CI fmt step.**
 37. ~~Document in CONTRIBUTING that the hook checks the WHOLE tree (not just pushed commits) — set expectations for large-repo cost as the repo grows. — Docs / Low / S~~ done (CONTRIBUTING Formatting-gate section documents the hook behavior)
 38. ~~Add `docs/status/archived/` move for this report's predecessors if not already routed (docs-health VERIFY found the 18-41 report's false-count earlier; confirm archived state). — Docs / Low / S~~ done (the 2026-09-22 sweeps annotate + route the candidates)
-39. Re-render `improved.d2` content audit: the file is byte-stable but its CONTENT vs the module reality (relay, dual-sign, pipe-lint) was not re-verified this session — the label check proved rendering fidelity, not content truth. — Docs / Med / M
-40. Same for `current.d2`: label-fresh ≠ fact-fresh; schedule a content-vs-modules audit. — Docs / Med / M
+~~39. Re-render `improved.d2` content audit: the file is byte-stable but its CONTENT vs the module reality (relay, dual-sign, pipe-lint) was not re-verified this session — the label check proved rendering fidelity, not content truth. — Docs / Med / M~~ routed - ROADMAP §5 arch-diagram content-freshness audit idea
+~~40. Same for `current.d2`: label-fresh ≠ fact-fresh; schedule a content-vs-modules audit. — Docs / Med / M~~ routed - same ROADMAP §5 idea (covers both d2 files)
 41. ~~Record in AGENTS.md that `nix flake check --no-build` emits the eval warnings quickly (useful cheap reproduction instrument for eval-noise triage). — Docs / Low / S~~ done (AGENTS.md check bullet gained the --no-build note 2026-09-22)
 42. ~~Evaluate whether the `.data.errors` pattern should extend to other management-API calls in the test (e.g. dkim-create response) — same precondition-assertion doctrine. — Quality / Low / S~~ **Won't implement — doctrine settled in the reload subtest assertion.**
 43. ~~Check that the new assertion's failure mode produces a readable error (jq prints nothing on mismatch except exit 1 — consider `jq -e '… == 0' file || { cat file; exit 1; }` for transcript-in-place). — Quality / Low / S~~ **Won't implement — assertion pattern settled in the test.**
