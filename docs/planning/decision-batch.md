@@ -158,3 +158,34 @@ Gated on D1 (rotation-due check before live enablement). **No recommendation nee
 - Q7 (demo VM boundary): RESOLVED 2026-09-17 — demo VM lives in THIS repo.
 - Q8 (tag cadence): RESOLVED 2026-09-17 — `v0.3.1` cut.
 - TLS-RPT / telemetry / RBL / rate-limit / expiry / audit / autoconfig wiring: not user-gated — execution follows the M9 verify verdicts (this session).
+
+## Agent-execution adoptions (2026-10-05 full-execution mandate)
+
+The owner mandate for the 2026-10-05 session was "execute the WHOLE
+plan". T1/T2 are owner calls, so agent work adopted the staged `[rec]`
+ONLY where unblocking required it, and every adoption below is
+reversible (re-answering the entry supersedes it). Entries NOT listed
+here stay OPEN owner calls.
+
+- **C35 (JMAP spike: start now)** — ADOPTED `[rec] start-now` and
+  EXECUTED same day: demo-VM probe transcripts
+  (`docs/probes/2026-10-05-jmap-demo-vm/`), push-vs-poll verdict +
+  `docs/INBOXCLEAN.md`, JMAP e2e subtest in `stalwart-e2e`. All four
+  High-impact JMAP rows closed.
+- **C17a (SystemNix pin: hard-pin `?ref=v0.4.0`)** — ADOPTED `[rec]` and
+  EXECUTED in the SystemNix repo (pinned, lock updated,
+  `nix-email-contract` green against the tag, pushed). Reversible:
+  re-floating is a one-line input change.
+- **C17 (SystemNix push)** — EXECUTED: the 12-commit backlog + the pin
+  - the statix sweep are pushed (through c6aaa6c5).
+- **C20 (mailsuite filing: file it)** — ADOPTED `[rec] file it` and
+  FILED as seanthegeek/mailsuite#65 (gates re-verified same day).
+- **C38 (daemon flush: ride the cycle)** — FOLLOWED implicitly: the
+  daemon raced several commits; nothing was suppressed or force-flushed.
+- **Q6 (spam→Junk)** — the "upstream ask" half is MOOT (Gate-2 verdict:
+  auto-move exists upstream since 0.5.0; see the TODO row); the
+  "tag-only now" half stays as recorded.
+
+Explicitly still blocked, for the record: T17 (needs the real Resend
+API key), T19 (needs explicit force-push approval), T20 (D1/D2 +
+production infra), T21 (C24/C29 monitoring encoding calls).

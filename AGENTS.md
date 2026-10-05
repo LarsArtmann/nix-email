@@ -58,7 +58,8 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
   with `rm /tmp/st-e2e-root`). CI-side gc-roots are pointless - runners
   are ephemeral and flakehub-cache owns persistence there.
 - Gate commands never wear pipes (`cmd | tail` can print PASSED on a failing
-  run); test assertions are transcribed from observed transcripts, not from
+  run) - full redirect+echo-exit procedure in Working rules below; test
+  assertions are transcribed from observed transcripts, not from
   expected output (the swaks `<**` vs `<-` lesson).
 - swaks/SMTP forensics without a server (host, minutes): run a tiny python
   asyncio SMTP sink on a high port (greet, accept, print DATA), point swaks
@@ -104,9 +105,8 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
 - HOST-SIDE PARSER DRY-RUN before any VM test that feeds a fixture to a
   python service (2026-09-23, paid for itself same day; mechanized
   2026-10-05): `python3 scripts/host-parse-fixture.py <fixture> --check
-  parsedmarc-e2e` runs the PINNED parser on the fixture in ~30 s (it walks
-  the check closure with `nix-store -qR --include-outputs`, puts the pinned
-  minor's site-packages dirs on PYTHONPATH, and calls the pinned
+  parsedmarc-e2e` runs the PINNED parser on the fixture in ~30 s (walks
+  the check closure, PYTHONPATH = pinned minor's site-packages,
   `parse_report_file(offline=True)`; realize the check first if the
   closure is missing). This
   reproduced a VM red (upstream's forensic sample had space-only blank
@@ -312,12 +312,10 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
   decision counts as routed once it sits in `decision-batch.md` with a
   [rec]. Sections a/d/e stay historical records (unstruck by design).
   Bulk archives carry a manifest (`docs/status/archived/README.md`).
-  FORMAT BEFORE ARCHIVE: dprint (`buildflow -s dprint-format --fix`) runs
-  BEFORE the `git mv`, so archived files land gate-clean instead of
-  churning a post-archive reformat commit (2026-10-05). Sub-bullet strike
-  rule: strike the parent line AND each sub-bullet's own text with its
-  own verdict marker - a struck parent with clean children reads as open
-  and fails check-rows (2026-10-05).
+  FORMAT BEFORE ARCHIVE: dprint (`buildflow -s dprint-format --fix`)
+  before the `git mv` - post-archive reformat commits churn history.
+  Sub-bullets: strike each with its own verdict marker; a struck parent
+  with clean children reads as open and fails check-rows (2026-10-05).
 - `docs/TELEMETRY.md` - Stalwart telemetry best-practices guide (from
   stalw.art docs fetched 2026-09-15; carries an upstream-object-model vs
   pinned-0.15.5 version-skew caveat - verify keys against the binary
