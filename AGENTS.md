@@ -303,6 +303,12 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
   decision counts as routed once it sits in `decision-batch.md` with a
   [rec]. Sections a/d/e stay historical records (unstruck by design).
   Bulk archives carry a manifest (`docs/status/archived/README.md`).
+  FORMAT BEFORE ARCHIVE: dprint (`buildflow -s dprint-format --fix`) runs
+  BEFORE the `git mv`, so archived files land gate-clean instead of
+  churning a post-archive reformat commit (2026-10-05). Sub-bullet strike
+  rule: strike the parent line AND each sub-bullet's own text with its
+  own verdict marker - a struck parent with clean children reads as open
+  and fails check-rows (2026-10-05).
 - `docs/TELEMETRY.md` - Stalwart telemetry best-practices guide (from
   stalw.art docs fetched 2026-09-15; carries an upstream-object-model vs
   pinned-0.15.5 version-skew caveat - verify keys against the binary
