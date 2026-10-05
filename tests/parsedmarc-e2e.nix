@@ -77,7 +77,7 @@
   neteaseSampleReport = pkgs.fetchurl {
     name = "netease-failure-report";
     url = "https://github.com/domainaware/parsedmarc/raw/ae1e5adb6609946209278b2bf3f633c752a09383/samples/failure/%5BNetease%20DMARC%20Failure%20Report%5D%20Rent%20Reminder.eml";
-    sha256 = "sha256-YypKOU+Qq2bWrMzbE+UKWjq8zLVIYR9z9VACoqq+BuE=";
+    sha256 = "sha256-YyqROU+Qq2bWqszbE+UKWjq7zLVIZR9z9VACoqvuBuE=";
   };
   linkedinSampleReport = pkgs.fetchurl {
     name = "linkedin-failure-report";

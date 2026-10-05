@@ -60,6 +60,52 @@ jobs:
       - name: Enforce alejandra formatting (fail-closed)
         run: nix fmt -- . --check
 
+      - name: Lint markdown tables for unescaped pipes (fail-closed, self-tested)
+        run: |
+          # TABLE PIPE LINT (the 2026-09-23 eaten-rows lesson, mechanized):
+          # dprint re-splits markdown table rows on UNESCAPED pipes and
+          # DROPS overflow cells when a row has more than its header - two
+          # status-report rows were silently eaten that way. Every row must
+          # match its header's unescaped-pipe count; literal pipes in a
+          # cell MUST be escaped as `\|`. The step self-tests the lint on
+          # planted fixtures first (the gawk \b lesson: a never-firing
+          # lint is a false green - negative tests are mandatory).
+          set -eu
+          fixture="$(mktemp /tmp/pipe-lint-XXXXXX.md)"
+          trap 'rm -f "$fixture"' EXIT
+          # 1) fewer cells than header -> must FAIL
+          printf '| a | b | c |\n| --- | --- | --- |\n| 1 | 2 |\n' > "$fixture"
+          if bash scripts/check-md-table-pipes.sh "$fixture" > /dev/null 2>&1; then
+            echo "FATAL: lint accepted a row with fewer cells than its header"; exit 1
+          fi
+          # 2) the eaten-rows class: more cells than header -> must FAIL
+          printf '| a | b | c |\n| --- | --- | --- |\n| 1 | 2 | 3 | 4 |\n' > "$fixture"
+          if bash scripts/check-md-table-pipes.sh "$fixture" > /dev/null 2>&1; then
+            echo "FATAL: lint accepted a row with more cells than its header"; exit 1
+          fi
+          # 3) escaped pipe -> must PASS
+          printf '| a | b | c |\n| --- | --- | --- |\n| 1 \\| x | 2 | 3 |\n' > "$fixture"
+          if ! bash scripts/check-md-table-pipes.sh "$fixture" > /dev/null 2>&1; then
+            echo "FATAL: lint flagged an escaped pipe"; exit 1
+          fi
+          # 4) pipes inside a code fence -> must PASS
+          printf 'text\n```sh\n| not | a | table |\n```\n| a | b | c |\n| 1 | 2 | 3 |\n' > "$fixture"
+          if ! bash scripts/check-md-table-pipes.sh "$fixture" > /dev/null 2>&1; then
+            echo "FATAL: lint flagged pipes inside a code fence"; exit 1
+          fi
+          git ls-files -z '*.md' > /tmp/md-files.list
+          xargs -0 bash scripts/check-md-table-pipes.sh < /tmp/md-files.list
+
+      - name: Statix lint Nix files (fail-closed)
+        run: |
+          # STATIX: structural nix warnings (W20-class collapses ship as
+          # deliberate styles here - the pinned statix must be the SAME
+          # rev the repo pins, so findings are reproducible locally:
+          # `nix run github:NixOS/nixpkgs/$(nix flake metadata --json . |
+          # jq -r .locks.nodes.nixpkgs.locked.rev)#statix -- check .`).
+          rev="$(nix flake metadata --json . | jq -r '.locks.nodes.nixpkgs.locked.rev')"
+          nix run "github:NixOS/nixpkgs/$rev#statix" -- check .
+
       - name: Ban piped grep/tail/head assertions in tests (fail-closed)
         run: |
           # PIPE LINT (the exit-23 lesson, mechanized): in-VM assertions must
