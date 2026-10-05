@@ -27,6 +27,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   inline, AGENTS.md gained the red-CI cause-attribution rule and a
   fixture-traps restructure, and FEATURES.md split the Renovate+Dependabot
   row honestly (Dependabot works; the Renovate app was never installed).
+- ROADMAP records the decided InboxClean integration direction (2026-09-30:
+  JMAP-first per InboxClean ADR-023, this stack is the adapter target).
+- Docs-health AUDIT pass (2026-10-05): the 2026-09-30 cross-repo session
+  HARVESTed (four JMAP-seam TODO rows - demo-VM probe transcript,
+  EventSource/push test, contract doc, e2e subtest; decisions C35-C37
+  batched with recommendations; C38 daemon-flush added), all 13 active
+  docs/status reports resolved inline (~185 new verdicts plus ~80
+  marker-column table rows uniformized cell-wise; 262 strikethrough lines,
+  grep-derived) and ARCHIVED under the new archive policy (AGENTS.md
+  Documentation map; manifest in docs/status/archived/README.md; the
+  signed-tags and PROXY-protocol opens verified resolved - v0.4.0 carries a
+  good ED25519 tag signature, the PROXY verdict lives in the README
+  ledger), TODO_LIST defects fixed (broken header emphasis, a blank line
+  splitting the Low-impact table), and decision-batch reorganized with a
+  cross-repo-integration section.
 
 ### Fixed
 
