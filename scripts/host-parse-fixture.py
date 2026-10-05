@@ -65,6 +65,8 @@ def find_parser_env(drv: str) -> tuple[Path, list[Path]]:
         )
     minor = next(sp.parent.name for sp in site_packages
                  if (sp / "parsedmarc").is_dir())
+    site_packages = [sp for sp in site_packages
+                     if sp.parent.name == minor]
     python_bin = None
     for ref in refs:
         exact = Path(ref) / "bin" / minor
@@ -82,22 +84,12 @@ def parse_fixture(python: Path, site_packages: list[Path],
     env = dict(os.environ,
                PYTHONPATH=":".join(str(sp) for sp in site_packages))
     code = f"""
-import json, sys
+import json
 import parsedmarc
 
-data = open({str(fixture)!r}, "rb").read()
-suffix = {str(fixture)!r}.lower()
-if suffix.endswith(".zip") or suffix.endswith(".xml"):
-    reports = parsedmarc.parse_report_file({str(fixture)!r})
-    out = {{"aggregate_reports": reports[0], "forensic_reports": reports[1]}}
-elif suffix.endswith(".json"):
-    out = {{"smtp_tls_reports": [parsedmarc.parse_smtp_tls_report_json(
-        data.decode())]}}
-else:
-    aggregate, forensic = parsedmarc.parse_email(data)
-    out = {{"aggregate_reports": aggregate, "forensic_reports": forensic}}
+result = parsedmarc.parse_report_file({str(fixture)!r}, offline=True)
 print(json.dumps({{"parsedmarc_version": parsedmarc.__version__,
-                   **out}}, default=str))
+                   **result}}, default=str))
 """
     result = subprocess.run(
         [str(python), "-c", code], capture_output=True, text=True, env=env)
@@ -121,18 +113,13 @@ def main() -> None:
     drv = check_drv(args.check, args.system)
     python, site_packages = find_parser_env(drv)
     print(f"pinned env: python={python}", file=sys.stderr)
-    print(f"site-packages={site_packages}", file=sys.stderr)
+    print(f"site-packages dirs: {len(site_packages)}", file=sys.stderr)
     parsed = parse_fixture(python, site_packages, args.fixture)
     args.out.write_text(json.dumps(parsed, indent=2, default=str) + "\n")
     print(json.dumps(parsed, indent=2, default=str))
 
-    kinds = [k for k, v in parsed.items()
-             if k.endswith("_reports") and v] + (
-        ["smtp_tls_reports"] if parsed.get("smtp_tls_reports") else [])
-    if not any(k in ("aggregate_reports", "forensic_reports",
-                     "smtp_tls_reports") and parsed.get(k)
-               for k in parsed):
-        raise SystemExit(f"no reports recognized in {args.fixture}")
+    if not parsed.get("report") or not parsed.get("report_type"):
+        raise SystemExit(f"no report recognized in {args.fixture}")
 
 
 if __name__ == "__main__":
