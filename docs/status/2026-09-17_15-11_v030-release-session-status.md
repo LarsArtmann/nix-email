@@ -59,19 +59,19 @@
 
 ## b) PARTIALLY DONE
 
-1. **Post-release consumer propagation** — the supply side is shipped; the SystemNix pin flip to v0.3.0 is NOT (their repo is ~47 commits ahead of origin, push-approval gated). Release notes cannot help consumers who stay pinned to v0.2.0.
+~~1. **Post-release consumer propagation** — the supply side is shipped; the SystemNix pin flip to v0.3.0 is NOT (their repo is ~47 commits ahead of origin, push-approval gated). Release notes cannot help consumers who stay pinned to v0.2.0.~~ routed - decision-batch C17 (+ C17a pin choice; stable ref now v0.4.0)
 2. ~~**In-repo release procedure** — executed correctly once, but documented nowhere in the repo (skill-dependent). Next release by a fresh session would re-derive it.~~ done (CONTRIBUTING Release procedure section (2026-09-22))
 3. ~~**Git history quality at the release point** — the CHANGELOG cut (the commit the tag points at!) carries a meaningless auto-commit message; only the TODO_LIST commit (d23b854) is explicit and descriptive.~~ done (v0.3.1 release carried an explicit commit (8a96e1b))
 4. ~~**Pre-push verification per the go-release letter** — buildflow full ran locally; the local `nix flake check` was skipped with post-hoc-validated reasoning (see self-review).~~ **Won't implement — accepted deviation - the runbook now runs BOTH gates pre-tag.**
 
 ## c) NOT STARTED (all pre-existing or newly noticed this session)
 
-1. SystemNix pin flip → v0.3.0 (user-gated: push approval + CI debt order)
+~~1. SystemNix pin flip → v0.3.0 (user-gated: push approval + CI debt order)~~ routed - decision-batch C17a (stable ref now v0.4.0, cut 2026-09-23)
 2. ~~Release automation: draft GitHub release from CHANGELOG on tag push (manual `gh` calls today)~~ **Won't implement — manual gh procedure - documented in the CONTRIBUTING runbook; automation dropped.**
 3. ~~CHANGELOG structure lint (one `### Added/Changed/Fixed` per `##` version; CI or docs-health check)~~ **Won't implement — manual merge discipline held since (no duplicate blocks in later cuts); no lint built.**
 4. ~~lychee allowlist for auth-gated github.com URLs (secret-scanning/unblock links 404 for unauthenticated crawlers — 7 warning findings every gate run)~~ **Won't implement — root cause documented (auth-gated URLs); rides the SystemNix CI-debt row.**
-5. Signed annotated tags (supply-chain posture, THREAT_MODEL tie-in)
-6. mailsuite auto-STARTTLS issue filing (draft ready, all 5 gates passed — user-gated per docs/planning)
+~~5. Signed annotated tags (supply-chain posture, THREAT_MODEL tie-in)~~ done - v0.4.0 tag carries a good ED25519 signature (verified 2026-10-05; tag.gpgSign=true)
+~~6. mailsuite auto-STARTTLS issue filing (draft ready, all 5 gates passed — user-gated per docs/planning)~~ routed - decision-batch C20 ([rec] file)
 7. ~~AGENTS.md entry: nix-email release procedure + "daemon races explicit commits during releases" warning~~ done (CONTRIBUTING Release procedure + AGENTS pointer (2026-09-22))
 8. ~~All standing user decisions (D1 rua mailbox, D2, Q6 Junk filing, branch-protection policy, Renovate install-or-drop) — untouched, as instructed~~ done (still open - tracked in decision-batch/ROADMAP (pointer item - not this report work))
 
@@ -97,7 +97,7 @@
 
 _Brainstorm, not commitment — most items are TODO_LIST/ROADMAP fuel and need HARVEST routing rigor. Sorted roughly by impact._
 
-1. Flip SystemNix pin to `v0.3.0` (after/with its unpushed-commits cleanup)
+~~1. Flip SystemNix pin to `v0.3.0` (after/with its unpushed-commits cleanup)~~ routed - decision-batch C17/C17a (v0.4.0 is the pin target now)
 2. ~~Write the in-repo release runbook (CONTRIBUTING section) from this session's procedure~~ done (CONTRIBUTING Release procedure runbook (2026-09-22))
 3. ~~Add AGENTS.md "release procedure + daemon race" entry~~ done (CONTRIBUTING + AGENTS pointer (2026-09-22))
 4. ~~Pre-push hook: fail `v*` tag pushes without a matching CHANGELOG section~~ **Won't implement — tag CI runs the full check already.**
@@ -105,27 +105,27 @@ _Brainstorm, not commitment — most items are TODO_LIST/ROADMAP fuel and need H
 6. ~~lychee allowlist for auth-gated GitHub URLs~~ **Won't implement — rides the SystemNix CI-debt row.**
 7. ~~Tag ruleset requiring CI before release/Latest~~ **Won't implement — ruleset never configured; tag CI observed-green accepted.**
 8. ~~Release automation: workflow drafting the GitHub release from the CHANGELOG section on tag push~~ **Won't implement — manual procedure documented in the runbook.**
-9. Signed tags decision + setup (ssh-signed annotated tags)
+~~9. Signed tags decision + setup (ssh-signed annotated tags)~~ done - v0.4.0 signed (ED25519 signature verified 2026-10-05)
 10. ~~Per-path suppression for the two fixture sha256 pins (if nix-checker supports inline ignores) — else document why warning stays~~ **Won't implement — documented deliberate non-fix; suppression dropped.**
-11. Watch upstream filings: nixpkgs #563651, #563652, #563777, mjs/imapclient #662/#663 (standing TODO_LIST row)
-12. D1 decision: rua mailbox (gates live enablement + secrets rotation + dmarc-monitor live validation)
-13. D2 decision + spam→Junk policy (ROADMAP)
-14. Q6 Junk-filing question (ROADMAP re-posed)
-15. Branch-protection policy decision: admin bypass acceptable? (this session bypassed once)
-16. Renovate: install or drop (standing user-blocked row)
-17. Rotate the three placeholder secrets in SystemNix `nix-email.yaml` (D1-gated)
-18. SystemNix: push ~47 unpushed commits + clear CI debt (statix sweep, `syn_` secret policy, pin flips, gitleaks allowlist)
-19. SystemNix worktree cache sweep (`.cache/signoz-src`, `.cache/gatus-src`, `nixos.qcow2`)
-20. dmarc-monitor live validation vs real IMAP mailbox (D1-gated TODO_LIST row)
+~~11. Watch upstream filings: nixpkgs #563651, #563652, #563777, mjs/imapclient #662/#663 (standing TODO_LIST row)~~ routed - TODO_LIST standing watch row
+~~12. D1 decision: rua mailbox (gates live enablement + secrets rotation + dmarc-monitor live validation)~~ routed - decision-batch D1
+~~13. D2 decision + spam→Junk policy (ROADMAP)~~ routed - decision-batch D2 + Q6
+~~14. Q6 Junk-filing question (ROADMAP re-posed)~~ routed - decision-batch Q6
+~~15. Branch-protection policy decision: admin bypass acceptable? (this session bypassed once)~~ routed - decision-batch C18
+~~16. Renovate: install or drop (standing user-blocked row)~~ routed - decision-batch C19
+~~17. Rotate the three placeholder secrets in SystemNix `nix-email.yaml` (D1-gated)~~ routed - TODO_LIST D1-gated secrets-rotation row
+~~18. SystemNix: push ~47 unpushed commits + clear CI debt (statix sweep, `syn_` secret policy, pin flips, gitleaks allowlist)~~ routed - TODO_LIST user-blocked SystemNix row + C17
+~~19. SystemNix worktree cache sweep (`.cache/signoz-src`, `.cache/gatus-src`, `nixos.qcow2`)~~ routed - rides the same TODO_LIST SystemNix row (cache list cited there)
+~~20. dmarc-monitor live validation vs real IMAP mailbox (D1-gated TODO_LIST row)~~ routed - TODO_LIST D1-gated row
 21. ~~Pin-advance runbook execution when nixpkgs moves `services.stalwart` past 0.15.5 (both locks together + workaround retirement)~~ done (pin-advance runbook exists and was executed 2026-09-22)
 22. ~~Stalwart 0.16.x capability watch (DKIM rotation/DNS automation are 0.16-only; `stalwart_0_16` incompatible note in gate output)~~ done (standing watch - AGENTS Conventions + README evidence refreshed 2026-09-22)
 23. ~~Workaround-retirement re-checks tied to upstream fixes (imapclient py3.14 pin, host-less `[elasticsearch]` strip, parsedmarc Restart policy)~~ done (runbook re-check procedure + 2026-09-22 imapclient evidence refresh)
-24. mailsuite auto-STARTTLS issue: file after your go-ahead (draft + gates ready)
+~~24. mailsuite auto-STARTTLS issue: file after your go-ahead (draft + gates ready)~~ routed - decision-batch C20
 25. ~~aarch64 `--all-systems` residue decision (ROADMAP)~~ done (decided - aarch64 eval-only (documented + measured))
 26. ~~treefmt-vs-alejandra tradeoff decision (ROADMAP)~~ done (REJECTED 2026-09-17 - AGENTS Conventions)
-27. reload-smoke ops idea (ROADMAP)
-28. PROXY protocol absence: upstream feature request or documented non-goal?
-29. 0.15.5 capability adoption pass from Pareto §10 verdicts (OIDC, TOTP, encryption-at-rest, autoconfig, JMAP-WS) — pick worthships
+~~27. reload-smoke ops idea (ROADMAP)~~ routed - ROADMAP theme-4 Respond bullet (reload-smoke ops step)
+~~28. PROXY protocol absence: upstream feature request or documented non-goal?~~ answered - documented non-goal until 0.16+ (README capability-audit ledger block)
+~~29. 0.15.5 capability adoption pass from Pareto §10 verdicts (OIDC, TOTP, encryption-at-rest, autoconfig, JMAP-WS) — pick worthships~~ routed - ROADMAP §5 OIDC line + theme-1 raw ideas (D1-gated adoption)
 30. ~~FEATURES.md verify: confirm DKIM dual-sign / native-ingestion rows reflect v0.3.0 status~~ done (FEATURES rows current through the 2026-09-22 audits)
 31. ~~ROADMAP prune: items shipped by v0.3.0 (if any linger post-harvest)~~ done (harvests pruned shipped items)
 32. ~~THREAT_MODEL refresh pass post-0.3.0 (docs-health VERIFY)~~ done (THREAT_MODEL refreshed 2026-09-22 (relay-SSRF posture))
@@ -135,9 +135,9 @@ _Brainstorm, not commitment — most items are TODO_LIST/ROADMAP fuel and need H
 36. ~~v0.1.0 release titled "(tagged retroactively)" and published after v0.2.0 — rename for chronological sanity or leave with a note~~ **Won't implement — left with the retroactive note in the release title.**
 37. ~~dmarc-eval: assert the RETENTION description survives option-docs (it was the trigger for the dmarc-eval extension — confirm the assertion covers this specific text)~~ done (dmarc-eval asserts RETENTION survives option-docs rendering (FEATURES row))
 38. ~~Document the devShell as the canonical tool runner in CONTRIBUTING (`nix develop -c echo ok` health check)~~ done (AGENTS buildflow bullet documents the devShell runner contract)
-39. Backup/restore drill cadence for production (runbook scheduling, consumer layer)
-40. Gatus monitors for deployed stalwart endpoints (consumer layer, SystemNix)
-41. DMARC report-volume dashboard/sanity alert (consumer layer)
+~~39. Backup/restore drill cadence for production (runbook scheduling, consumer layer)~~ routed - ROADMAP theme-1 (monthly restore drill)
+~~40. Gatus monitors for deployed stalwart endpoints (consumer layer, SystemNix)~~ routed - ROADMAP theme-4 Gatus bullets (consumer layer)
+~~41. DMARC report-volume dashboard/sanity alert (consumer layer)~~ routed - ROADMAP DMARC-viewer idea (Verify) + FEATURES PLANNED row
 42. ~~dmarc-eval: end-to-end `settings.general.offline` assertion strength review (grep → real ini parse?)~~ **Won't implement — grep-based contract is deliberate (pure eval check).**
 43. ~~Tests: stalwart-relay-e2e runtime budget documentation (like the main E2E's measured RCPT-probe costs)~~ **Won't implement — relay test stable; budget doc not owed.**
 44. ~~Extract shared VM-test bashlib from the three E2E scripts (dump-to-file grep pattern repeats) — judgment: only if a 4th test lands~~ **Won't implement — still three E2E scripts - the judgment trigger never fired.**
@@ -150,9 +150,9 @@ _Brainstorm, not commitment — most items are TODO_LIST/ROADMAP fuel and need H
 
 ## g) Questions I cannot figure out myself
 
-1. **SystemNix bump order:** should I prepare the pin flip to `v0.3.0` in a branch now, or does it wait until SystemNix's ~47 unpushed commits and CI debt are cleared first? (Ordering is a push-approval + coordination call only you can make.)
-2. **Daemon policy:** the auto-commit daemon ate the release CHANGELOG commit today (second known occurrence). Keep it as-is, exclude release-critical files, or disable on this repo?
-3. **Release hardening:** do you want signed annotated tags and a tag ruleset (CI required before an release can exist/be Latest) for future releases — yes/no per mechanism?
+~~1. **SystemNix bump order:** should I prepare the pin flip to `v0.3.0` in a branch now, or does it wait until SystemNix's ~47 unpushed commits and CI debt are cleared first? (Ordering is a push-approval + coordination call only you can make.)~~ routed - decision-batch C17(a/b)
+~~2. **Daemon policy:** the auto-commit daemon ate the release CHANGELOG commit today (second known occurrence). Keep it as-is, exclude release-critical files, or disable on this repo?~~ routed - decision-batch C38 (batched 2026-10-05)
+~~3. **Release hardening:** do you want signed annotated tags and a tag ruleset (CI required before an release can exist/be Latest) for future releases — yes/no per mechanism?~~ done - signed tags shipped (v0.4.0 ED25519 signature, verified 2026-10-05); CI on v* tags already required
 
 ---
 

@@ -57,7 +57,7 @@ decisions.
 
 ## b) PARTIALLY DONE
 
-1. **Integration design is docs-verified, not live-probed.**
+~~1. **Integration design is docs-verified, not live-probed.**~~ routed - TODO_LIST JMAP probe row (the ~15-min probe IS the row)
    Works: every JMAP claim cites code or README read this session.
    Remains: no transcript of a live JMAP session on the demo VM (no
    `curl http://localhost:18080/.well-known/jmap` has ever been run in a
@@ -65,12 +65,12 @@ decisions.
    against the binary. Blocker: none - it is a ~15-minute probe.
    Effort: S. (The repo's own rule - "no new test assertion without a
    transcript" - applies to the next step, the contract doc.)
-2. **Two-way coordination artifact: designed, not written.** The 12:19 report
+~~2. **Two-way coordination artifact: designed, not written.** The 12:19 report~~ routed - TODO_LIST JMAP contract-doc row
    flagged "nix-email coordination is one-way... no shared contract artifact
    exists yet". This session specified what that artifact is (contract doc:
    pinned version, endpoint, auth, capabilities, test-account recipe, demo-VM
    usage) but no file exists yet. Effort: S/M.
-3. **The "work together" answer is advisory until the owner picks a seam.**
+~~3. **The "work together" answer is advisory until the owner picks a seam.**~~ routed - decision-batch C35 (seam sequencing [rec] start-now)
    Pareto order was proposed (probe, contract doc, e2e assertion) and an
    offer to execute was made; nothing is committed to. Not blocked - waiting
    on owner direction (correct for exploration-mode).
@@ -79,17 +79,17 @@ decisions.
 
 | Item                                                            | Why not started                                                                        | Priority                             |
 | --------------------------------------------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------ |
-| Live JMAP probe on the demo VM                                  | Advisory session; probe was proposed, owner has not pulled the trigger                 | Critical - unblocks everything below |
-| Shared JMAP contract doc (nix-email side) + ADR-023 back-link   | Blocked on probe transcript (evidence-first)                                           | High                                 |
-| JMAP E2E assertions in `stalwart-e2e` (contract test seam)      | Blocked on probe + contract doc                                                        | High                                 |
-| InboxClean `contracts.MailClient` extraction (row 172)          | Their build order starts here; zero interface code exists (confirmed 12:19, unchanged) | Critical (InboxClean-side)           |
-| Go JMAP client library evaluation (row 173)                     | Nothing vetted - per verify-external-claims, do not assume a library exists            | High                                 |
-| Local corpus + SQLite/FTS5 index (row 174)                      | No schema (migration v11 territory), no Maildir layout spec                            | High                                 |
-| Corpus-backed web reads (row 175)                               | `handlers.go:289`/`:1338` still call live Gmail; depends on 174                        | High                                 |
-| Event-bus consumers: CRM (Ledger) feed, CV classifier (row 176) | Transport decision (in-process/webhook/MCP) owner-gated                                | Medium                               |
-| MCP server mode owner decision (#156)                           | Memo ready, awaiting owner call                                                        | Medium                               |
-| `DB_SYNCHRONOUS` / corpus durability decision                   | Owner-gated, escalated by corpus-as-backup                                             | High (decision)                      |
-| Deployment topology decision (where InboxClean + corpus live)   | See section g, Q1                                                                      | High (decision)                      |
+| ~~Live JMAP probe on the demo VM~~ routed - TODO_LIST JMAP probe row | ~~Advisory session; probe was proposed, owner has not pulled the trigger~~ routed (C35 [rec] start-now) | ~~Critical - unblocks everything below~~ routed |
+| ~~Shared JMAP contract doc (nix-email side) + ADR-023 back-link~~ routed - TODO_LIST JMAP contract-doc row | ~~Blocked on probe transcript (evidence-first)~~ routed | ~~High~~ routed |
+| ~~JMAP E2E assertions in `stalwart-e2e` (contract test seam)~~ routed - TODO_LIST JMAP e2e-subtest row | ~~Blocked on probe + contract doc~~ routed | ~~High~~ routed |
+| ~~InboxClean `contracts.MailClient` extraction (row 172)~~ InboxClean-side - their TODO row 172 | ~~Their build order starts here; zero interface code exists (confirmed 12:19, unchanged)~~ theirs | ~~Critical (InboxClean-side)~~ theirs |
+| ~~Go JMAP client library evaluation (row 173)~~ InboxClean-side - their row 173 | ~~Nothing vetted - per verify-external-claims, do not assume a library exists~~ theirs | ~~High~~ theirs |
+| ~~Local corpus + SQLite/FTS5 index (row 174)~~ InboxClean-side - their row 174 | ~~No schema (migration v11 territory), no Maildir layout spec~~ theirs | ~~High~~ theirs |
+| ~~Corpus-backed web reads (row 175)~~ InboxClean-side - their row 175 | ~~`handlers.go:289`/`:1338` still call live Gmail; depends on 174~~ theirs | ~~High~~ theirs |
+| ~~Event-bus consumers: CRM (Ledger) feed, CV classifier (row 176)~~ InboxClean-side - their row 176 | ~~Transport decision (in-process/webhook/MCP) owner-gated~~ theirs | ~~Medium~~ theirs |
+| ~~MCP server mode owner decision (#156)~~ InboxClean-side - their decision #156 | ~~Memo ready, awaiting owner call~~ theirs | ~~Medium~~ theirs |
+| ~~`DB_SYNCHRONOUS` / corpus durability decision~~ InboxClean-side - their decision | ~~Owner-gated, escalated by corpus-as-backup~~ theirs | ~~High (decision)~~ theirs |
+| ~~Deployment topology decision (where InboxClean + corpus live)~~ routed - decision-batch C36 | ~~See section g, Q1~~ routed | ~~High (decision)~~ routed |
 
 ## d) TOTALLY FUCKED UP
 
@@ -157,111 +157,111 @@ owner calls, not implementation.
 
 ### Phase 1 - Evidence first (do before anything else)
 
-1. Boot the demo VM (`nix run .#vm`) and probe JMAP from the host:
+~~1. Boot the demo VM (`nix run .#vm`) and probe JMAP from the host:~~ routed - TODO_LIST JMAP probe row (f/1-f/3 + README quickstart deliverable)
    `curl http://localhost:18080/.well-known/jmap` with `admin`/`demo-admin`;
    save the transcript. Impact Critical, S, Verification.
-2. Probe JMAP as a NON-admin principal: create a demo individual with
+~~2. Probe JMAP as a NON-admin principal: create a demo individual with~~ routed - TODO_LIST JMAP probe row (non-admin leg)
    `roles: ["user"]` (the known API gotcha) and authenticate as that user -
    the adapter will run as a mailbox owner, not the admin. Impact High, S,
    Verification.
-3. Record the 0.15.5 JMAP capability list from the session response
+~~3. Record the 0.15.5 JMAP capability list from the session response~~ routed - TODO_LIST JMAP probe row (capability-URN deliverable)
    (core/mail/submission/push URNs), pinned to the transcript. Impact High,
    S, Verification.
-4. Test whether JMAP EventSource/push works on 0.15.5 demo (decides
+~~4. Test whether JMAP EventSource/push works on 0.15.5 demo (decides~~ routed - TODO_LIST JMAP push-test row
    InboxClean sync: poll vs push). Impact High, M, Verification.
 
 ### Phase 2 - The shared contract artifact
 
-5. Write the JMAP contract doc in nix-email (`docs/INBOXCLEAN.md` or README
+~~5. Write the JMAP contract doc in nix-email (`docs/INBOXCLEAN.md` or README~~ routed - TODO_LIST JMAP contract-doc row
    section): pinned Stalwart version, endpoint, auth model, capabilities,
    test-account recipe, demo-VM quickstart. Impact High, S, Documentation.
-6. Link the contract doc from InboxClean ADR-023 and TODO row 173 - closes
+~~6. Link the contract doc from InboxClean ADR-023 and TODO row 173 - closes~~ routed - TODO_LIST JMAP contract-doc row (back-link deliverable)
    the "coordination is one-way" gap. Impact High, S, Documentation.
-7. Document the TLS posture delta in the contract: demo VM is plain HTTP;
+~~7. Document the TLS posture delta in the contract: demo VM is plain HTTP;~~ routed - TODO_LIST JMAP contract-doc row (TLS-delta content)
    production requires ACME/real certs - the adapter must support both,
    insecure-skip ONLY for demo. Impact Medium, S, Documentation.
-8. Define the label/keyword mapping (InboxClean labels vs Stalwart JMAP
+~~8. Define the label/keyword mapping (InboxClean labels vs Stalwart JMAP~~ routed - TODO_LIST JMAP contract-doc row (mapping content)
    keywords/flags) in the contract doc. Impact High, M, Documentation.
-9. Fix cross-repo relative links (`../nix-email` to absolute URLs) in
+~~9. Fix cross-repo relative links (`../nix-email` to absolute URLs) in~~ InboxClean-side - their repo docs (their next docs touch)
    InboxClean ROADMAP/ADR. Impact Low, S, Cleanup.
-10. Decide the contract-doc home convention for future cross-repo artifacts
+~~10. Decide the contract-doc home convention for future cross-repo artifacts~~ decided - upstream repo owns its surface docs (README pin-discipline precedent); carried in the TODO contract-doc row
     (recommendation: upstream repo owns its surface docs; nix-email README
     pin-discipline section is the precedent). Impact Medium, S, DECISION.
 
 ### Phase 3 - nix-email side (the contract test seam)
 
-11. Add JMAP assertions to `stalwart-e2e`: session GET + mailbox query/get on
+~~11. Add JMAP assertions to `stalwart-e2e`: session GET + mailbox query/get on~~ routed - TODO_LIST JMAP e2e-subtest row
     a seeded account, file-based assertions per repo rules. Impact High,
     M/L, Quality.
-12. If JMAP testing becomes its own flake check instead: update BOTH ci.yml
+~~12. If JMAP testing becomes its own flake check instead: update BOTH ci.yml~~ routed - TODO_LIST e2e-subtest row (ci.yml same-commit rule cited)
     guard lists in the same commit (x86_64 lockstep `expected=` + aarch64
     shape guard) - the known same-commit rule. Impact High, S, Quality.
-13. Seed a dedicated JMAP test principal (`roles: ["user"]`) in the e2e
+~~13. Seed a dedicated JMAP test principal (`roles: ["user"]`) in the e2e~~ routed - TODO_LIST e2e-subtest row (seeded principal)
     fixture. Impact Medium, S, Quality.
-14. Add a demo-VM JMAP curl quickstart to README "Try it in a VM" once the
+~~14. Add a demo-VM JMAP curl quickstart to README "Try it in a VM" once the~~ routed - TODO_LIST JMAP probe row (quickstart deliverable)
     probe transcript exists. Impact Medium, S, Documentation.
-15. Document the JMAP reverse-proxy posture in the runbook (8080 stays
+~~15. Document the JMAP reverse-proxy posture in the runbook (8080 stays~~ routed - TODO_LIST JMAP contract-doc row (reverse-proxy posture)
     loopback/reverse-proxied; JMAP clients never get raw exposure). Impact
     Medium, S, Documentation.
-16. Rule for the contract: no InboxClean adapter assertion may cite Stalwart
+~~16. Rule for the contract: no InboxClean adapter assertion may cite Stalwart~~ routed - TODO_LIST JMAP contract-doc row (transcript rule is contract content)
     behavior without a demo-VM transcript (extends the repo's existing
     transcript rule across the contract boundary). Impact Medium, S,
     Documentation.
-17. HARVEST this report into nix-email TODO_LIST (rows 1-16 above as bounded
+~~17. HARVEST this report into nix-email TODO_LIST (rows 1-16 above as bounded~~ done - executed 2026-10-05: four JMAP-seam TODO rows + decisions C35-C38 batched
     tasks; DECISION items to ROADMAP open decisions as C-numbered entries).
     Impact Medium, S, Documentation.
 
 ### Phase 4 - InboxClean side (refine rows 172-176, do not duplicate)
 
-18. Row 172: draft the `contracts.MailClient` interface as a design doc
+~~18. Row 172: draft the `contracts.MailClient` interface as a design doc~~ InboxClean-side - their TODO row 172
     FIRST (types before code, capability flags per ADR-023). Impact
     Critical, M, Feature.
-19. Row 173: replace the "demo VM is the test bed" assumption with the probe
+~~19. Row 173: replace the "demo VM is the test bed" assumption with the probe~~ InboxClean-side - their row 173 (refined by our probe row output)
     transcript + endpoint facts from Phase 1. Impact High, S, Documentation.
-20. Row 173: evaluate Go JMAP client libraries (nothing vetted exists;
+~~20. Row 173: evaluate Go JMAP client libraries (nothing vetted exists;~~ InboxClean-side - their row 173
     verify-external-claims before any choice is encoded). Impact High, M,
     Quality.
-21. Row 173 spike scope: prove list + raw fetch + label/state ops against
+~~21. Row 173 spike scope: prove list + raw fetch + label/state ops against~~ InboxClean-side - their row 173
     the demo VM, transcript per assertion. Impact High, M, Feature.
-22. Row 174: corpus schema design doc before code (migration v11 territory:
+~~22. Row 174: corpus schema design doc before code (migration v11 territory:~~ InboxClean-side - their row 174
     Maildir layout, FTS5, SHA-256 content-hash keys). Impact High, L,
     Feature.
-23. Row 174 gate: `DB_SYNCHRONOUS`/durability decision - corpus-as-backup
+~~23. Row 174 gate: `DB_SYNCHRONOUS`/durability decision - corpus-as-backup~~ InboxClean-side - their decision (escalated corpus-as-backup)
     escalates SQLite durability to first-class. Impact High, S, DECISION.
-24. Row 175: repoint web reads from live `ListMessages` to corpus +
+~~24. Row 175: repoint web reads from live `ListMessages` to corpus +~~ InboxClean-side - their row 175
     projections (sites known: `handlers.go:289`, `:1338`). Impact High, L,
     Feature.
-25. Row 176: event-consumer transport decision (in-process webhook vs MCP-
+~~25. Row 176: event-consumer transport decision (in-process webhook vs MCP-~~ InboxClean-side - their row 176
     only first). Impact Medium, S, DECISION.
-26. #156 MCP memo: make the owner call the pivot re-prioritized. Impact
+~~26. #156 MCP memo: make the owner call the pivot re-prioritized. Impact~~ InboxClean-side - their decision #156
     Medium, S, DECISION.
-27. Deployment topology decision: InboxClean (and the corpus) on evo-x2 at
+~~27. Deployment topology decision: InboxClean (and the corpus) on evo-x2 at~~ routed - decision-batch C36
     home vs on the VPS beside Stalwart. Impact High, S, DECISION (also g/Q1).
-28. Sequencing decision: start the JMAP spike now on the demo VM, or hold
+~~28. Sequencing decision: start the JMAP spike now on the demo VM, or hold~~ routed - decision-batch C35
     until D1/D2 production decisions land. Impact High, S, DECISION (g/Q2).
-29. Build-order refinement: rows 173 and 174 are independent (the corpus can
+~~29. Build-order refinement: rows 173 and 174 are independent (the corpus can~~ routed - decision-batch C37
     be built Gmail-only) - decide corpus-first vs adapter-first for the
     "backup ALL emails" goal. Impact High, S, DECISION (g/Q3).
-30. Reconcile the ROADMAP Theme 6 bulk-UI row with the README's shipped bulk
+~~30. Reconcile the ROADMAP Theme 6 bulk-UI row with the README's shipped bulk~~ InboxClean-side - their repo split brain (flagged twice, their fix)
     bar (pre-existing split brain, flagged twice). Impact Medium, S,
     Documentation.
-31. InboxClean AGENTS.md diet to within the 377-line BuildFlow budget.
+~~31. InboxClean AGENTS.md diet to within the 377-line BuildFlow budget.~~ InboxClean-side - their repo debt
     Impact Medium, M, Cleanup.
-32. Add the ADR-023 pointer paragraph to `docs/ARCHITECTURE.md`. Impact Low,
+~~32. Add the ADR-023 pointer paragraph to `docs/ARCHITECTURE.md`. Impact Low,~~ InboxClean-side - their docs/ARCHITECTURE.md
     S, Documentation.
-33. Verify the Paperless live path (rows 22/141) before row 174 makes it
+~~33. Verify the Paperless live path (rows 22/141) before row 174 makes it~~ InboxClean-side - their rows 22/141
     load-bearing. Impact Medium, M, Quality.
-34. Design the event-push topology doc: Stalwart JMAP push, sync --watch,
+~~34. Design the event-push topology doc: Stalwart JMAP push, sync --watch,~~ InboxClean-side - their design doc
     corpus, event bus, consumers. Impact High, M, Documentation.
-35. Design the account model: Stalwart principals as InboxClean accounts
+~~35. Design the account model: Stalwart principals as InboxClean accounts~~ InboxClean-side - their design doc
     (slug model extends; admin-issued vs per-user credentials). Impact
     Medium, M, Documentation.
-36. Plan corpus ingestion order across the migration: Gmail corpus now,
+~~36. Plan corpus ingestion order across the migration: Gmail corpus now,~~ InboxClean-side - their plan
     Stalwart corpus post-cutover, one InboxClean over both. Impact Medium,
     M, Documentation.
-37. Plan the corpus's own DR (it IS the backup: offsite copy, restore drill -
+~~37. Plan the corpus's own DR (it IS the backup: offsite copy, restore drill -~~ InboxClean-side - their plan (ties our ROADMAP backup theme)
     ties into nix-email ROADMAP's backup theme). Impact Medium, M, Feature.
-38. Keep the Gmail adapter at parity during the pivot so the corpus backfill
+~~38. Keep the Gmail adapter at parity during the pivot so the corpus backfill~~ InboxClean-side - their pivot constraint
     is not blocked on JMAP. Impact Medium, M, Feature.
 
 (38 items - stopped where the list would pad; items 1-4 are the critical
@@ -269,7 +269,7 @@ path and everything else is sequenced behind them.)
 
 ## g) Up to 3 questions I can NOT figure out myself
 
-1. **Where does InboxClean (and the corpus) live in the JMAP era - evo-x2 at
+~~1. **Where does InboxClean (and the corpus) live in the JMAP era - evo-x2 at~~ routed - decision-batch C36 ([rec] evo-x2)
    home, or the VPS beside Stalwart?** What I tried: ADR-023 says "local
    corpus under owner control" but never pins the host; nix-email's ROADMAP
    gates production on D1/D2 without naming InboxClean's host; the Gatus
@@ -277,7 +277,7 @@ path and everything else is sequenced behind them.)
    home box. The answer unblocks: where THE backup physically lives, its DR
    design, row 175 deployment, and the auth path (LAN/tunnel vs public).
    This is an infrastructure + security-posture call only you can make.
-2. **Start the JMAP spike on the demo VM now, or hold until D1/D2 land?**
+~~2. **Start the JMAP spike on the demo VM now, or hold until D1/D2 land?**~~ routed - decision-batch C35 ([rec] start now)
    What I tried: verified the demo VM is a complete test bed (host-smoked
    2026-09-22, JMAP listener confirmed in config), so the spike is
    technically unblocked today - but the account the adapter will eventually
@@ -285,7 +285,7 @@ path and everything else is sequenced behind them.)
    production cutover you have gated. If you would rather not context-switch
    mid-gating, the spike slides and the corpus (which is Gmail-only-capable)
    goes first. Priority call, yours.
-3. **After the MailClient seam (row 172): adapter-first (173) or
+~~3. **After the MailClient seam (row 172): adapter-first (173) or~~ routed - decision-batch C37 ([rec] corpus-first)
    corpus-first (174)?** What I tried: ADR-023's build order lists
    seam, spike, corpus, web, integrations - but reading it closely, the
    corpus does not actually depend on JMAP (it can be built and fed from the
