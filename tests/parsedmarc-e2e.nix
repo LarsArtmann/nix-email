@@ -65,6 +65,26 @@
     sha256 = "0prhfmph6rr41c1x1m4jy4ga9i6p46l3xf7ymrbfpqx59c2kwj6j";
   };
 
+  # Forensic BREADTH fixtures (2026-10-05): two more upstream failure
+  # reports at the same repaired rev, adding three timezone conversions
+  # (+0800 netease, +0000 linkedin besides the +0200 domain.de one) and
+  # two more reporter shapes (netease: bounce VERP mail-from + cardinal.com
+  # reported domain; linkedin: .crlf line endings, null original_mail_from,
+  # recipient@linkedin.com rcpt). Host-dry-run GREEN first against the
+  # pinned parser via scripts/host-parse-fixture.py (report_type=failure,
+  # arrival_date_utc transcribed from those runs) - parser-vs-fixture
+  # blame settled before any VM run, per AGENTS.md.
+  neteaseSampleReport = pkgs.fetchurl {
+    name = "netease-failure-report";
+    url = "https://github.com/domainaware/parsedmarc/raw/ae1e5adb6609946209278b2bf3f633c752a09383/samples/failure/%5BNetease%20DMARC%20Failure%20Report%5D%20Rent%20Reminder.eml";
+    sha256 = "sha256-YypKOU+Qq2bWrMzbE+UKWjq8zLVIYR9z9VACoqq+BuE=";
+  };
+  linkedinSampleReport = pkgs.fetchurl {
+    name = "linkedin-failure-report";
+    url = "https://github.com/domainaware/parsedmarc/raw/ae1e5adb6609946209278b2bf3f633c752a09383/samples/failure/dmarc_ruf_report_linkedin.crlf.eml";
+    sha256 = "sha256-aegJU+XZopkjx3t70/3yN5e9Xn963/zRpoK42VytR/g=";
+  };
+
   # RFC 8460 SMTP TLS-RPT fixture (fields mirror RFC 8460 A.2; the parser's
   # REQUIRED fields are organization-name, date-range, contact-info,
   # report-id, policies[] with policy.{policy-type,policy-domain} +
@@ -181,6 +201,24 @@
 
     with smtplib.SMTP('localhost') as server:
         server.sendmail(sender_email, receiver_email, forensic_bytes)
+        server.quit()
+
+    # Breadth probes (2026-10-05): two more real reporter artifacts -
+    # different timezones (+0800/+0000 vs +0200), CRLF line endings
+    # (linkedin), a VERP bounce mail-from (netease). All three parse
+    # green under the pinned parser host-side before this VM run.
+    with open("${neteaseSampleReport}", "rb") as report:
+        netease_bytes = report.read()
+
+    with smtplib.SMTP('localhost') as server:
+        server.sendmail(sender_email, receiver_email, netease_bytes)
+        server.quit()
+
+    with open("${linkedinSampleReport}", "rb") as report:
+        linkedin_bytes = report.read()
+
+    with smtplib.SMTP('localhost') as server:
+        server.sendmail(sender_email, receiver_email, linkedin_bytes)
         server.quit()
   '';
 
@@ -507,14 +545,42 @@ in
               "/var/lib/parsedmarc/reports/failure.json"
           )
           machine.succeed(
-              "jq -e '.[] | select(.parsed_sample.subject == \"Subject\")' "
-              "/var/lib/parsedmarc/reports/failure.json"
+          "jq -e '.[] | select(.parsed_sample.subject == \"Subject\")' "
+          "/var/lib/parsedmarc/reports/failure.json"
           )
           machine.succeed(
-              "test -s '/var/lib/parsedmarc/reports/samples/Subject.eml'"
+          "test -s '/var/lib/parsedmarc/reports/samples/Subject.eml'"
+          )
+          # arrival_date_utc conversions (host-dry-run transcripts,
+          # scripts/host-parse-fixture.py 2026-10-05): +0200 -> 09:20:27,
+          # +0800 -> 08:48:42, +0000 -> 02:09:00 - one UTC normalization
+          # assertion per reporter timezone.
+          machine.succeed(
+          "jq -e '.[] | select(.arrival_date_utc == \"2018-10-01 09:20:27\")' "
+          "/var/lib/parsedmarc/reports/failure.json"
           )
           machine.succeed(
-              "test \"$(wc -l < /var/lib/parsedmarc/reports/failure.csv)\" -ge 2"
+          "jq -e '.[] | select(.arrival_date_utc == \"2018-09-28 08:48:42\")' "
+          "/var/lib/parsedmarc/reports/failure.json"
+          )
+          machine.succeed(
+          "jq -e '.[] | select(.arrival_date_utc == \"2019-04-30 02:09:00\")' "
+          "/var/lib/parsedmarc/reports/failure.json"
+          )
+          # Breadth probes' distinguishing fields (same transcripts):
+          # netease carries a VERP bounce mail-from and cardinal.com as
+          # the reported domain; linkedin has a null original_mail_from
+          # and a linkedin.com rcpt (its .crlf shape is what parses).
+          machine.succeed(
+          "jq -e '.[] | select(.reported_domain == \"cardinal.com\")' "
+          "/var/lib/parsedmarc/reports/failure.json"
+          )
+          machine.succeed(
+          "jq -e '.[] | select(.original_rcpt_to == \"recipient@linkedin.com\")' "
+          "/var/lib/parsedmarc/reports/failure.json"
+          )
+          machine.succeed(
+          "test \"$(wc -l < /var/lib/parsedmarc/reports/failure.csv)\" -ge 4"
           )
           machine.succeed(
               "grep -q 'domain.de' /var/lib/parsedmarc/reports/failure.csv"
