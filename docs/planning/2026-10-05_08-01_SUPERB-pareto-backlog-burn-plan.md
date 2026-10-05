@@ -1,5 +1,13 @@
 # SUPERB Pareto Execution Plan — nix-email backlog burn-down (2026-10-05)
 
+> **STATUS (2026-10-05, post-execution): SUPERSEDED as a status source.**
+> The per-task statuses below are PRE-execution. The authoritative
+> verdicts live in `TODO_LIST.md` (struck rows with evidence) and
+> `docs/status/2026-10-05_10-29_pareto-execution-jmap-seam-flake-split-ci-hardening.md`
+> (15/23 tasks fully executed and verified; T13/T17/T19/T20/T21 remain
+> gated as listed in this file's §4). Do NOT re-execute struck tasks
+> from this file.
+
 - **Date:** 2026-10-05 08:01 CEST (`date` CLI)
 - **Input:** `TODO_LIST.md` (30 open rows: 4 High JMAP-seam, 2 Medium, 10 Low hygiene, 3 D1-gated, 11 user-blocked) + `docs/planning/decision-batch.md` (17 open owner calls, every one with a staged `[rec]`) + the 2026-10-05 status-report residue (7 unrouted-then-routed small items).
 - **Repo state at planning time:** master ahead 8 of origin (daemon commits, unpushed); CI green last verified 2026-09-30 (pre-session); `buildflow` EXIT:69 = the 4 documented nix-checker port-collision FPs; all 5 checks green; docs/status active set = 0 (everything archived 2026-10-05).
