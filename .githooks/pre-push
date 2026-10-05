@@ -19,3 +19,16 @@ nix fmt -- . --check
 
 echo "pre-push: check-inventory lockstep"
 bash scripts/check-inventory.sh
+
+# 3. Workflow actionlint (CI parity): CI's actionlint runs WITH shellcheck
+#    (preinstalled on runners); a shellcheck-less local machine shipped a
+#    public red that way (2026-10-05). Fail-closed on findings, fail-open
+#    on tool unavailability (CI is the hard gate).
+echo "pre-push: workflow actionlint"
+if command -v actionlint >/dev/null 2>&1 && command -v shellcheck >/dev/null 2>&1; then
+  actionlint
+elif command -v nix >/dev/null 2>&1; then
+  nix shell nixpkgs#shellcheck nixpkgs#actionlint -c actionlint
+else
+  echo "pre-push: actionlint/shellcheck unavailable - skipping (CI enforces)" >&2
+fi

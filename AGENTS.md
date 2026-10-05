@@ -242,11 +242,17 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
   skip the nix-checker step to go green (it also owns stale-hash/input
   drift checks with real signal) and do NOT contort the Nix to dodge the
   regex. Root fix routed in TODO_LIST (upstream BuildFlow change).
-- Workflow edits need a LOCAL `nix run nixpkgs#actionlint` before any
-  push: CI's actionlint runs WITH shellcheck, but the local machine has
-  no shellcheck binary, so buildflow's actionlint step is blind to
-  shellcheck findings (2026-10-05: a trap handler + a backtick-bearing
-  printf shipped as SC2016/SC2064 reds). Quoting fixes there have a
+- Workflow edits need a LOCAL actionlint run WITH shellcheck on PATH:
+  CI's actionlint runs WITH shellcheck (preinstalled on runners), but a
+  shellcheck-less local machine is blind to shellcheck findings
+  (2026-10-05: a trap handler + a backtick-bearing printf shipped as
+  SC2016/SC2064 reds). ROOT-FIXED 2026-10-05: the devShell carries
+  actionlint + shellcheck (buildflow runs tools inside it, so its
+  actionlint step is no longer blind), and the pre-push hook runs
+  actionlint with a `nix shell nixpkgs#shellcheck nixpkgs#actionlint`
+  fallback. Outside the devShell, bare `nix run nixpkgs#actionlint`
+  alone is STILL blind (it pulls actionlint without shellcheck).
+  Quoting fixes there have a
   crab-walk quality - SC2016 wants deferred, SC2064 wants immediate,
   SC1012 bans `\n` in double quotes - heredocs with quoted delimiters
   dissolve all three.
