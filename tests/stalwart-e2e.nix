@@ -798,8 +798,12 @@ in
           # All assertions are file-based (dump to /tmp, grep/jq the file)
           # and transcribed from those probe transcripts, never from
           # expected output.
+          # -L: /.well-known/jmap answers 307 on this pin (curl without -L
+          # yields an empty 2xx-ish body - the debug-driver run of
+          # 2026-10-05 caught it; the demo probe followed redirects via
+          # urllib automatically).
           machine.succeed(
-              "curl -fsS -u user2@example.test:testpass "
+              "curl -fsSL -u user2@example.test:testpass "
               "http://127.0.0.1:8080/.well-known/jmap -o /tmp/jmap-session.json"
           )
           machine.succeed("cat /tmp/jmap-session.json >&2")
