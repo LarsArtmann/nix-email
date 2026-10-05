@@ -950,3 +950,11 @@ conditions in the module comments and the Pin-advance runbook):
   the upstream crash report for the py3.14 `starttls()` bug (same root
   cause as nixpkgs#563652). CLOSED as fixed via the #663 merge (see the
   nixpkgs#563652 entry above for the retirement condition).
+- [seanthegeek/mailsuite#65](https://github.com/seanthegeek/mailsuite/issues/65) -
+  mailsuite auto-STARTTLS cannot be opted out of: `ssl=False` still
+  upgrades when the server advertises STARTTLS (same trap as
+  parsedmarc#534). Filed 2026-10-05 after the verify-before-filing gates
+  (master `imap.py` byte-identical at the quoted lines, no duplicate
+  issue). Wrapper impact today: none - the parsedmarc e2e runs TLS
+  IMAPS with DEFAULT verification; the ask is for future plaintext-hop
+  consumers.
