@@ -117,8 +117,8 @@ Radical honesty. Nothing this session BROKE (zero mutations), but these are fuck
 | #  | Improvement                         | Pain today                                          | Concrete fix                                                                                            |
 | -- | ----------------------------------- | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
 | ~~ | ~~1~~ | ~~Route-as-you-go for roadmap-fuel~~ | ~~Analyses die in chat/scrollback~~ |
-| 2  | Epistemic labels on advisory claims | Follow-up sessions can't tell verified from assumed | Convention: tag every factual claim `[verified: source]` / `[assumed]` / `[verify-needed: how]`         |
-| 3  | Freshness anchor before advising    | Advice inherits stale docs (v0.3.1 drift proved it) | 3-command ritual at advisory-session start: `git tag -l`, `git log --oneline -5`, TODO sweep-date check |
+| ~~ | ~~2~~ | ~~Epistemic labels on advisory claims~~ kept - never mechanized; rides session discipline (re-raised in the 09-30 report e/1) | ~~Follow-up sessions can't tell verified from assumed~~ | ~~Convention: tag every factual claim `[verified: source]` / `[assumed]` / `[verify-needed: how]`~~ kept |
+| ~~ | ~~3~~ | ~~Freshness anchor before advising~~ done in practice - TODO sweep headers carry the pass date; sessions open with tag/log/sweep checks | ~~Advice inherits stale docs (v0.3.1 drift proved it)~~ | ~~3-command ritual at advisory-session start: `git tag -l`, `git log --oneline -5`, TODO sweep-date check~~ done |
 | ~~ | ~~4~~ | ~~Single monitoring-coverage matrix~~ | ~~Gap state scattered across ROADMAP bullets + chat~~ |
 | ~~ | ~~5~~ | ~~ROADMAP theme 4 structure~~ | ~~Monitoring ideas accrete as an unstructured pile~~ |
 | ~~ | ~~6~~ | ~~TELEMETRY skew debt~~ | ~~`docs/TELEMETRY.md` keys unverified against pinned 0.15.5; blocks items #26/#27~~ |
