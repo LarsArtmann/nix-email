@@ -819,8 +819,8 @@ in
               "'{using:[\"urn:ietf:params:jmap:core\",\"urn:ietf:params:jmap:mail\"],"
               "methodCalls:[[\"Mailbox/query\",{accountId:$acct},\"a\"],"
               "[\"Mailbox/get\",{accountId:$acct,"
-              "\"#ids\":{resultOf:\"a\",name:\"Mailbox/query\",path:\"/ids\"}},\"b\"]]}"
-              " > /tmp/jmap-mb-req.json"
+              "\"#ids\":{resultOf:\"a\",name:\"Mailbox/query\",path:\"/ids\"}},\"b\"]]}' "
+              "> /tmp/jmap-mb-req.json"
           )
           machine.succeed(
               "curl -fsS -u user2@example.test:testpass "
@@ -846,8 +846,8 @@ in
               "filter:{text:\"needle-576a4565b70f5a4c\"}},\"a\"],"
               "[\"Email/get\",{accountId:$acct,"
               "\"#ids\":{resultOf:\"a\",name:\"Email/query\",path:\"/ids\"},"
-              "properties:[\"subject\",\"mailboxIds\"]},\"b\"]]}"
-              " > /tmp/jmap-email-req.json"
+              "properties:[\"subject\",\"mailboxIds\"]},\"b\"]]}' "
+              "> /tmp/jmap-email-req.json"
           )
           machine.succeed(
               "curl -fsS -u user2@example.test:testpass "
