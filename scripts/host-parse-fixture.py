@@ -38,8 +38,7 @@ def sh(*cmd: str) -> str:
 
 
 def check_drv(check: str, system: str) -> str:
-    return sh("nix", "eval", "--raw",
-              f".#checks.{system}.{check}.drvPath")
+    return sh("nix", "eval", "--raw", f".#checks.{system}.{check}.drvPath")
 
 
 def find_parser_env(drv: str) -> tuple[Path, list[Path]]:
@@ -63,10 +62,8 @@ def find_parser_env(drv: str) -> tuple[Path, list[Path]]:
             f"{drv}\n(is the check realized? run "
             "`nix build .#checks.x86_64-linux.<check>` first)"
         )
-    minor = next(sp.parent.name for sp in site_packages
-                 if (sp / "parsedmarc").is_dir())
-    site_packages = [sp for sp in site_packages
-                     if sp.parent.name == minor]
+    minor = next(sp.parent.name for sp in site_packages if (sp / "parsedmarc").is_dir())
+    site_packages = [sp for sp in site_packages if sp.parent.name == minor]
     python_bin = None
     for ref in refs:
         exact = Path(ref) / "bin" / minor
@@ -74,15 +71,12 @@ def find_parser_env(drv: str) -> tuple[Path, list[Path]]:
             python_bin = exact
             break
     if not python_bin:
-        raise SystemExit(f"python {minor} interpreter not found in closure "
-                         f"of {drv}")
+        raise SystemExit(f"python {minor} interpreter not found in closure of {drv}")
     return python_bin, site_packages
 
 
-def parse_fixture(python: Path, site_packages: list[Path],
-                  fixture: Path) -> dict:
-    env = dict(os.environ,
-               PYTHONPATH=":".join(str(sp) for sp in site_packages))
+def parse_fixture(python: Path, site_packages: list[Path], fixture: Path) -> dict:
+    env = dict(os.environ, PYTHONPATH=":".join(str(sp) for sp in site_packages))
     code = f"""
 import json
 import parsedmarc
@@ -92,7 +86,8 @@ print(json.dumps({{"parsedmarc_version": parsedmarc.__version__,
                    **result}}, default=str))
 """
     result = subprocess.run(
-        [str(python), "-c", code], capture_output=True, text=True, env=env)
+        [str(python), "-c", code], capture_output=True, text=True, env=env
+    )
     if result.returncode != 0:
         print(result.stdout, file=sys.stderr)
         raise SystemExit(f"parse FAILED under pinned parser:\n{result.stderr}")
@@ -102,8 +97,11 @@ print(json.dumps({{"parsedmarc_version": parsedmarc.__version__,
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("fixture", type=Path)
-    ap.add_argument("--check", default="parsedmarc-e2e",
-                    help="check whose closure supplies the pinned parser")
+    ap.add_argument(
+        "--check",
+        default="parsedmarc-e2e",
+        help="check whose closure supplies the pinned parser",
+    )
     ap.add_argument("--system", default="x86_64-linux")
     ap.add_argument("--out", type=Path, default=Path("/tmp/parse-result.json"))
     args = ap.parse_args()

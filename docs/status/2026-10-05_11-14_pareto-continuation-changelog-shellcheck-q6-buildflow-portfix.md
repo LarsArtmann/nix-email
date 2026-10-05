@@ -345,7 +345,7 @@ items 4-7, 17-18, 37-47 are new from this session).
 45. Fleet hygiene: once repos' buildflow flips, REMOVE their accepted
     port-collision baseline entries (accepted noise that no longer exists
     - the baseline-staleness machinery should catch this; verify it does).
-    Low/S/Quality (upstream fleet)
+      Low/S/Quality (upstream fleet)
 46. Add mask-function edge cases (CRLF files, no-trailing-newline) to the
     checker's test table. Low/S/Quality (upstream)
 47. Answer this report's g/1-g/3 - gates several items above.

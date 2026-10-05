@@ -12,21 +12,21 @@
 set -eu
 cd "$(git rev-parse --show-toplevel)"
 
-nix eval .#checks.x86_64-linux --json --apply 'builtins.attrNames' > /tmp/hook-actual-checks.json
+nix eval .#checks.x86_64-linux --json --apply 'builtins.attrNames' >/tmp/hook-actual-checks.json
 expected='["dmarc-eval","module-import-eval","parsedmarc-e2e","stalwart-e2e","stalwart-relay-e2e"]'
-if ! jq -e --argjson expected "$expected" 'sort == ($expected | sort)' /tmp/hook-actual-checks.json > /dev/null; then
-  echo "pre-push: flake checks and the expected list diverged."
-  echo "--- flake declares: $(cat /tmp/hook-actual-checks.json)"
-  echo "--- expected:       $expected"
-  echo "--- update scripts/check-inventory.sh AND .github/workflows/ci.yml in the same commit"
-  exit 1
+if ! jq -e --argjson expected "$expected" 'sort == ($expected | sort)' /tmp/hook-actual-checks.json >/dev/null; then
+	echo "pre-push: flake checks and the expected list diverged."
+	echo "--- flake declares: $(cat /tmp/hook-actual-checks.json)"
+	echo "--- expected:       $expected"
+	echo "--- update scripts/check-inventory.sh AND .github/workflows/ci.yml in the same commit"
+	exit 1
 fi
 
 aarch64="$(nix eval .#checks.aarch64-linux --apply 'builtins.attrNames')"
 if [ "$aarch64" != '[ "dmarc-eval" "module-import-eval" ]' ]; then
-  echo "pre-push: aarch64 check set drifted: $aarch64"
-  echo "--- update scripts/check-inventory.sh AND .github/workflows/ci.yml in the same commit"
-  exit 1
+	echo "pre-push: aarch64 check set drifted: $aarch64"
+	echo "--- update scripts/check-inventory.sh AND .github/workflows/ci.yml in the same commit"
+	exit 1
 fi
 
 echo "pre-push: check inventory matches CI expectations"

@@ -12,8 +12,8 @@
 set -eu
 
 [ "$#" -ge 1 ] || {
-  echo "usage: $0 <markdown-file>..." >&2
-  exit 2
+	echo "usage: $0 <markdown-file>..." >&2
+	exit 2
 }
 
 awk '
