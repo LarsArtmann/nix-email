@@ -1,10 +1,7 @@
 # perSystem.checks, extracted from flake.nix 2026-10-05 (flake-parts
 # module split). The raw nixpkgs INPUT is passed to the pure-eval tests
 # so their legacyPackages semantics are unchanged.
-{
-  inputs,
-  ...
-}: {
+{inputs, ...}: {
   # `pkgs` is provided by flake-parts' built-in nixpkgs module
   # (inputs'.nixpkgs.legacyPackages - the semantics the tests were
   # verified against). NOTE: inside perSystem use `pkgs.lib`, not a

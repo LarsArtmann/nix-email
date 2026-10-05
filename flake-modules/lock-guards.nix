@@ -11,10 +11,7 @@
 # mystery as parse-scope, not eval). Drift that moves the lock behind
 # nix's back is therefore caught at the next outputs-forcing command,
 # not by lock.
-{
-  lockFile,
-  ...
-}: let
+{lockFile, ...}: let
   # The fleet-verified nixpkgs pin (compat doctrine, AGENTS.md
   # Conventions). SystemNix floats `nixos-unstable`, so its lock moves
   # autonomously (auto-daemon); this constant is the rev both locks

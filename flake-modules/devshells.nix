@@ -1,10 +1,7 @@
 # Devshell + formatter, extracted from flake.nix 2026-10-05 (flake-parts
 # module split).
 {
-  perSystem = {
-    pkgs,
-    ...
-  }: {
+  perSystem = {pkgs, ...}: {
     # Tool environment for `nix develop` (and the BuildFlow tool runners,
     # which execute ruff/mypy/pytest/dprint inside this shell). Minimal on
     # purpose: this repo's real gate is `nix flake check` (VM tests), not a
