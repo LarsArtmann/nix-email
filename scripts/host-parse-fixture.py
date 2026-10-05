@@ -42,35 +42,45 @@ def check_drv(check: str, system: str) -> str:
               f".#checks.{system}.{check}.drvPath")
 
 
-def find_parser_env(drv: str) -> tuple[Path, Path]:
-    """Return (python binary, site-packages dir) from the drv closure."""
-    refs = sh("nix-store", "-q", "--references", drv).splitlines()
-    site_packages = None
-    python_bin = None
+def find_parser_env(drv: str) -> tuple[Path, list[Path]]:
+    """Return (python binary, site-packages dirs) from the drv closure.
+
+    The parsedmarc package's own site-packages lacks its dependencies;
+    they live in the python env's site-packages. Every closure ref with a
+    matching python3.X/site-packages goes on PYTHONPATH."""
+    refs = sh("nix-store", "-qR", "--include-outputs", drv).splitlines()
+    site_packages: list[Path] = []
     for ref in refs:
         candidate = Path(ref) / "lib"
         if candidate.is_dir():
             for pydir in sorted(candidate.glob("python3.*")):
                 sp = pydir / "site-packages"
-                if (sp / "parsedmarc").is_dir():
-                    site_packages = sp
-                break
-        bin_dir = Path(ref) / "bin"
-        if bin_dir.is_dir():
-            for py in sorted(bin_dir.glob("python3.*")):
-                if py.is_file() and not py.is_symlink() or py.is_symlink():
-                    python_bin = py
-    if not site_packages or not python_bin:
+                if sp.is_dir() and any(sp.iterdir()):
+                    site_packages.append(sp)
+    if not any((sp / "parsedmarc").is_dir() for sp in site_packages):
         raise SystemExit(
-            "parsedmarc site-packages or python binary not found in "
-            f"closure of {drv}\n(is the check realized? run "
+            "parsedmarc site-packages not found in closure of "
+            f"{drv}\n(is the check realized? run "
             "`nix build .#checks.x86_64-linux.<check>` first)"
         )
+    minor = next(sp.parent.name for sp in site_packages
+                 if (sp / "parsedmarc").is_dir())
+    python_bin = None
+    for ref in refs:
+        exact = Path(ref) / "bin" / minor
+        if exact.is_file() and exact.stat().st_mode & 0o111:
+            python_bin = exact
+            break
+    if not python_bin:
+        raise SystemExit(f"python {minor} interpreter not found in closure "
+                         f"of {drv}")
     return python_bin, site_packages
 
 
-def parse_fixture(python: Path, site_packages: Path, fixture: Path) -> dict:
-    env = dict(os.environ, PYTHONPATH=str(site_packages))
+def parse_fixture(python: Path, site_packages: list[Path],
+                  fixture: Path) -> dict:
+    env = dict(os.environ,
+               PYTHONPATH=":".join(str(sp) for sp in site_packages))
     code = f"""
 import json, sys
 import parsedmarc
