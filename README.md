@@ -436,6 +436,30 @@ lookups just miss), and 1 `Configuration build error` + 6 `Configuration
 build warning` lines (bare, key-less; the stack's auth/listener/delivery
 paths are runtime-verified despite them).
 
+#### JMAP quickstart (live-verified 2026-10-05)
+
+The same listener serves JMAP; the session document is the entry point.
+Basic-auth username is the FULL principal name, and every URL in the
+session points at the guest's hostname - rewrite it to
+`127.0.0.1:18080` before use:
+
+```sh
+# session document (capabilities, URL templates)
+curl -fsS -u demo@mail.demo.invalid:demo http://127.0.0.1:18080/.well-known/jmap
+
+# mailboxes for the account (Mailbox/query + Mailbox/get in one call)
+curl -fsS -u demo@mail.demo.invalid:demo http://127.0.0.1:18080/jmap/ \
+  -H 'Content-Type: application/json' -d '{
+    "using": ["urn:ietf:params:jmap:core", "urn:ietf:params:jmap:mail"],
+    "methodCalls": [["Mailbox/query", {"accountId": "c"}, "a"]]}'
+```
+
+Push is available as SSE: `GET
+/jmap/eventsource/?types=Email` (the `{closeafter}`/`{ping}` placeholders
+in the session template are REJECTED by this pin - send `types` only).
+The full verified contract lives in `docs/INBOXCLEAN.md`; transcripts in
+`docs/probes/2026-10-05-jmap-demo-vm/`.
+
 ## Platform support
 
 The VM tests gate `stalwart-e2e`/`stalwart-relay-e2e` to **x86_64-linux

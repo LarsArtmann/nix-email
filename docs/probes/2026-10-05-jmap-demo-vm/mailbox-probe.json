@@ -1,0 +1,74 @@
+{
+  "methodResponses": [
+    [
+      "Mailbox/query",
+      {
+        "accountId": "e",
+        "queryState": "saa",
+        "canCalculateChanges": true,
+        "position": 0,
+        "ids": [
+          "a",
+          "b",
+          "c",
+          "d",
+          "e"
+        ]
+      },
+      "a"
+    ],
+    [
+      "Mailbox/get",
+      {
+        "accountId": "e",
+        "state": "sae",
+        "list": [
+          {
+            "name": "Inbox",
+            "role": "inbox",
+            "totalEmails": 0,
+            "id": "a"
+          },
+          {
+            "name": "Deleted Items",
+            "role": "trash",
+            "totalEmails": 0,
+            "id": "b"
+          },
+          {
+            "name": "Junk Mail",
+            "role": "junk",
+            "totalEmails": 0,
+            "id": "c"
+          },
+          {
+            "name": "Drafts",
+            "role": "drafts",
+            "totalEmails": 0,
+            "id": "d"
+          },
+          {
+            "name": "Sent Items",
+            "role": "sent",
+            "totalEmails": 0,
+            "id": "e"
+          }
+        ],
+        "notFound": []
+      },
+      "b"
+    ],
+    [
+      "Email/query",
+      {
+        "accountId": "e",
+        "queryState": "saa",
+        "canCalculateChanges": true,
+        "position": 0,
+        "ids": []
+      },
+      "c"
+    ]
+  ],
+  "sessionState": "3e25b2a0"
+}
