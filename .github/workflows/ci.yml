@@ -72,6 +72,9 @@ jobs:
           # lint is a false green - negative tests are mandatory).
           set -eu
           fixture="$(mktemp /tmp/pipe-lint-XXXXXX.md)"
+          # Deferred expansion is intentional (fixture path fixed at set
+          # time anyway); shellcheck's SC2016 fires on the quoted form.
+          # shellcheck disable=SC2016
           trap 'rm -f "$fixture"' EXIT
           # 1) fewer cells than header -> must FAIL
           printf '| a | b | c |\n| --- | --- | --- |\n| 1 | 2 |\n' > "$fixture"
@@ -89,7 +92,14 @@ jobs:
             echo "FATAL: lint flagged an escaped pipe"; exit 1
           fi
           # 4) pipes inside a code fence -> must PASS
-          printf 'text\n```sh\n| not | a | table |\n```\n| a | b | c |\n| 1 | 2 | 3 |\n' > "$fixture"
+          cat > "$fixture" <<'FENCEEOF'
+          text
+          ```sh
+          | not | a | table |
+          ```
+          | a | b | c |
+          | 1 | 2 | 3 |
+          FENCEEOF
           if ! bash scripts/check-md-table-pipes.sh "$fixture" > /dev/null 2>&1; then
             echo "FATAL: lint flagged pipes inside a code fence"; exit 1
           fi
