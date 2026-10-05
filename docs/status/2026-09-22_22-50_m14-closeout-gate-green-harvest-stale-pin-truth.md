@@ -128,8 +128,8 @@ Nothing shipped broken — the gate is green, every change is daemon-committed, 
 
 ## g) Three questions only you can answer
 
-1. **D1 + D2**: Retire Google Workspace mailboxes and execute the full build-out on a CX22-class VPS (backup to evo-x2, StorageBox later) — as recommended — or keep Workspace and run monitoring-only? Everything in section (c) rows 26-33 queues behind this.
-2. **C24 + C29**: Approve Discord (SystemNix DiscordSync, ntfy fallback) as the non-mail alert channel AND evo-x2 as the canary vantage? Both are recommendations; monitoring encoding (section f, rows 16-25) starts the moment you answer.
+~~1. **D1 + D2**: Retire Google Workspace mailboxes and execute the full build-out on a CX22-class VPS (backup to evo-x2, StorageBox later) — as recommended — or keep Workspace and run monitoring-only? Everything in section (c) rows 26-33 queues behind this.~~ routed - decision-batch "The big two" (D1/D2, both carry [rec]); no new information lives here
+~~2. **C24 + C29**: Approve Discord (SystemNix DiscordSync, ntfy fallback) as the non-mail alert channel AND evo-x2 as the canary vantage? Both are recommendations; monitoring encoding (section f, rows 16-25) starts the moment you answer.~~ routed - decision-batch "Session questions" (C24/C29, both carry [rec])
 3. ~~**C17 + pin policy**: Approve the SystemNix push (dedupe commit is ready, ~1 commit here + the fleet's CI-debt backlog), and should the input be hard-pinned to `?ref=v0.3.1` per the pin-discipline doctrine, or stay floating `?ref=master`?~~ tag leg RESOLVED - `v0.4.0` cut 2026-09-23 (05-55 a/7), so C17a has a stable ref to pin to; the SystemNix push + pin choice remain open (decision-batch C17)
 
 ---
