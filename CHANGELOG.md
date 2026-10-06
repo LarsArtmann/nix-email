@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- `demo-eval` check (2026-10-06): pure-eval contract for the demo host
+  (`nixosConfigurations.demo`). `nix flake check` already forces the demo
+  toplevel (probe-verified), but the demo's human contract - the README
+  quickstart QEMU port forwards (18080/2525/2587/2593), the provisioning
+  unit's `roles:["user"]`, the fallback-admin login, the pyzor-off
+  posture, the absolute-curl provisioning path - could regress while
+  still evaluating clean. Negative-tested: a drifted forward port fails
+  the check with a named error. x86_64-only (the demo host is); the
+  aarch64 check shape is unchanged, CI's lockstep expected-list updated
+  in the same change.
 - JMAP seam (2026-10-05 execution session): `stalwart-e2e` gains a JMAP
   subtest (session document as a `roles:["user"]` principal, Mailbox
   query/get asserting `inbox`+`junk` roles, the delivered e2e needle

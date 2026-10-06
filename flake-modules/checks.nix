@@ -1,7 +1,11 @@
 # perSystem.checks, extracted from flake.nix 2026-10-05 (flake-parts
 # module split). The raw nixpkgs INPUT is passed to the pure-eval tests
 # so their legacyPackages semantics are unchanged.
-{inputs, ...}: {
+{
+  inputs,
+  self,
+  ...
+}: {
   # `pkgs` is provided by flake-parts' built-in nixpkgs module
   # (inputs'.nixpkgs.legacyPackages - the semantics the tests were
   # verified against). NOTE: inside perSystem use `pkgs.lib`, not a
@@ -38,6 +42,15 @@
         };
       }
       // pkgs.lib.optionalAttrs (system == "x86_64-linux") {
+        # Demo-host contract (2026-10-06): flake check already forces the
+        # demo toplevel (probe-verified), but the HUMAN contract - quickstart
+        # port forwards, provision roles:["user"], fallback admin, pyzor
+        # off - can regress while still evaling clean. Pure eval, no VM;
+        # x86_64-only because the demo host is.
+        demo-eval = import ../tests/demo-eval.nix {
+          inherit pkgs system;
+          demoConfig = self.nixosConfigurations.demo.config;
+        };
         stalwart-e2e = import ../tests/stalwart-e2e.nix {inherit pkgs;};
         stalwart-relay-e2e = import ../tests/stalwart-relay-e2e.nix {inherit pkgs;};
         parsedmarc-e2e = import ../tests/parsedmarc-e2e.nix {inherit pkgs;};

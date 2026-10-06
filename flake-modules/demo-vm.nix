@@ -36,12 +36,6 @@
         # to 26.11" eval warning (fleet convention 26.05, matching the
         # e2e relay node).
         system.stateVersion = "26.05";
-        assertions = [
-          {
-            assertion = false;
-            message = "demo-eval-probe: does flake check force this?";
-          }
-        ];
         imports = [
           (modulesPath + "/virtualisation/qemu-vm.nix")
         ];
