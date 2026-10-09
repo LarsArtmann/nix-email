@@ -14,7 +14,7 @@
   system,
   demoConfig,
 }: let
-  lib = pkgs.lib;
+  inherit (pkgs) lib;
 
   # hostfwd pairs exactly as the banner + README quickstart print them
   # (QEMU aborts on taken targets, and a dropped forward makes the
