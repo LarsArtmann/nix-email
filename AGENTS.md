@@ -18,11 +18,16 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
   Working rules for the deliberate non-fixes. "N tools unavailable"
   (jest/knip/madge/pnpm tools, interrogate) is expected noise for a
   Nix-only repo.
-- `nix flake check` - the full gate: eval contract + Stalwart VM E2E test
+- `nix flake check` - the full gate: eval contract tests (dmarc-eval,
+  module-import-eval, demo-eval) + the three VM E2E tests
   (~2-4 min; the SMTP subtest intentionally waits out ~60 s of resolver
   timeouts in the DNS-less VM). NOTE: failed check results are CACHED - a
   rerun without an input change replays the old verdict. `--no-build`
   emits the eval warnings fast (cheap triage instrument for eval noise).
+  The gate also forces the `nixosConfigurations.demo` toplevel incl. its
+  assertions (probe-verified 2026-10-06); `demo-eval` additionally pins
+  the demo's human contract (quickstart port pairs, provision
+  roles/catch-all/absolute-curl, fallback admin, pyzor off).
 - Host binary spike = DEAD END for Stalwart (2026-09-16): the pinned binary
   boots and parses config on the host but listeners never bind (futex-wait
   after external-resource downloads); the same binary boots fine in the VM.
