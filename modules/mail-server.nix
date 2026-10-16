@@ -773,24 +773,34 @@ in {
               };
             }
           ]
-          ++ lib.optionals (cfg.spamFilter.dnsbl.servers != {}) [
-            {
-              SpamDnsblServer = {
-                reconcile = false;
-                objects = lib.mapAttrs (id: srv:
-                  {
-                    "@type" = dnsblScopeVariant.${srv.scope};
-                    name = id;
-                    enable = true;
-                    zone = constantExpr srv.zone;
-                  }
-                  // lib.optionalAttrs (srv.tag != null) {
-                    tag = constantExpr srv.tag;
-                  })
-                cfg.spamFilter.dnsbl.servers;
-              };
-            }
-          ]
+          # ALWAYS reconciled (not optionals): stalwart 0.16.22 SHIPS 18
+          # default SpamDnsblServer rows whose tag expressions use an
+          # operator ("bit_and") the binary's own parser rejects - every
+          # apply's reload validation FAILS on them and the core never
+          # swaps (provisioned listeners never activate; VM transcripts
+          # 2026-10-16, docs/status/2026-10-16_20-48_*). Reconciling the
+          # set (empty unless the consumer configures servers) destroys
+          # the broken defaults, which ALSO mechanizes the wrapper's
+          # long-standing "DNSBL off by default" posture (DNS-less E2E
+          # lesson). Consumers merging their own servers into this set
+          # keep them; reconcile deletes only rows outside the plan.
+          {
+            SpamDnsblServer = {
+              reconcile = true;
+              match = ["name"];
+              objects = lib.mapAttrs (id: srv:
+                {
+                  "@type" = dnsblScopeVariant.${srv.scope};
+                  name = id;
+                  enable = true;
+                  zone = constantExpr srv.zone;
+                }
+                // lib.optionalAttrs (srv.tag != null) {
+                  tag = constantExpr srv.tag;
+                })
+              cfg.spamFilter.dnsbl.servers;
+            };
+          }
           ++ lib.optionals (cfg.relay != null) [
             {
               MtaRoute.objects.${cfg.relay.routeId} =
