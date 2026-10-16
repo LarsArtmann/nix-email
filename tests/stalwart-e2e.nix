@@ -684,7 +684,7 @@ in
           # against a LIVE server with an incremental plan (Domain upsert
           # patch + new Account), the exact workflow runtime account
           # provisioning uses. IMAP LOGIN is by full EMAIL ADDRESS in 0.16.
-          machine.succeed("cat > /tmp/catchall-plan.ndjson <<'PLAN'\n{\"@type\":\"upsert\",\"object\":\"Domain\",\"value\":{\"domain\":{\"name\":\"example.test\",\"catchAllAddress\":\"catchall@example.test\"}}}\n{\"@type\":\"upsert\",\"object\":\"Account\",\"value\":{\"catchall\":{\"@type\":\"User\",\"name\":\"catchall\",\"domainId\":\"#domain\",\"roles\":{\"@type\":\"User\"},\"credentials\":[{\"@type\":\"Password\",\"secret\":\"${testPass}\"}]}}}\nPLAN")
+          machine.succeed("cat > /tmp/catchall-plan.ndjson <<'PLAN'\n{\"@type\":\"upsert\",\"object\":\"Domain\",\"value\":{\"domain\":{\"name\":\"example.test\",\"catchAllAddress\":\"catchall@example.test\"}}}\n{\"@type\":\"upsert\",\"object\":\"Account\",\"value\":{\"catchall\":{\"@type\":\"User\",\"name\":\"catchall\",\"domainId\":\"#domain\",\"roles\":{\"@type\":\"User\"},\"credentials\":{\"0\":{\"@type\":\"Password\",\"secret\":\"${testPass}\"}}}}}\nPLAN")
           # Plan ORDER matters: ops apply SEQUENTIALLY and "#id" references
           # resolve against EARLIER ops in the same plan only - the Domain
           # upsert (patching the wrapper's boot-time "domain" object with
