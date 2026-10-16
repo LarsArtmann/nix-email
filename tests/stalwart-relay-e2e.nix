@@ -124,10 +124,13 @@ in
               reconcile = true;
               match = ["name"];
               objects.user1 = {
+                # 0.16 schema: User.name IS the primary address (no
+                # emailAddress field) - name == address keeps the auth
+                # identity and the sender check aligned (stalwart-e2e
+                # transcript 2026-10-16).
                 "@type" = "User";
-                name = "user1";
+                name = "user1@example.test";
                 domainId = "#example-test";
-                emailAddress = "user1@example.test";
                 roles."@type" = "User";
                 credentials = [
                   {
@@ -139,10 +142,16 @@ in
             };
           };
 
-          # Bridge DNS for the relay hostname: stalwart's system resolver reads
-          # /etc/resolv.conf only; dnsmasq answers from /etc/hosts (where the
-          # test driver injects the node names) - networking.nameservers below
-          # points the resolver at this dnsmasq.
+          # Bridge DNS for the relay hostname: stalwart's resolver is a
+          # pure-DNS path that IGNORES /etc/hosts, so dnsmasq serves the
+          # test driver's node names while FORWARDING everything else to
+          # the QEMU user-net resolver (10.0.2.3 -> host DNS). The upstream
+          # forward is REQUIRED, not cosmetic: 0.16's reload validation
+          # resolves the SpamPyzor address through the system resolver, and
+          # the earlier black-hole upstream (192.0.2.1) failed the whole
+          # apply with "Invalid address: failed to lookup address
+          # information" (transcript 2026-10-16) - listeners never spawned
+          # and every subsequent subtest starved.
           dnsmasq = {
             enable = true;
             settings = {
@@ -150,7 +159,7 @@ in
               bind-interfaces = true;
               # resolv.conf points at dnsmasq itself - never read it back
               no-resolv = true;
-              server = ["192.0.2.1"];
+              server = ["10.0.2.3"];
             };
           };
         };

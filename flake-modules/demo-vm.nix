@@ -72,10 +72,12 @@
                 match = ["name"];
                 objects = {
                   demo = {
+                    # 0.16 schema: User.name IS the primary address - the
+                    # quickstart login demo@mail.demo.test is the account
+                    # NAME, not a separate emailAddress field.
                     "@type" = "User";
-                    name = "demo";
+                    name = "demo@mail.demo.test";
                     domainId = "#domain";
-                    emailAddress = "demo@mail.demo.test";
                     roles."@type" = "User";
                     # Strength-checked by stalwart at apply time (zxcvbn):
                     # a bare "demo" is rejected - keep the passphrase long.
@@ -88,9 +90,8 @@
                   };
                   catchall = {
                     "@type" = "User";
-                    name = "catchall";
+                    name = "catchall@mail.demo.test";
                     domainId = "#domain";
-                    emailAddress = "catchall@mail.demo.test";
                     roles."@type" = "User";
                   };
                 };

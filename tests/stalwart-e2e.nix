@@ -270,7 +270,14 @@ in
       services = {
         mail-server = {
           enable = true;
-          hostname = "mail.example.test";
+          # hostname IS the provisioned mail domain (the wrapper derives the
+          # Domain object + SystemSettings.defaultHostname from it) - so the
+          # hostname must equal example.test or every account address below
+          # lands outside the local namespace (auth 535s, MAIL FROM 501s;
+          # transcript 2026-10-16: with hostname mail.example.test, the
+          # session rendered user1@mail.example.test and rejected
+          # user1@example.test everywhere).
+          hostname = "example.test";
           metrics.enable = true;
           # Low negative-cache TTL (upstream default 3600 s): kept from the
           # 0.15 era as a cheap canary - the declarative plan means nothing
@@ -313,10 +320,13 @@ in
               match = ["name"];
               objects = {
                 user1 = {
+                  # 0.16 schema: User.name IS the primary address
+                  # ("user@domain"; there is no emailAddress field -
+                  # struct-verified 2026-10-16). Name == address keeps the
+                  # auth identity and the sender check aligned.
                   "@type" = "User";
-                  name = "user1";
+                  name = "user1@example.test";
                   domainId = "#domain";
-                  emailAddress = "user1@example.test";
                   roles."@type" = "User";
                   credentials = [
                     {
@@ -327,9 +337,8 @@ in
                 };
                 user2 = {
                   "@type" = "User";
-                  name = "user2";
+                  name = "user2@example.test";
                   domainId = "#domain";
-                  emailAddress = "user2@example.test";
                   roles."@type" = "User";
                   credentials = [
                     {
@@ -340,9 +349,8 @@ in
                 };
                 reports = {
                   "@type" = "User";
-                  name = "reports";
+                  name = "reports@example.test";
                   domainId = "#domain";
-                  emailAddress = "reports@example.test";
                   roles."@type" = "User";
                   credentials = [
                     {
@@ -356,9 +364,8 @@ in
                 # reschedule lines asserted below).
                 user3 = {
                   "@type" = "User";
-                  name = "user3";
+                  name = "user3@example.test";
                   domainId = "#domain";
-                  emailAddress = "user3@example.test";
                   roles."@type" = "User";
                   credentials = [
                     {
@@ -372,9 +379,8 @@ in
                 # `emails` entry on a principal.
                 user4 = {
                   "@type" = "User";
-                  name = "user4";
+                  name = "user4@example.test";
                   domainId = "#domain";
-                  emailAddress = "user4@example.test";
                   roles."@type" = "User";
                   credentials = [
                     {
@@ -672,7 +678,7 @@ in
           # against a LIVE server with an incremental plan (Domain upsert
           # patch + new Account), the exact workflow runtime account
           # provisioning uses. IMAP LOGIN is by full EMAIL ADDRESS in 0.16.
-          machine.succeed("cat > /tmp/catchall-plan.ndjson <<'PLAN'\n{\"@type\":\"upsert\",\"object\":\"Domain\",\"value\":{\"domain\":{\"catchAllAddress\":\"catchall@example.test\"}}}\n{\"@type\":\"upsert\",\"object\":\"Account\",\"value\":{\"catchall\":{\"@type\":\"User\",\"name\":\"catchall\",\"domainId\":\"#domain\",\"emailAddress\":\"catchall@example.test\",\"roles\":{\"@type\":\"User\"},\"credentials\":[{\"@type\":\"Password\",\"secret\":\"${testPass}\"}]}}}\nPLAN")
+          machine.succeed("cat > /tmp/catchall-plan.ndjson <<'PLAN'\n{\"@type\":\"upsert\",\"object\":\"Domain\",\"value\":{\"domain\":{\"catchAllAddress\":\"catchall@example.test\"}}}\n{\"@type\":\"upsert\",\"object\":\"Account\",\"value\":{\"catchall\":{\"@type\":\"User\",\"name\":\"catchall@example.test\",\"domainId\":\"#domain\",\"roles\":{\"@type\":\"User\"},\"credentials\":[{\"@type\":\"Password\",\"secret\":\"${testPass}\"}]}}}\nPLAN")
           machine.succeed(
               "STALWART_URL=http://127.0.0.1:8080 STALWART_USER=admin "
               "STALWART_PASSWORD=test-admin-secret "
