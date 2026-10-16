@@ -49,8 +49,10 @@
   inherit (stalwart) provision;
 
   # M14 (2026-09-22): the hardening options must be OFF by default - the
-  # default PLAN carries NO throttle, NO DNSBL, NO metrics, NO cache-TTL
-  # override. (Upstream ships its own conservative inbound limiters and
+  # default PLAN carries NO throttle, NO metrics, NO cache-TTL override,
+  # and the DNSBL set is EMPTY (it exists only to reconcile away the
+  # broken shipped default rows - see the wrapper's SpamDnsblServer
+  # comment). (Upstream ships its own conservative inbound limiters and
   # DNSBL needs real resolver DNS - README ledger.)
   defaultSingletons = provision.singletons;
   defaultObjects = provision.objects;
@@ -159,9 +161,11 @@
     # config.json shape: datastore descriptor only.
     settingsType = stalwart.settings."@type" or "MISSING";
     settingsHasPath = stalwart.settings ? path;
-    # Default posture: wrapper-managed hardening sets absent from the plan.
+    # Default posture: wrapper-managed hardening sets absent from the plan;
+    # DNSBL set present but EMPTY (reconcile-destroy of the broken shipped
+    # default rows - wrapper comment owns the why).
     defaultHasThrottle = defaultObjects ? MtaInboundThrottle;
-    defaultHasDnsbl = defaultObjects ? SpamDnsblServer;
+    defaultDnsblEmpty = (defaultObjects.SpamDnsblServer.objects or null) == {};
     defaultHasMetrics = defaultSingletons ? Metrics;
     defaultHasCache = defaultSingletons ? Cache;
     defaultHasRelayStrategy = defaultSingletons ? MtaOutboundStrategy;
@@ -182,7 +186,7 @@ in
   assert renderedAttrs.settingsType == "RocksDb" || throw "module-import-eval: default settings must be the 0.16 config.json datastore descriptor (RocksDb).";
   assert renderedAttrs.settingsHasPath || throw "module-import-eval: default settings must carry the datastore path.";
   assert !renderedAttrs.defaultHasThrottle || throw "module-import-eval: default plan must not carry MtaInboundThrottle - the wrapper's rateLimits default OFF posture is broken.";
-  assert !renderedAttrs.defaultHasDnsbl || throw "module-import-eval: default plan must not carry SpamDnsblServer - the DNSBL default OFF posture (DNS-less E2E lesson) is broken.";
+  assert renderedAttrs.defaultDnsblEmpty || throw "module-import-eval: default SpamDnsblServer set must be EMPTY (reconcile-destroy of broken shipped default rows) - a configured-by-default DNSBL breaks the DNS-less posture.";
   assert !renderedAttrs.defaultHasMetrics || throw "module-import-eval: default plan must not carry the Metrics singleton - metrics.enable default OFF is broken.";
   assert !renderedAttrs.defaultHasCache || throw "module-import-eval: default plan must not carry the Cache singleton - directoryCacheTtlNegative default (upstream 3600s) is broken.";
   assert !renderedAttrs.defaultHasRelayStrategy || throw "module-import-eval: default plan must not carry MtaOutboundStrategy - direct-to-MX (relay=null) is broken.";
@@ -214,7 +218,7 @@ in
           grep -q '"settingsType":"RocksDb"' "$renderedPath"
           grep -q '"settingsHasPath":true' "$renderedPath"
           grep -q '"defaultHasThrottle":false' "$renderedPath"
-          grep -q '"defaultHasDnsbl":false' "$renderedPath"
+          grep -q '"defaultDnsblEmpty":true' "$renderedPath"
           grep -q '"defaultHasMetrics":false' "$renderedPath"
           grep -q '"defaultHasCache":false' "$renderedPath"
           grep -q '"defaultHasRelayStrategy":false' "$renderedPath"

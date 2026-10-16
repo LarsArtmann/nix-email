@@ -784,23 +784,25 @@ in {
           # long-standing "DNSBL off by default" posture (DNS-less E2E
           # lesson). Consumers merging their own servers into this set
           # keep them; reconcile deletes only rows outside the plan.
-          {
-            SpamDnsblServer = {
-              reconcile = true;
-              match = ["name"];
-              objects = lib.mapAttrs (id: srv:
-                {
-                  "@type" = dnsblScopeVariant.${srv.scope};
-                  name = id;
-                  enable = true;
-                  zone = constantExpr srv.zone;
-                }
-                // lib.optionalAttrs (srv.tag != null) {
-                  tag = constantExpr srv.tag;
-                })
-              cfg.spamFilter.dnsbl.servers;
-            };
-          }
+          ++ [
+            {
+              SpamDnsblServer = {
+                reconcile = true;
+                match = ["name"];
+                objects = lib.mapAttrs (id: srv:
+                  {
+                    "@type" = dnsblScopeVariant.${srv.scope};
+                    name = id;
+                    enable = true;
+                    zone = constantExpr srv.zone;
+                  }
+                  // lib.optionalAttrs (srv.tag != null) {
+                    tag = constantExpr srv.tag;
+                  })
+                cfg.spamFilter.dnsbl.servers;
+              };
+            }
+          ]
           ++ lib.optionals (cfg.relay != null) [
             {
               MtaRoute.objects.${cfg.relay.routeId} =

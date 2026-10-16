@@ -114,18 +114,28 @@ in
               dnsManagement."@type" = "Manual";
               certificateManagement."@type" = "Manual";
             };
-            Account.objects.user1 = {
-              "@type" = "User";
-              name = "user1";
-              domainId = "#example-test";
-              emailAddress = "user1@example.test";
-              roles."@type" = "User";
-              credentials = [
-                {
-                  "@type" = "Password";
-                  secret = testPass;
-                }
-              ];
+            # match ["name"] is REQUIRED: without it apply matches accounts
+            # BY VALUE, and the stored secret is server-hashed after the
+            # first apply - a second apply then sees a "changed" object and
+            # tries a fresh create, hitting the unique-email index
+            # ("primaryKeyViolation | Properties: email", transcript
+            # 2026-10-16).
+            Account = {
+              reconcile = true;
+              match = ["name"];
+              objects.user1 = {
+                "@type" = "User";
+                name = "user1";
+                domainId = "#example-test";
+                emailAddress = "user1@example.test";
+                roles."@type" = "User";
+                credentials = [
+                  {
+                    "@type" = "Password";
+                    secret = testPass;
+                  }
+                ];
+              };
             };
           };
 
