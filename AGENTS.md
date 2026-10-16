@@ -82,6 +82,17 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
   edits reach CI and the fail-closed alejandra step goes red on a push you
   never explicitly made (2026-09-16, two red runs, fix was pure
   re-indentation).
+- A working-tree gate red may belong to ANOTHER session's UNCOMMITTED
+  in-flight fix, not your edits (2026-10-17: stalwart-e2e's catch-all apply
+  failed in a gate run whose tree carried a foreign, uncommitted
+  Account-before-Domain plan reorder whose own comment documents that exact
+  failure). Before attributing a red to your diff: `git status`/`git diff`
+  for files you didn't touch, and date the check output via
+  `nix path-info --json <outPath>` registrationTime - an output registered
+  BEFORE your edit window but hashing to the SAME path your post-edit tree
+  evals to is content-addressing proof the refactor changed nothing (the
+  2026-10-17 attrpath collapses reproduced the byte-identical relay-e2e VM
+  closure this way). Never edit the foreign in-flight file; report it.
 - After editing ONE check, build THAT check first
   (`nix build .#checks.x86_64-linux.<name> -L`), then the full gate - a
   full-gate run just to discover a single subtest's typo costs ~9 min.
