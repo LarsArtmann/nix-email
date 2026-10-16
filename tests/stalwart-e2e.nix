@@ -36,8 +36,8 @@
 #  12. Alias delivery: a provisioned EmailAlias on user4 receives into the
 #      same account's INBOX
 #  13. Catch-all: applied AT RUNTIME via a second `stalwart-cli apply`
-#      (Account BEFORE the Domain patch - catchAllAddress validation
-#      needs the target account to exist) - proves apply
+#      (Domain patch BEFORE the Account - "#id" references resolve only
+#      against earlier ops in the same plan) - proves apply
 #      idempotency against a live server AND the ordering semantics: before
 #      the catch-all exists, unknown local parts are REJECTED (subtest 2)
 #  14. Account quota: quotas.maxDiskQuota = 1 makes delivery RETRY forever -
@@ -684,12 +684,14 @@ in
           # against a LIVE server with an incremental plan (Domain upsert
           # patch + new Account), the exact workflow runtime account
           # provisioning uses. IMAP LOGIN is by full EMAIL ADDRESS in 0.16.
-          machine.succeed("cat > /tmp/catchall-plan.ndjson <<'PLAN'\n{\"@type\":\"upsert\",\"object\":\"Account\",\"value\":{\"catchall\":{\"@type\":\"User\",\"name\":\"catchall\",\"domainId\":\"#domain\",\"roles\":{\"@type\":\"User\"},\"credentials\":[{\"@type\":\"Password\",\"secret\":\"${testPass}\"}]}}}\n{\"@type\":\"upsert\",\"object\":\"Domain\",\"value\":{\"domain\":{\"catchAllAddress\":\"catchall@example.test\"}}}\nPLAN")
-          # Plan ORDER matters: the Account must be created BEFORE the
-          # Domain patch - catchAllAddress validation resolves its target
-          # address, and a Domain-first plan fails at runtime with the
-          # account still missing (the boot path gets this ordering from
-          # the vendored module's topo-sort). The apply log is dumped even
+          machine.succeed("cat > /tmp/catchall-plan.ndjson <<'PLAN'\n{\"@type\":\"upsert\",\"object\":\"Domain\",\"value\":{\"domain\":{\"catchAllAddress\":\"catchall@example.test\"}}}\n{\"@type\":\"upsert\",\"object\":\"Account\",\"value\":{\"catchall\":{\"@type\":\"User\",\"name\":\"catchall\",\"domainId\":\"#domain\",\"roles\":{\"@type\":\"User\"},\"credentials\":[{\"@type\":\"Password\",\"secret\":\"${testPass}\"}]}}}\nPLAN")
+          # Plan ORDER matters: ops apply SEQUENTIALLY and "#id" references
+          # resolve against EARLIER ops in the same plan only - the Domain
+          # upsert (patching the wrapper's boot-time "domain" object with
+          # catchAllAddress) must come BEFORE the Account whose domainId
+          # references it, or apply fails with invalidResultReference:
+          # 'Invalid reference to non-existing object "domain"'
+          # (apply-log transcript 2026-10-16). The apply log is dumped even
           # on failure: a silent log cost one full VM run (2026-10-16).
           applyStatus = machine.execute(
               "STALWART_URL=http://127.0.0.1:8080 STALWART_USER=admin "
