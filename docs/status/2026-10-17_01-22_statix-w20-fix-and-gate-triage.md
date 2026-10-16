@@ -14,10 +14,15 @@ content-addressed VM output identity). The fix is committed locally
 (8f8ced8) but **not pushed**, so master is still red from CI's perspective.
 
 The full gate then failed on a SECOND, distinct problem: stalwart-e2e's
-runtime catch-all apply. That failure predates this session, was being fixed
-by a parallel session with an uncommitted edit (Account-before-Domain plan
-reorder), and that fix is now committed locally by the daemon in three
-pieces. The e2e re-verification was launched during this report.
+runtime catch-all apply. That failure predates this session. A parallel
+session iterated on it while this one ran (3 daemon commits to the test
+gained: log-dump-on-failure, explicit assert, and a corrected ordering
+comment). My re-verification against the latest committed state is still
+RED - but the log dump now captures the REAL root cause:
+`Domain: match property \`name\` is missing from the object body`. The
+earlier plan-ordering theory (Account-before-Domain) was a red herring:
+Account-first fails with invalidResultReference, Domain-first is required,
+and the true bug is the missing match property in the Domain upsert body.
 
 ## a) FULLY DONE
 
@@ -46,33 +51,40 @@ pieces. The e2e re-verification was launched during this report.
    fail-closed "Statix lint Nix files" step on exactly the findings the user
    pasted; last green was 2026-10-16 05:25:23Z. This session's fix is the
    cure (pending push).
-6. **Root cause of the stalwart-e2e catch-all failure identified from the
-   foreign diff.** Domain-first plan order fails because catchAllAddress
-   validation resolves its target account; the boot path avoids this via the
-   vendored module's topo-sort, the runtime apply did not.
+6. **Root-cause hunting for the stalwart-e2e catch-all failure advanced from
+   silent red to a precise API error.** Started from the foreign diff's
+   ordering theory; my recheck against the committed fix refuted it and the
+   new log dump captured the real error: `Domain: match property \`name\`
+   is missing from the object body` (apply-log transcript, this session's
+   e2e-recheck log). Ordering was re-established as correct (Domain-first;
+   Account-first fails invalidResultReference).
 7. **AGENTS.md updated with the session lesson** (cf78a1f): attribute gate
    reds via git-status baseline + registrationTime dating before blaming
    your own diff; never edit a foreign in-flight file.
 
 ## b) PARTIALLY DONE
 
-1. **"Full gate green on this tree" - not yet a single clean run.**
-   - Works: every check verified individually (relay-e2e, dmarc-eval,
+1. **"Full gate green on this tree" - not achieved.**
+   - Works: every OTHER check verified individually (relay-e2e, dmarc-eval,
      module-import-eval, demo-eval) - all green.
-   - Open: stalwart-e2e re-verification launched during this report against
-     the committed fix; result appended below when done.
-   - Effort to finish: S (one gate run once e2e verdict is in).
+   - Open: stalwart-e2e re-verified during this report - STILL RED, now with
+     the true root cause captured (see d2). Next fix is one line-class:
+     add the match property `name` to the Domain upsert body.
+   - Effort to finish: S (edit + one e2e run).
 2. **Master CI green - blocked on push.**
    - Works: all 5 local commits (statix fix + e2e fix + AGENTS.md) are
      committed, tree clean.
    - Open: origin/master has none of it; `gh run list` shows no run newer
      than 22:56:10Z. The daemon owns pushes; I do not push unasked.
    - Effort: S.
-3. **stalwart-e2e catch-all bug fix - committed but not verified by me (at
-   report start).**
-   - The parallel session's fix (test-side reorder + apply-log dump on
-     failure) is now local commits 65f69e2/30d4f4f/2588261.
-   - Open: my verification run (see 1); push; CI validation.
+3. **stalwart-e2e catch-all bug fix - committed, verified RED, root cause
+   now precise.**
+   - The parallel session's fix evolved across 3 daemon commits: kept
+     Domain-first order (Account-first fails invalidResultReference - their
+     apply-log transcript), added execute+log-dump+assert (this produced
+     today's diagnostic transcript), but the Domain upsert body still lacks
+     the required match property `name`.
+   - Open: the one-line-class body fix + re-run; ownership unclear (g1).
 4. **Demo VM verification after the environment-block move.**
    - Works: demo-eval green; banner string byte-identical.
    - Open: no runtime smoke (`nix run .#vm`) this session - the demo
@@ -113,18 +125,22 @@ pieces. The e2e re-verification was launched during this report.
      them. Local dev never ran statix before the push.
    - Mitigation: FIXED locally in 8f8ced8, verified with CI's exact pinned
      statix - but **still red upstream until pushed**.
-2. **stalwart-e2e catch-all: runtime apply fails (exit 1).**
+2. **stalwart-e2e catch-all: runtime apply fails (exit 1) - true root cause
+   now captured.**
    - Severity: blocks the full gate; the repo's primary behavioral E2E is
      red on every full run.
-   - Root cause (identified): plan-ordering split brain - Domain upsert
-     before Account upsert makes catchAllAddress validation resolve a
-     missing account; boot plans are topo-sorted, runtime NDJSON plans are
-     not.
-   - Aggravation: the first failure's actual API error is LOST EVIDENCE -
-     the old test code redirected the apply log into the VM's /tmp and
-     never dumped it on failure; the VM was destroyed with the log inside.
-   - Mitigation: parallel session's fix committed locally (reorder + log
-     dump + explicit assert); verification run launched during this report.
+   - Root cause (CAPTURED THIS SESSION, replacing the earlier ordering
+     theory): `upsert Domain: match property \`name\` is missing from the
+     object body` - the 0.16 API requires the match property in an upsert
+     body even when patching an existing object; the test's Domain body
+     carries only catchAllAddress. Diagnosis evolution: ordering theory
+     (from the first foreign diff) was REFUTED by the committed fix's own
+     transcript comment plus my recheck.
+   - Evidence-loss note: the FIRST failure's error is still lost (old code
+     never dumped the log); every future failure now dumps. The dump
+     mechanism is proven working (it produced today's transcript).
+   - Mitigation: add the match property to the Domain upsert body, re-run;
+     ownership with the parallel session (g1).
 3. **Not fucked up - stated to keep (d) honest:** nothing in this session's
    own edits broke anything. Proof: pinned-statix exit 0, fmt exit 0,
    byte-identical eval captures, and a VM closure that hashes identical to
@@ -165,10 +181,10 @@ pieces. The e2e re-verification was launched during this report.
 | #  | Task                                                                                              | Impact   | Effort | Category      |
 | -- | ------------------------------------------------------------------------------------------------- | -------- | ------ | ------------- |
 | 1  | Push the 5 local commits and watch CI to green on master                                          | Critical | S      | Quality       |
-| 2  | Get a green verdict (or a fresh diagnosis) for stalwart-e2e on the committed fix                  | Critical | M      | Bug           |
+| 2  | Add match property `name` to the Domain upsert body in the catch-all plan, re-run stalwart-e2e     | Critical | S      | Bug           |
 | 3  | One clean full `nix flake check` on the committed tree                                            | Critical | M      | Quality       |
 | 4  | Harvest this report's (f) into TODO_LIST/ROADMAP (docs-health HARVEST)                            | High     | S      | Documentation |
-| 5  | Decide: topo-sort hardening for runtime NDJSON plans in stalwart-provision vs test-only ordering  | High     | M      | Feature       |
+| 5  | Audit other 0.16 runtime plans (provision singletons et al) for the missing match-property class  | High     | M      | Bug           |
 | 6  | Reconcile "running 4 flake checks" gate-log line against the 5 defined checks                     | High     | S      | Bug           |
 | 7  | Adopt the session-start baseline ritual (git status + same-day status-doc scan)                   | High     | S      | Process       |
 | 8  | Full buildflow gate pass on the fixed tree (nix-checker drift signal)                             | Medium   | M      | Quality       |
@@ -199,11 +215,12 @@ headroom stays empty rather than padded.)
    statix fix, or do you/daemon own pushes on your own schedule?** I
    verified via `gh run list` (no run after 22:56:10Z) and `git status -sb`
    (ahead 5). I will not push unasked; every hour of delay keeps master red.
-3. **Scope of the catch-all ordering fix: test-only reorder (what is
-   committed) or also harden stalwart-provision to topo-sort runtime plans?**
-   The test fix unblocks the gate; the module fix prevents the whole failure
-   class for future runtime plans. This is a product-scope call I will not
-   make unilaterally.
+3. **For the catch-all fix: should I apply the one-line-class repair (add
+   `name` to the Domain upsert body) myself, or is the parallel session
+   mid-iteration and I must stay hands-off?** I tried: the committed code
+   plus my recheck transcript pin the fix precisely; what I cannot know is
+   whether the other session is seconds from landing exactly that. A wrong
+   guess either duplicates work or clobbers theirs.
 
 ## Verification chain appendix (evidence, reproducible)
 
@@ -220,3 +237,7 @@ headroom stays empty rather than padded.)
 - dmarc-eval + module-import-eval + demo-eval -> exit 0
 - Full `nix flake check` -> exit 1, failing check stalwart-e2e catch-all
   (pre-existing, root-caused, fix committed, re-verification launched)
+- `nix build .#checks.x86_64-linux.stalwart-e2e` on the committed fix ->
+  exit 1, BUT the new log dump captured the real error:
+  `upsert Domain: match property \`name\` is missing from the object body`
+  (the ordering red herring is retired; see d2)
