@@ -17,7 +17,10 @@
 > provision.opensearch port procedure is now MANDATORY at the next pin
 > advance), stale SystemNix pin claims fixed in README/AGENTS, ROADMAP Q6
 > closed out to its 2026-10-05 residue resolution, master green (CI run
-> 37993942414, 2026-10-09). Prior sweeps 2026-09-17/22/29, 2026-10-05:
+> 37993942414, 2026-10-09). BONUS CLOSE same pass: the home-manager
+> buildflow profile had flipped to a build >= 15ea141d2 - full gate
+> verified EXIT:0, the standing exit-69 posture and the AGENTS caveat are
+> RETIRED (CHANGELOG Fixed). Prior sweeps 2026-09-17/22/29, 2026-10-05:
 > details in git history and CHANGELOG.
 > The D1/D2 user decisions gate everything in ROADMAP, not here.
 
@@ -35,7 +38,6 @@
 | Task                                                                                                                                                                                                                                               | Status                                    | Impact | Effort | Evidence                                                                                                                 |
 | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- | ------ | ------ | ------------------------------------------------------------------------------------------------------------------------ |
 | Cut **v0.5.0**: annotated tag → tag-CI → gh release. Payload is release-ready in CHANGELOG `[Unreleased]` (JMAP subtest + contract doc + probes, CI hardening pair, flake split, demo-eval, SECURITY.md)                                           | 🔵 `BLOCKED` (C40 release-timing)         | High   | 30m    | 11-14 report f/2 + g/1; CHANGELOG `[Unreleased]`; CONTRIBUTING "Release procedure"                                       |
-| Flip the home-manager buildflow profile to a build ≥ `15ea141d2`, run ONE full gate here (expect EXIT:0), then shorten the AGENTS known-noise caveat to a history line                                                                             | 🔵 `BLOCKED` (owner HM rebuild)           | High   | 15m    | 11-14 report f/3 + b/2; AGENTS.md known-noise caveat; BuildFlow commit `15ea141d2`                                       |
 | dmarc-eval: add an eval-time assertion pinning the upstream parsedmarc unit-hardening shape (`DynamicUser`, `SystemCallFilter`, `RestrictAddressFamilies`) so a pin-advance that drops them fails loudly                                           | 🔴 `TODO`                                 | Med    | 45m    | 11-53 report f/7; pinned nixpkgs `services/monitoring/parsedmarc.nix` lines 568/584/589 (source-verified 2026-10-05)     |
 | MemoryMax policy for both wrapped services: wrapper-level `mkDefault` vs consumer-layer ownership - decide (C39), then document (module header or THREAT_MODEL.md)                                                                                 | 🔵 `BLOCKED` (C39)                        | Med    | 30m    | 11-53 report f/1 + g/1 (a wrong default OOM-kills delivery); nix-review found it undocumented everywhere (grep-verified) |
 | SystemNix CI-debt residue (their repo): Actions credential for the private branching-flow input, digest-based canary allowlist (TODO 509 incl. the `re_bzp5m` provenance call), 2 remaining pin flips, explain the scheduled-vs-push CI divergence | 🔵 `BLOCKED` (their repo + owner console) | Med    | 2h     | 11-14 report a/7 + b/3-b/4 + f/4-f/5 + f/17; 10-29 b/2 (statix sweep + caches already done)                              |

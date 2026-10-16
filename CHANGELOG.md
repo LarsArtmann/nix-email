@@ -44,9 +44,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   lint with four in-CI self-tests) and a lock-pinned statix CI step;
   `.githooks/pre-push` now mirrors the CI check-inventory guards via
   `scripts/check-inventory.sh`.
+- `SECURITY.md` security policy (2026-10-09): supported-versions table,
+  private GitHub Security Advisory reporting path, response-commitment
+  timeline.
 
 ### Changed
-
 
 - Docs-health audit pass (2026-09-29) over every `docs/status` and
   `docs/planning` 2026-0* file: the seven unannotated reports plus both
@@ -99,9 +101,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - SystemNix consumption (cross-repo): the nix-email input hard-pinned
   `?ref=v0.4.0` (contract check green against the tag) plus a full-tree
   statix sweep.
+- Docs-health AUDIT pass (2026-10-16) over every `docs/status` and
+  `docs/planning` 2026-0*/2026-1* file: the four 2026-10-05 session
+  reports got 207 inline verdicts (b/c/f/g resolved or routed; a/d/e
+  historical by policy) and were ARCHIVED (manifest in
+  `docs/status/archived/README.md`), the three planning plans got their
+  stale Resolution verdicts corrected inline (C17/C17a push+pin EXECUTED
+  2026-10-05, mailsuite FILED, T13 completed upstream) plus archive
+  banners and were ARCHIVED (new manifest
+  `docs/planning/archived/README.md`; decision-batch reference updated to
+  the archived path), the harvest routed ~20 new TODO_LIST rows and
+  deleted 19 done/stale ones, decision-batch gained C39 (MemoryMax
+  ownership), C40 (v0.5.0 release timing) and C41 (AGENTS ~21 KB floor),
+  ROADMAP closed Q6 to its source-verified residue resolution and dropped
+  the executed flake-split idea, AGENTS fixed the obsolete "SystemNix
+  floats ?ref=master" claim (hard-pinned v0.4.0 since 2026-10-05), gained
+  the concurrent-gates rule and the arrival_date_utc fixture-trap class,
+  FEATURES corrected the devShell row (actionlint + shellcheck are
+  CI-parity members) and the CI row (md-table-pipe lint + statix +
+  pre-push inventory mirror), README fixed the same pin-claim drift,
+  marked nixpkgs PR #566282 MERGED (2026-10-13, `22579286` - the
+  provision.opensearch port procedure is now mandatory at the first pin
+  past it) and added the one-VM-per-qcow2 demo write-lock note, and the
+  upstream watch row was re-verified (filings all still OPEN,
+  #566282 MERGED).
 
 ### Fixed
 
+- The standing EXIT:69 gate posture is RETIRED (2026-10-16): the
+  home-manager buildflow profile has flipped to a build >= 15ea141d2
+  (binary 83db580) and a FULL gate run verified EXIT:0 - the AGENTS
+  known-noise caveat is now a history line, and the vulture finding it
+  surfaced (unused `REPO` in `scripts/host-parse-fixture.py`) is fixed.
 - CI red (run 37281593175): shellcheck findings (SC2016 backtick-printf,
   trap quoting) in the pipe-lint step were invisible to a
   shellcheck-less local machine - fixed via a quoted-delimiter heredoc
