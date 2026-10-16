@@ -766,10 +766,20 @@ in {
           ]
           ++ lib.optionals cfg.rateLimits.enable [
             {
-              MtaInboundThrottle.objects.${cfg.rateLimits.id} = {
-                enable = true;
-                key = map (k: throttleKeyMap.${k}) cfg.rateLimits.keys;
-                rate = parseRate cfg.rateLimits.rate;
+              MtaInboundThrottle = {
+                # match ["description"]: MtaInboundThrottle has NO name
+                # field; the server's implicit upsert match key for this
+                # type is `description` and it refuses the op when the
+                # field is missing ("match property `description` is
+                # missing", VM transcript 2026-10-16). Carrying the field
+                # makes re-applies update instead of value-match.
+                match = ["description"];
+                objects.${cfg.rateLimits.id} = {
+                  description = cfg.rateLimits.id;
+                  enable = true;
+                  key = map (k: throttleKeyMap.${k}) cfg.rateLimits.keys;
+                  rate = parseRate cfg.rateLimits.rate;
+                };
               };
             }
           ]

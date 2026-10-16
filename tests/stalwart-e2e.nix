@@ -374,7 +374,11 @@ in
                   ];
                   aliases = [
                     {
-                      name = "alias4@example.test";
+                      # EmailAlias.name takes the LOCAL PART only - a full
+                      # address fails apply with "Invalid email local part
+                      # | Properties: aliases/name" (transcript
+                      # 2026-10-16); domainId carries the domain side.
+                      name = "alias4";
                       domainId = "#domain";
                       enabled = true;
                     }
