@@ -11,7 +11,8 @@
 #     everything exists before the first bind, so there is nothing left to
 #     poison (directoryCacheTtlNegative stays for consumers that provision
 #     accounts at runtime);
-#   - the "admin API" probes moved to /jmap (the 0.16 management surface);
+#   - the "admin API" probes moved to the JMAP session endpoint (0.16 moved
+#     the session off /jmap, which now answers 404);
 #   - the webadmin DKIM-keygen subtest became a second DECLARATIVE signature
 #     (ed25519) asserted on the wire (dual DKIM-Signature headers);
 #   - the offline backup/restore subtest is dropped: 0.16 removed the
@@ -21,7 +22,8 @@
 #       declarative plan applies clean (stalwart-provision oneshot)
 #   2.  SMTP dialogue with unknown recipient REJECTED 5xx (directory lookup)
 #   3.  IMAPS implicit-TLS greeting; HTTP answers on loopback
-#   4.  /jmap: fallback-admin authenticates, anonymous rejected 401
+#   4.  JMAP session: fallback-admin authenticates via /.well-known/jmap,
+#       anonymous session grants no accounts (primaryAccounts = {})
 #   5.  Accounts + domain provisioned DECLARATIVELY (plan, not API calls)
 #   6.  Authenticated submission on 587 (STARTTLS + AUTH PLAIN)
 #   7.  Delivery: message lands in the recipient's INBOX, fetched via IMAPS
@@ -30,7 +32,7 @@
 #   9.  Metrics: /metrics/prometheus answers 200 on the HTTP listener
 #  10. Journal hygiene: no configuration build errors
 #  11. Restart persistence: message survives `systemctl restart`, anonymous
-#      /jmap stays 401
+#      session keeps primaryAccounts empty
 #  12. Alias delivery: a provisioned EmailAlias on user4 receives into the
 #      same account's INBOX
 #  13. Catch-all: applied AT RUNTIME via a second `stalwart-cli apply`
@@ -539,19 +541,34 @@ in
       # bundle; a DNS-less VM cannot even fetch it) and / answers 4xx. The
       # /jmap subtests below are the loopback-HTTP contract.
 
-      with subtest("management: fallback-admin authenticates on /jmap, anonymous rejected"):
-          # 0.16: management rides /jmap (the /api/* surface is gone).
-          # The fallback admin exists in production mode (vendored module
-          # admin option); anonymous must bounce with 401. File-based:
-          # dump to /tmp, grep the file (pipe-lint rule).
+      with subtest("management: fallback-admin authenticates on the session endpoint"):
+          # 0.16 moved the JMAP session endpoint (demo-VM transcript,
+          # 2026-10-16): GET /jmap is 404 for everyone; the session lives
+          # at /.well-known/jmap (307 -> location /jmap/session). The
+          # fallback admin authenticates there (vendored module admin
+          # option). Anonymous gets a 200 session SHELL with EMPTY
+          # primaryAccounts - the enforcement point is the API POST (401,
+          # pinned with this exact body). File-based: dump to /tmp,
+          # grep/jq the file (pipe-lint rule).
           machine.succeed(
-              "curl -fsS -u admin:test-admin-secret http://127.0.0.1:8080/jmap -o /tmp/jmap-admin-session.json"
+              "curl -fsSL -u admin:test-admin-secret "
+              "http://127.0.0.1:8080/.well-known/jmap -o /tmp/jmap-admin-session.json"
           )
           machine.succeed("cat /tmp/jmap-admin-session.json >&2")
           machine.succeed("grep -q 'capabilities' /tmp/jmap-admin-session.json")
+          machine.succeed("grep -q '\"username\":\"admin\"' /tmp/jmap-admin-session.json")
+          machine.succeed(
+              "curl -fsS http://127.0.0.1:8080/jmap/session -o /tmp/jmap-anon-session.json"
+          )
+          machine.succeed(
+              "jq -e '.primaryAccounts == {}' /tmp/jmap-anon-session.json > /dev/null"
+          )
           machine.succeed(
               "curl -sS -o /dev/null -w '%{http_code}' "
-              "http://127.0.0.1:8080/jmap > /tmp/jmap-anon-code.txt"
+              "-H 'Content-Type: application/json' "
+              "-d '{\"using\":[\"urn:ietf:params:jmap:core\",\"urn:ietf:params:jmap:mail\"],"
+              "\"methodCalls\":[[\"Mailbox/query\",{\"accountId\":\"\",\"filter\":null},\"a\"]}' "
+              "http://127.0.0.1:8080/jmap/ > /tmp/jmap-anon-code.txt"
               "&& grep -q 401 /tmp/jmap-anon-code.txt"
           )
 
@@ -772,17 +789,21 @@ in
           )
 
       with subtest("JMAP: session, mailboxes, and the delivered needle over the API"):
-          # The JMAP surface rides the same HTTP listener (contract doc:
-          # docs/INBOXCLEAN.md; live-verified on the demo VM 2026-10-05,
-          # transcripts docs/probes/2026-10-05-jmap-demo-vm/). user2 is a
-          # roles:["user"] principal - exactly the adapter's auth shape.
-          # All assertions are file-based (dump to /tmp, grep/jq the file)
-          # and transcribed from those probe transcripts, never from
-          # expected output.
-          # -L: /.well-known/jmap answers 307 on this pin (curl without -L
-          # yields an empty 2xx-ish body - the debug-driver run of
-          # 2026-10-05 caught it; the demo probe followed redirects via
-          # urllib automatically).
+          # 0.16 moved the session endpoint (demo-VM transcript,
+          # 2026-10-16): GET /jmap is 404; /.well-known/jmap answers 307
+          # (location: /jmap/session) and -L lands on the session doc.
+          # apiUrl is an ABSOLUTE https://hostname URL (pinned:
+          # https://mail.demo.test/jmap/ on the demo VM) - unusable from
+          # this DNS-less VM, so assert its shape, strip scheme+authority
+          # with jq, and ride the loopback listener at the extracted path.
+          # user2 is a roles:["user"] principal - exactly the adapter's
+          # auth shape. All assertions are file-based (dump to /tmp,
+          # grep/jq the file), never from expected output.
+          machine.succeed(
+              "curl -sS -o /dev/null -w '%{http_code}' "
+              "http://127.0.0.1:8080/jmap > /tmp/jmap-old-code.txt"
+              "&& grep -q 404 /tmp/jmap-old-code.txt"
+          )
           machine.succeed(
               "curl -fsSL -u user2@example.test:${testPass} "
               "http://127.0.0.1:8080/.well-known/jmap -o /tmp/jmap-session.json"
@@ -791,6 +812,12 @@ in
           machine.succeed("grep -q 'user2@example.test' /tmp/jmap-session.json")
           machine.succeed("grep -q 'urn:ietf:params:jmap:mail' /tmp/jmap-session.json")
           machine.succeed("grep -q 'eventSourceUrl' /tmp/jmap-session.json")
+          machine.succeed(
+              "jq -j '.apiUrl | sub(\"^https?://[^/]+\"; \"\")' "
+              "/tmp/jmap-session.json > /tmp/jmap-api-path.txt"
+          )
+          machine.succeed("cat /tmp/jmap-api-path.txt >&2")
+          machine.succeed("grep -q '^/jmap/$' /tmp/jmap-api-path.txt")
           machine.succeed(
               "jq -j '.primaryAccounts[\"urn:ietf:params:jmap:mail\"]' "
               "/tmp/jmap-session.json > /tmp/jmap-acct.txt"
@@ -806,7 +833,7 @@ in
           machine.succeed(
               "curl -fsS -u user2@example.test:${testPass} "
               "-H 'Content-Type: application/json' "
-              "http://127.0.0.1:8080/jmap/ -o /tmp/jmap-mailboxes.json "
+              "http://127.0.0.1:8080$(cat /tmp/jmap-api-path.txt) -o /tmp/jmap-mailboxes.json "
               "-d @/tmp/jmap-mb-req.json"
           )
           machine.succeed("cat /tmp/jmap-mailboxes.json >&2")
@@ -833,7 +860,7 @@ in
           machine.succeed(
               "curl -fsS -u user2@example.test:${testPass} "
               "-H 'Content-Type: application/json' "
-              "http://127.0.0.1:8080/jmap/ -o /tmp/jmap-email.json "
+              "http://127.0.0.1:8080$(cat /tmp/jmap-api-path.txt) -o /tmp/jmap-email.json "
               "-d @/tmp/jmap-email-req.json"
           )
           machine.succeed("cat /tmp/jmap-email.json >&2")
@@ -849,9 +876,9 @@ in
           machine.wait_for_open_port(993, timeout=180)
           machine.succeed("imap-probe needle-576a4565b70f5a4c")
           machine.succeed(
-              "curl -sS -o /dev/null -w '%{http_code}' "
-              "http://127.0.0.1:8080/jmap > /tmp/jmap-anon-code2.txt"
-              "&& grep -q 401 /tmp/jmap-anon-code2.txt"
+              "curl -fsS http://127.0.0.1:8080/jmap/session "
+              "-o /tmp/jmap-anon-session2.json"
+              "&& jq -e '.primaryAccounts == {}' /tmp/jmap-anon-session2.json > /dev/null"
           )
 
       with subtest("no crashes"):
