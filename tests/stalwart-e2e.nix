@@ -36,7 +36,8 @@
 #  12. Alias delivery: a provisioned EmailAlias on user4 receives into the
 #      same account's INBOX
 #  13. Catch-all: applied AT RUNTIME via a second `stalwart-cli apply`
-#      (Domain.catchAllAddress + catchall account) - proves apply
+#      (Account BEFORE the Domain patch - catchAllAddress validation
+#      needs the target account to exist) - proves apply
 #      idempotency against a live server AND the ordering semantics: before
 #      the catch-all exists, unknown local parts are REJECTED (subtest 2)
 #  14. Account quota: quotas.maxDiskQuota = 1 makes delivery RETRY forever -
