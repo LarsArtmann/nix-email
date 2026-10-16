@@ -44,7 +44,7 @@
         services = {
           mail-server = {
             enable = true;
-            hostname = "mail.demo.invalid";
+            hostname = "mail.demo.test";
             # The default loopback bind only serves inside the guest; the
             # demo forwards host:8080 to the web admin/JMAP/API listener.
             httpBind = "0.0.0.0:8080";
@@ -75,7 +75,7 @@
                     "@type" = "User";
                     name = "demo";
                     domainId = "#domain";
-                    emailAddress = "demo@mail.demo.invalid";
+                    emailAddress = "demo@mail.demo.test";
                     roles."@type" = "User";
                     # Strength-checked by stalwart at apply time (zxcvbn):
                     # a bare "demo" is rejected - keep the passphrase long.
@@ -90,12 +90,12 @@
                     "@type" = "User";
                     name = "catchall";
                     domainId = "#domain";
-                    emailAddress = "catchall@mail.demo.invalid";
+                    emailAddress = "catchall@mail.demo.test";
                     roles."@type" = "User";
                   };
                 };
               };
-              Domain.objects.domain.catchAllAddress = "catchall@mail.demo.invalid";
+              Domain.objects.domain.catchAllAddress = "catchall@mail.demo.test";
             };
           };
           getty.autologinUser = "root";
@@ -154,10 +154,10 @@
 
              web admin / JMAP : http://localhost:18080  (admin / demo-admin)
              SMTP             : swaks --server localhost:2525 \\
-                                  --to anyone@mail.demo.invalid \\
+                                  --to anyone@mail.demo.test \\
                                   --from you@example.com
-             submission (STARTTLS) : localhost:2587  (demo@mail.demo.invalid / demo-nixemail-2026)
-             IMAPS                 : localhost:2593  (demo@mail.demo.invalid / demo-nixemail-2026)
+             submission (STARTTLS) : localhost:2587  (demo@mail.demo.test / demo-nixemail-2026)
+             IMAPS                 : localhost:2593  (demo@mail.demo.test / demo-nixemail-2026)
 
              Provisioned declaratively by stalwart-provision.service
              (stalwart-cli apply; journal: systemctl status). The catch-all

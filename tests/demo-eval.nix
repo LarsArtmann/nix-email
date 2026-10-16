@@ -61,7 +61,7 @@ in
   assert renderedAttrs.mailServerEnabled || throw "demo-eval: the demo host must enable services.mail-server.";
   assert renderedAttrs.stalwartEnabled || throw "demo-eval: the demo host must enable the wrapped stalwart service.";
   assert renderedAttrs.stalwart016 || throw "demo-eval: the demo must run Stalwart >= 0.16 (the declarative provision surface).";
-  assert renderedAttrs.hostname == "mail.demo.invalid" || throw "demo-eval: demo hostname drifted from the README quickstart domain.";
+  assert renderedAttrs.hostname == "mail.demo.test" || throw "demo-eval: demo hostname drifted from the README quickstart domain.";
   assert renderedAttrs.httpBind == "0.0.0.0:8080" || throw "demo-eval: demo httpBind must be non-loopback (0.0.0.0:8080) or the hostfwd 18080 forward hits nothing.";
   assert renderedAttrs.fallbackAdminUser == "admin" || throw "demo-eval: fallback-admin user drifted from the banner login.";
   assert lib.hasSuffix "/etc/demo-admin-secret" renderedAttrs.fallbackAdminCred || throw "demo-eval: fallback-admin password must ride the /etc/demo-admin-secret credential file (0.16 systemd-creds path), not an inline secret.";
@@ -73,10 +73,10 @@ in
   assert renderedAttrs.provisionWantedBy == "multi-user.target" || throw "demo-eval: provision unit must be wanted by multi-user.target.";
   assert renderedAttrs.provisionUsesCli || throw "demo-eval: provision unit must apply the plan via stalwart-cli (the 0.16 management surface - /api/principal is gone).";
   assert renderedAttrs.demoIsUserVariant || throw "demo-eval: the demo account must be an Account User variant (0.16 object model).";
-  assert renderedAttrs.demoEmail == "demo@mail.demo.invalid" || throw "demo-eval: demo account email drifted from the README quickstart login.";
+  assert renderedAttrs.demoEmail == "demo@mail.demo.test" || throw "demo-eval: demo account email drifted from the README quickstart login.";
   assert renderedAttrs.demoHasPassword || throw "demo-eval: the demo account lost its password credential - the quickstart login would not work.";
   assert renderedAttrs.demoRolesUser || throw "demo-eval: the demo account must carry the User role - accounts without it are refused submission (README ledger).";
-  assert renderedAttrs.catchAllAddress == "catchall@mail.demo.invalid" || throw "demo-eval: the demo lost its @mail.demo.invalid catch-all (Domain.catchAllAddress -> catchall account).";
+  assert renderedAttrs.catchAllAddress == "catchall@mail.demo.test" || throw "demo-eval: the demo lost its @mail.demo.test catch-all (Domain.catchAllAddress -> catchall account).";
   assert renderedAttrs.demoAssertionsClean || throw "demo-eval: the demo host carries firing assertions.";
     builtins.derivation {
       name = "demo-eval-${system}";
@@ -91,7 +91,7 @@ in
           grep -q '"mailServerEnabled":true' "$renderedPath"
           grep -q '"stalwartEnabled":true' "$renderedPath"
           grep -q '"stalwart016":true' "$renderedPath"
-          grep -q '"hostname":"mail.demo.invalid"' "$renderedPath"
+          grep -q '"hostname":"mail.demo.test"' "$renderedPath"
           grep -q '"httpBind":"0.0.0.0:8080"' "$renderedPath"
           grep -q '"fallbackAdminUser":"admin"' "$renderedPath"
           grep -q 'demo-admin-secret' "$renderedPath"
@@ -103,10 +103,10 @@ in
           grep -q '"provisionWantedBy":"multi-user.target"' "$renderedPath"
           grep -q '"provisionUsesCli":true' "$renderedPath"
           grep -q '"demoIsUserVariant":true' "$renderedPath"
-          grep -q '"demoEmail":"demo@mail.demo.invalid"' "$renderedPath"
+          grep -q '"demoEmail":"demo@mail.demo.test"' "$renderedPath"
           grep -q '"demoHasPassword":true' "$renderedPath"
           grep -q '"demoRolesUser":true' "$renderedPath"
-          grep -q '"catchAllAddress":"catchall@mail.demo.invalid"' "$renderedPath"
+          grep -q '"catchAllAddress":"catchall@mail.demo.test"' "$renderedPath"
           grep -q '"demoAssertionsClean":true' "$renderedPath"
           touch "$out"
         ''
