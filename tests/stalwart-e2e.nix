@@ -534,12 +534,10 @@ in
               timeout=180,
           )
 
-      with subtest("HTTP admin/JMAP answers on loopback"):
-          machine.succeed(
-              "curl -fsSL -o /dev/null -w '%{http_code}' "
-              "http://127.0.0.1:8080/ > /tmp/http-root-code.txt"
-              "&& grep -Eq '200|30[0-9]' /tmp/http-root-code.txt"
-          )
+      # NOTE: no HTTP-root subtest - 0.16's listener root is NOT the webadmin
+      # mount anymore (WebUI lives at /admin as a downloadable Application
+      # bundle; a DNS-less VM cannot even fetch it) and / answers 4xx. The
+      # /jmap subtests below are the loopback-HTTP contract.
 
       with subtest("management: fallback-admin authenticates on /jmap, anonymous rejected"):
           # 0.16: management rides /jmap (the /api/* surface is gone).
