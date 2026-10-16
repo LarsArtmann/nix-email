@@ -667,6 +667,10 @@ in {
               SystemSettings =
                 {
                   defaultHostname = cfg.hostname;
+                  # REQUIRED server-side (0.16 apply: "defaultDomainId:
+                  # required", VM transcript 2026-10-16) - points at the
+                  # wrapper Domain object defined below.
+                  defaultDomainId = "#${wrapperDomainId}";
                 }
                 // lib.optionalAttrs (cfg.certificate.mode == "manual" && cfg.certificate.manual.default) {
                   defaultCertificateId = "#${cfg.certificate.manual.id}";
