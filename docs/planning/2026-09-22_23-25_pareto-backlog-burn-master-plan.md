@@ -328,7 +328,7 @@ Level-A outcomes (evidence: the 02-58 / 03-21 / 05-55 status reports, CHANGELOG 
 
 | Task                              | Verdict                                                                                                       |
 | --------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| T01 decision batch                | OPEN - only the v0.4.0 leg answered; D1/D2/C24/C29/C17/C18-C22/C34/Q4-Q6/g1/g2 still pending (decision-batch) |
+| T01 decision batch                | OPEN - owner calls (decision-batch; C20 mailsuite + C17/C17a push+pin since EXECUTED 2026-10-05, Q6 residue resolved 2026-10-05, C39-C41 batched 2026-10-16) |
 | T02 cut v0.4.0                    | DONE 2026-09-23 (05-55 a/7: tag, push, tag+master CI green, GitHub release Latest)                            |
 | T03 demo hostfwd root-cause       | DONE (02-58 a/3-a/4: guest firewall + systemd-PATH curl; two product bugs fixed)                              |
 | T04 demo re-smoke + withheld docs | DONE (02-58 a/5-a/6: layered transcripts; README/FEATURES/CHANGELOG/AGENTS landed)                            |
@@ -343,11 +343,11 @@ Level-A outcomes (evidence: the 02-58 / 03-21 / 05-55 status reports, CHANGELOG 
 | T13 catch-all ordering            | DONE (doc verdict: README ordering footgun, 02-58 a/10)                                                       |
 | T14 upstream watch                | DONE (02-58 a/1: #663 merged evidence propagated)                                                             |
 | T15 buildflow pass                | DONE (05-55 a/3; dprint pipe-eating incident handled)                                                         |
-| T16 C17 SystemNix push            | OPEN (user-gated)                                                                                             |
+| T16 C17 SystemNix push            | EXECUTED 2026-10-05 (C17/C17a adopted - SystemNix pushed through c6aaa6c5 with the input hard-pinned `?ref=v0.4.0`, contract check green) |
 | T17 Resend live smoke             | OPEN (needs API key from Lars)                                                                                |
-| T18 SystemNix CI debt             | OPEN (gated on T16)                                                                                           |
+| T18 SystemNix CI debt             | PARTIAL - statix sweep + cache sweep done 2026-10-05; the allowlist, 2 pin flips and the branching-flow credential remain (their repo; TODO_LIST SystemNix residue row) |
 | T19 qcow2 history purge           | OPEN (user verdict)                                                                                           |
 | T20 Dependabot branch             | DONE (PR #2 merged, 02-58 a/2)                                                                                |
 | T21 D1 build-out slices           | OPEN (hard-gated on D1+D2)                                                                                    |
-| T22 verdict filings               | OPEN (user-gated: C20/Q6-d/C19/C22)                                                                           |
-| T23 standing pin-bump row         | STANDING - fires on the NEXT nixpkgs bump                                                                     |
+| T22 verdict filings               | EXECUTED 2026-10-05 at the gates - mailsuite FILED as #65, Junk-ask DROPPED (Gate-2: auto-move exists upstream), Restart DROPPED (premise error; #563777 canonical); C19/C22 remain OPEN owner calls |
+| T23 standing pin-bump row         | STANDING - fires on the NEXT nixpkgs bump (trigger updated 2026-10-16: PR #566282 MERGED - the runbook port procedure is mandatory at the first pin past 22579286) |

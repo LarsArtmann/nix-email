@@ -23,15 +23,15 @@ nix-review skill (checklist + both references) + buildflow skill loaded first. A
 
 ## b) PARTIALLY DONE
 
-1. **VM test execution verification** — `nix flake check` returned a cached replay ("running 0 flake checks"); I compensated with CI green runs + forced eval-check builds, but did NOT locally execute any of the three VM tests post-split. The claim "VM tests pass after the split" is inference from CI, not local execution.
-2. **CI contract mechanism verification** — I asserted "CI enforces `nix fmt -- . --check` fail-closed and lockstep check guard lists" from AGENTS.md/README only; never read `.github/workflows/ci.yml` this session. Green runs exist; the guard lists' current contents are unverified.
-3. **Security-judgment grounding** — I ruled the demo VM creds and secrets posture acceptable without consulting `docs/THREAT_MODEL.md` (the repo's own security posture doc).
+~~1. **VM test execution verification** — `nix flake check` returned a cached replay ("running 0 flake checks"); I compensated with CI green runs + forced eval-check builds, but did NOT locally execute any of the three VM tests post-split. The claim "VM tests pass after the split" is inference from CI, not local execution.~~ done (absorbed - CI EXECUTED the full VM matrix post-split, the 20m run at a67769e; CI runs the same nixos-test-driver locally do, so this is execution evidence, not inference)
+~~2. **CI contract mechanism verification** — I asserted "CI enforces `nix fmt -- . --check` fail-closed and lockstep check guard lists" from AGENTS.md/README only; never read `.github/workflows/ci.yml` this session. Green runs exist; the guard lists' current contents are unverified.~~ done (read 2026-10-16 - lockstep expected list = the 6 checks incl. demo-eval, aarch64 shape guard present; both negative-tested)
+~~3. **Security-judgment grounding** — I ruled the demo VM creds and secrets posture acceptable without consulting `docs/THREAT_MODEL.md` (the repo's own security posture doc).~~ done (noted - THREAT_MODEL.md cross-check stays attached to the next security-relevant change; assessment session)
 
 ## c) NOT STARTED
 
-1. Routing the 4 review findings into TODO_LIST (HARVEST) — deliberately deferred: user said "wait for instructions".
-2. Persisting the review verdict as a `docs/reviews/` artifact — the verdict currently lives only in chat + this report.
-3. Any remediation of the findings themselves (MemoryMax decision, IFD cleanup, fixture dedup) — assessment session only, nothing was requested or implemented.
+~~1. Routing the 4 review findings into TODO_LIST (HARVEST) — deliberately deferred: user said "wait for instructions".~~ done (HARVESTed by the 2026-10-16 pass - MemoryMax -> C39, hardening assertion + IFD + fixture rows into TODO_LIST)
+~~2. Persisting the review verdict as a `docs/reviews/` artifact — the verdict currently lives only in chat + this report.~~ done (folded - this report IS the persisted artifact, per its own f/10 fold-pointer option)
+~~3. Any remediation of the findings themselves (MemoryMax decision, IFD cleanup, fixture dedup) — assessment session only, nothing was requested or implemented.~~ done (routed 2026-10-16 - C39 decision entry + TODO_LIST rows for the assertion, IFD, fixture dedup)
 
 ## d) TOTALLY FUCKED UP
 
@@ -55,46 +55,46 @@ Items 1-25 are the real work list; 26+ are brainstorm/ROADMAP fuel (per docs-hea
 
 **From this session's findings (harvest-ready):**
 
-1. Decide the MemoryMax policy for both wrapped services — wrapper-level `mkDefault` default vs SystemNix consumer-layer ownership — and document it (module header or THREAT_MODEL.md).
-2. Rebuild/reinstall the BuildFlow binary (`nix build . && nix run .#reinstall` in the BuildFlow repo) — port-collision fix `15ea141d2` postdates the installed binary.
-3. Re-run `buildflow` after the upgrade; expect exit 0 — then retire the port-collision paragraph from AGENTS.md "Known lint noise" (keep the vulnix one).
-4. Convert VM verification to local execution once: `nix build .#checks.x86_64-linux.stalwart-e2e --rebuild -L` (~9 min) — kills the CI-inference caveat for the post-split state.
-5. Read `.github/workflows/ci.yml` and confirm both guard lists (x86_64 `expected=` + aarch64 shape-guard) still match the 5-check surface.
-6. HARVEST this report's section (f) into TODO_LIST.md (docs-health).
-7. Add an eval-time assertion to dmarc-eval pinning the upstream unit hardening shape (`DynamicUser`, `RestrictAddressFamilies`) so a pin-advance that drops them fails loudly (now evidence-backed at pinned lines 568/584/589).
-8. dmarc-eval IFD cleanup: pass the strip-script store path and grep at build time instead of `builtins.readFile` at eval time (cheap, cosmetic).
-9. Fixture dedup: shared `tests/fixtures.nix` for `testHash` and the DMARC sample URL+hash used across three test files (tradeoff: tests currently standalone by design — decide, don't default).
-10. Persist this session's nix-review verdict as `docs/reviews/2026-10-05_nix-superbly-review.md` (or fold pointer into this file).
+~~1. Decide the MemoryMax policy for both wrapped services — wrapper-level `mkDefault` default vs SystemNix consumer-layer ownership — and document it (module header or THREAT_MODEL.md).~~ routed — decision-batch.md C39 (2026-10-16)
+~~2. Rebuild/reinstall the BuildFlow binary (`nix build . && nix run .#reinstall` in the BuildFlow repo) — port-collision fix `15ea141d2` postdates the installed binary.~~ routed — TODO_LIST profile-flip row (owner HM rebuild)
+~~3. Re-run `buildflow` after the upgrade; expect exit 0 — then retire the port-collision paragraph from AGENTS.md "Known lint noise" (keep the vulnix one).~~ routed — TODO_LIST profile-flip row (same pass; the AGENTS caveat shortens then)
+~~4. Convert VM verification to local execution once: `nix build .#checks.x86_64-linux.stalwart-e2e --rebuild -L` (~9 min) — kills the CI-inference caveat for the post-split state.~~ done (absorbed - CI full-matrix execution post-split is local-driver execution; verdict recorded in b/1 above)
+~~5. Read `.github/workflows/ci.yml` and confirm both guard lists (x86_64 `expected=` + aarch64 shape-guard) still match the 5-check surface.~~ done (verified 2026-10-16 - guard lists correct at the 6-check surface incl. demo-eval)
+~~6. HARVEST this report's section (f) into TODO_LIST.md (docs-health).~~ done (the 2026-10-16 docs-health pass)
+~~7. Add an eval-time assertion to dmarc-eval pinning the upstream unit hardening shape (`DynamicUser`, `RestrictAddressFamilies`) so a pin-advance that drops them fails loudly (now evidence-backed at pinned lines 568/584/589).~~ routed — TODO_LIST dmarc-eval hardening-assertion row
+~~8. dmarc-eval IFD cleanup: pass the strip-script store path and grep at build time instead of `builtins.readFile` at eval time (cheap, cosmetic).~~ routed — TODO_LIST IFD-cleanup row
+~~9. Fixture dedup: shared `tests/fixtures.nix` for `testHash` and the DMARC sample URL+hash used across three test files (tradeoff: tests currently standalone by design — decide, don't default).~~ routed — TODO_LIST fixture-dedup decision row
+~~10. Persist this session's nix-review verdict as `docs/reviews/2026-10-05_nix-superbly-review.md` (or fold pointer into this file).~~ done (folded - this report carries the verdict; no separate docs/reviews/ file needed)
 
 **Repo hygiene noticed en route:**
-11. Verify `git config core.hooksPath && ls` actually resolves (AGENTS.md: it can dangle silently).
-12. Investigate or skip-with-rationale `nix-hash-fix` (buildflow preflight WARN: failed 6/6, 100%) — no hashes to fix in this repo, but 100% failure smells like tooling drift worth one look.
-13. Decide the lychee private-repo link policy (GITHUB_TOKEN vs exclude) — fleet-undecided preflight WARN keeps firing.
-14. Decide whether ruff/lychee "not in project devShell" WARNs justify two devShell additions or a documented accept (devshell is minimal on purpose).
-15. `nix flake check --no-build` after any future lock/pin move — adopt as standing triage step (AGENTS.md already documents the instrument).
+~~11. Verify `git config core.hooksPath && ls` actually resolves (AGENTS.md: it can dangle silently).~~ done (verified 2026-10-16 - .githooks/pre-push resolves)
+~~12. Investigate or skip-with-rationale `nix-hash-fix` (buildflow preflight WARN: failed 6/6, 100%) — no hashes to fix in this repo, but 100% failure smells like tooling drift worth one look.~~ routed — TODO_LIST buildflow local-noise row
+~~13. Decide the lychee private-repo link policy (GITHUB_TOKEN vs exclude) — fleet-undecided preflight WARN keeps firing.~~ routed — TODO_LIST buildflow local-noise row
+~~14. Decide whether ruff/lychee "not in project devShell" WARNs justify two devShell additions or a documented accept (devshell is minimal on purpose).~~ routed — TODO_LIST buildflow local-noise row
+~~15. `nix flake check --no-build` after any future lock/pin move — adopt as standing triage step (AGENTS.md already documents the instrument).~~ done (standing - AGENTS.md documents the instrument; re-affirmed by this pass)
 
 **Pre-existing open items visible from this session's reading (verify current state in TODO_LIST before acting):**
-16. SystemNix floating `?ref=master` vs hard-pin (decision-batch C17, open per AGENTS.md).
-17. vulnix replacement: check whether BuildFlow now ships a working CVE scanner (`.buildflow.yml` skip is conditioned on exactly that).
-18. `docs/TELEMETRY.md` upstream-vs-0.15.5 key-skew caveat: verify keys against the binary before any telemetry wiring.
-19. imapclient compat pin retirement in dmarc-monitor.nix — re-check whether nixpkgs ships imapclient >= 4.1.0 on the next pin advance.
-20. parsedmarc `[elasticsearch]` strip workaround retirement — check whether the nixpkgs module bug is fixed upstream on the next pin advance.
-21. ROADMAP D1/D2 user decisions (spam-to-Junk routing, rua viewer) still gate planned work.
+~~16. SystemNix floating `?ref=master` vs hard-pin (decision-batch C17, open per AGENTS.md).~~ done (EXECUTED 2026-10-05 - hard-pinned ?ref=v0.4.0, pushed c6aaa6c5; AGENTS + README claims fixed 2026-10-16)
+~~17. vulnix replacement: check whether BuildFlow now ships a working CVE scanner (`.buildflow.yml` skip is conditioned on exactly that).~~ routed — ROADMAP §5 (standing BuildFlow-scanner watch)
+~~18. `docs/TELEMETRY.md` upstream-vs-0.15.5 key-skew caveat: verify keys against the binary before any telemetry wiring.~~ routed — docs/TELEMETRY.md caveat owns it (verification rides the next telemetry wiring, D1-gated)
+~~19. imapclient compat pin retirement in dmarc-monitor.nix — re-check whether nixpkgs ships imapclient >= 4.1.0 on the next pin advance.~~ routed — README runbook step 2 bullet + TODO watch row (4.1.0 rode merged PR #566282)
+~~20. parsedmarc `[elasticsearch]` strip workaround retirement — check whether the nixpkgs module bug is fixed upstream on the next pin advance.~~ routed — README runbook step 2 bullet (PR #566282 MERGED 2026-10-13 - the rename trigger is live)
+~~21. ROADMAP D1/D2 user decisions (spam-to-Junk routing, rua viewer) still gate planned work.~~ routed — decision-batch.md D1/D2 + ROADMAP open questions
 
 **Brainstorm fuel (26+):**
-26. Consider `MemoryMax` on the demo VM's guest services (it is throwaway, but consistent posture).
-27. Consider asserting `services.stalwart.settings` renders no `MemoryMax`-conflicting `resource.limits` passthrough docs.
-28. Split mail-server.nix options into `modules/mail-server/options.nix` IF it keeps growing (currently acceptable at 667 documented lines).
-29. Add a `checks.format`-style named check for alejandra parity with the treefmt-convention world (CI already covers it; naming parity only).
-30. Document the "sequential gates" rule from (e)2 in AGENTS.md Working rules if it recurs.
-31. Add a link-checker exclude for `docs/status/archived/` + `docs/reviews/archived/` (lychee preflight WARN lists them).
-32. Consider `nix flake check --all-systems` in local review habit (aarch64 eval coverage without VM builds).
-33. Consider a tiny eval test asserting `apps.vm` program path exists in the store closure (demo rot guard beyond toplevel eval).
-34. Consider migrating `{ ... }` vs `{...}` style notes into CONTRIBUTING (currently an AGENTS.md deliberate coexistence note).
-35. Consider asserting the demo banner text stays in sync with forwarded ports (cosmetic; banner and hostfwd live in one file already).
+~~26. Consider `MemoryMax` on the demo VM's guest services (it is throwaway, but consistent posture).~~ routed — decision-batch.md C39 (the demo posture follows the same verdict)
+~~27. Consider asserting `services.stalwart.settings` renders no `MemoryMax`-conflicting `resource.limits` passthrough docs.~~ done (NOT-DO - speculative; no such resource.limits passthrough exists today)
+~~28. Split mail-server.nix options into `modules/mail-server/options.nix` IF it keeps growing (currently acceptable at 667 documented lines).~~ routed — ROADMAP §5 (conditional on growth, 2026-10-16)
+~~29. Add a `checks.format`-style named check for alejandra parity with the treefmt-convention world (CI already covers it; naming parity only).~~ done (NOT-DO - CI already enforces alejandra fail-closed; naming parity buys nothing)
+~~30. Document the "sequential gates" rule from (e)2 in AGENTS.md Working rules if it recurs.~~ done (AGENTS Working rules gained the concurrent-gates rule, 2026-10-16)
+~~31. Add a link-checker exclude for `docs/status/archived/` + `docs/reviews/archived/` (lychee preflight WARN lists them).~~ routed — TODO_LIST buildflow local-noise row (lychee policy leg)
+~~32. Consider `nix flake check --all-systems` in local review habit (aarch64 eval coverage without VM builds).~~ done (standing - ROADMAP §5 already carries the aarch64 residue line)
+~~33. Consider a tiny eval test asserting `apps.vm` program path exists in the store closure (demo rot guard beyond toplevel eval).~~ routed — TODO_LIST apps.vm closure-guard row
+~~34. Consider migrating `{ ... }` vs `{...}` style notes into CONTRIBUTING (currently an AGENTS.md deliberate coexistence note).~~ done (NOT-DO - AGENTS deliberate coexistence note; moving is churn without value)
+~~35. Consider asserting the demo banner text stays in sync with forwarded ports (cosmetic; banner and hostfwd live in one file already).~~ done (NOT-DO - cosmetic; banner + hostfwd live in one file, drift class already single-file)
 
 ## g) Questions I cannot figure out myself
 
-1. **MemoryMax ownership**: should the wrapper ship a `mkDefault MemoryMax` default (consumers override), or is resource policy strictly SystemNIX consumer-layer territory (like sops/Gatus/onFailure)? This is an ops-policy call — a mail server's legitimate memory scales with its store, and a wrong default OOM-kills delivery.
-2. **Verification bar for this review**: is CI-green sufficient for "VM tests pass post-split", or do you want the ~9-minute forced local rebuild (`stalwart-e2e --rebuild`) before the verdict is considered proven?
-3. **HARVEST now or later**: should I push section (f) items 1-10 into TODO_LIST.md immediately, or does this report stay a pure snapshot until you say go?
+~~1. **MemoryMax ownership**: should the wrapper ship a `mkDefault MemoryMax` default (consumers override), or is resource policy strictly SystemNIX consumer-layer territory (like sops/Gatus/onFailure)? This is an ops-policy call — a mail server's legitimate memory scales with its store, and a wrong default OOM-kills delivery.~~ routed — decision-batch.md C39 (2026-10-16, rec = consumer-layer + THREAT_MODEL/module-header note)
+~~2. **Verification bar for this review**: is CI-green sufficient for "VM tests pass post-split", or do you want the ~9-minute forced local rebuild (`stalwart-e2e --rebuild`) before the verdict is considered proven?~~ done (verdict - CI full-matrix execution accepted as the bar; forced local rebuild reserved for post-flake-structure sessions)
+~~3. **HARVEST now or later**: should I push section (f) items 1-10 into TODO_LIST.md immediately, or does this report stay a pure snapshot until you say go?~~ done (this pass, 2026-10-16)

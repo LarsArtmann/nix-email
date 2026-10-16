@@ -111,52 +111,52 @@
 
 ## b) PARTIALLY DONE
 
-1. **T13 overall** - the port-collision half is DONE upstream and verified
+~~1. **T13 overall** - the port-collision half is DONE upstream and verified~~ done at `af5eb80` (port-collision half upstreamed + verified; dprint half routed — TODO_LIST T13b row)
    (a/4-a/5). The OTHER half (T13b: dprint's markdown pipe-cell handling,
    the eaten-rows class at the source) is NOT STARTED: the bug lives in
    dprint's markdown plugin (external project), and nix-email's own
    `check-md-table-pipes.sh` remains the working mitigation. Remaining
    effort: L (verify-before-filing gate + upstream investigation).
-2. **exit-69 retirement** - the fix is landed and step-verified, but the
+~~2. **exit-69 retirement** - the fix is landed and step-verified, but the~~ routed — TODO_LIST profile-flip row (owner HM rebuild to a build >= 15ea141d2)
    INSTALLED gate binary is home-manager-managed (store rev `3bb229e`,
    root-owned symlink; I deliberately did not touch the user profile). Full
    buildflow runs here still exit 69 with the same 4 known findings until
    the profile flips to >= `15ea141d2`. Effort to finish: one HM rebuild
    (owner-side), then shorten the AGENTS caveat.
-3. **SystemNix canary allowlist (their TODO 509)** - now FULLY specced
+~~3. **SystemNix canary allowlist (their TODO 509)** - now FULLY specced~~ routed — TODO_LIST SystemNix residue row (their TODO 509; re_bzp5m provenance call included)
    (complete hit inventory, digest-based approach, the re_bzp5m
    judge-first flag) but NOT implemented: it is a SystemNix-internal policy
    call, re-confirmed as such. Blocked on g/3 below.
-4. **SystemNix branching-flow CI fix** - diagnosed to the exact fix shape
+~~4. **SystemNix branching-flow CI fix** - diagnosed to the exact fix shape~~ routed — TODO_LIST SystemNix residue row (owner secrets console)
    (Actions credential for a private input) but needs the owner's secrets
    console; `[blocked:user]` row filed, nothing codeable from here.
-5. **InboxClean CI** - triaged to "jobs fail with zero steps, logs
+~~5. **InboxClean CI** - triaged to "jobs fail with zero steps, logs~~ done (NOT ours - setup-level zero-step failures, their debt; 11-14 a/8)
    unarchivable"; root cause unknown, not fixable from this side.
-6. **The 10-29 report's f/20-f/50 backlog** - untouched this session
+~~6. **The 10-29 report's f/20-f/50 backlog** - untouched this session~~ done (carried into f/ below by its own note - resolved there)
    (deliberate: this session executed the unblocked high-leverage set).
    The still-relevant items are carried forward into f/ below so the
    harvest does not lose them.
 
 ## c) NOT STARTED
 
-1. **v0.5.0 release cut** - the CHANGELOG `[Unreleased]` is now complete and
+~~1. **v0.5.0 release cut** - the CHANGELOG `[Unreleased]` is now complete and~~ routed — decision-batch.md C40 + TODO_LIST release row
    release-ready; gated on the release-timing call (g/1). Payload: JMAP
    subtest + contract doc + CI hardening + flake split + fixture breadth.
-2. **T17** Resend live `:587` SASL smoke - needs the real API key.
-3. **T19** qcow2 history purge - needs explicit force-push approval (or the
+~~2. **T17** Resend live `:587` SASL smoke - needs the real API key.~~ routed — TODO_LIST blocked row (needs the real API key)
+~~3. **T19** qcow2 history purge - needs explicit force-push approval (or the~~ routed — TODO_LIST blocked row
    accept-weight verdict).
-4. **T20** D1-gated enablement slice (secrets rotation, live dmarc
+~~4. **T20** D1-gated enablement slice (secrets rotation, live dmarc~~ routed — TODO_LIST Gated-on-D1 rows
    validation, migration compare, M22) - needs D1/D2 + real infrastructure.
-5. **T21** monitoring encoding (Gatus checks, queue poll, failed-auth burst,
+~~5. **T21** monitoring encoding (Gatus checks, queue poll, failed-auth burst,~~ routed — ROADMAP §4 + docs/MONITORING.md (C24/C29)
    dead-man) - needs C24/C29.
-6. **T13b** dprint pipe-cell upstream work (see b/1).
-7. **SystemNix**: the 2 remaining pin flips; CI-green confirmation after
+~~6. **T13b** dprint pipe-cell upstream work (see b/1).~~ routed — TODO_LIST T13b row
+~~7. **SystemNix**: the 2 remaining pin flips; CI-green confirmation after~~ routed — TODO_LIST SystemNix residue row
    their branching-flow fix lands.
-8. **InboxClean**: wiring the T4 push-quirk into their adapter as a
+~~8. **InboxClean**: wiring the T4 push-quirk into their adapter as a~~ done (NOT ours - their adapter; the rule lives in docs/INBOXCLEAN.md)
    documented client rule.
-9. **Owner policy batch** (unchanged): D1, D2, C18, C19, C22, C34, Q4, Q5,
+~~9. **Owner policy batch** (unchanged): D1, D2, C18, C19, C22, C34, Q4, Q5,~~ routed — decision-batch.md (C39-C41 batched 2026-10-16)
    C36, C37, demo g1/g2, qcow2 verdict.
-10. **Post-flip cleanup** (after the HM buildflow flip): one full gate run
+~~10. **Post-flip cleanup** (after the HM buildflow flip): one full gate run~~ routed — TODO_LIST profile-flip row (same pass)
     here expecting EXIT:0, then reduce the AGENTS caveat to a history line.
 
 ## d) TOTALLY FUCKED UP (honest failure log)
@@ -240,129 +240,129 @@ Sorted by leverage; the first ten are the real queue. This section is the
 HARVEST input for TODO_LIST/ROADMAP (most gated items already live there;
 items 4-7, 17-18, 37-47 are new from this session).
 
-1. Ratify or override the four executed `[rec]` adoptions (C35, C17/C17a,
+~~1. Ratify or override the four executed `[rec]` adoptions (C35, C17/C17a,~~ routed — decision-batch.md Agent-execution adoptions (standing)
    C20, C38) and answer g/1-g/3 below - unblocks the release, the
    allowlist, and the pin verdicts. High/S/Decision
-2. Cut **v0.5.0**: annotated tag -> tag-CI -> gh release. The CHANGELOG is
+~~2. Cut **v0.5.0**: annotated tag -> tag-CI -> gh release. The CHANGELOG is~~ routed — decision-batch.md C40 + TODO_LIST release row
    ready; payload documented. High/S/Release
-3. Flip the home-manager buildflow profile to >= `15ea141d2`, run ONE full
+~~3. Flip the home-manager buildflow profile to >= `15ea141d2`, run ONE full~~ routed — TODO_LIST profile-flip row
    gate here (expect EXIT:0), then shorten the AGENTS caveat to a history
    line. High/S/Tooling
-4. SystemNix: add an Actions credential for the private branching-flow
+~~4. SystemNix: add an Actions credential for the private branching-flow~~ routed — TODO_LIST SystemNix residue row
    input (deploy key or PAT), flip the input URL, confirm their CI green.
    High/S/Infra (owner console)
-5. SystemNix: implement the digest-based canary allowlist (TODO 509, now
+~~5. SystemNix: implement the digest-based canary allowlist (TODO 509, now~~ routed — TODO_LIST SystemNix residue row
    fully specced) - blocked on g/3. High/M/Security
-6. Triage BuildFlow's Build Gate red (`go build ./cmd/buildflow`, 6+
+~~6. Triage BuildFlow's Build Gate red (`go build ./cmd/buildflow`, 6+~~ routed — TODO_LIST BuildFlow upstream row
    consecutive failures, no failing step, logs unarchivable) - and the
    Lint Gate red. High/M/Bug (upstream infra)
-7. Reconcile the nix-checker summary-vs-detail finding-count gap (12 vs 2)
+~~7. Reconcile the nix-checker summary-vs-detail finding-count gap (12 vs 2)~~ routed — TODO_LIST BuildFlow upstream row
    in the new binary. Medium/S/Quality
-8. **T17**: Resend live `:587` SASL smoke (needs the real API key).
+~~8. **T17**: Resend live `:587` SASL smoke (needs the real API key).~~ routed — TODO_LIST blocked row
    High/S/Feature (gated)
-9. **T19**: qcow2 history purge or record the accept-weight verdict
+~~9. **T19**: qcow2 history purge or record the accept-weight verdict~~ routed — TODO_LIST blocked row
    (force-push approval needed). Low/M/Cleanup (gated)
-10. **T20**: D1-gated enablement slice (rotate 3 secrets, live dmarc
+~~10. **T20**: D1-gated enablement slice (rotate 3 secrets, live dmarc~~ routed — TODO_LIST Gated-on-D1 rows
     validation, migration compare, M22). High/M/Feature (gated)
-11. **T21**: monitoring encoding (Gatus starttls/tls/cert, queue depth/age,
+~~11. **T21**: monitoring encoding (Gatus starttls/tls/cert, queue depth/age,~~ routed — ROADMAP §4 + docs/MONITORING.md
     failed-auth burst, dead-man). High/M/Feature (gated)
-12. Answer **D1** (Workspace) / **D2** (VPS) - unblocks T20 + the
+~~12. Answer **D1** (Workspace) / **D2** (VPS) - unblocks T20 + the~~ routed — decision-batch.md D1/D2
     production ROADMAP half. High/S/Decision
-13. Answer the policy batch: C18, C19, C22, C34, Q4, Q5, C36, C37, demo
+~~13. Answer the policy batch: C18, C19, C22, C34, Q4, Q5, C36, C37, demo~~ routed — decision-batch.md
     g1/g2, qcow2 verdict. Medium/S/Decision
-14. **T13b**: investigate dprint's markdown pipe-cell behavior upstream
+~~14. **T13b**: investigate dprint's markdown pipe-cell behavior upstream~~ routed — TODO_LIST T13b row
     (verify-before-filing gate first). Medium/L/Bug (external)
-15. Watch nixpkgs PR #566282 (imapclient 4.1.0 + `provision.opensearch`
+~~15. Watch nixpkgs PR #566282 (imapclient 4.1.0 + `provision.opensearch`~~ done (MERGED 2026-10-13, 22579286 - runbook step 2 now MANDATORY at the first pin past it; TODO watch row updated 2026-10-16)
     rename); when merged, run README runbook step 2's port procedure
     BEFORE the next pin bump. High/S/Watch
-16. Re-check mailsuite#65 + nixpkgs#563651/#563777 on the next watch
+~~16. Re-check mailsuite#65 + nixpkgs#563651/#563777 on the next watch~~ done (re-checked 2026-10-16 - all still OPEN; watch row updated)
     cadence; track #566282's mailsuite 4.6.5 bump for fixture drift.
     Medium/S/Watch
-17. Explain the SystemNix scheduled-vs-push CI divergence (a 07:25Z
+~~17. Explain the SystemNix scheduled-vs-push CI divergence (a 07:25Z~~ routed — TODO_LIST SystemNix residue row
     schedule run went green while pushes stayed red - different job set?).
     Medium/S/Infra
-18. InboxClean: triage their setup-level CI failure (jobs with zero steps).
+~~18. InboxClean: triage their setup-level CI failure (jobs with zero steps).~~ done (NOT ours - 11-14 a/8 verdict stands)
     Medium/S/Bug (their repo)
-19. InboxClean: wire the T4 push-quirk (`{closeafter}`/`{ping}` rejected on
+~~19. InboxClean: wire the T4 push-quirk (`{closeafter}`/`{ping}` rejected on~~ done (NOT ours - their adapter; docs/INBOXCLEAN.md carries the rule)
     0.15.5) into their adapter as a documented client rule. Medium/S/Feature
-20. Add a JMAP push e2e assertion (EventSource 200 on `?types=Email`) to
+~~20. Add a JMAP push e2e assertion (EventSource 200 on `?types=Email`) to~~ routed — TODO_LIST JMAP anti-rot pair row
     stalwart-e2e - cheap anti-rot. Medium/S/Quality
-21. Verify the per-account Junk-filing JMAP automation path end-to-end
+~~21. Verify the per-account Junk-filing JMAP automation path end-to-end~~ routed — TODO_LIST JMAP anti-rot pair row
     (push + Mailbox/set fileinto): with Q6's hard-coded-move finding, the
     automation path is THE declarative path this stack will ever have.
     Medium/M/Feature
-22. Make `scripts/host-parse-fixture.py` a flake app
+~~22. Make `scripts/host-parse-fixture.py` a flake app~~ routed — TODO_LIST flake-app row
     (`nix run .#host-parse -- <fixture>`). Low/S/Cleanup
-23. Extend `check-md-table-pipes.sh`: argless mode defaulting to
+~~23. Extend `check-md-table-pipes.sh`: argless mode defaulting to~~ routed — TODO_LIST pipe-lint row
     `git ls-files` + indented-fence coverage. Low/S/Quality
-24. Add the `arrival_date_utc` timezone-normalization assertion class to
+~~24. Add the `arrival_date_utc` timezone-normalization assertion class to~~ done (AGENTS fixture-traps updated 2026-10-16)
     the AGENTS fixture-traps list. Low/S/Docs
-25. Consider TLS-node coverage for the two new parsedmarc fixtures (they
+~~25. Consider TLS-node coverage for the two new parsedmarc fixtures (they~~ routed — TODO_LIST TLS-node row
     ride the plaintext node only). Low/M/Quality
-26. Re-read the ci.yml lockstep/shape guard lists once post-session (they
+~~26. Re-read the ci.yml lockstep/shape guard lists once post-session (they~~ done (verified 2026-10-16 - expected list = the 6 checks incl. demo-eval; shape guard intact)
     should exclude `scripts/` - verify, do not assume). Low/S/Quality
-27. README demo section: add the one-VM-per-qcow2 write-lock note (bit
+~~27. README demo section: add the one-VM-per-qcow2 write-lock note (bit~~ done (README demo section note added 2026-10-16)
     InboxClean's spike). Low/S/Docs
-28. Pin the VM debug-driver recipe (GC root + `--test-script`) as a script.
+~~28. Pin the VM debug-driver recipe (GC root + `--test-script`) as a script.~~ routed — TODO_LIST debug-driver script row
     Low/S/Tooling
-29. Extend the docs-health sweep rule to cover `docs/probes/` (the
+~~29. Extend the docs-health sweep rule to cover `docs/probes/` (the~~ done (AGENTS Documentation map updated 2026-10-16)
     Documentation map names the dir; the sweep rule does not yet).
     Low/S/Docs
-30. F22.3 verdict: accept ~21 KB as the AGENTS floor (recommended) or
+~~30. F22.3 verdict: accept ~21 KB as the AGENTS floor (recommended) or~~ routed — decision-batch.md C41
     define an enforced budget. Low/S/Decision
-31. Archive/supersede the 2026-09-22 master plans once their M/T-number
+~~31. Archive/supersede the 2026-09-22 master plans once their M/T-number~~ done (both plans archived 2026-10-16 by this pass after their stale verdicts were updated inline)
     references are harvested. Low/S/Docs
-32. Evaluate removing the interrogate/jest "N tools unavailable" noise via
+~~32. Evaluate removing the interrogate/jest "N tools unavailable" noise via~~ routed — TODO_LIST buildflow local-noise row
     proper skip configs. Low/S/Tooling
-33. `buildflow timings --regressions` cleanup (govulncheck +758 percent
+~~33. `buildflow timings --regressions` cleanup (govulncheck +758 percent~~ routed — TODO_LIST buildflow local-noise row
     noise). Low/S/Tooling
-34. Invite SystemNix's inboxclean-paperless check to assert the v0.4.0 TAG
+~~34. Invite SystemNix's inboxclean-paperless check to assert the v0.4.0 TAG~~ routed — TODO_LIST SystemNix residue row (their repo)
     (their contract check pins the input, not tag semantics).
     Low/S/Quality (their repo)
-35. Audit that every fine task executed via daemon commits has its evidence
+~~35. Audit that every fine task executed via daemon commits has its evidence~~ done (cross-checked by the 2026-10-16 pass - CHANGELOG b1deb35 + the living docs carry the evidence)
     landed (f/44 of the 10-29 report). Low/M/Docs
-36. Explore upstream auto-move-to-Junk on NEWER stalwart (0.16+) during the
+~~36. Explore upstream auto-move-to-Junk on NEWER stalwart (0.16+) during the~~ routed — ROADMAP open question 6 (0.16+ re-check)
     stalwart-passing watch: Q6 proved NO key exists in 0.15.5; the 0.16+
     question is the only open form. Low/S/Watch
-37. Record the AGAINST decision on seeding JMAP facts into the README
+~~37. Record the AGAINST decision on seeding JMAP facts into the README~~ done (NOT-DO - duplication risk; quickstart + docs/INBOXCLEAN.md carry the facts)
     ledger (the quickstart already carries them; duplication risk).
     Low/S/Docs (likely DROP)
-38. BuildFlow: document the masking semantics + privileged threshold in
+~~38. BuildFlow: document the masking semantics + privileged threshold in~~ routed — TODO_LIST BuildFlow upstream row
     user-facing docs. Low/S/Docs (upstream)
-39. BuildFlow: consider exposing the 1024 threshold as config with the
+~~39. BuildFlow: consider exposing the 1024 threshold as config with the~~ routed — TODO_LIST BuildFlow upstream row
     current value as default. Low/S/Feature (upstream)
-40. Update SystemNix's nix-email-contract to also assert tag semantics
+~~40. Update SystemNix's nix-email-contract to also assert tag semantics~~ routed — TODO_LIST SystemNix residue row
     when their profile/pin story settles. Low/S/Quality
-41. Next docs-health pass at the next release boundary (audit cadence).
+~~41. Next docs-health pass at the next release boundary (audit cadence).~~ done (this pass, 2026-10-16)
     Low/M/Docs
-42. Sweep remaining /tmp session scratch (driver logs) if any survive.
+~~42. Sweep remaining /tmp session scratch (driver logs) if any survive.~~ done (11-14 a/9 trashed the session artifacts; nothing repo-critical)
     Low/S/Cleanup
-43. Consider a `BUILDFLOW_TELEMETRY_DISABLED=true` note for CI-adjacent
+~~43. Consider a `BUILDFLOW_TELEMETRY_DISABLED=true` note for CI-adjacent~~ routed — TODO_LIST buildflow local-noise row
     runs (observed 403 telemetry noise in step output). Low/S/Tooling
-44. Verify `nix flake show`/FEATURES describes the devShell surface
+~~44. Verify `nix flake show`/FEATURES describes the devShell surface~~ done (FEATURES devShell row updated 2026-10-16 - actionlint + shellcheck named as CI-parity members)
     correctly now that actionlint+shellcheck are intentional members.
     Low/S/Docs
-45. Fleet hygiene: once repos' buildflow flips, REMOVE their accepted
+~~45. Fleet hygiene: once repos' buildflow flips, REMOVE their accepted~~ done (NOT ours - BuildFlow fleet-side baseline machinery; verify there after each flip)
     port-collision baseline entries (accepted noise that no longer exists
     - the baseline-staleness machinery should catch this; verify it does).
       Low/S/Quality (upstream fleet)
-46. Add mask-function edge cases (CRLF files, no-trailing-newline) to the
+~~46. Add mask-function edge cases (CRLF files, no-trailing-newline) to the~~ routed — TODO_LIST BuildFlow upstream row
     checker's test table. Low/S/Quality (upstream)
-47. Answer this report's g/1-g/3 - gates several items above.
+~~47. Answer this report's g/1-g/3 - gates several items above.~~ done (g/1 -> C40; g/2 -> decision-batch standing; g/3 -> their TODO 509 via the SystemNix row)
     High/S/Decision
 
 ## g) QUESTIONS FOR YOU (not answerable from the repo)
 
-1. **Release timing**: cut **v0.5.0 NOW** (CHANGELOG `[Unreleased]` is
+~~1. **Release timing**: cut **v0.5.0 NOW** (CHANGELOG `[Unreleased]` is~~ routed — decision-batch.md C40 (2026-10-16)
    complete; tag -> tag-CI -> gh release), or do releases wait for a
    boundary you pick? I tagged nothing - an annotated public release is
    irreversible-ish and stays your call.
-2. **Ratification**: confirm the four executed `[rec]` adoptions as
+~~2. **Ratification**: confirm the four executed `[rec]` adoptions as~~ routed — decision-batch.md Agent-execution adoptions (standing)
    RESOLVED - C35 (JMAP seam executed), C17/C17a (SystemNix pushed +
    hard-pinned `?ref=v0.4.0`), C20 (mailsuite#65 public), C38 (daemon-flush
    followed) - or name overrides and I will revert the pin / comment on the
    issue.
-3. **SystemNix `re_bzp5m`**: the two June-2026 history blobs (session-131B
+~~3. **SystemNix `re_bzp5m`**: the two June-2026 history blobs (session-131B~~ routed — TODO_LIST SystemNix residue row (their TODO 509 digest-allowlist call)
    archive) matching the Resend-key pattern - deliberate canary
    (digest-allowlist it) or a real since-rotated key (rotate now, then
    allowlist)? I refused to read or print the blob content, and nothing in
