@@ -683,14 +683,24 @@ in
           # against a LIVE server with an incremental plan (Domain upsert
           # patch + new Account), the exact workflow runtime account
           # provisioning uses. IMAP LOGIN is by full EMAIL ADDRESS in 0.16.
-          machine.succeed("cat > /tmp/catchall-plan.ndjson <<'PLAN'\n{\"@type\":\"upsert\",\"object\":\"Domain\",\"value\":{\"domain\":{\"catchAllAddress\":\"catchall@example.test\"}}}\n{\"@type\":\"upsert\",\"object\":\"Account\",\"value\":{\"catchall\":{\"@type\":\"User\",\"name\":\"catchall\",\"domainId\":\"#domain\",\"roles\":{\"@type\":\"User\"},\"credentials\":[{\"@type\":\"Password\",\"secret\":\"${testPass}\"}]}}}\nPLAN")
-          machine.succeed(
+          machine.succeed("cat > /tmp/catchall-plan.ndjson <<'PLAN'\n{\"@type\":\"upsert\",\"object\":\"Account\",\"value\":{\"catchall\":{\"@type\":\"User\",\"name\":\"catchall\",\"domainId\":\"#domain\",\"roles\":{\"@type\":\"User\"},\"credentials\":[{\"@type\":\"Password\",\"secret\":\"${testPass}\"}]}}}\n{\"@type\":\"upsert\",\"object\":\"Domain\",\"value\":{\"domain\":{\"catchAllAddress\":\"catchall@example.test\"}}}\nPLAN")
+          # Plan ORDER matters: the Account must be created BEFORE the
+          # Domain patch - catchAllAddress validation resolves its target
+          # address, and a Domain-first plan fails at runtime with the
+          # account still missing (the boot path gets this ordering from
+          # the vendored module's topo-sort). The apply log is dumped even
+          # on failure: a silent log cost one full VM run (2026-10-16).
+          applyStatus = machine.execute(
               "STALWART_URL=http://127.0.0.1:8080 STALWART_USER=admin "
               "STALWART_PASSWORD=test-admin-secret "
               "stalwart-cli apply --file /tmp/catchall-plan.ndjson"
               " > /tmp/catchall-apply.log 2>&1"
-          )
+          )[0]
           machine.succeed("cat /tmp/catchall-apply.log >&2")
+          assert applyStatus == 0, (
+              f"catch-all stalwart-cli apply failed (exit {applyStatus}) - "
+              "see the /tmp/catchall-apply.log dump above"
+          )
           machine.succeed(
               "swaks --timeout 120 --server 127.0.0.1:587 --tls --auth PLAIN "
               "--auth-user user1@example.test --auth-password '${testPass}' "
