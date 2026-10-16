@@ -3,10 +3,13 @@
 > **STATUS (2026-10-05, post-execution): SUPERSEDED as a status source.**
 > The per-task statuses below are PRE-execution. The authoritative
 > verdicts live in `TODO_LIST.md` (struck rows with evidence) and
-> `docs/status/2026-10-05_10-29_pareto-execution-jmap-seam-flake-split-ci-hardening.md`
-> (15/23 tasks fully executed and verified; T13/T17/T19/T20/T21 remain
-> gated as listed in this file's §4). Do NOT re-execute struck tasks
-> from this file.
+> `docs/status/archived/2026-10-05_10-29_pareto-execution-jmap-seam-flake-split-ci-hardening.md`
+> (15/23 tasks fully executed and verified; T13 was since completed
+> upstream - BuildFlow `15ea141d2` - with the profile-flip residue in
+> TODO_LIST; T17/T19/T20/T21 remain gated as listed in this file's §4).
+> Do NOT re-execute struck tasks from this file.
+> ARCHIVED 2026-10-16 under the routed-bar policy (AGENTS.md
+> Documentation map) by that date's docs-health pass.
 
 - **Date:** 2026-10-05 08:01 CEST (`date` CLI)
 - **Input:** `TODO_LIST.md` (30 open rows: 4 High JMAP-seam, 2 Medium, 10 Low hygiene, 3 D1-gated, 11 user-blocked) + `docs/planning/decision-batch.md` (17 open owner calls, every one with a staged `[rec]`) + the 2026-10-05 status-report residue (7 unrouted-then-routed small items).

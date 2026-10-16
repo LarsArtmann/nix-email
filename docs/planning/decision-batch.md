@@ -1,10 +1,10 @@
 # Decision Batch — every open call, one page
 
-| Field         | Value                                                                                                                              |
-| ------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| Date          | 2026-09-22 (execution session)                                                                                                     |
+| Field         | Value                                                                                                                                       |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| Date          | 2026-09-22 (execution session)                                                                                                              |
 | Purpose       | Unblock the 19 decision-gated todos (Pareto plan M2; plan file `archived/2026-09-22_19-23_pareto-master-plan-super-email-monitoring.md` §1) |
-| How to answer | Reply with the decision IDs (`D1: retire`, `C24: discord`, ...). Defaults marked **[rec]** execute on your go.                     |
+| How to answer | Reply with the decision IDs (`D1: retire`, `C24: discord`, ...). Defaults marked **[rec]** execute on your go.                              |
 
 ## The big two (gate ~15 todos incl. the entire production build-out)
 
@@ -173,14 +173,15 @@ unset forever means a runaway stalwart is bounded only by the host.
 ### C40 — v0.5.0 release timing (new 2026-10-16, carried from the 11-14 report g/1)
 
 CHANGELOG `[Unreleased]` is release-ready: JMAP subtest + `docs/INBOXCLEAN.md`
-+ probe transcripts, CI hardening pair (md-table-pipe lint, statix step,
-pre-push inventory mirror), `flake.nix` split, parsedmarc breadth fixtures,
-`scripts/host-parse-fixture.py`, `demo-eval`, SECURITY.md.
 
-- **[rec] Cut now** — the payload is a release-worthy surface and the
+- probe transcripts, CI hardening pair (md-table-pipe lint, statix step,
+  pre-push inventory mirror), `flake.nix` split, parsedmarc breadth fixtures,
+  `scripts/host-parse-fixture.py`, `demo-eval`, SECURITY.md.
+
+* **[rec] Cut now** — the payload is a release-worthy surface and the
   SystemNix hard-pin (`?ref=v0.4.0`) would happily ride a newer tag.
-- Unblocks: the v0.5.0 TODO row; the next docs-health pass boundary.
-- Cost of delay: `[Unreleased]` keeps growing; consumers pin a stale tag.
+* Unblocks: the v0.5.0 TODO row; the next docs-health pass boundary.
+* Cost of delay: `[Unreleased]` keeps growing; consumers pin a stale tag.
 
 ### C41 — AGENTS.md size floor (new 2026-10-16, F22.3 verdict call)
 

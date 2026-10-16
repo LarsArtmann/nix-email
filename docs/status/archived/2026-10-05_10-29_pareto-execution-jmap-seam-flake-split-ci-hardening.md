@@ -136,40 +136,40 @@
 ## b) PARTIALLY DONE
 
 ~~1. **F22.3 AGENTS diet**: 20,950 → 20,813 bytes (~150 bytes of honest~~ routed — decision-batch.md C41 (2026-10-16: ~21 KB accepted as the floor, no gate)
-   dedupe). Verdict recorded: ~21 KB is the floor without deleting
-   distinct paid-for lessons; the 15 KB target was aspirational and no
-   gate enforces size in this repo. Deeper cuts = memory loss.
+dedupe). Verdict recorded: ~21 KB is the floor without deleting
+distinct paid-for lessons; the 15 KB target was aspirational and no
+gate enforces size in this repo. Deeper cuts = memory loss.
 ~~2. **T14 SystemNix CI-debt**: statix sweep + cache sweep done; the~~ routed — TODO_LIST SystemNix residue row (2026-10-16: statix + caches done here; allowlist/credential/pin-flips remain, their repo)
-   secret-history canary allowlist (their TODO 509, GH013 doctrine
-   choice) and the 2 remaining pin flips NOT done — SystemNix-internal
-   policy calls, left for their own sitting.
+secret-history canary allowlist (their TODO 509, GH013 doctrine
+choice) and the 2 remaining pin flips NOT done — SystemNix-internal
+policy calls, left for their own sitting.
 ~~3. **T13 BuildFlow upstream fix**: NOT STARTED (deliberately~~ done at `af5eb80` (port-collision half upstreamed + verified; dprint half routed — TODO_LIST T13b row)
-   deprioritized below JMAP/CI work; it is the biggest recurring tax —
-   exit-69 posture and the dprint pipe-cell bug live there).
+deprioritized below JMAP/CI work; it is the biggest recurring tax —
+exit-69 posture and the dprint pipe-cell bug live there).
 ~~4. **Pipe-lint coverage**: fences recognized at column 0 only~~ routed — TODO_LIST pipe-lint row (argless mode + indented fences)
-   (documented in the script); indented fences inside lists are a
-   known gap.
+(documented in the script); indented fences inside lists are a
+known gap.
 ~~5. **Plan-document status**: `docs/planning/2026-10-05_08-01…md` still~~ done at `537b832` (SUPERSEDED banner; archived 2026-10-16 by this pass)
-   shows raw 🔴/⏸/👤 statuses — TODO_LIST rows carry the real state
-   (all executed rows struck with verdicts), but the plan doc itself is
-   now stale vs reality.
+shows raw 🔴/⏸/👤 statuses — TODO_LIST rows carry the real state
+(all executed rows struck with verdicts), but the plan doc itself is
+now stale vs reality.
 
 ## c) NOT STARTED
 
 ~~1. **T13** — BuildFlow upstream: port-collision context-scoping +~~ done at `af5eb80` (port-collision half upstreamed + verified 2026-10-05; dprint half routed — TODO_LIST T13b row)
-   dprint markdown pipe-cell handling (retires exit-69).
+dprint markdown pipe-cell handling (retires exit-69).
 ~~2. **T17** — Resend live `:587` SASL smoke: needs the REAL API key~~ routed — TODO_LIST blocked row (needs the real API key)
-   (never available in-session).
+(never available in-session).
 ~~3. **T19** — qcow2 history purge: needs explicit force-push approval~~ routed — TODO_LIST blocked row (force-push approval or accept verdict)
-   (`--force-with-lease`); not safe to assume from a general mandate.
+(`--force-with-lease`); not safe to assume from a general mandate.
 ~~4. **T20** — D1-gated enablement slice (secrets rotation, live dmarc,~~ routed — TODO_LIST Gated-on-D1 rows
-   migration compare, M22): needs D1/D2 + real infrastructure.
+migration compare, M22): needs D1/D2 + real infrastructure.
 ~~5. **T21** — monitoring encoding (Gatus checks, queue poll, failed-auth,~~ routed — ROADMAP §4 + docs/MONITORING.md (C24/C29-gated)
-   dead-man): needs C24/C29 owner calls.
+dead-man): needs C24/C29 owner calls.
 ~~6. **T1/T2 proper owner sitting**: the 17 decisions were handled as~~ routed — decision-batch.md (C39-C41 batched 2026-10-16)
-   [rec]-adoptions where execution required it; the rest (D1, D2,
-   C18/C19/C22/C34, Q4/Q5, C36/C37, demo g1/g2, qcow2 verdict) remain
-   OPEN owner calls, now clearly listed in decision-batch.
+[rec]-adoptions where execution required it; the rest (D1, D2,
+C18/C19/C22/C34, Q4/Q5, C36/C37, demo g1/g2, qcow2 verdict) remain
+OPEN owner calls, now clearly listed in decision-batch.
 
 ## d) TOTALLY FUCKED UP (honest failure log)
 
@@ -249,122 +249,122 @@
 ## f) NEXT (up to 50, sorted by leverage)
 
 ~~1. Write CHANGELOG `[Unreleased]` entries for today's ~30 commits~~ done at `b1deb35` (full coverage of this session, pipe-lint green)
-   (JMAP subtest/contract/probes, breadth fixtures, CI pipe-lint +
-   statix steps, flake split, upstream filings, pre-push inventory
-   guard).
+(JMAP subtest/contract/probes, breadth fixtures, CI pipe-lint +
+statix steps, flake split, upstream filings, pre-push inventory
+guard).
 ~~2. Confirm/reject the decision-batch adoptions (C35, C17/C17a, C20,~~ routed — decision-batch.md Agent-execution adoptions (ratification standing)
-   C38) — one sitting, ~10 min.
+C38) — one sitting, ~10 min.
 ~~3. Answer the still-open big gates: D1 (Workspace), D2 (VPS) — unblocks~~ routed — decision-batch.md D1/D2
-   T20 + the production ROADMAP half.
+T20 + the production ROADMAP half.
 ~~4. Answer C24/C29 — unblocks T21 monitoring encoding.~~ routed — decision-batch.md C24/C29
 ~~5. Answer remaining policy batch: C18, C19, C22, C34, Q4, Q5, C36, C37,~~ routed — decision-batch.md (C18, C19, C22, C34, Q4, Q5, C36, C37, demo g1/g2, qcow2)
-   demo g1/g2, qcow2 verdict.
+demo g1/g2, qcow2 verdict.
 ~~6. **T13**: BuildFlow upstream — port-collision same-config scoping +~~ done at `af5eb80` (15ea141d2 upstreamed + step-verified here; exit-69 retirement routed — TODO_LIST profile-flip row)
-   finding-level suppression; retire exit-69 here.
+finding-level suppression; retire exit-69 here.
 ~~7. **T13b**: BuildFlow dprint markdown pipe-cell handling (fixes the~~ routed — TODO_LIST T13b row (verify-before-filing gate first)
-   eaten-rows class at the source).
+eaten-rows class at the source).
 ~~8. **T17**: Resend live `:587` SASL smoke (needs the real API key from~~ routed — TODO_LIST blocked row (needs the real API key)
-   you).
+you).
 ~~9. **T19**: qcow2 history purge (needs your explicit force-push~~ routed — TODO_LIST blocked row
-   approval) or record the accept-weight verdict.
+approval) or record the accept-weight verdict.
 ~~10. **T20**: D1-gated enablement slice (rotate 3 secrets, live dmarc~~ routed — TODO_LIST Gated-on-D1 rows
-    validation, migration compare, M22 provisioning+DKIM oneshot).
+validation, migration compare, M22 provisioning+DKIM oneshot).
 ~~11. **T21**: monitoring encoding (Gatus starttls/tls/cert checks, queue~~ routed — ROADMAP §4 + docs/MONITORING.md (C24/C29)
-    depth/age poll, failed-auth burst rule, dead-man switch).
+depth/age poll, failed-auth burst rule, dead-man switch).
 ~~12. Cut **v0.5.0** once the CHANGELOG lands (payload is large: JMAP~~ routed — decision-batch.md C40 (2026-10-16) + TODO_LIST release row
-    subtest + contract doc + CI hardening + flake split is a
-    release-worthy surface; runbook step: tag → tag-CI → gh release).
+subtest + contract doc + CI hardening + flake split is a
+release-worthy surface; runbook step: tag → tag-CI → gh release).
 ~~13. SystemNix CI-debt: secret-history canary allowlist (their TODO 509).~~ routed — TODO_LIST SystemNix residue row (their TODO 509)
 ~~14. SystemNix CI-debt: the 2 remaining pin flips.~~ routed — TODO_LIST SystemNix residue row
 ~~15. Q6 residue: find the 0.15.5 setting name behind upstream's~~ done at `099ba9d` (NO setting name exists - hard-coded in ingest.rs:344; wrapper junkFiling NOT implementable)
-    auto-move-to-Junk (source dig in the pinned tarball), decide
-    wrapper option vs leave.
+auto-move-to-Junk (source dig in the pinned tarball), decide
+wrapper option vs leave.
 ~~16. Watch PR #566282 (parsedmarc/OpenSearch overhaul) — when merged,~~ done (MERGED 2026-10-13, 22579286 - TODO watch row + README runbook updated 2026-10-16)
-    run the runbook port procedure (provision rename) BEFORE riding the
-    next nixpkgs bump.
+run the runbook port procedure (provision rename) BEFORE riding the
+next nixpkgs bump.
 ~~17. Add `pkgs.shellcheck` to the flake devShell (e/2).~~ done at `4e027d2` (devshell carries actionlint + shellcheck)
 ~~18. Add workflow-actionlint to the pre-push hook for `ci.yml`-touching~~ done at `4e027d2` (.githooks/pre-push actionlint guard, fail-closed)
-    pushes (e/2 alt).
+pushes (e/2 alt).
 ~~19. Update the plan doc's statuses or mark it superseded (b/5).~~ done at `537b832` (SUPERSEDED banner; archived 2026-10-16)
 ~~20. Make `host-parse-fixture.py` a flake app (`nix run .#host-parse --~~ routed — TODO_LIST flake-app row
     <fixture>`).
 ~~21. Wire the T4 push-quirk (`{closeafter}`/`{ping}` rejected) into~~ done (NOT ours - InboxClean's adapter owns the wiring; the rule is documented in docs/INBOXCLEAN.md)
-    InboxClean's adapter as a documented client rule (their row).
+InboxClean's adapter as a documented client rule (their row).
 ~~22. Extend pipe-lint to indented fences (b/4) if list-embedded tables~~ routed — TODO_LIST pipe-lint row
-    ever appear.
+ever appear.
 ~~23. Re-check mailsuite#65 + nixpkgs#563651/#563777 responses on the~~ done (re-checked 2026-10-16: mailsuite#65 OPEN 0c; #563651/#563652/#563777 OPEN - watch row updated)
-    next watch cadence.
+next watch cadence.
 ~~24. Track upstream PR #566282's mailsuite bump (4.6.5) for behavior~~ done (PR MERGED 2026-10-13; fixture-drift watch folded into the TODO watch row)
-    drift in our parsedmarc fixtures.
+drift in our parsedmarc fixtures.
 ~~25. Explore upstream auto-move setting on NEWER stalwart (0.16+) as~~ routed — ROADMAP open question 6 (0.16+ re-check is the only open form)
-    part of the "stalwart passing 0.15.5" watch.
+part of the "stalwart passing 0.15.5" watch.
 ~~26. Delete or archive the superseded~~ done (both 09-22 plans archived 2026-10-16 by this pass, stale verdicts updated first)
-    `docs/planning/2026-09-22_19-23`/`23-25` master plans once their
-    M/T-number references are all harvested (g/3 from the previous
-    report, still unanswered).
+`docs/planning/2026-09-22_19-23`/`23-25` master plans once their
+M/T-number references are all harvested (g/3 from the previous
+report, still unanswered).
 ~~27. Give F22.3 a real decision: accept ~21 KB as the AGENTS floor~~ routed — decision-batch.md C41
-    (recommended) or define an enforced budget.
+(recommended) or define an enforced budget.
 ~~28. Add a docs-health sweep for `docs/probes/` (new directory — make~~ done (AGENTS Documentation map updated 2026-10-16 - probe dirs are sweep targets)
-    sure future audits know its manifest convention).
+sure future audits know its manifest convention).
 ~~29. Consider a `docs/INBOXCLEAN.md` link from FEATURES.md (the JMAP~~ done (already carried - FEATURES stalwart-e2e row cites docs/INBOXCLEAN.md + the probe dir)
-    surface row) so the feature inventory points at the contract.
+surface row) so the feature inventory points at the contract.
 ~~30. Run one full `buildflow` pass after the CHANGELOG entries land~~ done (11-14 ran the gates over the CHANGELOG landing; this pass runs them again 2026-10-16)
-    (markdown steps will re-flow the new tables).
+(markdown steps will re-flow the new tables).
 ~~31. Re-verify `gh api repos/LarsArtmann/SystemNix` CI went green on~~ done (11-14 a/7 - their CI reds pre-existing + diagnosed in their pipeline.md)
-    c6aaa6c5 (I pushed their sweep but did not watch their CI).
+c6aaa6c5 (I pushed their sweep but did not watch their CI).
 ~~32. Watch InboxClean CI on their 2 unpushed… now-pushed? — confirm~~ done (11-14 a/8 - setup-level zero-step failures, their debt)
-    their back-link commit (cb004f2) has CI green wherever it lands.
+their back-link commit (cb004f2) has CI green wherever it lands.
 ~~33. Add the demo-VM "one VM per qcow2 write-lock" note (from InboxClean~~ done (README demo section note added 2026-10-16)
-    spike) to the README demo section — it bit them, it will bite us.
+spike) to the README demo section — it bit them, it will bite us.
 ~~34. Pin the debug-driver recipe as a script (the GC-root + `--test-script`~~ routed — TODO_LIST debug-driver script row
-    dance is still 4 commands of tribal memory).
+dance is still 4 commands of tribal memory).
 ~~35. Sweep the session's /tmp artifacts (forensic.eml, aggregate.zip,~~ done (11-14 a/9 - session artifacts trashed)
-    netease/linkedin copies, driver logs) — nothing repo-critical, just
-    hygiene.
+netease/linkedin copies, driver logs) — nothing repo-critical, just
+hygiene.
 ~~36. Decide whether `docs/planning/mailsuite-starttls-issue-draft.md`~~ done at `537b832` (re-headed FILED as mailsuite#65)
-    should now carry a "FILED as #65" header (it still says NOT filed).
+should now carry a "FILED as #65" header (it still says NOT filed).
 ~~37. Consider seeding the probe transcripts' key facts into the README~~ done (NOT-DO verdict - duplication risk; the quickstart + docs/INBOXCLEAN.md carry the facts)
-    ledger (the JMAP facts currently live only in INBOXCLEAN.md).
+ledger (the JMAP facts currently live only in INBOXCLEAN.md).
 ~~38. Per-account Junk filing (webmail sieve / JMAP automation) — verify~~ routed — TODO_LIST JMAP anti-rot pair row
-    the JMAP automation path end-to-end (push + Mailbox/set fileinto)
-    since the adapter will need it.
+the JMAP automation path end-to-end (push + Mailbox/set fileinto)
+since the adapter will need it.
 ~~39. Add a JMAP push e2e assertion (EventSource 200 on `?types=Email`)~~ routed — TODO_LIST JMAP anti-rot pair row
-    to stalwart-e2e — cheap, prevents silent endpoint rot.
+to stalwart-e2e — cheap, prevents silent endpoint rot.
 ~~40. Verify SystemNix's Gatus/monitoring rows reference the JMAP/HTTP~~ routed — TODO_LIST SystemNix residue row (JMAP/HTTP listener health rides their monitoring encoding)
-    listener health (T21 dependency scan).
+listener health (T21 dependency scan).
 ~~41. Run `buildflow timings --regressions` cleanup (govulncheck +758%~~ routed — TODO_LIST buildflow local-noise row
-    noise from the SystemNix run polluted timings).
+noise from the SystemNix run polluted timings).
 ~~42. Update AGENTS "Documentation map" to mention `docs/probes/` +~~ done at `537b832` (both named; extended 2026-10-16 with the probes sweep rule)
-    `docs/INBOXCLEAN.md`.
+`docs/INBOXCLEAN.md`.
 ~~43. Invite the inboxclean-paperless SystemNix check to also assert the~~ done (NOT ours - their repo; recorded here and in the 11-14 report)
-    v0.4.0 pin (their contract check pins input, not tag semantics).
+v0.4.0 pin (their contract check pins input, not tag semantics).
 ~~44. Re-run the 131-fine-task plan bookkeeping for the tasks executed~~ done (cross-checked by the 2026-10-16 pass - CHANGELOG b1deb35 carries the session evidence)
-    via daemon commits (audit: did every fine task's evidence land?).
+via daemon commits (audit: did every fine task's evidence land?).
 ~~45. Check whether `parsedmarc-e2e`'s new fixtures should ALSO ride the~~ routed — TODO_LIST TLS-node coverage row
-    TLS node (they only ride the plaintext `machine` today).
+TLS node (they only ride the plaintext `machine` today).
 ~~46. Confirm the aarch64 shape guard still excludes the new scripts/~~ done (verified 2026-10-16 - ci.yml expected list = the 6 checks incl. demo-eval; scripts/ is not a check)
-    (it does — scripts are not checks — but the lockstep lists should
-    be re-read once after today).
+(it does — scripts are not checks — but the lockstep lists should
+be re-read once after today).
 ~~47. Add `arrival_date_utc`-style conversions note to the AGENTS~~ done (AGENTS fixture-traps gained the timezone-normalization class, 2026-10-16)
-    fixture-traps list (timezone normalization as an assertion class).
+fixture-traps list (timezone normalization as an assertion class).
 ~~48. Evaluate removing the `expected-unavailable` interrogate/jest noise~~ routed — TODO_LIST buildflow local-noise row
-    from buildflow runs via proper skip configs (cosmetic).
+from buildflow runs via proper skip configs (cosmetic).
 ~~49. Schedule the next docs-health pass at the next release boundary~~ done (this pass, 2026-10-16)
-    (per the audit cadence, not ad hoc).
+(per the audit cadence, not ad hoc).
 ~~50. Answer g/1–g/3 below — several next steps gate on them.~~ done (g/1 b1deb35; g/2 standing in decision-batch; g/3 done at `4e027d2` - both halves)
 
 ## g) QUESTIONS FOR YOU (not answerable from the repo)
 
 ~~1. **CHANGELOG now or at release?** I forgot `[Unreleased]` entries for~~ done at `b1deb35` (entries written the same day)
-   today's work. Want me to write them NOW (reconstructing from the
-   commit log), or do you prefer changelog entries accumulate only at
-   release cuts (the v0.3.x pattern)?
+today's work. Want me to write them NOW (reconstructing from the
+commit log), or do you prefer changelog entries accumulate only at
+release cuts (the v0.3.x pattern)?
 ~~2. **Adoption ratification**: four `[rec]`s were adopted and EXECUTED~~ routed — decision-batch.md Agent-execution adoptions (ratification standing; C39-C41 added 2026-10-16)
-   under the mandate (C35 start-JMAP, C17/C17a SystemNix push+hard-pin,
-   C20 mailsuite-filing). mailsuite#65 is public and irreversible-ish;
-   SystemNix's master now pins the tag. Confirm them as RESOLVED, or
-   override any (and I'll revert the pin / comment on the issue)?
+under the mandate (C35 start-JMAP, C17/C17a SystemNix push+hard-pin,
+C20 mailsuite-filing). mailsuite#65 is public and irreversible-ish;
+SystemNix's master now pins the tag. Confirm them as RESOLVED, or
+override any (and I'll revert the pin / comment on the issue)?
 ~~3. **Red-run tolerance**: today's one public red (shellcheck-blindness,~~ done at `4e027d2` (BOTH halves - devshell tooling AND the pre-push guard)
-   52 s) argues for either shellcheck-in-devShell or an actionlint
-   pre-push guard. Which do you want — devShell tooling (fast, local
-   only), pre-push enforcement (catches it before origin), or both?
+52 s) argues for either shellcheck-in-devShell or an actionlint
+pre-push guard. Which do you want — devShell tooling (fast, local
+only), pre-push enforcement (catches it before origin), or both?

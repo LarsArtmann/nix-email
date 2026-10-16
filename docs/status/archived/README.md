@@ -45,3 +45,20 @@ had a single-dash cell that the `-{2,}` separator rule could not recognize
 - normalized. Both files now pass `check-rows.py`; the fourth early file
   (2026-09-15_04-42) needed only 3 resolved-markers. Verdict: fix, not
   leave - the gate now reads the whole archived corpus green.
+
+## Manifest — 2026-10-16 docs-health bulk archive (4 files)
+
+The four 2026-10-05 session reports. All classified ANNOTATE→ARCHIVE:
+every b/c/f/g item struck inline with a dated verdict (207 markers across
+the four files; sections a/d/e historical by policy), check-rows green,
+dprint-formatted BEFORE the `git mv`. The same pass harvested their
+forward items into TODO_LIST/decision-batch (C39-C41) and refreshed the
+upstream watch (#566282 MERGED 2026-10-13).
+
+| File (date prefix)                                      | Classification | Deciding reason                                                                                                            |
+| ------------------------------------------------------- | -------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| 2026-10-05_07-54_docs-health-audit-jmap-harvest…        | ARCHIVE        | 37 verdicts: f/c items executed same day (JMAP seam, split, CI hardening) or routed; g/3 answered (plans archived this pass) |
+| 2026-10-05_10-29_pareto-execution-jmap-seam…            | ARCHIVE        | 64 verdicts: a/1-a/19 executed, f/1-f/50 done/routed (T13 upstream af5eb80, CHANGELOG b1deb35, Q6 099ba9d), g/1-g/3 closed  |
+| 2026-10-05_11-14_pareto-continuation…                   | ARCHIVE        | 66 verdicts: session debts paid same day; gated residue routed (TODO rows, C40, SystemNix row, BuildFlow rows)              |
+| 2026-10-05_11-53_nix-superbly-review…                   | ARCHIVE        | 40 verdicts: findings remediated or routed (C39, TODO rows), b-section caveats verified absorbed, g/1-g/3 answered          |
+
