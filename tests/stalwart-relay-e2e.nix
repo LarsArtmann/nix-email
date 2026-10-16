@@ -102,6 +102,11 @@ in
           # The wrapper owns the mail.example.test domain; the SENDER needs
           # the example.test domain + account, provisioned declaratively
           # (the pre-0.16 /api/principal calls are gone with the REST API).
+          # 0.16's reload-validation rejects the default-enabled pyzor host
+          # in this DNS-less VM ("Invalid address: failed to lookup address
+          # information", transcript 2026-10-16) - same network-dependence
+          # lesson as the 0.15 era, now enforced at apply+reload time.
+          stalwart.provision.singletons.SpamPyzor.enable = false;
           stalwart.provision.objects = {
             Domain.objects.example-test = {
               name = "example.test";
