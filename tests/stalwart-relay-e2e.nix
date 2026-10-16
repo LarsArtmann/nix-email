@@ -198,6 +198,16 @@ in
       relay.wait_for_open_port(1025, timeout=120)
       relay.wait_for_open_port(8025, timeout=60)
 
+      # The declarative plan (domain + sender account + relay objects)
+      # applies via stalwart-provision; `systemctl restart` BLOCKS until
+      # the oneshot finishes so a failure surfaces here, not as mystery
+      # 535s downstream. Journal dumped for the transcript.
+      smtp.succeed("systemctl restart stalwart-provision.service")
+      smtp.succeed(
+          "journalctl -u stalwart-provision -b 0 -o cat > /tmp/provision.log"
+      )
+      smtp.succeed("cat /tmp/provision.log >&2")
+
       # dnsmasq must be answering before we provision: the relay A lookup for
       # "relay" rides on it.
       # Assertions are file-based, never `producer | grep -q`: the test
@@ -219,30 +229,14 @@ in
           timeout=180,
       )
 
-      with subtest("provision domain and sender account before any traffic"):
-          # Same negative-cache discipline as the single-node E2E: provision
-          # BEFORE any SMTP touches the domain.
-          smtp.succeed(
-              "curl -fsS -u admin:test-admin-secret -H 'Content-Type: application/json' "
-              "-X POST http://127.0.0.1:8080/api/principal "
-              "-d '{\"type\": \"domain\", \"name\": \"example.test\"}'"
-          )
-          smtp.succeed(
-              "curl -fsS -u admin:test-admin-secret -H 'Content-Type: application/json' "
-              "-X POST http://127.0.0.1:8080/api/principal "
-              "-d '{\"type\": \"individual\", \"name\": \"user1@example.test\", "
-              "\"emails\": [\"user1@example.test\"], \"roles\": [\"user\"], "
-              "\"secrets\": [\"${testHash}\"]}'"
-          )
-
       with subtest("relay path: SASL-authed non-local submission lands in Mailpit"):
           # Mailpit rejects unauthenticated sessions (smtpAuthFile), so the
           # needle below is proof the wrapper's SASL credentials survived
-          # the whole path: secretFile -> systemd credential -> %{file:...}%
-          # macro -> queue.route."smarthost".auth -> SMTP AUTH.
+          # the whole path: secretFile -> systemd credential -> File-secret
+          # filePath -> MtaRoute (Relay) -> SMTP AUTH.
           smtp.succeed(
               "swaks --timeout 120 --server 127.0.0.1:587 --tls --auth PLAIN "
-              "--auth-user user1@example.test --auth-password testpass "
+              "--auth-user user1@example.test --auth-password '${testPass}' "
               "--from user1@example.test --to stranger@remote.example "
               "--header 'Subject: relay-e2e' --body '${relayNeedle}' "
               "> /tmp/swaks-relay.log 2>&1"
@@ -267,7 +261,7 @@ in
           # single-node E2E.
           smtp.succeed(
               "swaks --timeout 120 --server 127.0.0.1:587 --tls --auth PLAIN "
-              "--auth-user user1@example.test --auth-password testpass "
+              "--auth-user user1@example.test --auth-password '${testPass}' "
               "--from user1@example.test --to nobody@example.test "
               "--header 'Subject: local-e2e' --body 'local-needle-3a7d' "
               "> /tmp/swaks-local.log 2>&1 || true"

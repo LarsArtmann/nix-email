@@ -453,6 +453,13 @@ in
       norpol
       hexstella
     ];
-    doc = ./stalwart.md;
+    # VENDOR PATCH (vs PR #552103): `doc = ./stalwart.md` removed. The doc's
+    # section anchors (module-services-stalwart-provision etc.) must have
+    # matching entries in nixpkgs' nixos/doc/manual/redirects.json - the PR
+    # adds them THERE, which a vendored module cannot ship. With meta.doc
+    # set, every nixosSystem toplevel fails in nixos-manual
+    # ("Identifiers present in the source must have a mapping in the
+    # redirects file"). stalwart.md stays in-tree as reference reading.
+    # Restore `doc = ./stalwart.md;` verbatim when un-vendoring.
   };
 }
