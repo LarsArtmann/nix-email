@@ -7,25 +7,28 @@
   lib,
   pkgs,
   ...
-}:
-let
+}: let
   cfg = config.services.stalwart;
 
   since0_16 = lib.versionAtLeast cfg.package.version "0.16";
-  configFormatName = if since0_16 then "json" else "toml";
-  configFormat = pkgs.formats.${configFormatName} { };
+  configFormatName =
+    if since0_16
+    then "json"
+    else "toml";
+  configFormat = pkgs.formats.${configFormatName} {};
   configFile = configFormat.generate "stalwart.${configFormatName}" cfg.settings;
   useLegacyStorage = lib.versionOlder cfg.stateVersion "24.11";
   pre2605 = lib.versionOlder cfg.stateVersion "26.05";
-  stalwartIdentifier = if pre2605 then "stalwart-mail" else "stalwart";
+  stalwartIdentifier =
+    if pre2605
+    then "stalwart-mail"
+    else "stalwart";
   stalwartIdentifierText = ''if lib.versionOlder config.services.stalwart.stateVersion "26.05" then "stalwart-mail" else "stalwart"'';
-
-in
-{
+in {
   imports = [
     # since 0.12.0 (2025-05-26) release, upstream re-branded project to 'stalwart' due to inclusion of collaboration features (CalDAV, CardDAV, and WebDAV)
     #  https://github.com/stalwartlabs/stalwart/releases/tag/v0.12.0
-    (lib.mkRenamedOptionModule [ "services" "stalwart-mail" ] [ "services" "stalwart" ])
+    (lib.mkRenamedOptionModule ["services" "stalwart-mail"] ["services" "stalwart"])
   ];
   options.services.stalwart = {
     enable = lib.mkEnableOption "the all-in-one collaboration and mail server, Stalwart";
@@ -39,7 +42,7 @@ in
       '';
     };
 
-    package = lib.mkPackageOption pkgs "stalwart" { };
+    package = lib.mkPackageOption pkgs "stalwart" {};
 
     openFirewall = lib.mkOption {
       type = lib.types.bool;
@@ -55,8 +58,8 @@ in
     settings = lib.mkOption {
       # previously this was `inherit (configFormat) type;`, however now the config format is dependent on the package version,
       # choosing toml <0.16 and json >=0.16. thankfully, the `type` of the `json` format is identical to `toml` except the base value type is nullable
-      type = (pkgs.formats.json { }).type;
-      default = { };
+      inherit ((pkgs.formats.json {})) type;
+      default = {};
       description = ''
         Configuration options for the Stalwart server.
         See <https://stalw.art/docs/configuration> for available options.
@@ -185,12 +188,11 @@ in
         See {manpage}`systemd.exec(5)` (section "CREDENTIALS") for details.
       '';
       type = lib.types.attrsOf lib.types.str;
-      default = { };
+      default = {};
       example = {
         fallback_admin = "/run/credstore/stalwart.fallback_admin_password";
       };
     };
-
   };
 
   config = lib.mkIf cfg.enable {
@@ -207,7 +209,7 @@ in
         assertion =
           since0_16
           || !(
-            (lib.hasAttrByPath [ "settings" "queue" ] cfg)
+            (lib.hasAttrByPath ["settings" "queue"] cfg)
             && (builtins.any (lib.hasAttrByPath [
               "value"
               "next-hop"
@@ -223,70 +225,69 @@ in
 
     # Default config: all local
     services.stalwart.settings =
-      if since0_16 then
-        {
-          "@type" = lib.mkDefault "RocksDb";
-          path = lib.mkDefault "${cfg.dataDir}/db";
-        }
-      else
-        {
-          tracer =
-            if pre2605 then
-              {
-                stdout = {
-                  type = lib.mkDefault "stdout";
-                  level = lib.mkDefault "info";
-                  ansi = lib.mkDefault false; # no colour markers to journald
-                  enable = lib.mkDefault true;
-                };
-              }
-            else
-              {
-                journal = {
-                  type = lib.mkDefault "journal";
-                  level = lib.mkDefault "info";
-                  enable = lib.mkDefault true;
-                };
-              };
-          store =
-            if useLegacyStorage then
-              {
-                # structured data in SQLite, blobs on filesystem
-                db.type = lib.mkDefault "sqlite";
-                db.path = lib.mkDefault "${cfg.dataDir}/data/index.sqlite3";
-                fs.type = lib.mkDefault "fs";
-                fs.path = lib.mkDefault "${cfg.dataDir}/data/blobs";
-              }
-            else
-              {
-                # everything in RocksDB
-                db.type = lib.mkDefault "rocksdb";
-                db.path = lib.mkDefault "${cfg.dataDir}/db";
-                db.compression = lib.mkDefault "lz4";
-              };
-          storage.data = lib.mkDefault "db";
-          storage.fts = lib.mkDefault "db";
-          storage.lookup = lib.mkDefault "db";
-          storage.blob = lib.mkDefault (if useLegacyStorage then "fs" else "db");
-          directory.internal.type = lib.mkDefault "internal";
-          directory.internal.store = lib.mkDefault "db";
-          storage.directory = lib.mkDefault "internal";
-          resolver.type = lib.mkDefault "system";
-          resolver.public-suffix = lib.mkDefault [
-            "file://${pkgs.publicsuffix-list}/share/publicsuffix/public_suffix_list.dat"
-          ];
-          spam-filter.resource = lib.mkDefault "file://${cfg.package.spam-filter}/spam-filter.toml";
-          webadmin =
-            let
-              hasHttpListener = builtins.any (listener: listener.protocol == "http") (
-                lib.attrValues (cfg.settings.server.listener or { })
-              );
-            in
-            {
-              path = "/var/cache/${stalwartIdentifier}";
-              resource = lib.mkIf hasHttpListener (lib.mkDefault "file://${cfg.package.webadmin}/webadmin.zip");
+      if since0_16
+      then {
+        "@type" = lib.mkDefault "RocksDb";
+        path = lib.mkDefault "${cfg.dataDir}/db";
+      }
+      else {
+        tracer =
+          if pre2605
+          then {
+            stdout = {
+              type = lib.mkDefault "stdout";
+              level = lib.mkDefault "info";
+              ansi = lib.mkDefault false; # no colour markers to journald
+              enable = lib.mkDefault true;
             };
+          }
+          else {
+            journal = {
+              type = lib.mkDefault "journal";
+              level = lib.mkDefault "info";
+              enable = lib.mkDefault true;
+            };
+          };
+        store =
+          if useLegacyStorage
+          then {
+            # structured data in SQLite, blobs on filesystem
+            db.type = lib.mkDefault "sqlite";
+            db.path = lib.mkDefault "${cfg.dataDir}/data/index.sqlite3";
+            fs.type = lib.mkDefault "fs";
+            fs.path = lib.mkDefault "${cfg.dataDir}/data/blobs";
+          }
+          else {
+            # everything in RocksDB
+            db.type = lib.mkDefault "rocksdb";
+            db.path = lib.mkDefault "${cfg.dataDir}/db";
+            db.compression = lib.mkDefault "lz4";
+          };
+        storage.data = lib.mkDefault "db";
+        storage.fts = lib.mkDefault "db";
+        storage.lookup = lib.mkDefault "db";
+        storage.blob = lib.mkDefault (
+          if useLegacyStorage
+          then "fs"
+          else "db"
+        );
+        directory.internal.type = lib.mkDefault "internal";
+        directory.internal.store = lib.mkDefault "db";
+        storage.directory = lib.mkDefault "internal";
+        resolver.type = lib.mkDefault "system";
+        resolver.public-suffix = lib.mkDefault [
+          "file://${pkgs.publicsuffix-list}/share/publicsuffix/public_suffix_list.dat"
+        ];
+        spam-filter.resource = lib.mkDefault "file://${cfg.package.spam-filter}/spam-filter.toml";
+        webadmin = let
+          hasHttpListener = builtins.any (listener: listener.protocol == "http") (
+            lib.attrValues (cfg.settings.server.listener or {})
+          );
+        in {
+          path = "/var/cache/${stalwartIdentifier}";
+          resource = lib.mkIf hasHttpListener (lib.mkDefault "file://${cfg.package.webadmin}/webadmin.zip");
         };
+      };
 
     # This service stores a potentially large amount of data.
     # Running it as a dynamic user would force chown to be run everytime the
@@ -294,7 +295,7 @@ in
     # That would cause unnecessary and unwanted delays.
     users = {
       groups = lib.mkIf (cfg.group == stalwartIdentifier) {
-        ${cfg.group} = { };
+        ${cfg.group} = {};
       };
       users = lib.mkIf (cfg.user == stalwartIdentifier) {
         ${cfg.user} = {
@@ -311,7 +312,7 @@ in
     systemd = {
       services.stalwart = {
         description = "Stalwart Server";
-        wantedBy = [ "multi-user.target" ];
+        wantedBy = ["multi-user.target"];
         after = [
           "local-fs.target"
           "network.target"
@@ -328,23 +329,20 @@ in
           SyslogIdentifier = stalwartIdentifier;
 
           ExecStartPre =
-            if useLegacyStorage then
-              ''
-                ${lib.getExe' pkgs.coreutils "mkdir"} -p ${cfg.dataDir}/data/blobs
-              ''
-            else
-              ''
-                ${lib.getExe' pkgs.coreutils "mkdir"} -p ${cfg.dataDir}/db
-              '';
-          ExecStart =
-            let
-              env = lib.optionalString cfg.admin.enable "STALWART_RECOVERY_ADMIN=${lib.escapeShellArg cfg.admin.username}:`systemd-creds cat ${lib.escapeShellArg cfg.admin.username}`";
-              cmd = "${lib.getExe cfg.package} --config=${configFile}";
-            in
-            if since0_16 && cfg.admin.enable then
-              "${lib.getExe pkgs.bash} -c ${lib.escapeShellArg "${env} ${cmd}"}"
-            else
-              cmd;
+            if useLegacyStorage
+            then ''
+              ${lib.getExe' pkgs.coreutils "mkdir"} -p ${cfg.dataDir}/data/blobs
+            ''
+            else ''
+              ${lib.getExe' pkgs.coreutils "mkdir"} -p ${cfg.dataDir}/db
+            '';
+          ExecStart = let
+            env = lib.optionalString cfg.admin.enable "STALWART_RECOVERY_ADMIN=${lib.escapeShellArg cfg.admin.username}:`systemd-creds cat ${lib.escapeShellArg cfg.admin.username}`";
+            cmd = "${lib.getExe cfg.package} --config=${configFile}";
+          in
+            if since0_16 && cfg.admin.enable
+            then "${lib.getExe pkgs.bash} -c ${lib.escapeShellArg "${env} ${cmd}"}"
+            else cmd;
           Environment =
             lib.optionals since0_16 [
               "STALWART_PUBLIC_URL=${cfg.url}"
@@ -355,11 +353,10 @@ in
               "STALWART_RECOVERY_MODE_LOG_LEVEL=${cfg.recovery.logLevel}"
             ];
           EnvironmentFile = lib.optional (cfg.environmentFile != null) cfg.environmentFile;
-          LoadCredential =
-            let
-              # default credentials for the admin user, might be overridden by an explicitly configured cred in cfg.credentials
-              adminCreds = lib.optionalAttrs cfg.admin.enable { "${cfg.admin.username}" = cfg.admin.username; };
-            in
+          LoadCredential = let
+            # default credentials for the admin user, might be overridden by an explicitly configured cred in cfg.credentials
+            adminCreds = lib.optionalAttrs cfg.admin.enable {"${cfg.admin.username}" = cfg.admin.username;};
+          in
             lib.mapAttrsToList (key: value: "${key}:${value}") (adminCreds // cfg.credentials);
 
           ReadWritePaths = [
@@ -373,11 +370,11 @@ in
           Group = cfg.group;
 
           # Bind standard privileged ports
-          AmbientCapabilities = [ "CAP_NET_BIND_SERVICE" ];
-          CapabilityBoundingSet = [ "CAP_NET_BIND_SERVICE" ];
+          AmbientCapabilities = ["CAP_NET_BIND_SERVICE"];
+          CapabilityBoundingSet = ["CAP_NET_BIND_SERVICE"];
 
           # Hardening
-          DeviceAllow = [ "" ];
+          DeviceAllow = [""];
           LockPersonality = true;
           MemoryDenyWriteExecute = true;
           PrivateDevices = true;
@@ -415,34 +412,31 @@ in
     };
 
     # Make admin commands available in the shell
-    environment.systemPackages = [ cfg.package ] ++ (lib.optional since0_16 pkgs.stalwart-cli);
+    environment.systemPackages = [cfg.package] ++ (lib.optional since0_16 pkgs.stalwart-cli);
 
     networking.firewall = lib.mkIf cfg.openFirewall {
-      allowedTCPPorts =
-        let
-          parsePorts =
-            listeners:
-            let
-              parseAddresses = listeners: lib.flatten (lib.mapAttrsToList (name: value: value.bind) listeners);
-              splitAddress = addr: lib.splitString ":" addr;
-              extractPort = addr: lib.toInt (builtins.foldl' (a: b: b) "" (splitAddress addr));
-            in
-            map (address: extractPort address) (parseAddresses listeners);
+      allowedTCPPorts = let
+        parsePorts = listeners: let
+          parseAddresses = listeners: lib.flatten (lib.mapAttrsToList (_name: value: value.bind) listeners);
+          splitAddress = addr: lib.splitString ":" addr;
+          extractPort = addr: lib.toInt (builtins.foldl' (_a: b: b) "" (splitAddress addr));
         in
-        if since0_16 then
-          if cfg.recovery.enable then
-            [ cfg.recovery.port ]
-          else if cfg.provision.enable then
-            parsePorts (cfg.provision.objects.NetworkListener.objects or [ ])
+          map extractPort (parseAddresses listeners);
+      in
+        if since0_16
+        then
+          if cfg.recovery.enable
+          then [cfg.recovery.port]
+          else if cfg.provision.enable
+          then parsePorts (cfg.provision.objects.NetworkListener.objects or [])
           else
             builtins.warn ''
               <option>services.stalwart.openFirewall</option> is true, but Stalwart is neither:
               - in recovery mode <option>services.stalwart.recovery.enable</option>.
               - being provisioned by <option>services.stalwart.provision.enable</option>.
               Ports cannot be automatically detected, so none will be opened.
-            '' [ ]
-        else
-          parsePorts (cfg.settings.server.listener or [ ]);
+            '' []
+        else parsePorts (cfg.settings.server.listener or []);
     };
   };
 

@@ -3,14 +3,15 @@
 
   inputs = {
     # Pinned to the same nixpkgs rev as SystemNix (compat doctrine):
-    # services.stalwart (package pinned to 0.15.5 by nixpkgs - the 0.16.x
-    # package exists as stalwart_0_16 but is NOT yet compatible with the
-    # module), services.parsedmarc 11.0.1, services.mailpit, swaks
-    # 20240103.0, imapsync 2.314 all verified present.
+    # services.stalwart runs Stalwart 0.16.x via pkgs.stalwart_0_16 +
+    # the VENDORED 0.16 module (modules/stalwart-module/, from nixpkgs
+    # PR #552103 - nixpkgs' own stalwart.nix is still the 0.15 module at
+    # this rev and is disabledModules-swapped by our wrapper).
+    # Also verified present at this rev: services.parsedmarc 11.0.1,
+    # services.mailpit, swaks 20240103.0, imapsync 2.314, stalwart-cli
+    # 1.0.12 (the provision CLI - must stay >= 1.0.2).
     # ADVANCED 2026-09-22 eaad0894 -> 6774f7bc to track SystemNix's lock
-    # (their nixpkgs floats nixos-unstable; presence list re-verified:
-    # stalwart 0.15.5, parsedmarc 11.0.1, mailpit 1.31.1, swaks 20240103.0,
-    # imapsync 2.314).
+    # (their nixpkgs floats nixos-unstable).
     nixpkgs.url = "github:NixOS/nixpkgs/6774f7bc253789b113a4f39285dc0fa100abeacc";
 
     # flake-parts (SystemNix / nix-international-telephony pattern).

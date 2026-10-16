@@ -117,7 +117,7 @@
     period = lib.toInt (builtins.elemAt m 1);
     unit = builtins.elemAt m 2;
   in {
-    count = count;
+    inherit count;
     period = period * ratePeriodMs.${unit};
   };
 
@@ -664,12 +664,13 @@ in {
         singletons = lib.mkMerge (
           [
             {
-              SystemSettings = {
-                defaultHostname = cfg.hostname;
-              }
-              // lib.optionalAttrs (cfg.certificate.mode == "manual" && cfg.certificate.manual.default) {
-                defaultCertificateId = "#${cfg.certificate.manual.id}";
-              };
+              SystemSettings =
+                {
+                  defaultHostname = cfg.hostname;
+                }
+                // lib.optionalAttrs (cfg.certificate.mode == "manual" && cfg.certificate.manual.default) {
+                  defaultCertificateId = "#${cfg.certificate.manual.id}";
+                };
             }
           ]
           ++ lib.optionals (cfg.directoryCacheTtlNegative != null) [
@@ -772,32 +773,36 @@ in {
             {
               SpamDnsblServer = {
                 reconcile = false;
-                objects = lib.mapAttrs (id: srv: {
-                  "@type" = dnsblScopeVariant.${srv.scope};
-                  name = id;
-                  enable = true;
-                  zone = constantExpr srv.zone;
-                } // lib.optionalAttrs (srv.tag != null) {
-                  tag = constantExpr srv.tag;
-                }) cfg.spamFilter.dnsbl.servers;
+                objects = lib.mapAttrs (id: srv:
+                  {
+                    "@type" = dnsblScopeVariant.${srv.scope};
+                    name = id;
+                    enable = true;
+                    zone = constantExpr srv.zone;
+                  }
+                  // lib.optionalAttrs (srv.tag != null) {
+                    tag = constantExpr srv.tag;
+                  })
+                cfg.spamFilter.dnsbl.servers;
               };
             }
           ]
           ++ lib.optionals (cfg.relay != null) [
             {
-              MtaRoute.objects.${cfg.relay.routeId} = {
-                "@type" = "Relay";
-                name = cfg.relay.routeId;
-                address = cfg.relay.address;
-                port = cfg.relay.port;
-                protocol = "smtp";
-                implicitTls = cfg.relay.tlsImplicit;
-              }
-              // lib.optionalAttrs (cfg.relay.username != null) {
-                authUsername = cfg.relay.username;
-                authSecret."@type" = "File";
-                authSecret.filePath = credentialPath "mail-server-relay";
-              };
+              MtaRoute.objects.${cfg.relay.routeId} =
+                {
+                  "@type" = "Relay";
+                  name = cfg.relay.routeId;
+                  address = cfg.relay.address;
+                  port = cfg.relay.port;
+                  protocol = "smtp";
+                  implicitTls = cfg.relay.tlsImplicit;
+                }
+                // lib.optionalAttrs (cfg.relay.username != null) {
+                  authUsername = cfg.relay.username;
+                  authSecret."@type" = "File";
+                  authSecret.filePath = credentialPath "mail-server-relay";
+                };
             }
           ]
           ++ lib.optionals (cfg.certificate.mode == "acme") [

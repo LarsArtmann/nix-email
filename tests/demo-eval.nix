@@ -40,7 +40,7 @@
     httpBind = demoConfig.services.mail-server.httpBind;
     fallbackAdminUser = stalwart.admin.username;
     fallbackAdminCred = stalwart.credentials."${stalwart.admin.username}" or "MISSING";
-    pyzorDisabled = (stalwart.provision.singletons.SpinePyzor.enable or true) == false;
+    pyzorDisabled = (stalwart.provision.singletons.SpamPyzor.enable or true) == false;
     forwardPairs = lib.concatStringsSep "," forwardPairs;
     # system.name drives the runner script name (run-demo-vm) that the
     # quickstart invokes via `nix run .#vm`.

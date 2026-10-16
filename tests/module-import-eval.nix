@@ -46,7 +46,7 @@
 
   cfg = eval.config;
   stalwart = cfg.services.stalwart;
-  provision = stalwart.provision;
+  inherit (stalwart) provision;
 
   # M14 (2026-09-22): the hardening options must be OFF by default - the
   # default PLAN carries NO throttle, NO DNSBL, NO metrics, NO cache-TTL

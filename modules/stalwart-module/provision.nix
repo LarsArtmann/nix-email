@@ -5,15 +5,13 @@
   lib,
   pkgs,
   ...
-}:
-let
+}: let
   cfg = config.services.stalwart.provision;
   stalwart = config.services.stalwart;
-in
-{
+in {
   options.services.stalwart.provision = {
     enable = lib.mkEnableOption "Stalwart Configuration Provisioning";
-    package = lib.mkPackageOption pkgs "stalwart-cli" { };
+    package = lib.mkPackageOption pkgs "stalwart-cli" {};
     reloadSettings = lib.mkOption {
       type = lib.types.bool;
       default = true;
@@ -53,7 +51,7 @@ in
                 The fields to match on, a wildcard (`"*"`), or null.
                 Read the [documentation](https://stalw.art/docs/management/cli/apply/#upsert) for more information.
               '';
-              example = [ "name" ];
+              example = ["name"];
               default = null;
             };
 
@@ -78,7 +76,7 @@ in
       example = {
         NetworkListener = {
           reconcile = false;
-          match = [ "name" ];
+          match = ["name"];
           objects = {
             nl-mgmt = {
               name = "management";
@@ -99,7 +97,7 @@ in
         };
         Domain = {
           reconcile = true;
-          match = [ "name" ];
+          match = ["name"];
           objects = {
             mainDomain = {
               name = "mail.example.com";
@@ -116,42 +114,47 @@ in
 
   config = lib.mkIf cfg.enable (
     let
-      variant = type: value: { "@type" = type; } // value;
+      variant = type: value: {"@type" = type;} // value;
 
       plans =
         lib.mapAttrsToList (
           name: value:
-          variant "update" {
-            object = name;
-            value = value;
-          }
-        ) cfg.singletons
+            variant "update" {
+              object = name;
+              inherit value;
+            }
+        )
+        cfg.singletons
         ++ lib.mapAttrsToList (
           name: value:
-          variant (if value.reconcile then "reconcile" else "upsert") {
-            object = name;
-            matchOn = value.match;
-            scope = value.scope;
-            value = value.objects;
-          }
-        ) cfg.objects;
+            variant (
+              if value.reconcile
+              then "reconcile"
+              else "upsert"
+            ) {
+              object = name;
+              matchOn = value.match;
+              inherit (value) scope;
+              value = value.objects;
+            }
+        )
+        cfg.objects;
 
       unsorted = lib.concatMapStringsSep "\n" builtins.toJSON plans;
 
       sorted =
         pkgs.runCommand "stalwart-provision.ndjson"
-          {
-            nativeBuildInputs = with pkgs.lua52Packages; [
-              lua
-              dkjson
-            ];
-          }
-          ''
-            gzip -d ${stalwart.package.src}/resources/schema/schema.json.gz -c > ./schema.json
-            lua ${./provision-check-sort.lua} ${lib.escapeShellArg unsorted} $out ./schema.json ${lib.optionalString cfg.reloadSettings "--reload"}
-          '';
-    in
-    {
+        {
+          nativeBuildInputs = with pkgs.lua52Packages; [
+            lua
+            dkjson
+          ];
+        }
+        ''
+          gzip -d ${stalwart.package.src}/resources/schema/schema.json.gz -c > ./schema.json
+          lua ${./provision-check-sort.lua} ${lib.escapeShellArg unsorted} $out ./schema.json ${lib.optionalString cfg.reloadSettings "--reload"}
+        '';
+    in {
       assertions = [
         {
           assertion = stalwart.enable;
@@ -169,32 +172,28 @@ in
 
       systemd.services.stalwart-provision = {
         description = "Stalwart Configuration Provisioning";
-        wantedBy = [ "multi-user.target" ];
-        partOf = [ "stalwart.service" ];
-        after = [ "stalwart.service" ];
-        serviceConfig =
-          let
-            shortBashScript = script: "${lib.getExe pkgs.bash} -c ${lib.escapeShellArg script}";
-          in
-          {
-            Type = "oneshot";
-            LoadCredential =
-              let
-                uname = stalwart.admin.username;
-              in
-              [
-                "password:${stalwart.credentials.${uname} or stalwart.admin.username}"
-              ];
+        wantedBy = ["multi-user.target"];
+        partOf = ["stalwart.service"];
+        after = ["stalwart.service"];
+        serviceConfig = let
+          shortBashScript = script: "${lib.getExe pkgs.bash} -c ${lib.escapeShellArg script}";
+        in {
+          Type = "oneshot";
+          LoadCredential = let
+            uname = stalwart.admin.username;
+          in [
+            "password:${stalwart.credentials.${uname} or stalwart.admin.username}"
+          ];
 
-            # stalwart does not currently notify systemd that it has started
-            # see https://github.com/stalwartlabs/stalwart/pull/2383
-            ExecStartPre = shortBashScript "until ${pkgs.curl}/bin/curl --fail ${lib.escapeShellArg cfg.url} &> /dev/null; do sleep 0.25; done";
-            ExecStart = shortBashScript "STALWART_PASSWORD=`systemd-creds cat password` ${lib.getExe pkgs.stalwart-cli} apply --file ${sorted}";
-            Environment = [
-              "STALWART_URL=${lib.escapeShellArg cfg.url}"
-              "STALWART_USER=${lib.escapeShellArg stalwart.admin.username}"
-            ];
-          };
+          # stalwart does not currently notify systemd that it has started
+          # see https://github.com/stalwartlabs/stalwart/pull/2383
+          ExecStartPre = shortBashScript "until ${pkgs.curl}/bin/curl --fail ${lib.escapeShellArg cfg.url} &> /dev/null; do sleep 0.25; done";
+          ExecStart = shortBashScript "STALWART_PASSWORD=`systemd-creds cat password` ${lib.getExe pkgs.stalwart-cli} apply --file ${sorted}";
+          Environment = [
+            "STALWART_URL=${lib.escapeShellArg cfg.url}"
+            "STALWART_USER=${lib.escapeShellArg stalwart.admin.username}"
+          ];
+        };
       };
     }
   );
