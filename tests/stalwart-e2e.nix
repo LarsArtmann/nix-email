@@ -58,10 +58,15 @@
 # (see stalwart-relay-e2e). Those stay live-host go-live checks - see
 # README verified-facts ledger for the keys.
 {pkgs}: let
-  # 0.16 accounts take PLAINTEXT secrets at provision time (apply hashes
-  # server-side; the upstream 0.16 NixOS test does the same). Strength is
-  # ENFORCED at apply (zxcvbn: short/common passwords are rejected), hence
-  # the length. Test-only, published ON PURPOSE.
+  # Account identity contract (0.16 schema, apply-transcript-verified
+  # 2026-10-16): User.name is the LOCAL PART (a full address fails apply
+  # with "Invalid email local part | Properties: name"); the primary
+  # address is synthesized as name@<Domain(domainId).name> and is the
+  # unique 'email' index. Auth (SMTP AUTH, JMAP basic) resolves that
+  # synthesized address - which is why the wrapper hostname below must
+  # equal example.test, or every address lands in the wrong namespace
+  # (auth 535s, MAIL FROM 501s). MAIL FROM outside an account's address
+  # set 501s.
   testPass = "testpass-x7Kk-9mQw";
 
   # Real DMARC aggregate sample (same artifact as parsedmarc-e2e). The
@@ -270,12 +275,12 @@ in
       services = {
         mail-server = {
           enable = true;
-          # hostname IS the provisioned mail domain (the wrapper derives the
-          # Domain object + SystemSettings.defaultHostname from it) - so the
-          # hostname must equal example.test or every account address below
-          # lands outside the local namespace (auth 535s, MAIL FROM 501s;
-          # transcript 2026-10-16: with hostname mail.example.test, the
-          # session rendered user1@mail.example.test and rejected
+          # hostname IS the provisioned mail domain (the wrapper derives
+          # the Domain object + SystemSettings.defaultHostname from it, and
+          # account addresses synthesize as <name>@<hostname>): it must
+          # equal example.test or every account below lands outside the
+          # local namespace (transcript 2026-10-16: hostname
+          # mail.example.test rendered user1@mail.example.test and rejected
           # user1@example.test everywhere).
           hostname = "example.test";
           metrics.enable = true;
@@ -320,12 +325,12 @@ in
               match = ["name"];
               objects = {
                 user1 = {
-                  # 0.16 schema: User.name IS the primary address
-                  # ("user@domain"; there is no emailAddress field -
-                  # struct-verified 2026-10-16). Name == address keeps the
-                  # auth identity and the sender check aligned.
+                  # 0.16 schema: User.name is the LOCAL PART; the primary
+                  # address synthesizes as name@<Domain(domainId).name>
+                  # (= user1@example.test here) and indexes uniquely as
+                  # 'email'. There is no separate emailAddress field.
                   "@type" = "User";
-                  name = "user1@example.test";
+                  name = "user1";
                   domainId = "#domain";
                   roles."@type" = "User";
                   credentials = [
@@ -337,7 +342,7 @@ in
                 };
                 user2 = {
                   "@type" = "User";
-                  name = "user2@example.test";
+                  name = "user2";
                   domainId = "#domain";
                   roles."@type" = "User";
                   credentials = [
@@ -349,7 +354,7 @@ in
                 };
                 reports = {
                   "@type" = "User";
-                  name = "reports@example.test";
+                  name = "reports";
                   domainId = "#domain";
                   roles."@type" = "User";
                   credentials = [
@@ -364,7 +369,7 @@ in
                 # reschedule lines asserted below).
                 user3 = {
                   "@type" = "User";
-                  name = "user3@example.test";
+                  name = "user3";
                   domainId = "#domain";
                   roles."@type" = "User";
                   credentials = [
@@ -379,7 +384,7 @@ in
                 # `emails` entry on a principal.
                 user4 = {
                   "@type" = "User";
-                  name = "user4@example.test";
+                  name = "user4";
                   domainId = "#domain";
                   roles."@type" = "User";
                   credentials = [
@@ -678,7 +683,7 @@ in
           # against a LIVE server with an incremental plan (Domain upsert
           # patch + new Account), the exact workflow runtime account
           # provisioning uses. IMAP LOGIN is by full EMAIL ADDRESS in 0.16.
-          machine.succeed("cat > /tmp/catchall-plan.ndjson <<'PLAN'\n{\"@type\":\"upsert\",\"object\":\"Domain\",\"value\":{\"domain\":{\"catchAllAddress\":\"catchall@example.test\"}}}\n{\"@type\":\"upsert\",\"object\":\"Account\",\"value\":{\"catchall\":{\"@type\":\"User\",\"name\":\"catchall@example.test\",\"domainId\":\"#domain\",\"roles\":{\"@type\":\"User\"},\"credentials\":[{\"@type\":\"Password\",\"secret\":\"${testPass}\"}]}}}\nPLAN")
+          machine.succeed("cat > /tmp/catchall-plan.ndjson <<'PLAN'\n{\"@type\":\"upsert\",\"object\":\"Domain\",\"value\":{\"domain\":{\"catchAllAddress\":\"catchall@example.test\"}}}\n{\"@type\":\"upsert\",\"object\":\"Account\",\"value\":{\"catchall\":{\"@type\":\"User\",\"name\":\"catchall\",\"domainId\":\"#domain\",\"roles\":{\"@type\":\"User\"},\"credentials\":[{\"@type\":\"Password\",\"secret\":\"${testPass}\"}]}}}\nPLAN")
           machine.succeed(
               "STALWART_URL=http://127.0.0.1:8080 STALWART_USER=admin "
               "STALWART_PASSWORD=test-admin-secret "

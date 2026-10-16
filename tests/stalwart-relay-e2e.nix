@@ -124,12 +124,13 @@ in
               reconcile = true;
               match = ["name"];
               objects.user1 = {
-                # 0.16 schema: User.name IS the primary address (no
-                # emailAddress field) - name == address keeps the auth
-                # identity and the sender check aligned (stalwart-e2e
-                # transcript 2026-10-16).
+                # 0.16 schema: User.name is the LOCAL PART; the primary
+                # address synthesizes as name@<Domain(domainId).name>
+                # (= user1@example.test via the #example-test domain
+                # object above). There is no separate emailAddress field
+                # (stalwart-e2e apply transcript 2026-10-16).
                 "@type" = "User";
-                name = "user1@example.test";
+                name = "user1";
                 domainId = "#example-test";
                 roles."@type" = "User";
                 credentials = [

@@ -50,9 +50,12 @@
     provisionWantedBy = lib.concatStringsSep "," provisionUnit.wantedBy;
     provisionUsesCli = lib.hasInfix "stalwart-cli apply" provisionUnit.serviceConfig.ExecStart;
     demoIsUserVariant = (demoAccount."@type" or "") == "User";
-    # 0.16 schema: the primary address IS User.name (there is no
-    # emailAddress field; struct-verified 2026-10-16).
-    demoEmail = demoAccount.name or "MISSING";
+    # 0.16 schema (apply-transcript-verified 2026-10-16): User.name is the
+    # LOCAL PART; the primary address synthesizes as name@<Domain.name> -
+    # the quickstart login is the PAIR (name, domain), and a legacy
+    # emailAddress field must stay absent (0.16 silently drops it).
+    demoName = demoAccount.name or "MISSING";
+    demoDomainName = domainObject.name or "MISSING";
     demoNoLegacyEmail = !(demoAccount ? emailAddress);
     demoHasPassword = demoAccount ? credentials;
     demoRolesUser = (demoAccount.roles."@type" or "") == "User";
@@ -76,8 +79,9 @@ in
   assert renderedAttrs.provisionWantedBy == "multi-user.target" || throw "demo-eval: provision unit must be wanted by multi-user.target.";
   assert renderedAttrs.provisionUsesCli || throw "demo-eval: provision unit must apply the plan via stalwart-cli (the 0.16 management surface - /api/principal is gone).";
   assert renderedAttrs.demoIsUserVariant || throw "demo-eval: the demo account must be an Account User variant (0.16 object model).";
-  assert renderedAttrs.demoEmail == "demo@mail.demo.test" || throw "demo-eval: demo account email drifted from the README quickstart login.";
-  assert renderedAttrs.demoNoLegacyEmail || throw "demo-eval: the demo account still carries a legacy emailAddress field - 0.16 User.name IS the primary address.";
+  assert renderedAttrs.demoName == "demo" || throw "demo-eval: demo account name drifted from the README quickstart login local part.";
+  assert renderedAttrs.demoDomainName == "mail.demo.test" || throw "demo-eval: demo domain object drifted - the quickstart login is <name>@<Domain.name>.";
+  assert renderedAttrs.demoNoLegacyEmail || throw "demo-eval: the demo account still carries a legacy emailAddress field - 0.16 User.name is the local part and the domain rides Domain.name.";
   assert renderedAttrs.demoHasPassword || throw "demo-eval: the demo account lost its password credential - the quickstart login would not work.";
   assert renderedAttrs.demoRolesUser || throw "demo-eval: the demo account must carry the User role - accounts without it are refused submission (README ledger).";
   assert renderedAttrs.catchAllAddress == "catchall@mail.demo.test" || throw "demo-eval: the demo lost its @mail.demo.test catch-all (Domain.catchAllAddress -> catchall account).";
@@ -107,7 +111,8 @@ in
           grep -q '"provisionWantedBy":"multi-user.target"' "$renderedPath"
           grep -q '"provisionUsesCli":true' "$renderedPath"
           grep -q '"demoIsUserVariant":true' "$renderedPath"
-          grep -q '"demoEmail":"demo@mail.demo.test"' "$renderedPath"
+          grep -q '"demoName":"demo"' "$renderedPath"
+          grep -q '"demoDomainName":"mail.demo.test"' "$renderedPath"
           grep -q '"demoNoLegacyEmail":true' "$renderedPath"
           grep -q '"demoHasPassword":true' "$renderedPath"
           grep -q '"demoRolesUser":true' "$renderedPath"

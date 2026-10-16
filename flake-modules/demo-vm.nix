@@ -72,11 +72,11 @@
                 match = ["name"];
                 objects = {
                   demo = {
-                    # 0.16 schema: User.name IS the primary address - the
-                    # quickstart login demo@mail.demo.test is the account
-                    # NAME, not a separate emailAddress field.
+                    # 0.16 schema: User.name is the LOCAL PART; the quickstart
+                    # login demo@mail.demo.test synthesizes as
+                    # name@<Domain(domain).name> (hostname = mail.demo.test).
                     "@type" = "User";
-                    name = "demo@mail.demo.test";
+                    name = "demo";
                     domainId = "#domain";
                     roles."@type" = "User";
                     # Strength-checked by stalwart at apply time (zxcvbn):
@@ -90,7 +90,7 @@
                   };
                   catchall = {
                     "@type" = "User";
-                    name = "catchall@mail.demo.test";
+                    name = "catchall";
                     domainId = "#domain";
                     roles."@type" = "User";
                   };
