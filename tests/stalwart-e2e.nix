@@ -282,6 +282,14 @@ in
 
         stalwart.provision = {
           singletons = {
+            # 0.16's reload-validation READS the system resolver config and
+            # fails the whole reload with "no nameservers found in config"
+            # in this DNS-less VM (transcript 2026-10-16) - same patch the
+            # upstream 0.16 NixOS test applies ("specific patches for the
+            # test VM environment"). Lookups still stall ~30s per probe,
+            # but validation passes.
+            DnsResolver."@type" = "Cloudflare";
+
             # Pyzor OFF: its default host is unresolvable in the DNS-less
             # VM - network dependence + config-error risk for zero test
             # value (0.15-era lesson, unchanged posture).
@@ -457,6 +465,12 @@ in
             rate = "3/1m";
           };
         };
+        # Same reload-validation patches as the main node (no nameservers;
+        # pyzor host unresolvable - both fail the 0.16 reload validation).
+        stalwart.provision.singletons = {
+          DnsResolver."@type" = "Cloudflare";
+          SpamPyzor.enable = false;
+        };
       };
 
       environment.etc."test-admin-secret" = {
@@ -477,15 +491,20 @@ in
       machine.wait_for_open_port(8080, timeout=60)
 
       # The declarative plan applies via stalwart-provision (wanted by
-      # multi-user.target, partOf stalwart). `systemctl restart` BLOCKS
-      # until the oneshot finishes, so a failure surfaces here with the
-      # unit's exit status instead of as mysterious 550s later - and the
-      # journal is dumped for the transcript either way.
+      # multi-user.target). `systemctl restart` BLOCKS until the oneshot
+      # finishes, so a failure surfaces here with the unit's exit status
+      # instead of as mysterious 550s later - and the journal is dumped
+      # for the transcript either way. NOTE: the vendored module's unit
+      # RESTARTS stalwart after a successful apply (listener sockets do
+      # not re-spawn on reload), so the mail ports flap here - re-wait
+      # for them before any probe.
       machine.succeed("systemctl restart stalwart-provision.service")
       machine.succeed(
           "journalctl -u stalwart-provision -b 0 -o cat > /tmp/provision.log"
       )
       machine.succeed("cat /tmp/provision.log >&2")
+      machine.wait_for_open_port(25, timeout=120)
+      machine.wait_for_open_port(8080, timeout=60)
 
       with subtest("SMTP: full dialogue, unknown recipient rejected 5xx"):
           # --timeout 120: the RCPT decision runs SPF/DNSBL checks whose
