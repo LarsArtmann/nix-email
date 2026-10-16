@@ -24,8 +24,6 @@ import subprocess
 import sys
 from pathlib import Path
 
-REPO = Path(__file__).resolve().parent.parent
-
 
 def sh(*cmd: str) -> str:
     result = subprocess.run(cmd, capture_output=True, text=True)

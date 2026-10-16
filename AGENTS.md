@@ -250,11 +250,12 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
   downgrades privileged-port (<1024) collisions to warnings, so a full
   buildflow run exits 0 again - VERIFIED with a locally built binary
   against this repo (EXIT:0, zero error findings; the 587 pair survives
-  as an annotated warning). CAVEAT: the installed `buildflow`
-  (home-manager nix-profile, store rev 3bb229e) predates the fix - until
-  the profile flips to a BuildFlow build >= 15ea141d2, the gate still
-  exits 69 with the same 4 known findings; do NOT "fix" this repo's Nix
-  for them and do NOT skip the nix-checker step (it also owns
+  as an annotated warning). RESOLVED 2026-10-16: the home-manager profile
+  flipped to a build >= 15ea141d2 (binary 83db580) and a FULL gate run here
+  verified EXIT:0 (the nix-checker step reports 12 warning-severity
+  findings, 0 errors - the summary-vs-detail 12-vs-2 count gap is a
+  BuildFlow-repo TODO). Do NOT "fix" this repo's Nix for the surviving
+  warning pairs and do NOT skip the nix-checker step (it also owns
   stale-hash/input drift checks with real signal). The hardcoded-hash
   findings on the parsedmarc-e2e fetchurl pins are
   WARNINGS and documented wrong-about-fixtures (see above).
