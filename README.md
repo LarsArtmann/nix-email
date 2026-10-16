@@ -272,10 +272,10 @@ PIN DISCIPLINE: consumers of this flake MUST pin it by a hard rev/tag (not
 `services.stalwart` module (0.15.5) at a specific nixpkgs rev, and both
 repos deliberately pin the SAME nixpkgs rev (compat doctrine - bump both
 together; Renovate PRs are approval-gated so a nixpkgs move never lands
-unreviewed). STATUS 2026-09-22: SystemNix VIOLATES this today - its input
-floats `github:LarsArtmann/nix-email?ref=master` (flake.nix:671); the
-hard-pin + push move is decision-gated (docs/planning/decision-batch.md
-C17/C18). InboxClean's `?ref=master` is fine there because it has no
+unreviewed). STATUS 2026-10-05: SystemNix COMPLIES - its input is
+HARD-PINNED `github:LarsArtmann/nix-email?ref=v0.4.0` (decision-batch C17a
+executed; the 2026-09-22 "floats ?ref=master" violation is fixed, the pin
+rides each release tag from here). InboxClean's `?ref=master` is fine there because it has no
 nixpkgs-version-sensitive contract; this repo does.
 
 Gatus checks for the VPS (on evo-x2, external viewpoint):
@@ -352,8 +352,9 @@ inside nixpkgs are invisible to it, so the checks below are manual):
    carry the code side; this is the procedure side; every bullet is a fact
    the module depends on, re-verify each against the new pin):
    - `[elasticsearch]` emission: rerun `nix build .#checks.x86_64-linux.dmarc-eval`
-     and the `parsedmarc-e2e` VM test. KNOWN INCOMING (2026-10-05): nixpkgs
-     PR #566282 replaces `services.parsedmarc.provision.elasticsearch` with
+     and the `parsedmarc-e2e` VM test. **nixpkgs PR #566282 MERGED
+     2026-10-13 (`22579286`)**: it replaces
+     `services.parsedmarc.provision.elasticsearch` with
      `provision.opensearch` and throws on elasticsearch provisioning - the
      first pin past it breaks our `provision.elasticsearch = mkDefault false`
      and the `ExecStartPre` guard that reads the option. Port both to the
@@ -363,8 +364,10 @@ inside nixpkgs are invisible to it, so the checks below are manual):
      version. Revert `parsedmarcPackage` in `modules/dmarc-monitor.nix` (and
      the `dmarc-eval` pin assertion) when the pin ships imapclient >= 4.1.0:
      upstream fixed `starttls()` there (mjs/imapclient#663 merged, released
-     2026-09-18, confirmed by the maintainer on nixpkgs #563652); the nixpkgs
-     bump itself is pending inside PR #566282 (imapclient 4.0.1 -> 4.1.0).
+     2026-09-18, confirmed by the maintainer on nixpkgs #563652); the
+     imapclient 4.0.1 → 4.1.0 bump rode PR #566282 (merged 2026-10-13), so
+     the first pin past `22579286` likely ships it - verify the version
+     before reverting the pin.
    - Watch for `services.stalwart` passing 0.15.5: the wrapper's verified key
      set (relay IfBlocks, certificate tiers) must be re-verified against the
      new source before riding the bump.

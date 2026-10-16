@@ -106,7 +106,12 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
     file CONTENTS into dovecot.conf and doveconf dies parsing the first
     PEM line as a path);
   - the parsedmarc ini generator renders bools Python-style (`ssl=True`,
-    NOT `ssl=true`) - grep assertions must match `True`.
+    NOT `ssl=true`) - grep assertions must match `True`;
+  - `arrival_date_utc` assertions are TIMEZONE-NORMALIZATION proofs, not
+    date greps: the fixture's `+0200`/`+0800`/`+0000` offsets must each
+    survive conversion to UTC in the asserted string (the e2e asserts all
+    three classes - keep new fixtures in at least one non-UTC offset or
+    the assertion proves nothing).
 - HOST-SIDE PARSER DRY-RUN before any VM test that feeds a fixture to a
   python service (2026-09-23, paid for itself same day; mechanized
   2026-10-05): `python3 scripts/host-parse-fixture.py <fixture> --check
@@ -128,10 +133,11 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
 - nixpkgs pinned to SystemNix's lock rev (compat doctrine). Bump both
   together; note in README when nixpkgs moves `services.stalwart` past
   0.15.5. The full bump + consumer-pin + workaround-retirement procedure
-  is the README "Pin-advance runbook". CORRECTED 2026-09-22: SystemNix
-  consumes this flake via floating `?ref=master` (flake.nix:671), NOT a
-  release tag - the old "current: v0.2.0" claim was stale; hard-pinning
-  the URL is an open decision (decision-batch C17).
+  is the README "Pin-advance runbook". EXECUTED 2026-10-05: SystemNix
+  HARD-PINNED this flake `?ref=v0.4.0` (C17a adopted; the earlier
+  "floats `?ref=master`" and "pins v0.2.0" claims are both obsolete) -
+  the consumer pin rides each release tag from here (README PIN
+  DISCIPLINE).
 - Wrapper hardening options (2026-09-22, M14): `rateLimits` and
   `spamFilter.dnsbl.servers` default OFF by design - v0.15.5 already
   ships two conservative inbound limiters via DEFAULT_SETTINGS (boot.rs,
@@ -350,4 +356,6 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
 - `docs/INBOXCLEAN.md` - the InboxClean JMAP integration contract
   (pinned-version facts, auth/host-rewrite rules, label mapping,
   re-verification procedure); raw probe transcripts live under
-  `docs/probes/<date-topic>/` with their own README manifests.
+  `docs/probes/<date-topic>/` with their own README manifests - and BOTH
+  are docs-health sweep targets (a pass audits probe-dir manifests for
+  staleness too, not just status/planning docs).

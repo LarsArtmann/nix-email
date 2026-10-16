@@ -203,8 +203,18 @@ are batched in `docs/planning/decision-batch.md` (2026-09-22) - answer there.
    lifecycle - adjacent to open question 5), (b) user/webmail-managed sieve
    per account (zero wrapper code, manual per account), (c) tag-only as the
    documented end state, (d) upstream feature request for declarative
-   server-side filing and revisit on 0.16+. Recommendation: (c) now + (d)
-   as the path to (a) later; awaiting the final call.
+   server-side filing and revisit on 0.16+. ~~Recommendation: (c) now + (d)
+   as the path to (a) later; awaiting the final call.~~ RESIDUE RESOLVED
+   2026-10-05 (source-verified, commit `099ba9d`): there IS no 0.15.5
+   setting name - the auto-move is HARD-CODED in
+   `crates/email/src/message/ingest.rs:344` (INBOX-targeted deliveries of
+   spam-verdict messages go to `JUNK_ID` + the `$Junk` keyword, gated only
+   by `spam-filter.enable` + score thresholds). (d) is MOOT (the feature
+   exists upstream since 0.5.0); a wrapper `junkFiling` option is NOT
+   implementable as a Stalwart setting; (c) tag-only stands as the
+   documented end state and (a)'s JMAP automation is the only declarative
+   path (TODO_LIST Low row). Owner ratification pending (decision-batch
+   Agent-execution adoptions, Q6).
 7. ~~**Demo VM boundary (2026-09-17 flake-parts session):** a runnable
    throwaway mail VM in THIS repo (`nix run .#vm`, telephony's `apps.vm`
    pattern), or does "boot the stack" belong to the consumer layer
