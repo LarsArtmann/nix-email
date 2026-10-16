@@ -7,8 +7,16 @@
 # only accepted form) and node `relay` runs Mailpit as the catch-all
 # smarthost.
 #
-#   1. Relay generates queue.route."smarthost" + queue.strategy.route with
-#      the default-shape IfBlock (is_local_domain -> 'local', else -> relay)
+# 0.16 REWORK (2026-10-16): the relay emits a MtaRoute (Relay variant) + a
+# MtaOutboundStrategy route Expression (is_local_domain -> 'local', else ->
+# relay NAME) instead of the 0.15 queue.route/queue.strategy.route TOML,
+# and the sender account is DECLARATIVE (stalwart-provision plan) - the
+# /api/principal provisioning calls are gone with the REST API. The relay
+# secret still rides systemd LoadCredential -> File-secret filePath.
+#
+#   1. Relay generates MtaRoute "smarthost" (Relay) + the outbound strategy
+#      expression with the default shape (is_local_domain -> 'local', else
+#      -> relay)
 #   2. Submission on 587 for a NON-local domain lands in Mailpit (relay path)
 #   3. Submission for a LOCAL domain still delivers locally (strategy did not
 #      break the local queue)
@@ -25,11 +33,13 @@
 # The username==null emission shape is pinned by the eval assertions in the
 # let block (this VM runs the SASL shape).
 {pkgs}: let
-  testHash = "$6$StalwartTestSalt$gagC41V16GV6khfXMiraIyZLKuYDgSyRzVfM0TaSFNMRqkLewQ5d/b9Ns0uc1Rr4DWD15BxHHzh2XaC4ZAS97.";
+  # 0.16 account secrets are PLAINTEXT at provision time (apply hashes
+  # server-side); strength is enforced (zxcvbn), hence the length.
+  testPass = "testpass-x7Kk-9mQw";
   relayNeedle = "relay-needle-9f2c1b";
 
   # The username==null relay emission shape (import-and-eval pattern from
-  # dmarc-eval): no auth block on the generated route, and no credential
+  # dmarc-eval): no auth fields on the generated MtaRoute, and no credential
   # registered for it. The wrapper asserts username/secretFile pair up, so
   # this is the only legal no-credential shape. NOTE: eval-config.nix, NOT
   # nixos/default.nix - the latter only accepts {configuration, system,
@@ -43,6 +53,7 @@
           services.mail-server = {
             enable = true;
             hostname = "mail.example.test";
+            admin.secretFile = "/run/relay-eval-admin-secret";
             relay = {
               address = "relay.example.test";
               port = 587;
@@ -54,10 +65,14 @@
       ];
     }).config;
 
-  nullRelayAsserts = assert nullRelayConfig.services.stalwart.settings.queue.route ? "smarthost";
-  assert !(nullRelayConfig.services.stalwart.settings.queue.route."smarthost" ? auth);
+  nullRelayRoute = nullRelayConfig.services.stalwart.provision.objects.MtaRoute.objects."smarthost";
+  nullRelayAsserts = assert nullRelayRoute ? address;
+  assert nullRelayRoute."@type" == "Relay";
+  assert !(nullRelayRoute ? authUsername);
+  assert !(nullRelayRoute ? authSecret);
   assert !(nullRelayConfig.services.stalwart.credentials ? mail-server-relay);
-    nullRelayConfig.services.stalwart.settings.queue.route."smarthost".address;
+  assert nullRelayConfig.services.stalwart.provision.singletons.MtaOutboundStrategy.route."else" == "'smarthost'";
+    nullRelayRoute.address;
 in
   pkgs.testers.runNixOSTest {
     name = "stalwart-relay-e2e";
@@ -70,12 +85,13 @@ in
           mail-server = {
             enable = true;
             hostname = "mail.example.test";
+            admin.secretFile = "/etc/test-admin-secret";
             relay = {
               address = "relay";
               port = 1025;
               # SASL smarthost (Mailpit enforces AUTH via --smtp-auth-file,
               # see the relay node): exercises the username + secretFile
-              # emission path with the %{file:...}% credential macro - the
+              # emission path with the 0.16 File-secret filePath - the
               # same mechanism SystemNix's contract test asserts with sops.
               username = "relayuser";
               secretFile = "/etc/relay-secret";
@@ -83,9 +99,29 @@ in
             };
           };
 
-          stalwart.settings.authentication.fallback-admin = {
-            user = "admin";
-            secret = "test-admin-secret";
+          # The wrapper owns the mail.example.test domain; the SENDER needs
+          # the example.test domain + account, provisioned declaratively
+          # (the pre-0.16 /api/principal calls are gone with the REST API).
+          stalwart.provision.objects = {
+            Domain.objects.example-test = {
+              name = "example.test";
+              dkimManagement."@type" = "Manual";
+              dnsManagement."@type" = "Manual";
+              certificateManagement."@type" = "Manual";
+            };
+            Account.objects.user1 = {
+              "@type" = "User";
+              name = "user1";
+              domainId = "#example-test";
+              emailAddress = "user1@example.test";
+              roles."@type" = "User";
+              credentials = [
+                {
+                  "@type" = "Password";
+                  secret = testPass;
+                }
+              ];
+            };
           };
 
           # Bridge DNS for the relay hostname: stalwart's system resolver reads
@@ -104,8 +140,12 @@ in
           };
         };
 
-        # Test-only credential file (real hosts: sops-rendered path).
+        # Test-only credential files (real hosts: sops-rendered paths).
         environment.etc."relay-secret".text = "relaypass";
+        environment.etc."test-admin-secret" = {
+          mode = "0600";
+          text = "test-admin-secret";
+        };
 
         networking.nameservers = ["127.0.0.1"];
 

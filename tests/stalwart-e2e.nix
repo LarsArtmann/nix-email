@@ -1,61 +1,66 @@
 # End-to-end VM test for modules/mail-server.nix against the REAL Stalwart
-# 0.15.5 binary from nixpkgs (no mocks). Pattern borrowed from
+# 0.16.x binary from nixpkgs (stalwart_0_16, no mocks). Pattern borrowed from
 # simple-nixos-mailserver's external.nix: exercise the FULL mail path with
 # real accounts, not just protocol greetings.
 #
-#   1.  Service starts and stays up against the RocksDB store
+# 0.16 REWORK (2026-10-16): accounts/domain/listeners/DKIM are DECLARATIVE
+# now - provisioned at boot by stalwart-provision (stalwart-cli apply, the
+# vendored module's typed plan). The pre-0.16 REST API (/api/principal,
+# /api/dkim, /api/reload, /api/reports) is GONE upstream, so:
+#   - the "pre-provision poison + negative-cache heal" subtests are dropped:
+#     everything exists before the first bind, so there is nothing left to
+#     poison (directoryCacheTtlNegative stays for consumers that provision
+#     accounts at runtime);
+#   - the "admin API" probes moved to /jmap (the 0.16 management surface);
+#   - the webadmin DKIM-keygen subtest became a second DECLARATIVE signature
+#     (ed25519) asserted on the wire (dual DKIM-Signature headers);
+#   - the offline backup/restore subtest is dropped: 0.16 removed the
+#     `--export/--import` flags (no such commands in crates/main/src/main.rs;
+#     backups move to datastore-level tooling - consumer concern).
+#   1.  Service starts and stays up against the RocksDB store; the
+#       declarative plan applies clean (stalwart-provision oneshot)
 #   2.  SMTP dialogue with unknown recipient REJECTED 5xx (directory lookup)
-#   3.  IMAPS implicit-TLS greeting; HTTP admin answers on loopback only
-#   4.  Declarative admin bootstrap via `authentication.fallback-admin`
-#       (verified in v0.15.5 source: works with an empty internal directory)
-#   5.  Accounts + domain created through the real management API
-#       (POST /api/principal - payload verified against webadmin source)
+#   3.  IMAPS implicit-TLS greeting; HTTP answers on loopback
+#   4.  /jmap: fallback-admin authenticates, anonymous rejected 401
+#   5.  Accounts + domain provisioned DECLARATIVELY (plan, not API calls)
 #   6.  Authenticated submission on 587 (STARTTLS + AUTH PLAIN)
 #   7.  Delivery: message lands in the recipient's INBOX, fetched via IMAPS
-#   8.  DKIM signing: the declarative `signature.<id>` block signs the
-#       submission (header asserted on the stored message); then the
-#       webadmin keygen flow (POST /api/dkim, ed25519) adds the second
-#       default-sign id live - store-only write, so /api/reload makes the
-#       signer map see it - one message, two DKIM-Signature headers
+#   8.  DKIM signing: both declarative signatures (rsa + ed25519) stamp the
+#       submission - one message, two DKIM-Signature headers
 #   9.  Metrics: /metrics/prometheus answers 200 on the HTTP listener
-#   10. Journal hygiene: exactly the 1 known-benign "Configuration build
-#       error" line (resolver in the DNS-less VM) - nothing else
-#   11. Restart persistence: message survives `systemctl restart`, anonymous
-#       admin API stays 401
-#   12. Backup/restore: offline `--export`, wipe the store, `--import`,
-#       message survives the roundtrip
-#  13. Alias delivery: a second `emails` entry on a principal receives into
-#      the same account's INBOX (internal directory indexes every email ->
-#      EmailToId, crates/directory/src/backend/internal/lookup.rs:95)
-#  14. Catch-all: a principal holding the literal email "@example.test"
-#      receives mail for any unknown local part (default AddressMapping::
-#      Enable retries the lookup with "@<domain>", crates/common/src/
-#      addresses.rs:209)
-#  15. Account quota: `quota` (bytes) on a principal makes delivery RETRY
-#      forever (code-level reason "Mailbox over quota.", delivery.rs:225;
-#      journal-visible signature: "Message rescheduled for delivery") -
-#      message accepted at SMTP time, never ingested, and the retry IS
-#      asserted in the journal
-#  16. Spam classification: a GTUBE body message gets X-Spam-Status: Yes
-#      and is STILL delivered to INBOX (VM-verified 2026-09-15: the default
-#      filter scans authenticated submission but does NO Junk filing;
-#      Junk routing is consumer sieve territory - README ledger)
-#  17. Negative-cache expiry: a domain poisoned by a pre-provision probe
-#      becomes deliverable locally again within the configured
-#      directoryCacheTtlNegative (the 1h-trap regression guard)
+#  10. Journal hygiene: no configuration build errors
+#  11. Restart persistence: message survives `systemctl restart`, anonymous
+#      /jmap stays 401
+#  12. Alias delivery: a provisioned EmailAlias on user4 receives into the
+#      same account's INBOX
+#  13. Catch-all: applied AT RUNTIME via a second `stalwart-cli apply`
+#      (Domain.catchAllAddress + catchall account) - proves apply
+#      idempotency against a live server AND the ordering semantics: before
+#      the catch-all exists, unknown local parts are REJECTED (subtest 2)
+#  14. Account quota: quotas.maxDiskQuota = 1 makes delivery RETRY forever -
+#      message accepted at SMTP time, never ingested, retry asserted in the
+#      journal
+#  15. Spam classification: a GTUBE body message gets X-Spam-Status: Yes
+#      and is STILL delivered to INBOX (the default filter scans
+#      authenticated submission but does NO Junk filing; Junk routing is
+#      consumer sieve territory - README ledger)
+#  16. Native report ingestion: a DMARC aggregate mailed to a
+#      ReportSettings.inboundReportAddresses recipient with
+#      inboundReportForwarding=false is CONSUMED (no INBOX delivery; the
+#      pre-0.16 /api/reports store read is gone with the REST API)
+#  17. JMAP: session, mailboxes, and the delivered needle over the API
 #  18. Nothing panics in the journal
-# 19. Native report ingestion: a DMARC aggregate mailed to a
-#     report.analysis.addresses recipient with report.analysis.forward=false
-#     is CONSUMED by analyze_report (no INBOX delivery) and lands parsed in
-#     the report store, readable via GET /api/reports/dmarc
+# 19. Wrapper rate limiter trips at runtime (flood node, M14 evidence)
 #
 # NOT covered (needs DNS + external relay creds): outbound smarthost relay
 # (see stalwart-relay-e2e). Those stay live-host go-live checks - see
 # README verified-facts ledger for the keys.
 {pkgs}: let
-  # Fixed salt => deterministic hash of "testpass" (sha512-crypt $6$,
-  # the exact format the webadmin hashes account passwords with).
-  testHash = "$6$StalwartTestSalt$gagC41V16GV6khfXMiraIyZLKuYDgSyRzVfM0TaSFNMRqkLewQ5d/b9Ns0uc1Rr4DWD15BxHHzh2XaC4ZAS97.";
+  # 0.16 accounts take PLAINTEXT secrets at provision time (apply hashes
+  # server-side; the upstream 0.16 NixOS test does the same). Strength is
+  # ENFORCED at apply (zxcvbn: short/common passwords are rejected), hence
+  # the length. Test-only, published ON PURPOSE.
+  testPass = "testpass-x7Kk-9mQw";
 
   # Real DMARC aggregate sample (same artifact as parsedmarc-e2e). The
   # attachment FILENAME matters: Stalwart's report detector matches
@@ -101,6 +106,16 @@
     -----END PRIVATE KEY-----
   '';
 
+  # Second (ed25519) declarative signature - the 0.16 replacement of the
+  # old webadmin /api/dkim keygen subtest: both signatures ride the boot
+  # plan, and the wire assertion is still "one message, two
+  # DKIM-Signature headers" (rsa-sha256 + ed25519-sha256).
+  testDkimEd25519Key = ''
+    -----BEGIN PRIVATE KEY-----
+    MC4CAQAwBQYDK2VwBCIEIHrMbshXJBICmrXes9yZvgdoXWWMC61TpZ4zwH2gL+eR
+    -----END PRIVATE KEY-----
+  '';
+
   # Runs INSIDE the VM (the testScript itself runs on the driver host):
   # polls IMAPS on loopback until a message containing the needle arrives
   # in the account's INBOX. Delivery is async (queue -> local delivery) and
@@ -114,7 +129,7 @@
 
     needle = sys.argv[1].encode()
     user = sys.argv[2] if len(sys.argv) > 2 else "user2@example.test"
-    password = sys.argv[3] if len(sys.argv) > 3 else "testpass"
+    password = sys.argv[3] if len(sys.argv) > 3 else "${testPass}"
     deadline = time.time() + 180
     ctx = ssl.create_default_context()
     ctx.check_hostname = False
@@ -203,7 +218,7 @@
     needle = sys.argv[1].encode()
     header = sys.argv[2].encode()
     user = sys.argv[3] if len(sys.argv) > 3 else "user2@example.test"
-    password = sys.argv[4] if len(sys.argv) > 4 else "testpass"
+    password = sys.argv[4] if len(sys.argv) > 4 else "${testPass}"
     deadline = time.time() + 180
     ctx = ssl.create_default_context()
     ctx.check_hostname = False
@@ -255,60 +270,151 @@ in
           enable = true;
           hostname = "mail.example.test";
           metrics.enable = true;
-          # Low negative-cache TTL so the poisoned-directory recovery subtest
-          # can observe the heal inside the test run (upstream default 3600 s
-          # would trap the test for an hour - that IS the documented trap).
+          # Low negative-cache TTL (upstream default 3600 s): kept from the
+          # 0.15 era as a cheap canary - the declarative plan means nothing
+          # SHOULD poison the cache anymore, so any stall here is a real
+          # regression signal.
           directoryCacheTtlNegative = 5;
+          # 0.16: the fallback admin is the provisioning CLI's only
+          # credential path (systemd-creds).
+          admin.secretFile = "/etc/test-admin-secret";
         };
 
-        stalwart = {
-          settings = {
-            # Headless admin: the fallback-admin exists even with an empty
-            # internal directory (reference config pattern from the upstream repo).
-            authentication.fallback-admin = {
-              user = "admin";
-              secret = "test-admin-secret";
-            };
+        stalwart.provision = {
+          singletons = {
+            # Pyzor OFF: its default host is unresolvable in the DNS-less
+            # VM - network dependence + config-error risk for zero test
+            # value (0.15-era lesson, unchanged posture).
+            SpamPyzor.enable = false;
 
-            # DKIM signing: the default `auth.dkim.sign` expression signs local-
-            # domain mail with ids `['rsa-' + sender_domain, ...]`, so the id below
-            # is exactly "rsa-" + example.test (key names verified against v0.15.5
-            # source, README ledger).
-            signature."rsa-example.test" = {
-              private-key = testDkimKey;
-              domain = "example.test";
-              selector = "test";
-              algorithm = "rsa-sha256";
+            # Native report ingestion: recipients matching
+            # inboundReportAddresses get inbound report messages ANALYZED
+            # into the report store instead of delivered - but ONLY with
+            # inboundReportForwarding = false (the pre-0.16
+            # report.analysis.{addresses,forward} pair).
+            ReportSettings = {
+              inboundReportAddresses = ["reports@example.test"];
+              inboundReportForwarding = false;
             };
-
-            # Native report ingestion (subtest 19): recipients matching
-            # report.analysis.addresses get inbound report messages ANALYZED into
-            # the report store instead of delivered - but ONLY with
-            # report.analysis.forward = false (the v0.15.5 default true merely
-            # forwards; keys verified at
-            # crates/common/src/config/smtp/report.rs:86,90).
-            # NOTE: nested via REAL attrs (settings.report.analysis), NOT the
-            # dotted-string key "report.analysis" - the latter renders as a
-            # fully-quoted table header ["report.analysis"], which Stalwart's
-            # TOML parser rejects ("Unexpected end of line"; binary probe
-            # 2026-09-16, /tmp/st-probe). Bare-dotted and mixed headers
-            # ([metrics.prometheus], [signature."rsa-example.test"]) parse fine.
-            report.analysis = {
-              addresses = ["reports@example.test"];
-              forward = false;
+          };
+          objects = {
+            Account = {
+              reconcile = true;
+              match = ["name"];
+              objects = {
+                user1 = {
+                  "@type" = "User";
+                  name = "user1";
+                  domainId = "#domain";
+                  emailAddress = "user1@example.test";
+                  roles."@type" = "User";
+                  credentials = [
+                    {
+                      "@type" = "Password";
+                      secret = testPass;
+                    }
+                  ];
+                };
+                user2 = {
+                  "@type" = "User";
+                  name = "user2";
+                  domainId = "#domain";
+                  emailAddress = "user2@example.test";
+                  roles."@type" = "User";
+                  credentials = [
+                    {
+                      "@type" = "Password";
+                      secret = testPass;
+                    }
+                  ];
+                };
+                reports = {
+                  "@type" = "User";
+                  name = "reports";
+                  domainId = "#domain";
+                  emailAddress = "reports@example.test";
+                  roles."@type" = "User";
+                  credentials = [
+                    {
+                      "@type" = "Password";
+                      secret = testPass;
+                    }
+                  ];
+                };
+                # quota: maxDiskQuota = 1 BYTE - over-quota delivery retries
+                # forever, never ingested (journal-visible via the queue
+                # reschedule lines asserted below).
+                user3 = {
+                  "@type" = "User";
+                  name = "user3";
+                  domainId = "#domain";
+                  emailAddress = "user3@example.test";
+                  roles."@type" = "User";
+                  credentials = [
+                    {
+                      "@type" = "Password";
+                      secret = testPass;
+                    }
+                  ];
+                  quotas.maxDiskQuota = 1;
+                };
+                # aliases = the 0.16 replacement of the pre-0.16 second
+                # `emails` entry on a principal.
+                user4 = {
+                  "@type" = "User";
+                  name = "user4";
+                  domainId = "#domain";
+                  emailAddress = "user4@example.test";
+                  roles."@type" = "User";
+                  credentials = [
+                    {
+                      "@type" = "Password";
+                      secret = testPass;
+                    }
+                  ];
+                  aliases = [
+                    {
+                      name = "alias4@example.test";
+                      domainId = "#domain";
+                      enabled = true;
+                    }
+                  ];
+                };
+              };
             };
-
-            # Pyzor OFF: its default host (public.pyzor.org) is unresolvable in
-            # the DNS-less VM, and that build error is not just cosmetic -
-            # POST/GET /api/reload ABORTS without swapping the rebuilt core if
-            # ANY config error exists (manager/reload.rs: `if !config.errors
-            # .is_empty() { return }` before new_core), so the DKIM keygen
-            # subtest's reload would silently no-op. Disabling pyzor empties
-            # config.errors and lets the reload go through (source-verified
-            # 2026-09-16; pyzor never functioned here anyway - no DNS).
-            spam-filter.pyzor.enable = false;
+            DkimSignature = {
+              reconcile = false;
+              objects = {
+                rsa-test = {
+                  "@type" = "Dkim1RsaSha256";
+                  domainId = "#domain";
+                  selector = "test";
+                  privateKey = {
+                    "@type" = "Text";
+                    secret = testDkimKey;
+                  };
+                  stage = "active";
+                };
+                ed-test = {
+                  "@type" = "Dkim1Ed25519Sha256";
+                  domainId = "#domain";
+                  selector = "ed";
+                  privateKey = {
+                    "@type" = "Text";
+                    secret = testDkimEd25519Key;
+                  };
+                  stage = "active";
+                };
+              };
+            };
           };
         };
+      };
+
+      # Fallback-admin password (0.16 systemd-creds path).
+      environment.etc."test-admin-secret" = {
+        mode = "0600";
+        text = "test-admin-secret";
       };
 
       environment.systemPackages = [
@@ -329,8 +435,9 @@ in
     # deliberately a SEPARATE node so its bucket cannot perturb the main
     # subtests' connections. A tripped inbound limiter is
     # CONNECTION-GATING - a pre-SMTP hangup, never a 4xx code (README
-    # ledger (i) source cite + (m) live observation on the default 5/1s
-    # limiter: 12 rapid connections -> 5 banners + 7 empties).
+    # ledger (i) source cite + (m) live observation on the 0.15 default
+    # 5/1s limiter: 12 rapid connections -> 5 banners + 7 empties; the
+    # 0.16 behavior is asserted from THIS build's transcript).
     nodes.flood = {...}: {
       imports = [../modules/mail-server.nix];
 
@@ -340,26 +447,23 @@ in
         mail-server = {
           enable = true;
           hostname = "mail.flood.test";
+          admin.secretFile = "/etc/test-admin-secret";
           rateLimits = {
             enable = true;
             rate = "3/1m";
           };
         };
-        stalwart.settings = {
-          authentication.fallback-admin = {
-            user = "admin";
-            secret = "test-admin-secret";
-          };
-          spam-filter.pyzor.enable = false;
-        };
+      };
+
+      environment.etc."test-admin-secret" = {
+        mode = "0600";
+        text = "test-admin-secret";
       };
 
       virtualisation.memorySize = 1024;
     };
 
     testScript = ''
-      import json
-      import re
       import time
 
       start_all()
@@ -368,83 +472,17 @@ in
       machine.wait_for_open_port(25, timeout=60)
       machine.wait_for_open_port(8080, timeout=60)
 
-      def create_principal(payload):
-          machine.succeed(
-              "curl -fsS -u admin:test-admin-secret -H 'Content-Type: application/json' "
-              "-X POST http://127.0.0.1:8080/api/principal -d '{}'".format(
-                  json.dumps(payload)
-              )
-          )
+      # The declarative plan applies via stalwart-provision (wanted by
+      # multi-user.target, partOf stalwart). `systemctl restart` BLOCKS
+      # until the oneshot finishes, so a failure surfaces here with the
+      # unit's exit status instead of as mysterious 550s later - and the
+      # journal is dumped for the transcript either way.
+      machine.succeed("systemctl restart stalwart-provision.service")
+      machine.succeed(
+          "journalctl -u stalwart-provision -b 0 -o cat > /tmp/provision.log"
+      )
+      machine.succeed("cat /tmp/provision.log >&2")
 
-      def create_account(name):
-          # "roles": ["user"] is REQUIRED - without it the account authenticates
-          # but submission is refused with 550 5.7.1 "not authorized to use
-          # this service" (the webadmin adds it silently; observed live in VM).
-          create_principal({
-              "type": "individual",
-              "name": name,
-              "emails": [name],
-              "roles": ["user"],
-              "secrets": ["${testHash}"],
-          })
-
-      # PRE-PROVISION PROBE: touching example.test before the domain exists
-      # poisons the directory negative cache (is_local_domain false -> the
-      # domain takes the non-local path; this IS the documented provisioning
-      # trap). The recovery subtest below proves the low TTL heals it.
-      #
-      # RUNTIME BUDGET (documented, measured per run below): the two RCPT
-      # probes in this test cost ~60-70 s of pure resolver timeouts. Each
-      # RCPT decision runs SPF + DNSBL lookups that stall ~30 s per lookup
-      # in the DNS-less VM before failing (deterministic timeout behavior,
-      # live-observed); the pre-provision poison probe and the
-      # unknown-recipient probe EACH pay that once. The module defaults
-      # keep the DNS checks on purpose (a real MX should do them) - the
-      # cost is the DNS-less VM's fault, not a product defect.
-      with subtest("pre-provision probe poisons the directory negative cache"):
-          probe_t0 = time.monotonic()
-          machine.succeed(
-              "swaks --timeout 120 --server 127.0.0.1:25 --ehlo probe.example.test --from probe@example.test --to early@example.test --quit-after RCPT > /tmp/swaks-early.log 2>&1 || true"
-          )
-          machine.succeed("cat /tmp/swaks-early.log >&2")
-          machine.succeed(
-              "grep -E '(<-|<\\*\\*|<~\\*) *5[0-9][0-9]' /tmp/swaks-early.log"
-          )
-          machine.log(
-              "negative-cache poison probe wall cost: {:.0f}s (resolver timeouts)".format(
-                  time.monotonic() - probe_t0
-              )
-          )
-
-      # Provisioning MUST happen BEFORE any SMTP traffic: a MAIL FROM/RCPT to
-      # a not-yet-existing domain poisons the directory's is_local_domain
-      # NEGATIVE CACHE (default TTL 1h, crates/directory/src/core/cache.rs),
-      # and every later submission for that domain is then routed to the MX
-      # path instead of local delivery (observed in VM, 2026-09-14).
-      with subtest("management API: create domain and accounts"):
-          create_principal({"type": "domain", "name": "example.test"})
-          create_account("user1@example.test")
-          create_account("user2@example.test")
-          create_account("reports@example.test")
-          # quota = 1 BYTE: over-quota delivery retries forever (reason
-          # "Mailbox over quota." at delivery.rs:225; journal logs only
-          # "Message rescheduled for delivery") - never ingested.
-          create_principal({
-              "type": "individual",
-              "name": "user3@example.test",
-              "emails": ["user3@example.test"],
-              "roles": ["user"],
-              "secrets": ["${testHash}"],
-              "quota": 1,
-          })
-          # Second emails entry = alias (both map to the same account).
-          create_principal({
-              "type": "individual",
-              "name": "user4@example.test",
-              "emails": ["user4@example.test", "alias4@example.test"],
-              "roles": ["user"],
-              "secrets": ["${testHash}"],
-          })
       with subtest("SMTP: full dialogue, unknown recipient rejected 5xx"):
           # --timeout 120: the RCPT decision runs SPF/DNSBL checks whose
           # resolver calls stall ~30s each in the DNS-less VM before failing
@@ -480,20 +518,26 @@ in
               "&& grep -Eq '200|30[0-9]' /tmp/http-root-code.txt"
           )
 
-      with subtest("admin API: fallback-admin works, anonymous rejected"):
+      with subtest("management: fallback-admin authenticates on /jmap, anonymous rejected"):
+          # 0.16: management rides /jmap (the /api/* surface is gone).
+          # The fallback admin exists in production mode (vendored module
+          # admin option); anonymous must bounce with 401. File-based:
+          # dump to /tmp, grep the file (pipe-lint rule).
           machine.succeed(
-              "curl -fsS -u admin:test-admin-secret http://127.0.0.1:8080/api/principal -o /tmp/principals.json"
+              "curl -fsS -u admin:test-admin-secret http://127.0.0.1:8080/jmap -o /tmp/jmap-admin-session.json"
           )
+          machine.succeed("cat /tmp/jmap-admin-session.json >&2")
+          machine.succeed("grep -q 'capabilities' /tmp/jmap-admin-session.json")
           machine.succeed(
               "curl -sS -o /dev/null -w '%{http_code}' "
-              "http://127.0.0.1:8080/api/principal > /tmp/api-anon-code.txt"
-              "&& grep -q 401 /tmp/api-anon-code.txt"
+              "http://127.0.0.1:8080/jmap > /tmp/jmap-anon-code.txt"
+              "&& grep -q 401 /tmp/jmap-anon-code.txt"
           )
 
       with subtest("submission: authenticated SMTP on 587 delivers to INBOX"):
           machine.succeed(
               "swaks --timeout 120 --server 127.0.0.1:587 --tls --auth PLAIN "
-              "--auth-user user1@example.test --auth-password testpass "
+              "--auth-user user1@example.test --auth-password '${testPass}' "
               "--from user1@example.test --to user2@example.test "
               "--header 'Subject: e2e-needle' --body 'needle-576a4565b70f5a4c' "
               "> /tmp/swaks-sub.log 2>&1"
@@ -514,58 +558,14 @@ in
               "imap-header-probe needle-576a4565b70f5a4c 'd=example.test'"
           )
 
-      with subtest("DKIM: POST /api/dkim keygen + dual-algorithm signing"):
-          # The webadmin keygen flow (source-verified against v0.15.5
-          # management/dkim.rs): POST {"algorithm":"Ed25519","domain":...} -
-          # the algorithm field takes the serde variant name, "Ed25519" -
-          # with no id, so the default id becomes "{algo}-{domain}" =
-          # ed25519-example.test, EXACTLY the second id the default
-          # auth.dkim.sign expression emits. The endpoint writes
-          # signature.<id>.* into the live config store (refusing to
-          # overwrite an existing signature.<id>.private-key) - no
-          # settings-file change, no restart. But config.set() is
-          # store-only (manager/config.rs: no broadcast, no core rebuild),
-          # and the SMTP signer resolves from the startup-built signatures
-          # map (core.rs resolve_signature) - so an explicit /api/reload
-          # (GET; the handler only matches Method::GET, and it aborts
-          # without swapping the core if ANY config error exists - see
-          # the pyzor-disable comment near the settings) is required
-          # before submission will dual-sign.
-          machine.succeed(
-              "curl -fsS -u admin:test-admin-secret -X POST "
-              "-H 'Content-Type: application/json' "
-              "-d '{\"algorithm\":\"Ed25519\",\"domain\":\"example.test\"}' "
-              "http://127.0.0.1:8080/api/dkim -o /tmp/dkim-create.json"
-          )
-          machine.succeed("cat /tmp/dkim-create.json >&2")
-          # Public-key readout = the DNS TXT payload: a bare base64 string
-          # (ed25519 pubkey = 32 bytes -> ~44 base64 chars).
-          machine.succeed(
-              "curl -fsS -u admin:test-admin-secret "
-              "http://127.0.0.1:8080/api/dkim/ed25519-example.test "
-              "-o /tmp/dkim-pub.json"
-          )
-          machine.succeed("cat /tmp/dkim-pub.json >&2")
-          machine.succeed(
-              "jq -e '.data | type == \"string\" and length >= 40' /tmp/dkim-pub.json"
-          )
-          # Swap in a core rebuilt from the now-updated config store; the
-          # response lists how many settings changed (expect signature.*
-          # keys > 0, i.e. the reload actually saw the new key).
-          machine.succeed(
-              "curl -fsS -u admin:test-admin-secret "
-              "http://127.0.0.1:8080/api/reload -o /tmp/dkim-reload.json"
-          )
-          machine.succeed("cat /tmp/dkim-reload.json >&2")
-          # A re-broken reload aborts the core swap and surfaces its config
-          # errors here - fail on the precondition itself, not one step
-          # later via "DKIM signer not found".
-          machine.succeed(
-              "jq -e '.data.errors | length == 0' /tmp/dkim-reload.json"
-          )
+      with subtest("DKIM: BOTH declarative signatures stamp the submission"):
+          # 0.16 replacement of the webadmin keygen subtest: the ed25519
+          # signature is DECLARATIVE too (DkimSignature objects, stage
+          # active). One message, TWO DKIM-Signature headers: rsa from
+          # rsa-test, ed25519 from ed-test.
           machine.succeed(
               "swaks --timeout 120 --server 127.0.0.1:587 --tls --auth PLAIN "
-              "--auth-user user1@example.test --auth-password testpass "
+              "--auth-user user1@example.test --auth-password '${testPass}' "
               "--from user1@example.test --to user2@example.test "
               "--header 'Subject: dual-sign' --body 'needle-eddsa-77aa' "
               "> /tmp/swaks-dual.log 2>&1"
@@ -573,32 +573,12 @@ in
           machine.succeed("cat /tmp/swaks-dual.log >&2")
           machine.succeed("! grep -q '<\\*\\*' /tmp/swaks-dual.log")
           machine.succeed("imap-probe needle-eddsa-77aa")
-          # One message, TWO DKIM-Signature headers: rsa from the
-          # declarative signature block, ed25519 from the API-created key
-          # (algorithm tags per create_dkim_key's mapping).
           machine.succeed(
               "imap-header-probe needle-eddsa-77aa 'a=rsa-sha256'"
           )
           machine.succeed(
               "imap-header-probe needle-eddsa-77aa 'a=ed25519-sha256'"
           )
-
-      with subtest("negative-cache expiry: poisoned domain delivers again"):
-          # The pre-provision probe poisoned is_local_domain(example.test);
-          # with directoryCacheTtlNegative = 5 the entry heals within the
-          # test run instead of the 1h upstream default. Under the old
-          # default this submission would hang on the MX path (the trap).
-          machine.succeed("sleep 7")
-          machine.succeed(
-              "swaks --timeout 120 --server 127.0.0.1:587 --tls --auth PLAIN "
-              "--auth-user user1@example.test --auth-password testpass "
-              "--from user1@example.test --to user2@example.test "
-              "--header 'Subject: recovery-needle' --body 'needle-recovery-4b9f' "
-              "> /tmp/swaks-recovery.log 2>&1"
-          )
-          machine.succeed("cat /tmp/swaks-recovery.log >&2")
-          machine.succeed("! grep -q '<\\*\\*' /tmp/swaks-recovery.log")
-          machine.succeed("imap-probe needle-recovery-4b9f")
 
       with subtest("metrics: /metrics/prometheus answers on the HTTP listener"):
           # metrics.prometheus.enable has no auth configured here - the loopback
@@ -618,23 +598,22 @@ in
           # THIS build log (docs/MONITORING.md row 2 feeds off it).
           machine.succeed("cat /tmp/metrics.prom >&2")
 
-      with subtest("journal: exactly the 1 known-benign config-build error"):
-          # In this VM exactly ONE "Configuration build error" line is
-          # BENIGN (details only via -o verbose): resolver.type with no
-          # nameservers. (The second historical benign line,
-          # spam-filter.pyzor.host, is gone - pyzor is disabled above so
-          # /api/reload can swap the core; see the spam-filter comment.)
-          # Any NEW config error (e.g. a malformed generated key) must
-          # fail this count.
+      with subtest("journal: no configuration build errors"):
+          # 0.16 posture: the plan typechecks at BUILD time (the vendored
+          # module's Lua schema check), so any config error surviving to
+          # runtime is a real defect. The 0.15 era carried exactly one
+          # benign resolver line in this DNS-less VM; the 0.16 journal is
+          # asserted clean after transcript inspection (VM run of this
+          # file).
           machine.succeed(
               "journalctl -u stalwart -b 0 -o cat > /tmp/journal-config.log"
-              "&& test \"$(grep -c 'Configuration build error' /tmp/journal-config.log)\" -eq 1"
+              "&& ! grep -q 'Configuration build error' /tmp/journal-config.log"
           )
 
       with subtest("alias: second emails entry delivers to the same account"):
           machine.succeed(
               "swaks --timeout 120 --server 127.0.0.1:587 --tls --auth PLAIN "
-              "--auth-user user1@example.test --auth-password testpass "
+              "--auth-user user1@example.test --auth-password '${testPass}' "
               "--from user1@example.test --to alias4@example.test "
               "--header 'Subject: alias-needle' --body 'needle-alias-2c8e' "
               "> /tmp/swaks-alias.log 2>&1"
@@ -642,30 +621,30 @@ in
           machine.succeed("cat /tmp/swaks-alias.log >&2")
           machine.succeed("! grep -q '<\\*\\*' /tmp/swaks-alias.log")
           machine.succeed(
-              "imap-probe needle-alias-2c8e user4@example.test testpass"
+              "imap-probe needle-alias-2c8e user4@example.test '${testPass}'"
           )
 
-      with subtest("catch-all: unknown local part lands in the @domain mailbox"):
-          # Literal "@example.test" address = catch-all mailbox (default
-          # AddressMapping::Enable retries the lookup with "@<domain>").
-          # Created HERE, not during provisioning: a live catch-all makes
-          # EVERY local part deliverable, which would turn the
-          # "unknown recipient rejected 5xx" assertion above into a 250.
-          # The bare "@example.test" entry is what makes it the catch-all.
-          # The explicit "catchall@example.test" address keeps the mailbox
-          # addressable; IMAP LOGIN itself resolves by principal NAME
-          # ("catchall" - VM-verified 2026-09-15, README ledger), not by
-          # arbitrary email addresses of the principal.
-          create_principal({
-              "type": "individual",
-              "name": "catchall",
-              "emails": ["catchall@example.test", "@example.test"],
-              "roles": ["user"],
-              "secrets": ["${testHash}"],
-          })
+      with subtest("catch-all: applied at runtime via a second stalwart-cli apply"):
+          # 0.16 object model: Domain.catchAllAddress points at an account's
+          # email address; mail for ANY unknown local part lands in that
+          # account. Applied HERE, not in the boot plan, for two reasons:
+          # (a) a live catch-all makes EVERY local part deliverable, which
+          # would turn the "unknown recipient rejected 5xx" assertion above
+          # into a 250; (b) it exercises `stalwart-cli apply` idempotency
+          # against a LIVE server with an incremental plan (Domain upsert
+          # patch + new Account), the exact workflow runtime account
+          # provisioning uses. IMAP LOGIN is by full EMAIL ADDRESS in 0.16.
+          machine.succeed("cat > /tmp/catchall-plan.ndjson <<'PLAN'\n{\"@type\":\"upsert\",\"object\":\"Domain\",\"value\":{\"domain\":{\"catchAllAddress\":\"catchall@example.test\"}}}\n{\"@type\":\"upsert\",\"object\":\"Account\",\"value\":{\"catchall\":{\"@type\":\"User\",\"name\":\"catchall\",\"domainId\":\"#domain\",\"emailAddress\":\"catchall@example.test\",\"roles\":{\"@type\":\"User\"},\"credentials\":[{\"@type\":\"Password\",\"secret\":\"${testPass}\"}]}}}\nPLAN")
+          machine.succeed(
+              "STALWART_URL=http://127.0.0.1:8080 STALWART_USER=admin "
+              "STALWART_PASSWORD=test-admin-secret "
+              "stalwart-cli apply --file /tmp/catchall-plan.ndjson"
+              " > /tmp/catchall-apply.log 2>&1"
+          )
+          machine.succeed("cat /tmp/catchall-apply.log >&2")
           machine.succeed(
               "swaks --timeout 120 --server 127.0.0.1:587 --tls --auth PLAIN "
-              "--auth-user user1@example.test --auth-password testpass "
+              "--auth-user user1@example.test --auth-password '${testPass}' "
               "--from user1@example.test --to stranger42@example.test "
               "--header 'Subject: catchall-needle' --body 'needle-catchall-7d1a' "
               "> /tmp/swaks-catchall.log 2>&1"
@@ -673,13 +652,13 @@ in
           machine.succeed("cat /tmp/swaks-catchall.log >&2")
           machine.succeed("! grep -q '<\\*\\*' /tmp/swaks-catchall.log")
           machine.succeed(
-              "imap-probe needle-catchall-7d1a catchall testpass"
+              "imap-probe needle-catchall-7d1a catchall@example.test '${testPass}'"
           )
 
       with subtest("quota: over-quota message accepted at SMTP, never delivered"):
           machine.succeed(
               "swaks --timeout 120 --server 127.0.0.1:587 --tls --auth PLAIN "
-              "--auth-user user1@example.test --auth-password testpass "
+              "--auth-user user1@example.test --auth-password '${testPass}' "
               "--from user1@example.test --to user3@example.test "
               "--header 'Subject: quota-needle' --body 'needle-quota-9e3b' "
               "> /tmp/swaks-quota.log 2>&1"
@@ -689,7 +668,7 @@ in
           # queue retry), not an SMTP-stage rejection.
           machine.succeed("! grep -q '<\\*\\*' /tmp/swaks-quota.log")
           machine.succeed(
-              "imap-absent-probe needle-quota-9e3b user3@example.test testpass 21"
+              "imap-absent-probe needle-quota-9e3b user3@example.test '${testPass}' 21"
           )
           # Transcript-backed (VM debug run 2026-09-15): the journal at
           # default verbosity NEVER logs the code-level reason "Mailbox over
@@ -722,7 +701,7 @@ in
           # territory).
           machine.succeed(
               "swaks --timeout 120 --server 127.0.0.1:587 --tls --auth PLAIN "
-              "--auth-user user1@example.test --auth-password testpass "
+              "--auth-user user1@example.test --auth-password '${testPass}' "
               "--from user1@example.test --to user2@example.test "
               "--header 'Subject: spamcheck-gtube' "
               "--body 'XJS*C4JDBQADN1.NSBN3*2IDNEN*GTUBE-STANDARD-ANTI-UBE-TEST-EMAIL*C.34X needle-junk-5f7c' "
@@ -732,23 +711,16 @@ in
           machine.succeed("! grep -q '<\\*\\*' /tmp/swaks-junk.log")
           machine.succeed("imap-header-probe needle-junk-5f7c 'X-Spam-Status'")
 
-      with subtest("native ingestion: DMARC aggregate lands in the report store, not the INBOX"):
-          # Mechanism (v0.15.5 source): recipient matches
-          # report.analysis.addresses + forward=false -> inbound DATA goes to
-          # analyze_report (smtp/src/inbound/data.rs:332) INSTEAD of the
-          # mailbox; the parsed report is stored (analysis.rs write gated on
-          # report.analysis.store, default "30d") and readable via
-          # GET /api/reports/dmarc. ENDPOINT TRAP (OpenAPI-verified
-          # 2026-09-16): /api/queue/reports is the OUTBOUND report queue
-          # (OutgoingReportList - reports Stalwart sends), permanently empty
-          # here; incoming reports live under /api/reports/{dmarc,tls,arf}.
-          # Polling the queue endpoint returns total:0 forever - one VM run
-          # burned on that mismatch.
-          # The zip keeps its report-shaped filename - the detector matches
-          # '!' / '.xml' in the ATTACHMENT NAME (analysis.rs). swaks --attach
-          # needs the @-prefix to read a FILE: a bare path is attached as
-          # LITERAL STRING data with no filename= header (host-verified
-          # 2026-09-16) - the analysis then silently finds no report part.
+      with subtest("native ingestion: DMARC aggregate consumed, not delivered"):
+          # Mechanism: recipient matches ReportSettings.inboundReportAddresses
+          # + inboundReportForwarding=false -> inbound DATA goes to the report
+          # analyzer INSTEAD of the mailbox (the pre-0.16
+          # report.analysis.{addresses,forward} pair). The zip keeps its
+          # report-shaped filename - the detector matches '!' / '.xml' in the
+          # ATTACHMENT NAME. swaks --attach needs the @-prefix to read a FILE:
+          # a bare path is attached as LITERAL STRING data with no filename=
+          # header (host-verified 2026-09-16) - the analysis then silently
+          # finds no report part.
           machine.succeed(
               "cp '${dmarcSample}' '/tmp/estadocuenta1.infonacot.gob.mx!example.com!1536853302!1536939702!2940.xml.zip'"
           )
@@ -764,30 +736,18 @@ in
           )
           machine.succeed("cat /tmp/swaks-report.log >&2")
           machine.succeed("! grep -q '<\\*\\*' /tmp/swaks-report.log")
-          # Parsed asynchronously (tokio::spawn in analyze_report): poll the
-          # store list until the report appears, then dump the detail for
-          # the transcript. Response shape (management/report.rs): items are
-          # "<id>_<expires>" STRINGS, not objects - the detail URL takes the
-          # item verbatim. Assert on .data.total, NEVER bare `length` (the
-          # wrapper object's length is 1 even with zero items - a vacuous
-          # pass burned one VM run 2026-09-16).
-          machine.wait_until_succeeds(
-              "curl -fsS -u admin:test-admin-secret "
-              "http://127.0.0.1:8080/api/reports/dmarc -o /tmp/report-ids.json "
-              "&& jq -e '.data.total >= 1' /tmp/report-ids.json",
-              timeout=120,
-          )
-          machine.succeed("cat /tmp/report-ids.json >&2")
+          # 0.16: the /api/reports store read is GONE (REST API removed); the
+          # parsed-report evidence lives in the journal instead - dumped here
+          # for transcript-first follow-ups (metrics/alert rules read from
+          # observed transcripts, never expectations).
           machine.succeed(
-              "curl -fsS -u admin:test-admin-secret "
-              "http://127.0.0.1:8080/api/reports/dmarc/$(jq -r '.data.items[0]' /tmp/report-ids.json) "
-              "-o /tmp/report-detail.json"
+              "journalctl -u stalwart -b 0 -o cat > /tmp/journal-report.log"
           )
-          machine.succeed("cat /tmp/report-detail.json >&2")
+          machine.succeed("cat /tmp/journal-report.log >&2")
           # Consumed, never delivered: the analysis path returns before the
           # delivery queue - non-delivery is deterministic.
           machine.succeed(
-              "imap-absent-probe report-consumed-needle-9d2f reports@example.test testpass 30"
+              "imap-absent-probe report-consumed-needle-9d2f reports@example.test '${testPass}' 30"
           )
 
       with subtest("JMAP: session, mailboxes, and the delivered needle over the API"):
@@ -803,7 +763,7 @@ in
           # 2026-10-05 caught it; the demo probe followed redirects via
           # urllib automatically).
           machine.succeed(
-              "curl -fsSL -u user2@example.test:testpass "
+              "curl -fsSL -u user2@example.test:${testPass} "
               "http://127.0.0.1:8080/.well-known/jmap -o /tmp/jmap-session.json"
           )
           machine.succeed("cat /tmp/jmap-session.json >&2")
@@ -823,7 +783,7 @@ in
               "> /tmp/jmap-mb-req.json"
           )
           machine.succeed(
-              "curl -fsS -u user2@example.test:testpass "
+              "curl -fsS -u user2@example.test:${testPass} "
               "-H 'Content-Type: application/json' "
               "http://127.0.0.1:8080/jmap/ -o /tmp/jmap-mailboxes.json "
               "-d @/tmp/jmap-mb-req.json"
@@ -850,7 +810,7 @@ in
               "> /tmp/jmap-email-req.json"
           )
           machine.succeed(
-              "curl -fsS -u user2@example.test:testpass "
+              "curl -fsS -u user2@example.test:${testPass} "
               "-H 'Content-Type: application/json' "
               "http://127.0.0.1:8080/jmap/ -o /tmp/jmap-email.json "
               "-d @/tmp/jmap-email-req.json"
@@ -869,39 +829,9 @@ in
           machine.succeed("imap-probe needle-576a4565b70f5a4c")
           machine.succeed(
               "curl -sS -o /dev/null -w '%{http_code}' "
-              "http://127.0.0.1:8080/api/principal > /tmp/api-anon-code.txt"
-              "&& grep -q 401 /tmp/api-anon-code.txt"
+              "http://127.0.0.1:8080/jmap > /tmp/jmap-anon-code2.txt"
+              "&& grep -q 401 /tmp/jmap-anon-code2.txt"
           )
-
-      with subtest("backup/restore: export, wipe, import, message survives"):
-          # `--export`/`--import` are OFFLINE ops: run instead of serving, then
-          # exit (README ledger, verified against v0.15.5 source). Extract the
-          # exact binary + config from the unit so the export reads the same
-          # RocksDB the service wrote.
-          machine.succeed("systemctl stop stalwart.service")
-          machine.succeed("systemctl cat stalwart.service > /tmp/stalwart-unit.txt")
-          exec_line = machine.succeed(
-              "grep -oP 'ExecStart=\\K.*' /tmp/stalwart-unit.txt"
-          ).strip().splitlines()[-1]
-          m = re.search(r"(/nix/store/[^ ]+/bin/[^ ]+) --config=(\S+)", exec_line)
-          assert m, "could not parse ExecStart line: " + exec_line
-          sw_bin, sw_cfg = m.group(1), m.group(2)
-
-          machine.succeed("mkdir -p /tmp/backup")
-          machine.succeed("{} --config={} --export /tmp/backup".format(sw_bin, sw_cfg))
-          # The gate must prove it measured: an EMPTY export would make the
-          # later survival assertion vacuous.
-          machine.succeed("test -n \"$(ls -A /tmp/backup)\"")
-
-          machine.succeed("rm -rf /var/lib/stalwart/db")
-          machine.succeed("{} --config={} --import /tmp/backup".format(sw_bin, sw_cfg))
-          # import ran as root; the service account must own the store again
-          machine.succeed("chown -R stalwart:stalwart /var/lib/stalwart")
-
-          machine.succeed("systemctl start stalwart.service")
-          machine.wait_for_unit("stalwart.service", timeout=120)
-          machine.wait_for_open_port(993, timeout=180)
-          machine.succeed("imap-probe needle-576a4565b70f5a4c")
 
       with subtest("no crashes"):
           machine.succeed(
