@@ -173,7 +173,19 @@ in {
       systemd.services.stalwart-provision = {
         description = "Stalwart Configuration Provisioning";
         wantedBy = ["multi-user.target"];
-        partOf = ["stalwart.service"];
+        # VENDOR PATCH (vs PR #552103): `partOf = ["stalwart.service"]`
+        # removed and ExecStartPost added. On the pinned stalwart 0.16.22
+        # the apply+reload Action swaps the in-memory core but does NOT
+        # spawn/kill LISTENER sockets - provisioned listeners only bind on
+        # a process restart (VM transcripts 2026-10-16: boot apply
+        # "Done ... 0 failed" yet ss showed the DEFAULT listener set;
+        # `systemctl restart stalwart` then bound the plan's listeners).
+        # The unit therefore restarts stalwart AFTER a successful apply.
+        # partOf MUST go with it: a stalwart restart would propagate back
+        # into a provision restart (partOf semantics) and the unit would
+        # restart stalwart again - an infinite loop. NixOS switch
+        # semantics stay intact: a changed plan changes the unit file,
+        # which restarts the provision unit on every deploy.
         after = ["stalwart.service"];
         serviceConfig = let
           shortBashScript = script: "${lib.getExe pkgs.bash} -c ${lib.escapeShellArg script}";
@@ -189,6 +201,7 @@ in {
           # see https://github.com/stalwartlabs/stalwart/pull/2383
           ExecStartPre = shortBashScript "until ${pkgs.curl}/bin/curl --fail ${lib.escapeShellArg cfg.url} &> /dev/null; do sleep 0.25; done";
           ExecStart = shortBashScript "STALWART_PASSWORD=`systemd-creds cat password` ${lib.getExe pkgs.stalwart-cli} apply --file ${sorted}";
+          ExecStartPost = shortBashScript "${pkgs.systemd}/bin/systemctl try-restart stalwart.service";
           Environment = [
             "STALWART_URL=${lib.escapeShellArg cfg.url}"
             "STALWART_USER=${lib.escapeShellArg stalwart.admin.username}"
