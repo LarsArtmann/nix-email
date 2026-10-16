@@ -285,6 +285,14 @@ in {
           );
         in {
           path = "/var/cache/${stalwartIdentifier}";
+          # SEMANTICS (source-proven, stalwart v0.15.5 boot.rs): the
+          # webadmin zip is fetched from `resource` ONLY when the blob
+          # store has none — the pin silently no-ops after the first
+          # boot, so a changed package pin does NOT converge the served
+          # bundle. Convergence = "Update WebAdmin" in the admin UI, or
+          # delete the stored webadmin blob host-side and restart. (A
+          # bundle-hash mismatch alone does NOT prove a version skew:
+          # JS chunk hashes vary per toolchain build.)
           resource = lib.mkIf hasHttpListener (lib.mkDefault "file://${cfg.package.webadmin}/webadmin.zip");
         };
       };
