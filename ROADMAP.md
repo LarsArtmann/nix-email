@@ -135,6 +135,9 @@ the verified-source work (what the wrapper OWNS) is done or specified in
   label-verified but the CONTENT vs module reality (relay, DKIM
   dual-sign, flood node) has no standing re-check - audit on the next
   diagram session
+- Split `modules/mail-server.nix` options into a `mail-server/options.nix`
+  ONLY if the file keeps growing (verdict 2026-10-05: acceptable at ~667
+  documented lines; re-check on the next option addition)
 - Replace the vulnix CVE scan once BuildFlow ships a working scanner
   (NVD retired the legacy JSON feeds that crashed vulnix 1.12.5
   fleet-wide; `.buildflow.yml` carries the skip rationale)

@@ -439,6 +439,12 @@ lookups just miss), and 1 `Configuration build error` + 6 `Configuration
 build warning` lines (bare, key-less; the stack's auth/listener/delivery
 paths are runtime-verified despite them).
 
+One VM at a time per working directory: the demo disk is CWD-relative
+(`./demo.qcow2`) and QEMU takes a write lock on it, so a second concurrent
+`nix run .#vm` from the same directory dies on the lock (observed during
+the InboxClean spike, 2026-10-05). Run from separate scratch dirs or
+serialize.
+
 #### JMAP quickstart (live-verified 2026-10-05)
 
 The same listener serves JMAP; the session document is the entry point.

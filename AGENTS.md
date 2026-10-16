@@ -287,6 +287,9 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
 - Gate commands redirect, never pipe: `nix flake check > /tmp/gate.log 2>&1;
   echo "EXIT:$?" >> /tmp/gate.log`, then read the log. A pipe reports the
   FILTER's exit code - two fake greens shipped that way in one session.
+  Also never run `buildflow` and `nix flake check` CONCURRENTLY - the
+  timing analytics become contention noise and get reported as phantom
+  regressions (2026-10-05: a +581% nix-build timing was self-inflicted).
 - An EMPTY `nix build` log means CACHE HIT, not a run (2026-09-16: EXIT 0
   on three VM checks whose outputs pre-existed 88 min earlier - caught only
   by grepping the log for execution lines). When execution itself is the
