@@ -1,14 +1,15 @@
 # Stalwart {#module-services-stalwart}
 
-*Source:* {file}`modules/services/stalwart/default.nix`
+_Source:_ {file}`modules/services/stalwart/default.nix`
 
-*Upstream documentation:* <https://stalw.art/docs>
+_Upstream documentation:_ <https://stalw.art/docs>
 
 Stalwart is an open-source mail and collaboration server designed for the modern internet.
 
 ## Running Stalwart {#module-services-stalwart-usage}
 
 To enable Stalwart, add the following to your {file}`configuration.nix`:
+
 ```nix
 {
   services.stalwart = {
@@ -32,6 +33,7 @@ Visit the public URL to sign in as the admin account and begin configuring your 
 ### Databases {#module-services-stalwart-databases}
 
 Other databases can be configured:
+
 ```nix
 {
   services.stalwart.settings = {
@@ -59,6 +61,7 @@ For RocksDB, SQLite, FoundationDB, and MySQL, refer to [the `Datastore` object](
 ## Recovery mode {#module-services-stalwart-recovery}
 
 To enable recovery mode:
+
 ```nix
 {
   services.stalwart.recovery = {
@@ -67,6 +70,7 @@ To enable recovery mode:
   };
 }
 ```
+
 Recovery mode disables many checks and features that could cause problems with using Stalwart,
 putting it into a state where you can use the {option}`services.stalwart.admin` account to fix it.
 
@@ -80,6 +84,7 @@ Please follow the instructions above of one of the other available modes to setu
 ## Declarative configuration {#module-services-stalwart-provision}
 
 Use {option}`services.stalwart.provision` to declaratively configure your Stalwart instance:
+
 ```nix
 {
   services.stalwart.provision =
