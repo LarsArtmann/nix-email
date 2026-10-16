@@ -3,7 +3,7 @@
 | Field         | Value                                                                                                                              |
 | ------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
 | Date          | 2026-09-22 (execution session)                                                                                                     |
-| Purpose       | Unblock the 19 decision-gated todos (Pareto plan M2; plan file `2026-09-22_19-23_pareto-master-plan-super-email-monitoring.md` §1) |
+| Purpose       | Unblock the 19 decision-gated todos (Pareto plan M2; plan file `archived/2026-09-22_19-23_pareto-master-plan-super-email-monitoring.md` §1) |
 | How to answer | Reply with the decision IDs (`D1: retire`, `C24: discord`, ...). Defaults marked **[rec]** execute on your go.                     |
 
 ## The big two (gate ~15 todos incl. the entire production build-out)
@@ -99,6 +99,7 @@ Public README carries go-live runbook detail (migration window, DR design) with 
 - **[rec] Approve push** once the pin question below is answered; CI debt list triaged in the same pass.
 - CORRECTED 2026-09-22: there is NO tag pin to bump — SystemNix's input floats `github:LarsArtmann/nix-email?ref=master` (flake.nix:671, verified today; the old "pins v0.2.0" claim was stale). What I did locally (committed by the daemon, UNPUSHED): added the `flake-parts` dedupe follow + relocked (nix-email now 2659abb); `nix-email-contract` check GREEN. Open calls: (a) hard-pin the URL to `?ref=v0.3.1` per this repo's pin-discipline doctrine, or keep floating master; (b) the push itself (~1 commit here + the fleet's ~47-commit CI-debt backlog).
 - UPDATE 2026-09-23: `v0.4.0` is cut, pushed, and CI-green (full `nix flake check` on the tag, 8m32s) — the stable ref C17a was waiting for now EXISTS (`?ref=v0.4.0`). The recommendation above is executed; only the SystemNix-side pin choice and push remain (user-gated, T16-T19 class).
+- EXECUTED 2026-10-05 (Agent-execution adoptions below): SystemNix pushed through `c6aaa6c5` with the input HARD-PINNED `?ref=v0.4.0` (contract check green against the tag). This entry is CLOSED pending owner ratification.
 
 ### C16-adjacent — Resend account actions (not strictly decisions; user actions)
 
@@ -152,6 +153,44 @@ Gated on D1 (rotation-due check before live enablement). **No recommendation nee
 `[Unreleased]` carries a release-worthy payload: M14 hardening options, fleet eval guards, `module-import-eval`, TLS-RPT e2e, the nixpkgs pin advance (+ workaround retirement).
 
 - **[rec] Cut `v0.4.0` now** — checkpoints the pin advance for the fleet and gives SystemNix's hard-pin call (C17a) a stable ref to pin to. ~~RESOLVED: user approved 2026-09-23; v0.4.0 cut, pushed, tag CI green, GitHub release published (Latest).~~
+
+### C39 — MemoryMax ownership (new 2026-10-16, from the nix-review session)
+
+Neither wrapped service sets `MemoryMax`; upstream doesn't either (verified in
+the pinned nixpkgs module 2026-10-05). A mail server's legitimate memory
+scales with its store, so a wrong default OOM-kills delivery — but leaving it
+unset forever means a runaway stalwart is bounded only by the host.
+
+- **[rec] Consumer-layer ownership**: the wrapper ships NO `MemoryMax`
+  (same doctrine as sops/Gatus/onFailure — deployment policy belongs to the
+  consumer layer); record the decision in THREAT_MODEL.md + the module
+  headers so the next review stops re-finding it.
+- Unblocks: closes the nix-review session's one open policy finding
+  (11-53 report f/1 + g/1).
+- Cost of delay: every future nix-review re-flags it; unbounded stalwart on
+  the future VPS.
+
+### C40 — v0.5.0 release timing (new 2026-10-16, carried from the 11-14 report g/1)
+
+CHANGELOG `[Unreleased]` is release-ready: JMAP subtest + `docs/INBOXCLEAN.md`
++ probe transcripts, CI hardening pair (md-table-pipe lint, statix step,
+pre-push inventory mirror), `flake.nix` split, parsedmarc breadth fixtures,
+`scripts/host-parse-fixture.py`, `demo-eval`, SECURITY.md.
+
+- **[rec] Cut now** — the payload is a release-worthy surface and the
+  SystemNix hard-pin (`?ref=v0.4.0`) would happily ride a newer tag.
+- Unblocks: the v0.5.0 TODO row; the next docs-health pass boundary.
+- Cost of delay: `[Unreleased]` keeps growing; consumers pin a stale tag.
+
+### C41 — AGENTS.md size floor (new 2026-10-16, F22.3 verdict call)
+
+AGENTS.md sits at ~21 KB — above the 15 KB skill target, below the 30 KB
+flag. The 2026-10-05 diet verdict: ~21 KB is the floor without deleting
+distinct paid-for lessons.
+
+- **[rec] Accept ~21 KB as the floor** (no enforced budget, no gate); re-visit
+  only if the flag threshold (30 KB) approaches.
+- Unblocks: retires the recurring F22.3 line from every docs pass.
 
 ## What is NOT a decision
 

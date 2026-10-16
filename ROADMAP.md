@@ -114,8 +114,9 @@ the verified-source work (what the wrapper OWNS) is done or specified in
   InboxClean JMAP adapter post-migration - DECIDED 2026-09-30 (InboxClean
   ADR-023: JMAP-first provider abstraction, this stack is the target; IMAP
   only on a real legacy-provider need); the bounded seam work (demo-VM
-  probe, push test, contract doc, e2e subtest) is routed to TODO_LIST,
-  sequencing gated by decision C35, topology by C36
+  probe, push test, contract doc, e2e subtest) EXECUTED 2026-10-05
+  (probe transcripts, push-vs-poll verdict, `docs/INBOXCLEAN.md`, e2e
+  subtest); production enablement stays D1-gated, topology by C36
 
 ### 5. Repo excellence
 
@@ -125,11 +126,10 @@ the verified-source work (what the wrapper OWNS) is done or specified in
 - Post-cutover: retire-or-keep decision documentation for the Resend-only path
 - Retire the two in-repo nixpkgs workarounds once upstream fixes land (host-less
   `[elasticsearch]` emission; imapclient on python 3.14) - re-check on every
-  nixpkgs bump; the module comments carry the revert conditions
-- Split `flake.nix` into `flake-modules/*.nix` (the flake-parts idiom):
-  the ~300-line trigger FIRED (356 lines after the demo VM, eval guards,
-  and M14 work, 2026-09-29) - GRADUATED to a TODO_LIST Medium row; do the
-  split there, not ad hoc
+  nixpkgs bump; the module comments carry the revert conditions. TRIGGER
+  UPDATED 2026-10-16: nixpkgs PR #566282 (parsedmarc overhaul + OpenSearch
+  rename) MERGED 2026-10-13 (`22579286`) - the port procedure in the README
+  runbook step 2 is now mandatory at the first pin advance past it
 - Arch-diagram content-freshness audit (routed 2026-09-22 from the
   16_19-16 report): `docs/architecture-understanding/*.d2` renders are
   label-verified but the CONTENT vs module reality (relay, DKIM
