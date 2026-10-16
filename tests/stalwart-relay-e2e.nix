@@ -166,20 +166,21 @@ in
         };
 
         # Test-only credential files (real hosts: sops-rendered paths).
-        environment.etc."relay-secret".text = "relaypass";
-        environment.etc."test-admin-secret" = {
-          mode = "0600";
-          text = "test-admin-secret";
+        environment = {
+          etc."relay-secret".text = "relaypass";
+          etc."test-admin-secret" = {
+            mode = "0600";
+            text = "test-admin-secret";
+          };
+          systemPackages = [
+            pkgs.swaks
+            pkgs.curl
+            pkgs.dnsutils
+            pkgs.openssl
+          ];
         };
 
         networking.nameservers = ["127.0.0.1"];
-
-        environment.systemPackages = [
-          pkgs.swaks
-          pkgs.curl
-          pkgs.dnsutils
-          pkgs.openssl
-        ];
 
         virtualisation.memorySize = 2048;
       };

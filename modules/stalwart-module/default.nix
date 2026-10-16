@@ -252,32 +252,44 @@ in {
           if useLegacyStorage
           then {
             # structured data in SQLite, blobs on filesystem
-            db.type = lib.mkDefault "sqlite";
-            db.path = lib.mkDefault "${cfg.dataDir}/data/index.sqlite3";
-            fs.type = lib.mkDefault "fs";
-            fs.path = lib.mkDefault "${cfg.dataDir}/data/blobs";
+            db = {
+              type = lib.mkDefault "sqlite";
+              path = lib.mkDefault "${cfg.dataDir}/data/index.sqlite3";
+            };
+            fs = {
+              type = lib.mkDefault "fs";
+              path = lib.mkDefault "${cfg.dataDir}/data/blobs";
+            };
           }
           else {
             # everything in RocksDB
-            db.type = lib.mkDefault "rocksdb";
-            db.path = lib.mkDefault "${cfg.dataDir}/db";
-            db.compression = lib.mkDefault "lz4";
+            db = {
+              type = lib.mkDefault "rocksdb";
+              path = lib.mkDefault "${cfg.dataDir}/db";
+              compression = lib.mkDefault "lz4";
+            };
           };
-        storage.data = lib.mkDefault "db";
-        storage.fts = lib.mkDefault "db";
-        storage.lookup = lib.mkDefault "db";
-        storage.blob = lib.mkDefault (
-          if useLegacyStorage
-          then "fs"
-          else "db"
-        );
-        directory.internal.type = lib.mkDefault "internal";
-        directory.internal.store = lib.mkDefault "db";
-        storage.directory = lib.mkDefault "internal";
-        resolver.type = lib.mkDefault "system";
-        resolver.public-suffix = lib.mkDefault [
-          "file://${pkgs.publicsuffix-list}/share/publicsuffix/public_suffix_list.dat"
-        ];
+        storage = {
+          data = lib.mkDefault "db";
+          fts = lib.mkDefault "db";
+          lookup = lib.mkDefault "db";
+          blob = lib.mkDefault (
+            if useLegacyStorage
+            then "fs"
+            else "db"
+          );
+          directory = lib.mkDefault "internal";
+        };
+        directory.internal = {
+          type = lib.mkDefault "internal";
+          store = lib.mkDefault "db";
+        };
+        resolver = {
+          type = lib.mkDefault "system";
+          public-suffix = lib.mkDefault [
+            "file://${pkgs.publicsuffix-list}/share/publicsuffix/public_suffix_list.dat"
+          ];
+        };
         spam-filter.resource = lib.mkDefault "file://${cfg.package.spam-filter}/spam-filter.toml";
         webadmin = let
           hasHttpListener = builtins.any (listener: listener.protocol == "http") (

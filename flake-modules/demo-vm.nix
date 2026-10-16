@@ -101,10 +101,6 @@
           };
           getty.autologinUser = "root";
         };
-        environment.etc."demo-admin-secret" = {
-          mode = "0600";
-          text = "demo-admin";
-        };
         # Headless (telephony hosts/pbx): the console goes to stdio, so
         # `nix run .#vm` works from any terminal. Ports bind 127.0.0.1
         # on the host - unprivileged, no LAN clash.
@@ -146,28 +142,34 @@
             }
           ];
         };
-        environment.systemPackages = [pkgs.swaks pkgs.curl];
-        # Printed by every root login shell (the autologin getty shows it).
-        environment.etc."profile.d/mail-demo-banner.sh".text = ''
-          cat <<'BANNER'
-          ==================================================================
-           nix-email demo VM - throwaway, all state dies with the process
+        environment = {
+          etc."demo-admin-secret" = {
+            mode = "0600";
+            text = "demo-admin";
+          };
+          systemPackages = [pkgs.swaks pkgs.curl];
+          # Printed by every root login shell (the autologin getty shows it).
+          etc."profile.d/mail-demo-banner.sh".text = ''
+            cat <<'BANNER'
+            ==================================================================
+             nix-email demo VM - throwaway, all state dies with the process
 
-             web admin / JMAP : http://localhost:18080  (admin / demo-admin)
-             SMTP             : swaks --server localhost:2525 \\
-                                  --to anyone@mail.demo.test \\
-                                  --from you@example.com
-             submission (STARTTLS) : localhost:2587  (demo@mail.demo.test / demo-nixemail-2026)
-             IMAPS                 : localhost:2593  (demo@mail.demo.test / demo-nixemail-2026)
+               web admin / JMAP : http://localhost:18080  (admin / demo-admin)
+               SMTP             : swaks --server localhost:2525 \\
+                                    --to anyone@mail.demo.test \\
+                                    --from you@example.com
+               submission (STARTTLS) : localhost:2587  (demo@mail.demo.test / demo-nixemail-2026)
+               IMAPS                 : localhost:2593  (demo@mail.demo.test / demo-nixemail-2026)
 
-             Provisioned declaratively by stalwart-provision.service
-             (stalwart-cli apply; journal: systemctl status). The catch-all
-             accepts mail for ANY local part.
-             Unauthenticated inbound lands in Junk Mail (spam filter);
-             authenticated submission lands in INBOX - both verified.
-          ==================================================================
-          BANNER
-        '';
+               Provisioned declaratively by stalwart-provision.service
+               (stalwart-cli apply; journal: systemctl status). The catch-all
+               accepts mail for ANY local part.
+               Unauthenticated inbound lands in Junk Mail (spam filter);
+               authenticated submission lands in INBOX - both verified.
+            ==================================================================
+            BANNER
+          '';
+        };
       })
     ];
   };
