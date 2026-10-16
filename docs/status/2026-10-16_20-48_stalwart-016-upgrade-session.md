@@ -164,58 +164,58 @@
 
 ## f) TOP 50 NEXT TASKS (ranked by impact; HARVEST fodder for docs-health)
 
-| #  | Task                                                                                          | Impact   | Effort | Category      |
-| --- | --------------------------------------------------------------------------------------------- | -------- | ------ | ------------- |
-| 1  | Wrapper: ALWAYS emit SpamDnsblServer reconcile set (empty ok) to destroy broken default rows   | Critical | S      | Bug           |
-| 2  | Re-run stalwart-relay-e2e until green with the two landed fixes                                | Critical | S-M    | Bug           |
-| 3  | First stalwart-e2e VM run; triage every transcript surprise                                    | Critical | M      | Bug           |
-| 4  | If apply rejects DkimSignature without publicKey, emit derived pubkeys or drop to single-sign  | Critical | S      | Bug           |
-| 5  | Fix journal assertions from transcript (config-error count, quota reschedule wording)          | High     | S      | Bug           |
-| 6  | Full `nix flake check` green (redirect + echo-exit procedure)                                  | Critical | M      | Quality       |
-| 7  | `nix fmt -- . --check` before yielding (daemon race discipline)                                | High     | S      | Quality       |
-| 8  | Run buildflow gate                                                                            | High     | S      | Quality       |
-| 9  | Verify ci.yml lockstep lists still match (no checks added/removed - confirm mechanically)      | High     | S      | Quality       |
-| 10 | README quickstart: demo.test domain + demo-nixemail-2026 password + stalwart-provision wording | High     | S      | Documentation |
-| 11 | README ledger: 0.16 facts (REST gone, export/import gone, .invalid rejected, ms durations, zxcvbn passwords, reload-listener caveat, DNSBL default rows) | High | M | Documentation |
-| 12 | README pin-advance note: breaking v0.5.0, SystemNix coordination                              | High     | S      | Documentation |
-| 13 | AGENTS.md: 0.16 doctrine, vendored-module retirement plan, FIFO-debug-first lesson, new traps  | High     | M      | Documentation |
-| 14 | CHANGELOG entry for the 0.16 breaking upgrade                                                 | High     | S      | Documentation |
-| 15 | FEATURES.md status flips (0.16, declarative provisioning, dropped backup flags)               | High     | S      | Documentation |
-| 16 | TODO_LIST.md refresh post-gate                                                                | Medium   | S      | Documentation |
-| 17 | INBOXCLEAN.md: flag JMAP contract for 0.16 re-verification (history stays historical)         | High     | S      | Documentation |
-| 18 | Check 0.16.26 (master) for the two 0.16.22 bugs; if fixed, overlay/bump version               | High     | M      | Bug           |
-| 19 | Upstream reports (reload-listener gap; broken default DNSBL rows) via verify-before-filing    | Medium   | M      | Quality       |
-| 20 | Host-side demo smoke (`nix run .#vm` + probes) once tests green                               | High     | M      | Quality       |
-| 21 | docs/probes/ 0.16 manifest for debug transcripts                                              | Medium   | S      | Documentation |
-| 22 | Account-secrets pattern for real hosts (sops-rendered runtime apply vs admin-created)         | High     | M      | Feature       |
-| 23 | Expose provision plan as a fast check (provision-plan-eval + ci.yml lists)                    | Medium   | S      | Quality       |
-| 24 | Confirm /metrics/prometheus path/format on 0.16 from transcript; fix docs/MONITORING.md       | High     | S      | Bug           |
-| 25 | Confirm GTUBE X-Spam-Status behavior on 0.16 (e2e subtest 15)                                 | High     | S      | Bug           |
-| 26 | Confirm over-quota retry loop + journal wording on 0.16 (subtest 14)                          | High     | S      | Bug           |
-| 27 | Confirm inbound-limiter connection gating on 0.16 (flood subtest 19)                          | High     | S      | Bug           |
-| 28 | Confirm EmailAlias delivery + catch-all runtime apply patch (subtests 12-13)                  | High     | S      | Bug           |
-| 29 | Re-verify JMAP session/mailbox shape for INBOXCLEAN contract on 0.16                          | High     | M      | Quality       |
-| 30 | Dedup testPass constants into tests/lib.nix                                                   | Low      | S      | Cleanup       |
-| 31 | Clean repo-root result symlinks from ad-hoc builds                                            | Low      | S      | Cleanup       |
-| 32 | Kill stale /tmp debug VMs + GC-root hygiene                                                   | Low      | S      | Cleanup       |
-| 33 | Document vendor patches vs PR #552103 in one README section                                   | Medium   | S      | Documentation |
-| 34 | VENDOR retirement checklist when PR merges (restore meta.doc + partOf, drop ExecStartPost)    | Medium   | S      | Documentation |
-| 35 | Mechanize stalwart-cli >= 1.0.2 assertion (eval-time version check)                           | Low      | S      | Quality       |
-| 36 | Document password-strength (zxcvbn) requirement for consumer provisioning                     | Medium   | S      | Documentation |
-| 37 | Sweep docs for /api/principal references; mark 0.15-historical                                | Medium   | S      | Documentation |
-| 38 | docs/TELEMETRY.md: retire 0.15 version-skew caveat or re-verify keys on 0.16                  | Medium   | S      | Documentation |
-| 39 | ROADMAP D1/D2 notes: .invalid rename implications for prod domains                            | Medium   | S      | Documentation |
-| 40 | THREAT_MODEL: File-secret filePath paths + plan-in-store exposure note                        | Medium   | S      | Documentation |
-| 41 | Add GC-root discipline note for local debug runs (AGENTS.md working rules)                    | Low      | S      | Documentation |
-| 42 | Verify aarch64 module-import-eval still green (pure eval runs on both arches)                 | Medium   | S      | Quality       |
-| 43 | Consider `publicUrl` warning when scheme is https but no ACME/manual cert configured          | Low      | S      | Quality       |
-| 44 | Decide: track upstream PR branch vs vendored copy as the intermediate support surface         | Medium   | S      | Cleanup       |
-| 45 | Add eval assertion wrapper Domain id `#domain` stability contract (consumers reference it)    | Medium   | S      | Quality       |
-| 46 | Confirm flood node's stateVersion asymmetry (machine node lacks system.stateVersion) is inert | Low      | S      | Cleanup       |
-| 47 | Update docs/DOMAIN_LANGUAGE.md if it exists with 0.16 object nouns (MtaRoute, provision plan) | Low      | S      | Documentation |
-| 48 | Harvest this report into TODO_LIST.md (docs-health HARVEST) after green                       | High     | S      | Documentation |
-| 49 | Cut v0.5.0 release (CHANGELOG -> gates -> tag -> release) once gates green + user approves    | Critical | M      | Release       |
-| 50 | SystemNix consumer pin advance to the new tag (runbook)                                       | Critical | S      | Release       |
+| #  | Task                                                                                                                                                     | Impact   | Effort | Category      |
+| -- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ------ | ------------- |
+| 1  | Wrapper: ALWAYS emit SpamDnsblServer reconcile set (empty ok) to destroy broken default rows                                                             | Critical | S      | Bug           |
+| 2  | Re-run stalwart-relay-e2e until green with the two landed fixes                                                                                          | Critical | S-M    | Bug           |
+| 3  | First stalwart-e2e VM run; triage every transcript surprise                                                                                              | Critical | M      | Bug           |
+| 4  | If apply rejects DkimSignature without publicKey, emit derived pubkeys or drop to single-sign                                                            | Critical | S      | Bug           |
+| 5  | Fix journal assertions from transcript (config-error count, quota reschedule wording)                                                                    | High     | S      | Bug           |
+| 6  | Full `nix flake check` green (redirect + echo-exit procedure)                                                                                            | Critical | M      | Quality       |
+| 7  | `nix fmt -- . --check` before yielding (daemon race discipline)                                                                                          | High     | S      | Quality       |
+| 8  | Run buildflow gate                                                                                                                                       | High     | S      | Quality       |
+| 9  | Verify ci.yml lockstep lists still match (no checks added/removed - confirm mechanically)                                                                | High     | S      | Quality       |
+| 10 | README quickstart: demo.test domain + demo-nixemail-2026 password + stalwart-provision wording                                                           | High     | S      | Documentation |
+| 11 | README ledger: 0.16 facts (REST gone, export/import gone, .invalid rejected, ms durations, zxcvbn passwords, reload-listener caveat, DNSBL default rows) | High     | M      | Documentation |
+| 12 | README pin-advance note: breaking v0.5.0, SystemNix coordination                                                                                         | High     | S      | Documentation |
+| 13 | AGENTS.md: 0.16 doctrine, vendored-module retirement plan, FIFO-debug-first lesson, new traps                                                            | High     | M      | Documentation |
+| 14 | CHANGELOG entry for the 0.16 breaking upgrade                                                                                                            | High     | S      | Documentation |
+| 15 | FEATURES.md status flips (0.16, declarative provisioning, dropped backup flags)                                                                          | High     | S      | Documentation |
+| 16 | TODO_LIST.md refresh post-gate                                                                                                                           | Medium   | S      | Documentation |
+| 17 | INBOXCLEAN.md: flag JMAP contract for 0.16 re-verification (history stays historical)                                                                    | High     | S      | Documentation |
+| 18 | Check 0.16.26 (master) for the two 0.16.22 bugs; if fixed, overlay/bump version                                                                          | High     | M      | Bug           |
+| 19 | Upstream reports (reload-listener gap; broken default DNSBL rows) via verify-before-filing                                                               | Medium   | M      | Quality       |
+| 20 | Host-side demo smoke (`nix run .#vm` + probes) once tests green                                                                                          | High     | M      | Quality       |
+| 21 | docs/probes/ 0.16 manifest for debug transcripts                                                                                                         | Medium   | S      | Documentation |
+| 22 | Account-secrets pattern for real hosts (sops-rendered runtime apply vs admin-created)                                                                    | High     | M      | Feature       |
+| 23 | Expose provision plan as a fast check (provision-plan-eval + ci.yml lists)                                                                               | Medium   | S      | Quality       |
+| 24 | Confirm /metrics/prometheus path/format on 0.16 from transcript; fix docs/MONITORING.md                                                                  | High     | S      | Bug           |
+| 25 | Confirm GTUBE X-Spam-Status behavior on 0.16 (e2e subtest 15)                                                                                            | High     | S      | Bug           |
+| 26 | Confirm over-quota retry loop + journal wording on 0.16 (subtest 14)                                                                                     | High     | S      | Bug           |
+| 27 | Confirm inbound-limiter connection gating on 0.16 (flood subtest 19)                                                                                     | High     | S      | Bug           |
+| 28 | Confirm EmailAlias delivery + catch-all runtime apply patch (subtests 12-13)                                                                             | High     | S      | Bug           |
+| 29 | Re-verify JMAP session/mailbox shape for INBOXCLEAN contract on 0.16                                                                                     | High     | M      | Quality       |
+| 30 | Dedup testPass constants into tests/lib.nix                                                                                                              | Low      | S      | Cleanup       |
+| 31 | Clean repo-root result symlinks from ad-hoc builds                                                                                                       | Low      | S      | Cleanup       |
+| 32 | Kill stale /tmp debug VMs + GC-root hygiene                                                                                                              | Low      | S      | Cleanup       |
+| 33 | Document vendor patches vs PR #552103 in one README section                                                                                              | Medium   | S      | Documentation |
+| 34 | VENDOR retirement checklist when PR merges (restore meta.doc + partOf, drop ExecStartPost)                                                               | Medium   | S      | Documentation |
+| 35 | Mechanize stalwart-cli >= 1.0.2 assertion (eval-time version check)                                                                                      | Low      | S      | Quality       |
+| 36 | Document password-strength (zxcvbn) requirement for consumer provisioning                                                                                | Medium   | S      | Documentation |
+| 37 | Sweep docs for /api/principal references; mark 0.15-historical                                                                                           | Medium   | S      | Documentation |
+| 38 | docs/TELEMETRY.md: retire 0.15 version-skew caveat or re-verify keys on 0.16                                                                             | Medium   | S      | Documentation |
+| 39 | ROADMAP D1/D2 notes: .invalid rename implications for prod domains                                                                                       | Medium   | S      | Documentation |
+| 40 | THREAT_MODEL: File-secret filePath paths + plan-in-store exposure note                                                                                   | Medium   | S      | Documentation |
+| 41 | Add GC-root discipline note for local debug runs (AGENTS.md working rules)                                                                               | Low      | S      | Documentation |
+| 42 | Verify aarch64 module-import-eval still green (pure eval runs on both arches)                                                                            | Medium   | S      | Quality       |
+| 43 | Consider `publicUrl` warning when scheme is https but no ACME/manual cert configured                                                                     | Low      | S      | Quality       |
+| 44 | Decide: track upstream PR branch vs vendored copy as the intermediate support surface                                                                    | Medium   | S      | Cleanup       |
+| 45 | Add eval assertion wrapper Domain id `#domain` stability contract (consumers reference it)                                                               | Medium   | S      | Quality       |
+| 46 | Confirm flood node's stateVersion asymmetry (machine node lacks system.stateVersion) is inert                                                            | Low      | S      | Cleanup       |
+| 47 | Update docs/DOMAIN_LANGUAGE.md if it exists with 0.16 object nouns (MtaRoute, provision plan)                                                            | Low      | S      | Documentation |
+| 48 | Harvest this report into TODO_LIST.md (docs-health HARVEST) after green                                                                                  | High     | S      | Documentation |
+| 49 | Cut v0.5.0 release (CHANGELOG -> gates -> tag -> release) once gates green + user approves                                                               | Critical | M      | Release       |
+| 50 | SystemNix consumer pin advance to the new tag (runbook)                                                                                                  | Critical | S      | Release       |
 
 ## g) QUESTIONS (cannot answer myself)
 
@@ -235,6 +235,7 @@
    domain you own in the demo/quickstart?
 
 ---
+
 _Report is a point-in-time snapshot (2026-10-16 20:48 CEST). Section (f) is
 HARVEST input for TODO_LIST.md/ROADMAP.md per docs-health. Format note: this
 report is `.md` at the operator's explicit request (skill default is HTML -
