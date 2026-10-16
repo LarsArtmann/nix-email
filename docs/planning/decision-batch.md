@@ -185,12 +185,13 @@ CHANGELOG `[Unreleased]` is release-ready: JMAP subtest + `docs/INBOXCLEAN.md`
 
 ### C41 — AGENTS.md size floor (new 2026-10-16, F22.3 verdict call)
 
-AGENTS.md sits at ~21 KB — above the 15 KB skill target, below the 30 KB
-flag. The 2026-10-05 diet verdict: ~21 KB is the floor without deleting
-distinct paid-for lessons.
+AGENTS.md sits at ~23.5 KB (measured 2026-10-16; 22.8 KB before that
+day's docs pass) — above the 15 KB skill target, below the 30 KB flag.
+The 2026-10-05 diet verdict stands: the current size is the floor without
+deleting distinct paid-for lessons.
 
-- **[rec] Accept ~21 KB as the floor** (no enforced budget, no gate); re-visit
-  only if the flag threshold (30 KB) approaches.
+- **[rec] Accept the current size as the floor** (no enforced budget, no
+  gate); re-visit only if the flag threshold (30 KB) approaches.
 - Unblocks: retires the recurring F22.3 line from every docs pass.
 
 ## What is NOT a decision
