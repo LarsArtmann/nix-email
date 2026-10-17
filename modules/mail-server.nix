@@ -625,20 +625,19 @@ in {
       # The 0.16 package attr; pkgs.stalwart is still the 0.15 line at this
       # pin (and warns loudly if used with this module).
       package = pkgs.stalwart_0_16;
-
-      # The management listener must bind from the STATIC config, not only
-      # from the provision plan: the plan applier probes cfg.url BEFORE it
-      # can apply, and the plan is the only thing that binds the listener —
-      # a self-deadlock for every httpBind that is not stalwart's built-in
-      # default port 8080 (the 8080 default worked by coincidence; the pbx
-      # host's 8082 wedged the whole NixOS switch for 43 min, 2026-10-17,
-      # VM-reproduced the same night). Static bind: stalwart answers the
-      # prestart probe at boot, the apply reconciles the same shape, and
-      # the post-apply restart re-reads the reconciled plan.
-      settings.server.listener.http = {
-        bind = [cfg.httpBind];
-        protocol = "http";
-      };
+      # 0.16 fact (binary-proven 2026-10-17): the config file carries ONLY
+      # the store backend — server.listener/tracer/hostname keys are
+      # SILENTLY IGNORED, and listeners live exclusively in the datastore
+      # (NetworkListener plan objects; on a virgin store the built-in
+      # default set binds, which is smtp 25 + http 8080 serving the SPA
+      # for every path). The management httpBind is therefore plan-only,
+      # and the provision applier's prestart probe (cfg.url) can
+      # self-deadlock on any store where the plan has not been applied and
+      # httpBind is not 8080 — the 2026-10-17 pbx host switch burn (43-min
+      # wedge). The bootstrap-endpoint design (probe/apply fallback to the
+      # built-in port vs an API-enabled bootstrap listener) is the open
+      # upstream question; the unit's bounded start timeout below keeps
+      # the failure VISIBLE until it lands.
       inherit (cfg) stateVersion;
       # nixpkgs' openFirewall derives ports from provision listener binds,
       # which would punch the management port through the firewall on every

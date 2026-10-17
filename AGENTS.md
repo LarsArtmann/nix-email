@@ -37,9 +37,10 @@ intuitions: REST recipes, provision-plan dialect, JMAP session path; the
   Use the VM debug loop below instead. Host loops remain fine for pure
   client-side forensics (swaks/SMTP sink, see below).
 - `nix run .#vm` (x86_64) - throwaway demo VM (`nixosConfigurations.demo`,
-  end-to-end host-smoked 2026-09-22, README "Try it in a VM"): web/API
-  host :18080 (admin/demo-admin), SMTP :2525, submission :2587
-  (demo@mail.demo.invalid / demo), IMAPS :2593. Debug pattern that worked:
+  reworked for 0.16: declarative plan, `mail.demo.test`, password
+  `demo-nixemail-2026`, admin `demo-admin` via /etc credential; a fresh
+  0.16 host-side smoke is pending - TODO_LIST): web/API host :18080,
+  SMTP :2525, submission :2587, IMAPS :2593. Debug pattern that worked:
   FIFO console (`mkfifo in && cat in | <vm-closure>/bin/run-demo-vm > log`
   with a `sleep infinity > in` holder) - more reliable than the
   nixos-test-driver for ad-hoc demo runs, because the driver's
@@ -406,10 +407,22 @@ intuitions: REST recipes, provision-plan dialect, JMAP session path; the
   repos - three concurrent builds (this repo + pbx-artmann + SystemNix)
   OOM-killed one run mid-flight.
 - Session-start baseline ritual (2026-10-17, after a near-clobber on a
-  foreign in-flight file): `git status --short` + scan `ls docs/status`
-  for same-day reports BEFORE the first edit; attribute gate reds via the
-  baseline + `registrationTime` dating, never by blaming your own diff;
-  never edit a file another session is mid-iterating on.
+  foreign in-flight file): `git status --short` + `pgrep -af crush` +
+  scan `ls docs/status` for same-day reports BEFORE the first edit;
+  attribute gate reds via the baseline + `registrationTime` dating, never
+  by blaming your own diff; never edit a file another session is
+  mid-iterating on - if a file is hot (mtime moving, same-day report
+  names it), write to a non-colliding location and hand off via
+  TODO_LIST rows. Register reads with `view` (bash sed/grep does NOT
+  arm the edit tool's modified-since-read guard).
+- Annotated status reports are formatter-fragile: dprint REWRAPS struck
+  table rows and EATS the overflow cells (verdict + category lost - the
+  2026-10-17 pass had to rebuild 120 rows from git blobs). Rules:
+  strike table rows in the PER-CELL canonical form
+  (`| ~~N~~ | ~~cell~~ verdict | ...`), run `annotate.go check-rows`
+  AFTER every formatter pass over an annotated file (it proves
+  uniformity AND shape), and never hand-roll row repairs - the verdict
+  text must come from the preserved spec, never from memory.
 - Known gate noise (2026-10-17): the full-gate log printed "running 4
   flake checks" while SIX are defined (`nix eval
   .#checks.x86_64-linux --apply builtins.attrNames` = 6 = ci.yml's

@@ -154,6 +154,14 @@ the verified-source work (what the wrapper OWNS) is done or specified in
   `meta.doc` + `partOf`, drop the ExecStartPost patch; checklist in the
   module header); (c) the Stalwart version surface is decision C45
   (0.16.22 vs overlay 0.16.26, which needs x86-64-v2)
+- 0.16-born raw ideas (2026-10-17 harvest): declarative catch-all wrapper
+  option (today: runtime-plan only; product-shape call documented in the
+  README); a typed `credentials.<user>.secretFile` wrapper option
+  (post-C44); queue-depth observability as a first-class metric + dashboard
+  row (the journal is silent on 0.16); parsedmarc end-to-end against a REAL
+  0.16 deployment (SystemNix wiring: report destinations, IMAP polling);
+  wrapper option-surface review post-0.16 (which 0.15-era options are
+  dead/no-op under the object model)
 - Arch-diagram content-freshness audit (routed 2026-09-22 from the
   16_19-16 report): `docs/architecture-understanding/*.d2` renders are
   label-verified but the CONTENT vs module reality (relay, DKIM
