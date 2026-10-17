@@ -80,10 +80,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   shape and the throttle key `mx` are gone; firewall/port contract
   unchanged. Full fact set in the README ledger "Stalwart 0.16" section
   and the 2026-10-16/17 status reports (transcript-pinned).
-  Upgrade state at entry time: eval checks green, relay-e2e fix landed
-  (rebuild pending), stalwart-e2e one subtest from green (quota retry
-  signature), full gate pending - tracked in TODO_LIST section "0.16
-  upgrade completion".
+  Upgrade state as of 2026-10-17 03:34: GATE GREEN - `nix flake check`
+  passes all checks on the 0.16 tree (stalwart-e2e 17/17 subtests in a
+  real run incl. the four never-exercised ones, relay-e2e 3/3, buildflow
+  EXIT:0). The 0.15 quota journal signature is DEAD on 0.16
+  (transcript-pinned JOURNAL SILENCE, `docs/probes/2026-10-17-quota-
+  journal-silence/`): the subtest now asserts SMTP acceptance
+  (`250 Message queued with id`), IMAP absence, and a negative journal
+  assertion. Remaining: release doctrine (C43), the 0.16 backup-story
+  gap, and the consumer pin advance - TODO_LIST owns the queue.
 
 - Docs-health audit pass (2026-09-29) over every `docs/status` and
   `docs/planning` 2026-0* file: the seven unannotated reports plus both

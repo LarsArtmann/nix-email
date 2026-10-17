@@ -13,11 +13,13 @@ DMARC/TLS-RPT monitor, packaged as a NixOS flake for consumption by
 > `services.stalwart.provision` plans through a vendored 0.16 module
 > (nixpkgs PR #552103). REST `/api` management recipes and
 > `--export`/`--import` backup are GONE upstream; the demo renamed to
-> `mail.demo.test`. State at this banner's date: eval checks green,
-> `stalwart-relay-e2e` fix landed (rebuild pending), `stalwart-e2e` one
-> subtest from green (quota retry signature), full gate pending - live
-> status in [TODO_LIST.md](TODO_LIST.md) ("0.16 upgrade completion"), the
-> transcript-pinned fact set in the ledger's "Stalwart 0.16" section.
+> `mail.demo.test`. State at this banner's date: **GATE GREEN** -
+> `nix flake check` passes all checks on the 0.16 tree (stalwart-e2e 17/17
+> subtests in a real run, relay-e2e 3/3, buildflow EXIT:0, alejandra
+> clean; the 03-34 status report). What remains is release doctrine (C43)
+> and the 0.16 backup-story gap - live status in
+> [TODO_LIST.md](TODO_LIST.md), the transcript-pinned fact set in the
+> ledger's "Stalwart 0.16" section.
 
 Architecture (per `~/projects/reports/selfhosted-email-guide.md`): self-hosted
 **inbound** on a Hetzner VPS (residential evo-x2 can never be an MX),
