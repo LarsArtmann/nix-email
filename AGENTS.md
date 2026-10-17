@@ -21,7 +21,8 @@ are era-marked historical).
   deliberate non-fixes. "N tools unavailable" (jest/knip/madge/pnpm tools,
   interrogate) is expected noise for a Nix-only repo.
 - `nix flake check` - the full gate: pure eval contract checks + the
-  x86_64-only VM E2E tests (~2-4 min; the SMTP subtest intentionally waits
+  x86_64-only VM E2E tests (~4-6 min on CI for the 7-check set, step-timed
+  2026-10-17; the SMTP subtest intentionally waits
   out ~60 s of resolver timeouts in the DNS-less VM; aarch64 evals a
   reduced set, shape-guarded in CI). The check set is SINGLE-SOURCED: the
   canonical list is the ci.yml lockstep `expected=` list / README "What is

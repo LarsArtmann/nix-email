@@ -323,10 +323,14 @@ covered:
 Listeners, rate limits, and report settings do NOT ride the migration
 (0.16 objects) - the provision plan recreates them at the next start.
 Quota counters are reset by upstream's recovery mode; recalculate them
-from the webadmin's task panel afterwards. Pinned end to end (guard
-refusal, poison refusal, `--backup-dir` recovery, 0.15 password
-authenticating on 0.16, restart persistence) by
-`checks.x86_64-linux.stalwart-migrate-e2e`.
+from the webadmin's task panel afterwards. The migration path is
+exercised by `tests/stalwart-migrate-e2e.nix` (guard refusal, poison
+refusal, `--backup-dir` recovery, 0.15 password authenticating on 0.16,
+restart persistence) - CORRECTED 2026-10-17: that check is currently
+UNREGISTERED (known-broken: the in-VM switch to the foreign-eval toplevel
+wedges the test driver; TODO row "migrate-e2e repair" owns the two-node
+redesign), so treat the path as scripted-and-reviewed, not CI-proven,
+until it re-registers.
 
 ## Module: `services.dmarc-monitor`
 
