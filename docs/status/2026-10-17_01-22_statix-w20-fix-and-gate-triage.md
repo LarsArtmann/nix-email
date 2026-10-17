@@ -178,28 +178,28 @@ and the true bug is the missing match property in the Domain upsert body.
 
 ## f) Next tasks (ranked; brainstorm input for docs-health HARVEST, not a commitment list)
 
-| #  | Task                                                                                              | Impact   | Effort | Category      |
-| -- | ------------------------------------------------------------------------------------------------- | -------- | ------ | ------------- |
-| 1  | Push the 5 local commits and watch CI to green on master                                          | Critical | S      | Quality       |
-| 2  | Add match property `name` to the Domain upsert body in the catch-all plan, re-run stalwart-e2e     | Critical | S      | Bug           |
-| 3  | One clean full `nix flake check` on the committed tree                                            | Critical | M      | Quality       |
-| 4  | Harvest this report's (f) into TODO_LIST/ROADMAP (docs-health HARVEST)                            | High     | S      | Documentation |
-| 5  | Audit other 0.16 runtime plans (provision singletons et al) for the missing match-property class  | High     | M      | Bug           |
-| 6  | Reconcile "running 4 flake checks" gate-log line against the 5 defined checks                     | High     | S      | Bug           |
-| 7  | Adopt the session-start baseline ritual (git status + same-day status-doc scan)                   | High     | S      | Process       |
-| 8  | Full buildflow gate pass on the fixed tree (nix-checker drift signal)                             | Medium   | M      | Quality       |
-| 9  | README ledger entry: catchAllAddress validation ordering trap                                     | Medium   | S      | Documentation |
-| 10 | Demo VM runtime smoke after the environment-block move (nix run .#vm, ports + banner probe)       | Medium   | M      | Quality       |
-| 11 | Verify the apply-log dump fires on failure via deliberate fault-injection                         | Medium   | S      | Quality       |
-| 12 | Audit all VM-test steps that redirect output to VM-local files: dump on failure, repo-wide rule   | Medium   | M      | Quality       |
-| 13 | Script the refactor-identity proof (drv/outPath + registrationTime dating)                        | Medium   | S      | Quality       |
-| 14 | Add pinned-statix to the pre-push hook (mirror CI, like actionlint+shellcheck)                    | Medium   | M      | Quality       |
-| 15 | Session-start habit: statix check . before any .nix edit session                                  | Medium   | S      | Process       |
-| 16 | Confirm no ci.yml lockstep/shape-guard change needed (no checks added/removed this session)       | Low      | S      | Quality       |
-| 17 | Verify daemon-committed content matches intended edits (git diff 8f8ced8^..8f8ced8 read-back)     | Low      | S      | Cleanup       |
-| 18 | Annotate the 21:08 going-green status doc: green predates the 23:04 catch-all red                 | Low      | S      | Documentation |
-| 19 | Track the BuildFlow nix-checker summary-vs-detail 12-vs-2 count gap (BuildFlow-repo TODO)         | Low      | M      | Quality       |
-| 20 | Clean session /tmp artifacts (gate.log, eval captures) after the verification window closes       | Low      | S      | Cleanup       |
+| #  | Task                                                                                             | Impact   | Effort | Category      |
+| -- | ------------------------------------------------------------------------------------------------ | -------- | ------ | ------------- |
+| 1  | Push the 5 local commits and watch CI to green on master                                         | Critical | S      | Quality       |
+| 2  | Add match property `name` to the Domain upsert body in the catch-all plan, re-run stalwart-e2e   | Critical | S      | Bug           |
+| 3  | One clean full `nix flake check` on the committed tree                                           | Critical | M      | Quality       |
+| 4  | Harvest this report's (f) into TODO_LIST/ROADMAP (docs-health HARVEST)                           | High     | S      | Documentation |
+| 5  | Audit other 0.16 runtime plans (provision singletons et al) for the missing match-property class | High     | M      | Bug           |
+| 6  | Reconcile "running 4 flake checks" gate-log line against the 5 defined checks                    | High     | S      | Bug           |
+| 7  | Adopt the session-start baseline ritual (git status + same-day status-doc scan)                  | High     | S      | Process       |
+| 8  | Full buildflow gate pass on the fixed tree (nix-checker drift signal)                            | Medium   | M      | Quality       |
+| 9  | README ledger entry: catchAllAddress validation ordering trap                                    | Medium   | S      | Documentation |
+| 10 | Demo VM runtime smoke after the environment-block move (nix run .#vm, ports + banner probe)      | Medium   | M      | Quality       |
+| 11 | Verify the apply-log dump fires on failure via deliberate fault-injection                        | Medium   | S      | Quality       |
+| 12 | Audit all VM-test steps that redirect output to VM-local files: dump on failure, repo-wide rule  | Medium   | M      | Quality       |
+| 13 | Script the refactor-identity proof (drv/outPath + registrationTime dating)                       | Medium   | S      | Quality       |
+| 14 | Add pinned-statix to the pre-push hook (mirror CI, like actionlint+shellcheck)                   | Medium   | M      | Quality       |
+| 15 | Session-start habit: statix check . before any .nix edit session                                 | Medium   | S      | Process       |
+| 16 | Confirm no ci.yml lockstep/shape-guard change needed (no checks added/removed this session)      | Low      | S      | Quality       |
+| 17 | Verify daemon-committed content matches intended edits (git diff 8f8ced8^..8f8ced8 read-back)    | Low      | S      | Cleanup       |
+| 18 | Annotate the 21:08 going-green status doc: green predates the 23:04 catch-all red                | Low      | S      | Documentation |
+| 19 | Track the BuildFlow nix-checker summary-vs-detail 12-vs-2 count gap (BuildFlow-repo TODO)        | Low      | M      | Quality       |
+| 20 | Clean session /tmp artifacts (gate.log, eval captures) after the verification window closes      | Low      | S      | Cleanup       |
 
 (20 items - grounded strictly in this session's observations; the "up to 50"
 headroom stays empty rather than padded.)
