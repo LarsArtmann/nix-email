@@ -336,11 +336,13 @@ parsedmarc polls the `rua` mailboxes over IMAP and writes JSON+CSV reports to
 `outputDirectory`, `settings` (passthrough). Closes domains-repo findings
 H1/H2 (rua reports go nowhere today).
 
-0.16 CAVEAT (2026-10-17): Stalwart 0.16 natively imports inbound DMARC and
-TLS AGGREGATE reports (DMARCbis, 0.16.12+), so this module's monopoly
-shrinks - parsedmarc still uniquely owns forensic/failure-report parsing,
-file sinks, and multi-mailbox polling. Retire-or-keep is decision C42
-(decision-batch); the module stands until that call.
+0.16 CAVEAT (updated 2026-10-17, stalw.art/docs/mta/reports): Stalwart 0.16
+natively imports and ANALYZES inbound DMARC and TLS AGGREGATE reports
+(DMARCbis, 0.16.12+) AND inbound authentication-failure reports (DKIM/SPF/
+DMARC, ARF), so parsedmarc's parsing monopoly is gone - it still uniquely
+owns file-sink outputs and arbitrary-mailbox IMAP polling. Retire-or-keep
+is decision C42 (decision-batch, evidence recorded 2026-10-17); the module
+stands until that call.
 
 ## SystemNix integration (planned shape)
 
@@ -647,12 +649,16 @@ json/yaml/markdown.
   Application bundle; the bare `/` root is 4xx); the fallback admin is a
   REQUIRED systemd credential (the provisioning CLI's only auth path);
   `stalwart-cli` >= 1.0.2 required (pin ships 1.0.12).
-- **0.16 report features (upstream CHANGELOG-verified 2026-10-16)**:
-  DMARCbis - RFC 9989/9990/9991 - landed in 0.16.12 (2026-07-06); 0.16.x
-  natively imports inbound DMARC AND TLS aggregate reports;
-  `inboundReportMaxSize` bounds them. UNKNOWN (one docs fetch settles):
-  whether 0.16 parses inbound forensic/failure reports. This is the C42
-  evidence base (parsedmarc retire-or-keep).
+- **0.16 report features (upstream CHANGELOG-verified 2026-10-16; docs
+  fetched 2026-10-17)**: DMARCbis - RFC 9989/9990/9991 - landed in 0.16.12
+  (2026-07-06); 0.16.x natively imports inbound DMARC AND TLS aggregate
+  reports; `inboundReportMaxSize` bounds them. RESOLVED 2026-10-17
+  (stalw.art/docs/mta/reports + /analysis): 0.16 also RECEIVES AND PARSES
+  inbound authentication-failure reports (DKIM/SPF/DMARC ARF) - governed by
+  `inboundReportAddresses` / `inboundReportForwarding` /
+  `holdMtaReportsFor`. C42 evidence base complete: parsedmarc's remaining
+  unique value = file sinks + arbitrary-mailbox polling (docs-verified, not
+  yet runtime-verified on the pin).
 
 ### Stalwart 0.15.5 era (historical facts; several are superseded above)
 

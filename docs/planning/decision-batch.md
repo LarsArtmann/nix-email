@@ -247,14 +247,22 @@ production infra), T21 (C24/C29 monitoring encoding calls).
 
 Stalwart 0.16 natively imports inbound DMARC **and TLS** aggregate reports
 (DMARCbis - RFC 9989/9990/9991 - added in 0.16.12; live-verified against the
-upstream tagged CHANGELOG 2026-10-16, 08-26 report a/6). parsedmarc still
-uniquely owns: inbound forensic/failure-report parsing (the one unknown:
-whether 0.16 PARSES inbound failure reports - one stalw.art docs fetch
-settles it), file-sink outputs, arbitrary-mailbox polling, and the
-watcher-outside-the-watched decoupling.
+upstream tagged CHANGELOG 2026-10-16, 08-26 report a/6). **The one unknown is
+now SETTLED (stalw.art docs fetched 2026-10-17: /docs/mta/reports/ +
+/docs/mta/reports/analysis/): 0.16 RECEIVES AND PARSES inbound
+authentication-FAILURE reports (DKIM, SPF, DMARC - ARF) and generic ARF
+abuse reports, alongside the aggregates** (`inboundReportAddresses` default
+`postmaster@*`, `inboundReportForwarding` default true, retention
+`holdMtaReportsFor` 30 d). parsedmarc's failure-report PARSING monopoly is
+gone on 0.16; its remaining unique value: file-sink outputs,
+arbitrary-mailbox IMAP polling, watcher-outside-the-watched decoupling, and
+any format upstream's parser does not cover. Evidence TILTS retire once 0.16
+is the fleet pin, but the call stays owner-gated.
 
 - **[rec] Keep through 0.16 stabilization**; re-decide once the live webadmin
-  exists (D1) and the 0.16 native report surface has been inspected hands-on.
+  exists (D1) and the 0.16 native report surface has been inspected hands-on
+  (our e2e exercised AGGREGATE ingest on 0.16.22 only; failure-report parse
+  is docs-verified, not runtime-verified).
 - Cost of delay: the wrapper may be partially redundant on 0.16; the
   rationale text in README/FEATURES carries the 0.16 caveat meanwhile.
 
