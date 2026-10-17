@@ -30,10 +30,14 @@ Raw ideas:
   removed on 0.16); the 0.16 path is declarative `DkimSignature` objects
   (the server derives public keys - e2e-verified); selector rotation into
   sops stays an open idea
-- Backup/DR: RE-RESEARCH OWED on 0.16 - `stalwart --export`/`--import` is
-  REMOVED upstream with no replacement shipped (2026-10-16 transcript);
-  the 0.15 export-timer design below is historical until a 0.16 answer
-  (file-level cold copies vs a datastore snapshot mechanism) exists.
+- Backup/DR: ANSWERED 2026-10-17 (stalw.art docs + UPGRADING/v0_16.md,
+  0.16.26-era): full-data backup = offline stop + `cp -a` snapshot;
+  MAIN-binary `stalwart --export/--import <dir>` (server STOPPED,
+  `EXPORT_TYPES` families) is documented upstream - the 2026-10-16
+  "removed with no replacement" transcript tested a different build and
+  needs reconciling in the VM proof on OUR pin (TODO row: 0.16.22 vs
+  0.16.26 docs is exactly the C45 delta class); config-only =
+  `stalwart-cli snapshot` (NDJSON plan) + `stalwart-cli apply`.
   0.15-era record: `stalwart --export` timer + offsite pull + recovery age
   key in the sops key group + MONTHLY restore drill
 - Queue-depth/queue-age alerting: the `GET /api/queue/messages` lever was
