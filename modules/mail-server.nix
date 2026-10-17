@@ -745,36 +745,64 @@ in {
               NetworkListener = {
                 reconcile = true;
                 match = ["name"];
-                objects = {
-                  smtp = {
-                    name = "smtp";
-                    protocol = "smtp";
-                    bind = ["[::]:25"];
+                # 0.16 renders set-typed fields (bind, SAN sets) as JSON
+                # MAPS on the plan wire; the lua sorter normalizes these
+                # Nix lists into that shape (binary-proven 2026-10-17:
+                # a hand-added LIST bind dies invalidPatch).
+                #
+                # STATIC EXTRAS MERGE (2026-10-17): 0.16 silently ignores
+                # config-file server.listener keys (only the store backend
+                # survives in the TOML), so a consumer's
+                # services.stalwart.settings.server.listener.<name>
+                # addition - the documented 0.15 extension surface - was
+                # dropped WITHOUT trace. Extras are merged into the
+                # reconcile set as plan objects instead; the wrapper's own
+                # five ids win on collision (REPLACING a wrapper-owned
+                # listener stays a mkForce move, README "0.16 provisioning").
+                # Shape mapping: static { bind = [...]; protocol; tls.implicit }
+                # -> plan { name; protocol; bind; tlsImplicit }.
+                # Binary-proven end-to-end (pbx pop3 995 listener,
+                # 2026-10-17): reconcile accepts the merged object and the
+                # restarted server binds it (implicit-TLS POP3 banner).
+                objects =
+                  (lib.mapAttrs
+                    (name: listener: {
+                      inherit name;
+                      inherit (listener) protocol;
+                      bind = listener.bind;
+                      tlsImplicit = listener.tls.implicit or false;
+                    })
+                    (config.services.stalwart.settings.server.listener or {}))
+                  // {
+                    smtp = {
+                      name = "smtp";
+                      protocol = "smtp";
+                      bind = ["[::]:25"];
+                    };
+                    submission = {
+                      name = "submission";
+                      protocol = "smtp";
+                      bind = ["[::]:587"];
+                    };
+                    submissions = {
+                      name = "submissions";
+                      protocol = "smtp";
+                      bind = ["[::]:465"];
+                      tlsImplicit = true;
+                    };
+                    imaps = {
+                      name = "imaps";
+                      protocol = "imap";
+                      bind = ["[::]:993"];
+                      tlsImplicit = true;
+                    };
+                    http = {
+                      name = "http";
+                      protocol = "http";
+                      bind = [cfg.httpBind];
+                      useTls = false;
+                    };
                   };
-                  submission = {
-                    name = "submission";
-                    protocol = "smtp";
-                    bind = ["[::]:587"];
-                  };
-                  submissions = {
-                    name = "submissions";
-                    protocol = "smtp";
-                    bind = ["[::]:465"];
-                    tlsImplicit = true;
-                  };
-                  imaps = {
-                    name = "imaps";
-                    protocol = "imap";
-                    bind = ["[::]:993"];
-                    tlsImplicit = true;
-                  };
-                  http = {
-                    name = "http";
-                    protocol = "http";
-                    bind = [cfg.httpBind];
-                    useTls = false;
-                  };
-                };
               };
             }
           ]
@@ -856,11 +884,27 @@ in {
           ]
           ++ lib.optionals (cfg.certificate.mode == "manual") [
             {
-              Certificate.objects.${cfg.certificate.manual.id} = {
-                certificate."@type" = "File";
-                certificate.filePath = credentialPath "mail-server-certificate";
-                privateKey."@type" = "File";
-                privateKey.filePath = credentialPath "mail-server-certificate-key";
+              # subjectAlternativeNames is the ONLY filter property of
+              # Certificate AND is server-set (derived from the PEM) in
+              # 0.16.26: an upsert with no explicit match demands the
+              # implicit filter key in the object body and dies with
+              # "match property `subjectAlternativeNames` is missing from
+              # the object body" (binary-proven 2026-10-17 on a virgin
+              # store; the VM e2es never caught it - they run self-signed
+              # mode, which provisions no Certificate object at all).
+              # Carrying match + the SAN set (map form; the server treats
+              # the entry as a MATCH KEY, not a write - server-set fields
+              # are rejected as writes) makes the first apply create and
+              # re-applies UPDATE in place: the cert-rotation story.
+              Certificate = {
+                match = ["subjectAlternativeNames"];
+                objects.${cfg.certificate.manual.id} = {
+                  certificate."@type" = "File";
+                  certificate.filePath = credentialPath "mail-server-certificate";
+                  privateKey."@type" = "File";
+                  privateKey.filePath = credentialPath "mail-server-certificate-key";
+                  subjectAlternativeNames.${cfg.hostname} = true;
+                };
               };
             }
           ]
