@@ -90,6 +90,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   assertion. Remaining: release doctrine (C43), the 0.16 backup-story
   gap, and the consumer pin advance - TODO_LIST owns the queue.
 
+- Docs-health AUDIT pass (2026-10-17): the six 2026-10-16/17 upgrade-corridor
+  reports annotated inline (332 dated verdicts via annotate.go status-items;
+  check-rows green per file) and ARCHIVED with a manifest; decision-batch
+  gained C42-C46 (parsedmarc retire-or-keep, vendored-release doctrine,
+  account-secrets, package version, flap tolerance); TODO_LIST rebuilt
+  (0.16 release path + the 03-34 harvest: backup-story research,
+  MONITORING queue-metric rule, lockstep guard, flood robustness, relay
+  bounce-path, e2e polish); README/AGENTS/FEATURES/ROADMAP/INBOXCLEAN/
+  MONITORING/TELEMETRY swept to the 0.16 truth (provision model, JMAP
+  session move, ledger "Stalwart 0.16" section + 0.15 era markers, demo
+  `.test` rename, backup BROKEN status); the pass also repaired the
+  dprint re-wrap damage its own first format pass inflicted on the struck
+  report tables (rows rebuilt from git blobs + preserved specs; the
+  AGENTS formatter rule now mandates per-cell strikes + post-format
+  check-rows).
 - Docs-health audit pass (2026-09-29) over every `docs/status` and
   `docs/planning` 2026-0* file: the seven unannotated reports plus both
   Pareto plans got inline strikethrough verdicts (~350 new resolution
