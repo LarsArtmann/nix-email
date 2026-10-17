@@ -31,6 +31,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
     principal, the 0.16 switch trips the guard (journal instructions,
     zero panics), the poison refusal, the `--backup-dir` migration, and
     the 0.15 password authenticating on 0.16 + restart persistence.
+    CORRECTED 2026-10-17 (same-day, before any release): the check is
+    UNREGISTERED again - two full local runs proved the in-VM
+    switch-to-configuration to the foreign-eval toplevel stops
+    backdoor.service and wedges the test driver at the guard subtest.
+    The test file stays with the diagnosis + repair shape in its header;
+    TODO row "migrate-e2e repair" owns the two-node redesign. The guard,
+    the script, and the registration bookkeeping (ci.yml lockstep,
+    check-inventory.sh) are unaffected by the unregistration.
 - `stalwart-bind-e2e` check (2026-10-17): dedicated non-default `httpBind`
   (`127.0.0.1:8082`, the pbx-artmann shape) against a virgin store - the
   bootstrap class `stalwart-e2e` cannot cover (its bind coincides with the

@@ -1,3 +1,12 @@
+# KNOWN-BROKEN, NOT REGISTERED as a flake check (TODO row "migrate-e2e
+# repair", diagnosed 2026-10-17 over two full local runs): the mid-test
+# `switch-to-configuration test` targets a toplevel from a FOREIGN
+# eval-config, and switch-to-configuration STOPS backdoor.service (its
+# content differs from the testers-framework-rendered unit) - the test
+# driver loses its channel and the run wedges at the guard subtest.
+# Repair shape: two nodes (0.15.5 phase-A node seeds a store the 0.16
+# node boots with, via a shared directory) instead of an in-VM switch.
+#
 # 0.15 -> 0.16 store-migration e2e (the 2026-10-17 pbx outage class,
 # end to end): a VM is booted on the RAW module with a 0.15.x package
 # and a real principal in the store, then switched to the 0.16 wrapper

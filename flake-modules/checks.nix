@@ -58,8 +58,11 @@
         stalwart-bind-e2e = import ../tests/stalwart-bind-e2e.nix {inherit pkgs;};
         # 0.15 -> 0.16 store migration (guard + script + poisoned-store
         # recovery): the class that took the pbx host's mail down - no
-        # virgin-store test can see it by construction.
-        stalwart-migrate-e2e = import ../tests/stalwart-migrate-e2e.nix {inherit pkgs;};
+        # virgin-store test can see it by construction. KNOWN-BROKEN,
+        # UNREGISTERED (TODO row "migrate-e2e repair"): the in-VM switch to
+        # the foreign-eval toplevel stops backdoor.service, killing the test
+        # driver channel - the test wedges at the guard subtest. Register
+        # again only with the two-node (or reboot-in-place) redesign.
         stalwart-relay-e2e = import ../tests/stalwart-relay-e2e.nix {inherit pkgs;};
         parsedmarc-e2e = import ../tests/parsedmarc-e2e.nix {inherit pkgs;};
       };
