@@ -64,7 +64,10 @@
             with ctx2.wrap_socket(raw, server_hostname="bind.test") as tls:
                 cert = tls.getpeercert()
         cn = [
-            v for k, v in cert.get("subject", ()) if k == "commonName"
+            v
+            for rdn in cert.get("subject", ())
+            for k, v in rdn
+            if k == "commonName"
         ]
         assert "bind.test" in cn, cert
         print("imaps serves the manual cert (bind.test)")
