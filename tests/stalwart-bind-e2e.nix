@@ -97,8 +97,10 @@ in
           # missing" on 0.16.26 - the self-signed default never renders a
           # Certificate object, so only this mode can catch it).
           certificate.mode = "manual";
-          certificate.manual.certFile = "${testCert}/cert.pem";
-          certificate.manual.keyFile = "${testCert}/key.pem";
+          certificate.manual = {
+            certFile = "${testCert}/cert.pem";
+            keyFile = "${testCert}/key.pem";
+          };
         };
         # STATIC LISTENER EXTRA (the documented 0.15 extension surface):
         # 0.16 ignores config-file server.listener keys, so the wrapper

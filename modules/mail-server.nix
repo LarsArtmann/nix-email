@@ -768,8 +768,7 @@ in {
                   (lib.mapAttrs
                     (name: listener: {
                       inherit name;
-                      inherit (listener) protocol;
-                      bind = listener.bind;
+                      inherit (listener) protocol bind;
                       tlsImplicit = listener.tls.implicit or false;
                     })
                     (config.services.stalwart.settings.server.listener or {}))
