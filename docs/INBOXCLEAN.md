@@ -10,6 +10,19 @@ pinned nixpkgs rev). The repo's transcript rule applies across the
 boundary: a claim without a transcript is a guess, and a pin advance
 that touches Stalwart re-runs the probe (see "Re-verification" below).
 
+> **0.16 BANNER (2026-10-17): Stalwart 0.16.22 landed in tree** - the
+> JMAP contract below is 0.15.5-historical until re-verified. Known 0.16
+> deltas that touch THIS contract: the session endpoint moved
+> (`/.well-known/jmap` 307 -> `/jmap/session`; `GET /jmap` is 404), the
+> auth identity is the SYNTHESIZED address `name@<Domain>` (accounts are
+> localpart + Domain object), anonymous session returns 200 with
+> `primaryAccounts: {}` (enforcement is the API POST 401), and `apiUrl`
+> is absolute (strip scheme+authority in DNS-less contexts). The probe
+> transcripts under `docs/probes/2026-10-05-jmap-demo-vm/` are 0.15
+> history; the re-verification procedure below still applies, gated on
+> the 0.16 gate going green (TODO_LIST). InboxClean adapter work must
+> treat unauthenticated == empty primaryAccounts, not a 401.
+
 > Version note: InboxClean's spike header says "Stalwart v1.0.0". The
 > pinned binary self-reports and packages as **0.15.5**
 > (`/nix/store/*-stalwart-0.15.5/bin/stalwart`; `service.version` string

@@ -342,19 +342,19 @@ Gatus checks for the VPS (on evo-x2, external viewpoint):
    case-by-case approval. Port 587 is never blocked (Resend relay
    unaffected). Plan the go-live AFTER the unblock is granted.
 2. Stalwart admin bootstrap (0.16): set `services.mail-server.admin.username`
-   + `admin.secretFile` (REQUIRED - the 0.16 fallback admin is a systemd
-   credential and the provisioning CLI's only auth path; the wrapper's eval
-   assertion refuses to build without it). Domain/account/DKIM provisioning
-   is DECLARATIVE on 0.16 (`services.stalwart.provision.singletons/.objects`
-   merged into the wrapper's plan - see "Per-account semantics" above); the
-   web admin moved to `/admin` (a downloadable Application bundle served by
-   stalwart - reverse-proxy the loopback httpBind). On the VPS the secret
-   comes from a credential file (sops on the consumer side). Remote admin
-   access plan (2026-09-30): the
-   NetBird VPN on the pbx box replaces ad-hoc SSH tunnels as the standard
-   path (SystemNix
-   `docs/brainstorming/2026-09-30_netbird-larsartmann-cloud-selfhosted-vpn.md`
-   Phase 3); SSH tunnels stay the break-glass fallback.
+   - `admin.secretFile` (REQUIRED - the 0.16 fallback admin is a systemd
+     credential and the provisioning CLI's only auth path; the wrapper's eval
+     assertion refuses to build without it). Domain/account/DKIM provisioning
+     is DECLARATIVE on 0.16 (`services.stalwart.provision.singletons/.objects`
+     merged into the wrapper's plan - see "Per-account semantics" above); the
+     web admin moved to `/admin` (a downloadable Application bundle served by
+     stalwart - reverse-proxy the loopback httpBind). On the VPS the secret
+     comes from a credential file (sops on the consumer side). Remote admin
+     access plan (2026-09-30): the
+     NetBird VPN on the pbx box replaces ad-hoc SSH tunnels as the standard
+     path (SystemNix
+     `docs/brainstorming/2026-09-30_netbird-larsartmann-cloud-selfhosted-vpn.md`
+     Phase 3); SSH tunnels stay the break-glass fallback.
 
 3. Terraform (`domains` repo): new `stalwart-mail` module - MX, SPF
    (`v=spf1 mx -all`), DKIM txt, DMARC with `rua=mailto:dmarc@<domain>`,
@@ -467,9 +467,9 @@ endpoints (bound to 127.0.0.1 only):
 | Host port | Guest | What it                                                                                      |
 | --------- | ----- | -------------------------------------------------------------------------------------------- |
 | 18080     | 8080  | web admin (`/admin` bundle) / JMAP - admin login `admin` / `demo-admin` (systemd credential) |
-| 2525      | 25    | SMTP (unauthenticated inbound; catch-all accepts ANY local part)                              |
-| 2587      | 587   | submission, STARTTLS + AUTH (`demo@mail.demo.test` / `demo-nixemail-2026`)                    |
-| 2593      | 993   | IMAPS (`demo@mail.demo.test` / `demo-nixemail-2026`)                                          |
+| 2525      | 25    | SMTP (unauthenticated inbound; catch-all accepts ANY local part)                             |
+| 2587      | 587   | submission, STARTTLS + AUTH (`demo@mail.demo.test` / `demo-nixemail-2026`)                   |
+| 2593      | 993   | IMAPS (`demo@mail.demo.test` / `demo-nixemail-2026`)                                         |
 
 0.16 notes: there is NO REST API (the 0.15-era `GET /api/principal` probe
 is dead) - provisioning is the declarative plan applied by

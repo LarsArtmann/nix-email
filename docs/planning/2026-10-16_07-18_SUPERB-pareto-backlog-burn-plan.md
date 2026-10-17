@@ -5,6 +5,17 @@
 > stays in `TODO_LIST.md`; this plan feeds docs-health HARVEST/ANNOTATE later.
 > Customer = Lars (owner), SystemNix (the one consumer), future agent sessions.
 
+> **DISRUPTED 2026-10-16/17 (0.16 upgrade):** hours after this plan was
+> authored, the Stalwart 0.15.5 -> 0.16.22 upgrade landed in tree (vendored
+> PR #552103 module) and consumed the repo's capacity. Affected rows, as
+> re-mapped in the 2026-10-17 TODO_LIST rebuild: N3 (v0.5.0) is now a
+> BREAKING 0.16 release gated on C43 + gate green; N4/N5 (pin advance) are
+> entangled with the vendored module + the #566282 port procedure; N7/N8
+> (JMAP pair) ride the rewritten 0.16 subtests; the release/pin premises in
+> Errata 0-2 are historical. Owner sittings N1/N2 stand UNCHANGED (the
+> decision batch only grew: C42-C46). TODO_LIST section "0.16 upgrade
+> completion" is the canonical in-flight queue; harvest from THERE first.
+
 | Field                  | Value                                                                                                                                                                                                                                                        |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Date                   | 2026-10-16 07:18 CEST (`date` CLI)                                                                                                                                                                                                                           |

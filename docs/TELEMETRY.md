@@ -8,8 +8,10 @@ fit together, and a recommended baseline that avoids the known footguns.
 > on **2026-09-15**. Those pages describe the _current upstream_ object
 > model (WebUI `Settings › Telemetry` objects: `Tracer`, `Metrics`,
 > `WebHook`, `Alert`, `TracingStore`, `MetricsStore`, `DataRetention`,
-> `EventTracingLevel`). **This repo pins Stalwart 0.15.5** via nixpkgs
-> (`stalwart_0_16` exists but is module-incompatible — see README ledger).
+> `EventTracingLevel`). **This repo ran Stalwart 0.15.5 when this was
+> written; 0.16.22 landed in tree 2026-10-17** (vendored module) - the
+> version-skew caveat below still applies and the 0.16 keys need a
+> binary spot-check before wiring (TODO_LIST row — see README ledger).
 > Exact TOML key paths under `services.stalwart.settings` must be verified
 > against the pinned binary before any wiring; do not re-derive keys from
 > this document. Ledger doctrine applies.

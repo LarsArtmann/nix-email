@@ -241,7 +241,10 @@ are batched in `docs/planning/decision-batch.md` (2026-09-22) - answer there.
    implementable as a Stalwart setting; (c) tag-only stands as the
    documented end state and (a)'s JMAP automation is the only declarative
    path (TODO_LIST Low row). Owner ratification pending (decision-batch
-   Agent-execution adoptions, Q6).
+   Agent-execution adoptions, Q6). 0.16 UPDATE 2026-10-17: 0.16.22 landed
+   in-tree; its Junk-filing behavior is UNVERIFIED (the GTUBE subtest rides
+   the quota re-pin) - this question re-opens only if 0.16 changed the
+   hard-coded move.
 7. ~~**Demo VM boundary (2026-09-17 flake-parts session):** a runnable
    throwaway mail VM in THIS repo (`nix run .#vm`, telephony's `apps.vm`
    pattern), or does "boot the stack" belong to the consumer layer

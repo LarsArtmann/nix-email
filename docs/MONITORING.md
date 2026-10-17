@@ -7,6 +7,14 @@
 | Standing rule | **Alerts never ride the mail stack they watch.** The delivery channel must be non-mail (C24 decision pending; recommendation: the consumer's existing Discord path).                                  |
 | Standing rule | **The monitors are monitored** (dead-man switch): every checker must itself emit a heartbeat or be covered by an `absent()`-style rule (M13).                                                         |
 
+> **0.16 CAVEAT (2026-10-17):** Stalwart 0.16.22 landed in tree (upgrade in
+> flight). The 0.15-verified surfaces this doc leans on - the REST queue
+> levers (`GET /api/queue/messages`, §5.4), `/api/reload` no-op semantics,
+> and the metrics key set - are 0.15-era facts; 0.16 REMOVED the REST
+> family and moved config to provision objects. Re-verify against the
+> 0.16.22 binary before wiring any consumer (TODO_LIST row); the
+> `/metrics/prometheus` path/format passed the 0.16 e2e metrics subtest.
+
 ## 1. Severity taxonomy
 
 | Severity | Meaning                                                                                                            | Reaction | Channel              |

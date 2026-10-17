@@ -4,7 +4,10 @@ Upstream NixOS flake for the LarsArtmann mail stack. Consumed by SystemNix
 (InboxClean/DiscordSync upstream-flake pattern). Full architecture, runbook,
 and the verified-facts ledger live in README.md - READ THE LEDGER before
 touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
-(see `certificate.self-signed`, `[imap]` vs `[mailbox]`).
+(see `certificate.self-signed`, `[imap]` vs `[mailbox]`, and the whole
+"Stalwart 0.16" ledger section - the 0.16 object model broke most 0.15
+intuitions: REST recipes, provision-plan dialect, JMAP session path; the
+0.15.5 clusters are era-marked historical).
 
 ## Commands
 
@@ -142,21 +145,29 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
 ## Conventions
 
 - nixpkgs pinned to SystemNix's lock rev (compat doctrine). Bump both
-  together; note in README when nixpkgs moves `services.stalwart` past
-  0.15.5. The full bump + consumer-pin + workaround-retirement procedure
+  together. The full bump + consumer-pin + workaround-retirement procedure
   is the README "Pin-advance runbook". EXECUTED 2026-10-05: SystemNix
   HARD-PINNED this flake `?ref=v0.4.0` (C17a adopted; the earlier
   "floats `?ref=master`" and "pins v0.2.0" claims are both obsolete) -
   the consumer pin rides each release tag from here (README PIN
-  DISCIPLINE).
+  DISCIPLINE). STALWART SURFACE (2026-10-17): the wrapper NO LONGER uses
+  nixpkgs' `services.stalwart` module - the 0.16 module is VENDORED
+  (`modules/stalwart-module/`, PR #552103) and the binary is the pin's
+  `stalwart_0_16` (0.16.22); the nixpkgs watch item is now "PR #552103
+  merging into the pinned rev" (retire the vendored dir then - checklist
+  in the module header), plus the C45 0.16.26-overlay question.
 - Wrapper hardening options (2026-09-22, M14): `rateLimits` and
-  `spamFilter.dnsbl.servers` default OFF by design - v0.15.5 already
-  ships two conservative inbound limiters via DEFAULT_SETTINGS (boot.rs,
-  README ledger (i)) and DNSBL has no master switch + needs real DNS
-  (ledger (j)). Do NOT "fix" the defaults to ON; the eval test asserts
-  the absence posture (module-import-eval). Limiter key vocabulary:
-  `authenticated_as` (NOT auth_as); dnsbl zone/tag are emitted as QUOTED
-  expression constants.
+  `spamFilter.dnsbl.servers` default OFF by design - 0.15.5 shipped two
+  conservative inbound limiters via DEFAULT_SETTINGS (README ledger (i))
+  and DNSBL has no master switch + needs real DNS (ledger (j)). Do NOT
+  "fix" the defaults to ON. 0.16 update: the DNSBL plan section ALWAYS
+  carries an (empty-by-default) reconcile set that DESTROYS 0.16.22's 18
+  shipped-broken default rows (fixed upstream 0.16.23; the
+  `defaultDnsblEmpty` posture is contracted in module-import-eval) - do
+  not simplify it away. Limiter identity on 0.16: `MtaInboundThrottle`
+  matches on `description` (no `name`); key vocabulary `authenticated_as`
+  (NOT auth_as); dnsbl zone/tag are emitted as QUOTED expression
+  constants.
 - flake-parts input policy (decided 2026-09-17): FLOATING
   `github:hercules-ci/flake-parts`, pinned by flake.lock only - both
   reference flakes (SystemNix, nix-international-telephony) float it too,
@@ -186,17 +197,35 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
 - Tests: VM E2E for behavior (stalwart-e2e), eval contract for wiring
   (dmarc-eval). Never weaken module defaults to make a test deterministic -
   fix the test (e.g. swaks --timeout), keep the product honest.
+- STALWART 0.16 DOCTRINE (2026-10-16/17 upgrade): the wrapper vendors
+  nixpkgs PR #552103's module (`modules/stalwart-module/`, provenance +
+  retirement trigger in-file) and renders `services.stalwart.provision`
+  plans; `services.stalwart.settings` is ONLY the config.json datastore
+  descriptor; the admin is a REQUIRED systemd credential. Plan dialect
+  (ALL transcript-pinned, README ledger "Stalwart 0.16"):
+  `User.name`/`EmailAlias.name` = LOCAL PART only (a full address fails
+  apply); ops apply sequentially, `#id` refs resolve ONLY against earlier
+  ops in the SAME plan; an upsert patching an existing object MUST carry
+  its match property (`name` for Domain); `credentials` must be the
+  indexed-map form `{"0":{...}}`; `MtaInboundThrottle` matches on
+  `description`; Account sets need explicit `match = ["name"]` (value
+  matching breaks once the server hashes secrets); durations are integer
+  ms; passwords are zxcvbn-enforced; `.invalid` hostnames are rejected.
+  JMAP session: `/.well-known/jmap` 307 -> `/jmap/session` (`GET /jmap` is
+  404); anon session = 200 `primaryAccounts: {}`, anon API POST = 401.
+  IMAP LOGIN keys on the synthesized EMAIL ADDRESS (the 0.15
+  login-by-principal-name trap is gone); `hostname` = the provisioned
+  Domain value (keep them equal or addresses land outside the local
+  namespace: auth 535, MAIL FROM 501).
 - E2E ordering matters: provision domain/accounts BEFORE any SMTP probe -
-  a RCPT/MAIL FROM probe poisons the directory negative cache (1 h TTL)
-  and the domain then routes to MX instead of local (see README ledger).
-  Related API gotchas (also in the README ledger): individuals created via
-  `POST /api/principal` need `"roles": ["user"]` or submission is refused;
-  relay `queue.route` IfBlocks need INDEXED keys and resolvable hostnames.
-  More (README ledger, 2026-09-15): over-quota mail is ACCEPTED at RCPT and
-  retried forever - assert IMAP absence, not SMTP refusal; a catch-all
-  (`"@domain"` address) makes every local part deliverable, so it must be
-  created AFTER any unknown-recipient-rejection probe; and IMAP LOGIN
-  resolves by principal NAME, not by the principal's email addresses.
+  a probe touching an unprovisioned domain poisons the directory negative
+  cache (1 h TTL) and the domain then routes to MX instead of local; a
+  catch-all (`Domain.catchAllAddress` on 0.16) makes every local part
+  deliverable, so it is applied AFTER any unknown-recipient-rejection
+  probe (the e2e uses a second runtime plan). Over-quota mail is ACCEPTED
+  at RCPT and retried - assert IMAP absence, never SMTP refusal (the 0.15
+  journal signature `Message rescheduled for delivery` has NO confirmed
+  0.16 equivalent; the quota subtest re-pin is open).
 - SystemNix layers (sops, ports.nix, Gatus, onFailure, backup-coordination)
   belong to the CONSUMER wrapper, not here.
 
@@ -342,6 +371,35 @@ touching Stalwart/parsedmarc config keys; several "obvious" keys are wrong
 - Before creating a file at the repo root, `ls` the WHOLE repo including
   `docs/` - a duplicate `THREAT_MODEL.md` was once created beside
   `docs/THREAT_MODEL.md` by checking only the root.
+- 0.16-upgrade loop rules (all paid for 2026-10-16/17): (a) PROBE BEFORE
+  RERUN - on ANY VM-test failure, boot the demo/debug VM with the FIFO
+  console BEFORE rerunning the expensive test (every failure that session
+  was diagnosed cheaper on the console than by a rerun); (b) NEVER trust a
+  sibling report's "green" - read the stored run log / `registrationTime`
+  first (relay-e2e's "green" was stale for hours); (c) NO SCHEMA CLAIM
+  without an apply transcript - Rust struct doc comments have been wrong
+  once (`User.name`); (d) long-running debug commands under
+  `machine.execute` die silently (status 28/-1, empty log) - use
+  succeed-wrapped capture (`cmd || true` + file) or packaged probe
+  scripts; `systemctl start stalwart-provision` + settle BEFORE probing
+  (port-open != server-ready, the ExecStartPost restart window eats
+  connections); (e) every logged artifact in VM tests dumps on failure by
+  default, never only on success; (f) VM-test dnsmasq must FORWARD
+  upstream (10.0.2.3) - 0.16's reload validation resolves the SpamPyzor
+  address through the system resolver, and a black-hole upstream aborts
+  the apply before listeners spawn; (g) serialize heavy VM builds ACROSS
+  repos - three concurrent builds (this repo + pbx-artmann + SystemNix)
+  OOM-killed one run mid-flight.
+- Session-start baseline ritual (2026-10-17, after a near-clobber on a
+  foreign in-flight file): `git status --short` + scan `ls docs/status`
+  for same-day reports BEFORE the first edit; attribute gate reds via the
+  baseline + `registrationTime` dating, never by blaming your own diff;
+  never edit a file another session is mid-iterating on.
+- Known gate noise (2026-10-17): the full-gate log printed "running 4
+  flake checks" while SIX are defined (`nix eval
+  .#checks.x86_64-linux --apply builtins.attrNames` = 6 = ci.yml's
+  lockstep list, verified same day); trust the attrNames eval, not the
+  log's count line - reconciliation is a TODO_LIST row.
 
 ## Documentation map
 
