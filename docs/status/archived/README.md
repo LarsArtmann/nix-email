@@ -74,11 +74,11 @@ table rows). Forward items were routed into the 2026-10-17 TODO_LIST
 rebuild, decision-batch C42-C46, and ROADMAP; the 03-34 report (gate
 green) supersedes the upgrade-state facts and stays live.
 
-| File (date prefix)                                        | Classification | Deciding reason                                                                                                              |
-| --------------------------------------------------------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| File (date prefix)                                        | Classification | Deciding reason                                                                                                                    |
+| --------------------------------------------------------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
 | 2026-10-16_06-58_docs-health-full-archive-exit69-retired… | ARCHIVE        | 65 verdicts: f/1-21 routed into the 07-18 plan, f/22-32 closed in-pass or routed, watches superseded by the 0.16 landing; g routed |
-| 2026-10-16_08-26_pareto-plan-and-stalwart-016-research…   | ARCHIVE        | 45 verdicts: N-rows live in the (disruption-noted) 07-18 plan; C42 recorded; residue closed in-pass                            |
-| 2026-10-16_20-48_stalwart-016-upgrade-session…            | ARCHIVE        | 64 verdicts: b/c closed by 21-08→00-03→03-34; f-table done-in-pass (docs sweep) or routed (TODO rows, C43-C46); g routed      |
-| 2026-10-16_21-08_stalwart-016-vm-tests-going-green…       | ARCHIVE        | 63 verdicts incl. the inline CORRECTION of the stale relay "green" (a/2); rest done-in-pass or routed                          |
-| 2026-10-17_01-22_statix-w20-fix-and-gate-triage…          | ARCHIVE        | 36 verdicts: statix fix landed, catch-all fixed in-tree, gate green; process items routed (TODO rows + AGENTS ritual)          |
-| 2026-10-17_00-03_stalwart-016-quota-signature-and-schema… | ARCHIVE        | 59 verdicts: quota = journal silence (03-34 a/1-2), gate green (a/5), all f-items done/routed; g/3 closed as MOOT              |
+| 2026-10-16_08-26_pareto-plan-and-stalwart-016-research…   | ARCHIVE        | 45 verdicts: N-rows live in the (disruption-noted) 07-18 plan; C42 recorded; residue closed in-pass                                |
+| 2026-10-16_20-48_stalwart-016-upgrade-session…            | ARCHIVE        | 64 verdicts: b/c closed by 21-08→00-03→03-34; f-table done-in-pass (docs sweep) or routed (TODO rows, C43-C46); g routed           |
+| 2026-10-16_21-08_stalwart-016-vm-tests-going-green…       | ARCHIVE        | 63 verdicts incl. the inline CORRECTION of the stale relay "green" (a/2); rest done-in-pass or routed                              |
+| 2026-10-17_01-22_statix-w20-fix-and-gate-triage…          | ARCHIVE        | 36 verdicts: statix fix landed, catch-all fixed in-tree, gate green; process items routed (TODO rows + AGENTS ritual)              |
+| 2026-10-17_00-03_stalwart-016-quota-signature-and-schema… | ARCHIVE        | 59 verdicts: quota = journal silence (03-34 a/1-2), gate green (a/5), all f-items done/routed; g/3 closed as MOOT                  |
