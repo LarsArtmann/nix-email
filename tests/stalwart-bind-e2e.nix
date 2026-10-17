@@ -131,18 +131,19 @@ in
               "grep -q 'upserted Certificate' /tmp/provision.log"
           )
           # ...and the merged pop3 listener is bound with implicit TLS
-          # answering a real POP3 greeting (openssl s_client speaks TLS
-          # first, then we read the banner).
+          # answering a real POP3 greeting. -quiet + a bare stdin keep
+          # s_client alive past the handshake (a plain `echo |` pipe
+          # closes stdin and can drop the banner line).
           machine.wait_for_open_port(995, timeout=60)
           machine.succeed(
-              "echo | openssl s_client -connect 127.0.0.1:995 2>/dev/null"
-              " | grep -q 'Stalwart POP3'"
+              "timeout 10 openssl s_client -quiet -connect 127.0.0.1:995"
+              " < /dev/null 2>/dev/null | head -1 | grep -q 'Stalwart POP3'"
           )
           # The imaps listener serves the MANUAL certificate (subject
           # CN=bind.test), proving the File-typed PEM refs resolved.
           machine.succeed(
-              "echo | openssl s_client -connect 127.0.0.1:993 2>/dev/null"
-              " | grep -q 'CN = bind.test'"
+              "echo | timeout 10 openssl s_client -connect 127.0.0.1:993"
+              " 2>/dev/null | grep -q 'CN = bind.test'"
           )
 
       with subtest("management: the dedicated bind serves the real API"):
