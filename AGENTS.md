@@ -134,12 +134,12 @@ intuitions: REST recipes, provision-plan dialect, JMAP session path; the
   `scripts/check-md-table-pipes.sh` (self-tested lint; run it locally
   over edited .md files).
 - dprint also mangles PROSE wraps: a bullet-continuation line that
-  STARTS with `-` parses as a NESTED list item, and dprint re-indents
-  every following line under it (2026-10-17, caught in diff review). When
-  rewrapping bullets, never let a mid-sentence dash land at a line start -
-  keep it mid-line (`pending - see TODO_LIST)`, not a line starting
-  `- TODO_LIST)`). Always `git diff` after a dprint fmt pass over edited
-  prose.
+  STARTS with a list marker (`-` or `+`) parses as a NESTED list item
+  (or gets marker-normalized `+` -> `-`), and dprint re-indents/rewrites
+  every following line under it (2026-10-17, caught twice in one session:
+  dash and plus). When rewrapping bullets or prose, never let a
+  mid-sentence `-`/`+` land at a line start. Always `git diff` after a
+  dprint fmt pass over edited prose.
 - VM-test fixture traps (2026-09-15, both live-observed):
   - dovecot settings values must NOT use the `<path` prefix (that is
     dovecot's read-value-from-file syntax - the NixOS module then inlines
