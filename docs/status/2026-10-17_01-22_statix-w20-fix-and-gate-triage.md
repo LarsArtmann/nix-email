@@ -64,56 +64,57 @@ and the true bug is the missing match property in the Domain upsert body.
 
 ## b) PARTIALLY DONE
 
-1. **"Full gate green on this tree" - not achieved.**
-   - Works: every OTHER check verified individually (relay-e2e, dmarc-eval,
-     module-import-eval, demo-eval) - all green.
-   - Open: stalwart-e2e re-verified during this report - STILL RED, now with
-     the true root cause captured (see d2). Next fix is one line-class:
-     add the match property `name` to the Domain upsert body.
-   - Effort to finish: S (edit + one e2e run).
-2. **Master CI green - blocked on push.**
-   - Works: all 5 local commits (statix fix + e2e fix + AGENTS.md) are
-     committed, tree clean.
-   - Open: origin/master has none of it; `gh run list` shows no run newer
-     than 22:56:10Z. The daemon owns pushes; I do not push unasked.
-   - Effort: S.
-3. **stalwart-e2e catch-all bug fix - committed, verified RED, root cause
-   now precise.**
-   - The parallel session's fix evolved across 3 daemon commits: kept
-     Domain-first order (Account-first fails invalidResultReference - their
-     apply-log transcript), added execute+log-dump+assert (this produced
-     today's diagnostic transcript), but the Domain upsert body still lacks
-     the required match property `name`.
-   - Open: the one-line-class body fix + re-run; ownership unclear (g1).
-4. **Demo VM verification after the environment-block move.**
-   - Works: demo-eval green; banner string byte-identical.
-   - Open: no runtime smoke (`nix run .#vm`) this session - the demo
-     toplevel has never been realized on this machine (path-info
-     registrationTime is null), so there is no built-VM evidence.
-   - Effort: M.
-5. **Full-gate log triage.**
-   - Works: failing check identified with step-level evidence; cache-hit vs
-     real-run resolved via registrationTime dating.
-   - Open: the gate log says "running 4 flake checks" while the repo
-     defines 5; unexplained at report time.
+~~1. **"Full gate green on this tree" - not achieved.**~~ superseded - the catch-all root cause was fixed in-tree (Domain body carries `name`; credentials indexed-map, a38c137); the quota subtest is the remaining red (TODO_LIST)
+
+- Works: every OTHER check verified individually (relay-e2e, dmarc-eval,
+  module-import-eval, demo-eval) - all green.
+- Open: stalwart-e2e re-verified during this report - STILL RED, now with
+  the true root cause captured (see d2). Next fix is one line-class:
+  add the match property `name` to the Domain upsert body.
+- Effort to finish: S (edit + one e2e run).
+  ~~2. **Master CI green - blocked on push.**~~ routed - TODO_LIST push row (ahead 9 as of 2026-10-17; C38 posture)
+- Works: all 5 local commits (statix fix + e2e fix + AGENTS.md) are
+  committed, tree clean.
+- Open: origin/master has none of it; `gh run list` shows no run newer
+  than 22:56:10Z. The daemon owns pushes; I do not push unasked.
+- Effort: S.
+  ~~3. **stalwart-e2e catch-all bug fix - committed, verified RED, root cause~~ done - fixed in-tree (see b/1); the 00-03 report records the subtest passing
+  now precise.**
+- The parallel session's fix evolved across 3 daemon commits: kept
+  Domain-first order (Account-first fails invalidResultReference - their
+  apply-log transcript), added execute+log-dump+assert (this produced
+  today's diagnostic transcript), but the Domain upsert body still lacks
+  the required match property `name`.
+- Open: the one-line-class body fix + re-run; ownership unclear (g1).
+  ~~4. **Demo VM verification after the environment-block move.**~~ routed - TODO_LIST demo-smoke row
+- Works: demo-eval green; banner string byte-identical.
+- Open: no runtime smoke (`nix run .#vm`) this session - the demo
+  toplevel has never been realized on this machine (path-info
+  registrationTime is null), so there is no built-VM evidence.
+- Effort: M.
+  ~~5. **Full-gate log triage.**~~ partially closed 2026-10-17 - 6 checks defined = 6 in ci.yml lockstep (nix eval attrNames); the log count line remains unexplained (TODO_LIST row)
+- Works: failing check identified with step-level evidence; cache-hit vs
+  real-run resolved via registrationTime dating.
+- Open: the gate log says "running 4 flake checks" while the repo
+  defines 5; unexplained at report time.
 
 ## c) NOT STARTED
 
-1. **CI validation of the statix fix** - waiting on push (see g2).
-2. **One clean full `nix flake check`** on the committed tree.
-3. **Full buildflow gate pass** on the fixed tree (the nix-checker stale-hash
-   and input-drift signal has not run this session).
-4. **README ledger entry** for the catchAllAddress-validation-ordering trap
-   (it is exactly the "obvious key is wrong" class the ledger exists for).
-5. **Decision + work: topo-sort hardening for runtime plans** in
-   stalwart-provision (currently only the boot path orders correctly and
-   only the test works around it) - needs an owner decision, see g3.
-6. **docs-health HARVEST** of this report's section (f) into TODO_LIST /
-   ROADMAP.
-7. **"4 vs 5 flake checks" reconciliation** (`nix eval .#checks.x86_64-linux
+~~1. **CI validation of the statix fix** - waiting on push (see g2).~~ routed - TODO_LIST push row
+~~2. **One clean full `nix flake check`** on the committed tree.~~ routed - TODO_LIST gate row
+~~3. **Full buildflow gate pass** on the fixed tree (the nix-checker stale-hash~~ routed - TODO_LIST gate row
+and input-drift signal has not run this session).
+~~4. **README ledger entry** for the catchAllAddress-validation-ordering trap~~ done - the README 'Stalwart 0.16' ledger section carries the plan dialect incl. the Domain match-property trap (2026-10-17 pass)
+(it is exactly the "obvious key is wrong" class the ledger exists for).
+~~5. **Decision + work: topo-sort hardening for runtime plans** in~~ routed - TODO_LIST match-property audit row; the upstream topo-sort ask rides the #552103 merge watch
+stalwart-provision (currently only the boot path orders correctly and
+only the test works around it) - needs an owner decision, see g3.
+~~6. **docs-health HARVEST** of this report's section (f) into TODO_LIST /~~ done - this pass
+ROADMAP.
+~~7. **"4 vs 5 flake checks" reconciliation** (`nix eval .#checks.x86_64-linux~~ partially closed - see b/5
    --apply builtins.attrNames` vs the gate log line).
-8. **Proof that the new apply-log dump actually fires on failure**
-   (deliberate fault-injection in a debug VM run).
+~~8. **Proof that the new apply-log dump actually fires on failure**~~ routed - TODO_LIST fault-injection/dump-on-failure row
+(deliberate fault-injection in a debug VM run).
 
 ## d) TOTALLY FUCKED UP
 
@@ -178,49 +179,49 @@ and the true bug is the missing match property in the Domain upsert body.
 
 ## f) Next tasks (ranked; brainstorm input for docs-health HARVEST, not a commitment list)
 
-| #  | Task                                                                                             | Impact   | Effort | Category      |
-| -- | ------------------------------------------------------------------------------------------------ | -------- | ------ | ------------- |
-| 1  | Push the 5 local commits and watch CI to green on master                                         | Critical | S      | Quality       |
-| 2  | Add match property `name` to the Domain upsert body in the catch-all plan, re-run stalwart-e2e   | Critical | S      | Bug           |
-| 3  | One clean full `nix flake check` on the committed tree                                           | Critical | M      | Quality       |
-| 4  | Harvest this report's (f) into TODO_LIST/ROADMAP (docs-health HARVEST)                           | High     | S      | Documentation |
-| 5  | Audit other 0.16 runtime plans (provision singletons et al) for the missing match-property class | High     | M      | Bug           |
-| 6  | Reconcile "running 4 flake checks" gate-log line against the 5 defined checks                    | High     | S      | Bug           |
-| 7  | Adopt the session-start baseline ritual (git status + same-day status-doc scan)                  | High     | S      | Process       |
-| 8  | Full buildflow gate pass on the fixed tree (nix-checker drift signal)                            | Medium   | M      | Quality       |
-| 9  | README ledger entry: catchAllAddress validation ordering trap                                    | Medium   | S      | Documentation |
-| 10 | Demo VM runtime smoke after the environment-block move (nix run .#vm, ports + banner probe)      | Medium   | M      | Quality       |
-| 11 | Verify the apply-log dump fires on failure via deliberate fault-injection                        | Medium   | S      | Quality       |
-| 12 | Audit all VM-test steps that redirect output to VM-local files: dump on failure, repo-wide rule  | Medium   | M      | Quality       |
-| 13 | Script the refactor-identity proof (drv/outPath + registrationTime dating)                       | Medium   | S      | Quality       |
-| 14 | Add pinned-statix to the pre-push hook (mirror CI, like actionlint+shellcheck)                   | Medium   | M      | Quality       |
-| 15 | Session-start habit: statix check . before any .nix edit session                                 | Medium   | S      | Process       |
-| 16 | Confirm no ci.yml lockstep/shape-guard change needed (no checks added/removed this session)      | Low      | S      | Quality       |
-| 17 | Verify daemon-committed content matches intended edits (git diff 8f8ced8^..8f8ced8 read-back)    | Low      | S      | Cleanup       |
-| 18 | Annotate the 21:08 going-green status doc: green predates the 23:04 catch-all red                | Low      | S      | Documentation |
-| 19 | Track the BuildFlow nix-checker summary-vs-detail 12-vs-2 count gap (BuildFlow-repo TODO)        | Low      | M      | Quality       |
-| 20 | Clean session /tmp artifacts (gate.log, eval captures) after the verification window closes      | Low      | S      | Cleanup       |
+| #  | Task | Impact                                                                                           | Effort   | Category |
+| -- | ---- | ------------------------------------------------------------------------------------------------ | -------- | -------- |
+| ~~ | 1    | Push the 5 local commits and watch CI to green on master                                         | Critical | S        |
+| ~~ | 2    | Add match property `name` to the Domain upsert body in the catch-all plan, re-run stalwart-e2e   | Critical | S        |
+| ~~ | 3    | One clean full `nix flake check` on the committed tree                                           | Critical | M        |
+| ~~ | 4    | Harvest this report's (f) into TODO_LIST/ROADMAP (docs-health HARVEST)                           | High     | S        |
+| ~~ | 5    | Audit other 0.16 runtime plans (provision singletons et al) for the missing match-property class | High     | M        |
+| ~~ | 6    | Reconcile "running 4 flake checks" gate-log line against the 5 defined checks                    | High     | S        |
+| ~~ | 7    | Adopt the session-start baseline ritual (git status + same-day status-doc scan)                  | High     | S        |
+| ~~ | 8    | Full buildflow gate pass on the fixed tree (nix-checker drift signal)                            | Medium   | M        |
+| ~~ | 9    | README ledger entry: catchAllAddress validation ordering trap                                    | Medium   | S        |
+| ~~ | 10   | Demo VM runtime smoke after the environment-block move (nix run .#vm, ports + banner probe)      | Medium   | M        |
+| ~~ | 11   | Verify the apply-log dump fires on failure via deliberate fault-injection                        | Medium   | S        |
+| ~~ | 12   | Audit all VM-test steps that redirect output to VM-local files: dump on failure, repo-wide rule  | Medium   | M        |
+| ~~ | 13   | Script the refactor-identity proof (drv/outPath + registrationTime dating)                       | Medium   | S        |
+| ~~ | 14   | Add pinned-statix to the pre-push hook (mirror CI, like actionlint+shellcheck)                   | Medium   | M        |
+| ~~ | 15   | Session-start habit: statix check . before any .nix edit session                                 | Medium   | S        |
+| ~~ | 16   | Confirm no ci.yml lockstep/shape-guard change needed (no checks added/removed this session)      | Low      | S        |
+| ~~ | 17   | Verify daemon-committed content matches intended edits (git diff 8f8ced8^..8f8ced8 read-back)    | Low      | S        |
+| ~~ | 18   | Annotate the 21:08 going-green status doc: green predates the 23:04 catch-all red                | Low      | S        |
+| ~~ | 19   | Track the BuildFlow nix-checker summary-vs-detail 12-vs-2 count gap (BuildFlow-repo TODO)        | Low      | M        |
+| ~~ | 20   | Clean session /tmp artifacts (gate.log, eval captures) after the verification window closes      | Low      | S        |
 
 (20 items - grounded strictly in this session's observations; the "up to 50"
 headroom stays empty rather than padded.)
 
 ## g) Questions I cannot answer myself
 
-1. **Is the parallel 0.16-upgrade session still active, and do you want me to
-   take ownership of the stalwart-e2e fix (verify, iterate, push) or stay
-   hands-off?** I tried to tell from commit timestamps (its file was edited
-   at 01:05, committed by the daemon in three pieces) and the same-day
-   status docs - neither says whether the session is done.
-2. **Push policy: shall I push the 5 local commits now so CI validates the
-   statix fix, or do you/daemon own pushes on your own schedule?** I
-   verified via `gh run list` (no run after 22:56:10Z) and `git status -sb`
-   (ahead 5). I will not push unasked; every hour of delay keeps master red.
-3. **For the catch-all fix: should I apply the one-line-class repair (add
-   `name` to the Domain upsert body) myself, or is the parallel session
-   mid-iteration and I must stay hands-off?** I tried: the committed code
-   plus my recheck transcript pin the fix precisely; what I cannot know is
-   whether the other session is seconds from landing exactly that. A wrong
-   guess either duplicates work or clobbers theirs.
+~~1. **Is the parallel 0.16-upgrade session still active, and do you want me to~~ closed - the parallel session closed its own report at 02:06 (the 00-03 file); ownership question moot
+take ownership of the stalwart-e2e fix (verify, iterate, push) or stay
+hands-off?** I tried to tell from commit timestamps (its file was edited
+at 01:05, committed by the daemon in three pieces) and the same-day
+status docs - neither says whether the session is done.
+~~2. **Push policy: shall I push the 5 local commits now so CI validates the~~ routed - C38 posture + TODO_LIST push row
+statix fix, or do you/daemon own pushes on your own schedule?** I
+verified via `gh run list` (no run after 22:56:10Z) and `git status -sb`
+(ahead 5). I will not push unasked; every hour of delay keeps master red.
+~~3. **For the catch-all fix: should I apply the one-line-class repair (add~~ closed - fixed in-tree (see b/1)
+`name` to the Domain upsert body) myself, or is the parallel session
+mid-iteration and I must stay hands-off?** I tried: the committed code
+plus my recheck transcript pin the fix precisely; what I cannot know is
+whether the other session is seconds from landing exactly that. A wrong
+guess either duplicates work or clobbers theirs.
 
 ## Verification chain appendix (evidence, reproducible)
 

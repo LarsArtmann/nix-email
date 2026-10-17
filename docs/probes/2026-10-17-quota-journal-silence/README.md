@@ -6,8 +6,9 @@ signature `Message rescheduled for delivery` is GONE, and the journal
 is SILENT on over-quota mail. Every claim in the README ledger
 ("Per-account semantics" quota bullet + the storage-QUOTA ledger entry)
 and the quota subtest comment in `tests/stalwart-e2e.nix` cites these
-runs. ANSI stripped; ~170 KB each (mostly boot noise - the grepable
-parts are the DEBUG lines at the end).
+runs. ANSI stripped and trimmed to the last 300 lines each (boot noise
+dropped; all DEBUG polling lines, the swaks transcripts, and the final
+journal-tail dumps are retained).
 
 - `driver7.log` - clean-instrument run: swaks via `machine.succeed` +
   file capture, acceptance line `250 2.0.0 Message queued with id
