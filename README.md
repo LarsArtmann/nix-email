@@ -7,6 +7,18 @@ Declarative mail stack for LarsArtmann hosts: an opinionated
 DMARC/TLS-RPT monitor, packaged as a NixOS flake for consumption by
 [SystemNix](../SystemNix) (upstream-flake pattern, like InboxClean/DiscordSync).
 
+> **STATUS 2026-10-17: the Stalwart 0.15.5 -> 0.16.22 upgrade is in tree**
+> (breaking; release vehicle = the pending v0.5.0). The wrapper now maps its
+> options onto the 0.16 JMAP object model and renders declarative
+> `services.stalwart.provision` plans through a vendored 0.16 module
+> (nixpkgs PR #552103). REST `/api` management recipes and
+> `--export`/`--import` backup are GONE upstream; the demo renamed to
+> `mail.demo.test`. State at this banner's date: eval checks green,
+> `stalwart-relay-e2e` fix landed (rebuild pending), `stalwart-e2e` one
+> subtest from green (quota retry signature), full gate pending - live
+> status in [TODO_LIST.md](TODO_LIST.md) ("0.16 upgrade completion"), the
+> transcript-pinned fact set in the ledger's "Stalwart 0.16" section.
+
 Architecture (per `~/projects/reports/selfhosted-email-guide.md`): self-hosted
 **inbound** on a Hetzner VPS (residential evo-x2 can never be an MX),
 **outbound** relayed through Resend (clean-IP deliverability), DMARC reports
@@ -31,12 +43,13 @@ internet: Internet {
 
 proxy: Reverse proxy (Caddy on consumer host, TLS)
 
-stalwart: Stalwart 0.15.5 (services.mail-server wrapper) {
+stalwart: Stalwart 0.16.22 (services.mail-server wrapper) {
   smtp_in: SMTP listeners (25 MX, 587 submission, 465 submissions)
   imaps: IMAPS listener (993, implicit TLS)
   http: HTTP listener (127.0.0.1:8080, loopback only)
   queue: Queue + routing strategy (is_local_domain -> local, else -> relay)
   spam: Spam filter (GTUBE, rules)
+  provision: declarative plans via stalwart-cli apply (accounts, Domain, DKIM, routes)
   dkim: DKIM signer (signature.<id>)
   directory: Internal directory (negative-cache TTL option)
   acme: ACME client (self-signed | acme | manual tiers)
@@ -67,7 +80,8 @@ stalwart.queue -> internet.mx_senders: direct-to-MX when relay = null
 stalwart.queue -> relay: non-local mail when services.mail-server.relay set
 stalwart.smtp_in -> stalwart.store: local delivery
 stalwart.directory -> stalwart.store: principal/domain lookups
-stalwart.spam -> stalwart.store: tags X-Spam-Status (GTUBE/rules); INBOX by default, no auto-Junk filing
+stalwart.spam -> stalwart.store: tags X-Spam-Status (GTUBE/rules); 0.16 Junk-filing behavior re-verification pending (0.15 auto-moved spam to Junk)
+stalwart.provision -> stalwart.store: declarative Domain/Account/DkimSignature/MtaRoute objects
 stalwart.dkim -> stalwart.queue: signs outbound
 stalwart.acme -> letsencrypt: issues certificates
 stalwart.smtp_in -> dns: SPF/DNSBL/DKIM lookups
@@ -75,7 +89,7 @@ stalwart.queue -> dns: MX resolution
 parsedmarc.poller -> stalwart.imaps: polls rua mailbox (IMAP 993)
 parsedmarc.poller -> parsedmarc.output: save_output (fixed filenames)
 parsedmarc.output -> viewer: JSON/CSV files (future read path)
-secrets -> stalwart.http: "LoadCredential + %{file:...}% config macros"
+secrets -> stalwart.http: "systemd LoadCredential + %{file:/run/credentials/...}% macros"
 prometheus -> proxy: GET /metrics/prometheus
 ```
 
@@ -94,6 +108,8 @@ the rendered current-state SVG sits next to it.
 | VPS host, DNS cutover, migration, Gatus wiring | Planned - see "Go-live runbook" and ROADMAP.md (gated on the D1/D2 decisions) |
 
 Open work lives in [TODO_LIST.md](TODO_LIST.md); the honest feature
+inventory in [FEATURES.md](FEATURES.md); long-term direction and the gating
+user decisions in [ROADMAP.md](ROADMAP.md).
 
 Doctrine note (nixos-mailserver lessons, from a deep study of
 simple-nixos-mailserver at the pinned era, 2026-09-14): that project
@@ -103,31 +119,33 @@ them - upstream mail software already has native/complementary answers
 options for them rot into a second implementation to maintain. That
 removal independently validates this repo's thin-wrapper doctrine:
 wrap only what needs NixOS wiring (listeners, certs, firewall, systemd
-units), pass everything else through `services.stalwart.settings`.
-inventory in [FEATURES.md](FEATURES.md); long-term direction and the gating
-user decisions in [ROADMAP.md](ROADMAP.md).
+units), pass everything else through the provision model. (Irony noted
+2026-10-17: 0.16 removed Stalwart's own `--export`/`--import` - the
+backup answer needs re-research; see ROADMAP.)
 
-`nix flake check` runs both tests against the SAME nixpkgs pin as SystemNix
-(`eaad089`, NixOS 26.11):
+`nix flake check` runs the full check set against the SAME nixpkgs pin as
+SystemNix (`6774f7bc`, NixOS 26.11):
 
-- `stalwart-e2e`: real Stalwart 0.15.5 in a VM - service up, full SMTP
-  dialogue with unknown-recipient 550 rejection, implicit-TLS IMAPS greeting,
-  loopback HTTP admin, declarative `fallback-admin` bootstrap, accounts via
-  the management API, authenticated submission on 587 delivering into a real
-  INBOX fetched back over IMAPS, DKIM signing of the submission
-  (`DKIM-Signature` asserted on the stored message), Prometheus metrics
-  endpoint, journal-hygiene count (exactly the 2 known-benign config errors),
-  native DMARC report ingestion (real aggregate mailed to a
-  `report.analysis.addresses` recipient with `forward=false`: consumed by
-  the analyzer, NOT delivered, `total:1` readable at `/api/reports/dmarc`
-  with the detail parsing), restart persistence, offline backup/restore
-  drill (`--export`, wipe, `--import`, message survives), no panics.
+- `stalwart-e2e`: real Stalwart 0.16.22 in a VM - declarative provisioning
+  plan applied clean (accounts incl. quota + alias, dual declarative DKIM
+  rsa+ed25519, listeners, singletons; idempotent second apply),
+  unknown-recipient 550 rejection, implicit-TLS IMAPS greeting, JMAP
+  session at `/.well-known/jmap` -> `/jmap/session`, fallback admin via a
+  systemd credential, authenticated submission on 587 delivering into a
+  real INBOX fetched back over IMAPS, dual DKIM signatures asserted,
+  Prometheus metrics endpoint, journal hygiene, alias delivery, and the
+  runtime catch-all via a second `stalwart-cli apply` (in-plan `#id`
+  ordering + match-property dialect). Open at the 0.16 upgrade's last
+  run: the over-quota subtest (the 0.15 retry-signature assertion needs
+  its 0.16 re-pin) and the subtests behind it (GTUBE, flood limiter,
+  native DMARC ingestion shape) - see TODO_LIST.
 - `stalwart-relay-e2e`: TWO-node VM - Stalwart with `relay` (SASL
   credentials) -> Mailpit smarthost node enforcing AUTH. Non-local
-  submission lands in Mailpit through the generated
-  `queue.route`/`queue.strategy.route`, local domains still deliver locally
-  (and never leak to the relay), relay hostname resolved via dnsmasq
-  (Stalwart's resolver ignores /etc/hosts).
+  submission lands in Mailpit through the generated 0.16 MtaRoute relay
+  objects, local domains still deliver locally (and never leak to the
+  relay), relay hostname resolved via dnsmasq forwarding upstream to the
+  QEMU resolver (0.16's reload validation resolves SpamPyzor via the
+  system resolver - a black-hole upstream starves the whole boot).
 - `parsedmarc-e2e`: TWO-node VM - a Dovecot fixture mailbox seeded with the
   upstream sample DMARC aggregate report, polled by the real parsedmarc 11
   unit; JSON/CSV output asserted (row counts, org metadata), the runtime ini
@@ -142,7 +160,8 @@ user decisions in [ROADMAP.md](ROADMAP.md).
 
 ## Module: `services.mail-server`
 
-Enables nixpkgs `services.stalwart` with one RFC-compliant listener set:
+Enables the vendored Stalwart 0.16 module (`modules/stalwart-module/`, from
+nixpkgs PR #552103) with one RFC-compliant listener set:
 
 | Port                                | Listener    | Notes                                                 |
 | ----------------------------------- | ----------- | ----------------------------------------------------- |
@@ -152,22 +171,34 @@ Enables nixpkgs `services.stalwart` with one RFC-compliant listener set:
 | 993                                 | imaps       | implicit TLS                                          |
 | httpBind (default `127.0.0.1:8080`) | http        | web admin / JMAP - reverse-proxy it, never expose raw |
 
-Options: `enable`, `hostname` (FQDN, asserted to contain a dot), `httpBind`
-(loopback default; a NixOS warning fires on non-loopback binds),
-`stateVersion`, `relay` (outbound smarthost, see below), `metrics.enable`
-(`/metrics/prometheus` on the HTTP listener), `directoryCacheTtlNegative`
-(kills the 1h negative-cache trap on dev/test hosts), `certificate`
-(`self-signed | acme | manual` tier with completeness assertions), and the
-M14 hardening options `rateLimits` (opt-in sustained inbound damper - see
-the sizing note below) and `spamFilter.dnsbl.servers` (typed DNS blocklist
-entries, default `{}`). Everything
-else flows through `services.stalwart.settings` (all wrapper values are
-`mkDefault` - consumer settings win). Defaults set: listeners above and the
-self-signed certificate tier so implicit-TLS works out of the box. Firewall:
-the wrapper opens exactly 25/465/587/993, plus the `httpBind` port when the
-bind is non-loopback (nixpkgs' `openFirewall` is off - it would also open
-the loopback admin port on every interface); consumer
-port lists merge additively.
+Options: `enable`, `hostname` (FQDN with a dot; on 0.16 it ALSO becomes the
+provisioned Domain value, so account addresses synthesize as
+`name@<hostname>` - it must pass 0.16 hostname validation, e.g. `.invalid`
+TLDs are rejected), `httpBind` (loopback default; a NixOS warning fires on
+non-loopback binds), `publicUrl` (0.16 renders absolute URLs from it;
+defaults to `https://hostname`), `admin.username`/`admin.secretFile`
+(the 0.16 fallback admin is a REQUIRED systemd credential - it is the
+provisioning CLI's only auth path, so the wrapper refuses to eval without
+the secret), `stateVersion`, `relay` (outbound smarthost, see below),
+`metrics.enable` (`/metrics/prometheus` on the HTTP listener),
+`directoryCacheTtlNegative`, `certificate` (`self-signed | acme | manual`
+tier with completeness assertions), and the hardening options `rateLimits`
+(opt-in sustained inbound damper - see the sizing note below) and
+`spamFilter.dnsbl.servers` (typed DNS blocklist entries, default `{}`;
+the plan ALWAYS carries an empty reconcile set so 0.16.22's shipped-broken
+default DNSBL rows are destroyed at apply time).
+
+`services.stalwart.settings` is now ONLY the config.json datastore
+descriptor - everything else (domains, accounts, DKIM, routes, catch-all)
+lives in the datastore as JMAP objects and is provisioned declaratively via
+`services.stalwart.provision.singletons/.objects` (consumer plans MERGE into
+the wrapper's; replacing a wrapper-owned object id needs `mkForce`).
+Durations on 0.16 are integer milliseconds (the wrapper options stay in
+seconds and convert). Account passwords are zxcvbn-strength-enforced by the
+server. Firewall: the wrapper opens exactly 25/465/587/993, plus the
+`httpBind` port when the bind is non-loopback (nixpkgs' `openFirewall` is
+off - it would also open the loopback admin port on every interface);
+consumer port lists merge additively.
 
 ### Rate-limit sizing (`rateLimits`)
 
@@ -187,40 +218,37 @@ write `queue.limiter.inbound.<id>.match` via `services.stalwart.settings` -
 same for conditional DNSBL zones (`spam-filter.dnsbl.server.<id>.zone`
 IfBlocks).
 
-### Per-account semantics (API-provisioned accounts, VM-verified 2026-09-15)
+### Per-account semantics (declarative provision objects, VM-verified 0.16 2026-10-16/17)
 
-- **Quota** is an integer byte count on any individual principal
-  (`POST /api/principal` with `"quota": <bytes>`); there is no wrapper
-  option because it is per-account data, not host config. An over-quota
-  message is ACCEPTED at RCPT but NEVER delivered - the delivery queue
-  retries forever (internal reason "Mailbox over quota."; the journal
-  signature at default verbosity is `Message rescheduled for delivery`,
-  not the reason text). Monitoring/alerting on queue depth is the
-  operator-visible signal; asserting the behavior means asserting
-  delivery-absence over IMAP, never SMTP refusal.
-- **Catch-all** is a principal carrying the literal address `"@<domain>"`
-  (AddressMapping retries the lookup with `@<domain>`): it makes EVERY
-  local part deliverable, which silently disables unknown-recipient 5xx
-  rejection for that domain. Catch-all and strict rejection cannot
-  coexist on one domain - that is a product-shape decision per domain,
-  not a config bug. ORDERING FOOTGUN (verdict 2026-09-22: documented, not
-  asserted - the trap lives in runtime API order, which a module
-  assertion cannot see; a declarative catch-all option belongs to the
-  M22 provisioning work): create the catch-all principal AFTER any
-  unknown-recipient-rejection probe - once it exists, `RCPT
-  TO:<nobody@...>` answers 250 and every rejection assertion fails (the
-  E2E orders them correctly; ledger entry "CATCH-ALL vs
-  unknown-recipient rejection"). Provisioning order also matters more
-  broadly: any SMTP probe touching a domain BEFORE it is provisioned
-  poisons the directory negative cache (1 h TTL, see ledger) and routes
-  it to MX instead of local.
+- **Quota** is `quotas.maxDiskQuota` (bytes) on the User object; there is
+  no wrapper option because it is per-account data, not host config. An
+  over-quota message is ACCEPTED at RCPT but never delivered - the queue
+  retries (0.15's journal signature `Message rescheduled for delivery` has
+  NO confirmed 0.16 equivalent yet; the e2e re-pin is open - TODO_LIST).
+  Asserting the behavior means asserting delivery-absence over IMAP, never
+  SMTP refusal.
+- **Catch-all** is `Domain.catchAllAddress` pointing at an ACCOUNT's email
+  address (0.16 object model; the 0.15 `"@<domain>"` principal shape is
+  dead). It makes EVERY local part deliverable, which silently disables
+  unknown-recipient 5xx rejection for that domain - catch-all and strict
+  rejection cannot coexist on one domain. ORDERING FOOTGUN (re-learned
+  live on 0.16): create the catch-all AFTER any unknown-recipient-rejection
+  probe, and note the runtime plan dialect: ops apply SEQUENTIALLY, `#id`
+  references resolve only against EARLIER ops in the same plan, an upsert
+  patching an existing object must carry its match property (`name` for
+  Domain), and `credentials` must be the indexed-map form. Provisioning
+  order also matters more broadly: any SMTP probe touching a domain before
+  it is provisioned poisons the directory negative cache and routes it to
+  MX instead of local (0.15-verified mechanism; TTL knob:
+  `directoryCacheTtlNegative`).
 
 ### Outbound relay (`services.mail-server.relay`)
 
 null (default) = direct-to-MX. When set, non-local mail transits the
-smarthost - the wrapper generates `queue.route.<routeId>` +
-`queue.strategy.route` (IfBlock shape verified against the v0.15.5 source
-AND a live two-node VM test, `stalwart-relay-e2e`):
+smarthost - the wrapper renders the 0.16 MtaRoute relay object (with the
+outbound strategy expression); the shape is exercised by the two-node VM
+test `stalwart-relay-e2e` (green on 0.16.22; the 0.15-era
+`queue.route` IfBlock rendering is retired with the upgrade):
 
 ```nix
 services.mail-server.relay = {
@@ -231,14 +259,15 @@ services.mail-server.relay = {
 };
 ```
 
-Local-domain delivery is untouched (`is_local_domain` stays on the local
-queue). Relaying to loopback targets is refused by Stalwart (SSRF guard) and
-exercised by the two-node E2E; the auth-less form (`username = null`) is
-valid for trusted internal smarthosts.
+Local-domain delivery is untouched (local routing stays on the local
+queue). Relaying to loopback targets is refused by Stalwart (SSRF guard);
+the auth-less form (`username = null`) is valid for trusted internal
+smarthosts. The relay secret rides systemd `LoadCredential` and is
+referenced through the `%{file:/run/credentials/...}%` macro mechanism.
 
-Outbound smarthost relaying (Stalwart -> Resend) is a per-host `settings`
-addition - the verified keys are in the ledger below (confirmed against the
-v0.15.5 source, not guessed).
+Outbound smarthost relaying (Stalwart -> Resend) needs nothing beyond the
+`relay` option on 0.16 - the object rendering is wrapper-owned (verified
+in the two-node VM test, not guessed).
 
 ## Module: `services.dmarc-monitor`
 
@@ -247,6 +276,12 @@ parsedmarc polls the `rua` mailboxes over IMAP and writes JSON+CSV reports to
 `outputDirectory` (default `/var/lib/parsedmarc/reports`). Options: `enable`,
 `outputDirectory`, `settings` (passthrough). Closes domains-repo findings
 H1/H2 (rua reports go nowhere today).
+
+0.16 CAVEAT (2026-10-17): Stalwart 0.16 natively imports inbound DMARC and
+TLS AGGREGATE reports (DMARCbis, 0.16.12+), so this module's monopoly
+shrinks - parsedmarc still uniquely owns forensic/failure-report parsing,
+file sinks, and multi-mailbox polling. Retire-or-keep is decision C42
+(decision-batch); the module stands until that call.
 
 ## SystemNix integration (planned shape)
 
@@ -268,14 +303,16 @@ consumer-config flip plus filling the real
 `platforms/nixos/secrets/nix-email.yaml` secret, not new wiring.
 
 PIN DISCIPLINE: consumers of this flake MUST pin it by a hard rev/tag (not
-`?ref=master`): the wrapper is verified against the nixpkgs
-`services.stalwart` module (0.15.5) at a specific nixpkgs rev, and both
-repos deliberately pin the SAME nixpkgs rev (compat doctrine - bump both
-together; Renovate PRs are approval-gated so a nixpkgs move never lands
-unreviewed). STATUS 2026-10-05: SystemNix COMPLIES - its input is
+`?ref=master`): the wrapper is verified against a SPECIFIC Stalwart version
+(0.16.22 via the vendored module + the pin's `stalwart_0_16`) at a specific
+nixpkgs rev, and both repos deliberately pin the SAME nixpkgs rev (compat
+doctrine - bump both together; Renovate PRs are approval-gated so a nixpkgs
+move never lands unreviewed). STATUS 2026-10-05: SystemNix COMPLIES - its input is
 HARD-PINNED `github:LarsArtmann/nix-email?ref=v0.4.0` (decision-batch C17a
 executed; the 2026-09-22 "floats ?ref=master" violation is fixed, the pin
-rides each release tag from here). InboxClean's `?ref=master` is fine there because it has no
+rides each release tag from here). v0.4.0 is the 0.15 world - the fleet
+moves to 0.16 at the v0.5.0 tag (breaking; wrapper API changed, see
+CHANGELOG). InboxClean's `?ref=master` is fine there because it has no
 nixpkgs-version-sensitive contract; this repo does.
 
 Gatus checks for the VPS (on evo-x2, external viewpoint):
@@ -300,24 +337,26 @@ Gatus checks for the VPS (on evo-x2, external viewpoint):
    paid invoice, file a limit request (Hetzner Console > Limits) to unblock,
    case-by-case approval. Port 587 is never blocked (Resend relay
    unaffected). Plan the go-live AFTER the unblock is granted.
-2. Stalwart admin bootstrap: set `authentication.fallback-admin`
-   (`user` + `secret` - VERIFIED to work with an empty internal directory,
-   no first-run wizard needed) or use the web wizard over an SSH tunnel to
-   the loopback httpBind: create accounts/domains, DKIM keys. On the VPS the
-   secret must come from a credential file: `services.stalwart.credentials`
-
-- `%{file:/run/credentials/stalwart.service/<key>%}` macro in settings
-  (sops on the consumer side). Remote admin access plan (2026-09-30): the
-  NetBird VPN on the pbx box replaces ad-hoc SSH tunnels as the standard
-  path — see SystemNix
-  `docs/brainstorming/2026-09-30_netbird-larsartmann-cloud-selfhosted-vpn.md`
-  (Phase 3); SSH tunnels stay the break-glass fallback.
+2. Stalwart admin bootstrap (0.16): set `services.mail-server.admin.username`
+   + `admin.secretFile` (REQUIRED - the 0.16 fallback admin is a systemd
+   credential and the provisioning CLI's only auth path; the wrapper's eval
+   assertion refuses to build without it). Domain/account/DKIM provisioning
+   is DECLARATIVE on 0.16 (`services.stalwart.provision.singletons/.objects`
+   merged into the wrapper's plan - see "Per-account semantics" above); the
+   web admin moved to `/admin` (a downloadable Application bundle served by
+   stalwart - reverse-proxy the loopback httpBind). On the VPS the secret
+   comes from a credential file (sops on the consumer side). Remote admin
+   access plan (2026-09-30): the
+   NetBird VPN on the pbx box replaces ad-hoc SSH tunnels as the standard
+   path (SystemNix
+   `docs/brainstorming/2026-09-30_netbird-larsartmann-cloud-selfhosted-vpn.md`
+   Phase 3); SSH tunnels stay the break-glass fallback.
 
 3. Terraform (`domains` repo): new `stalwart-mail` module - MX, SPF
    (`v=spf1 mx -all`), DKIM txt, DMARC with `rua=mailto:dmarc@<domain>`,
    MTA-STS + `_smtp._tls` TLS-RPT records; point `rua` mailboxes at the VPS.
-   Outbound relay through Resend - verified keys in the ledger below
-   (`queue.route."resend"` type=relay + `queue.strategy.route`).
+   Outbound relay through Resend - the wrapper's `relay` option renders the
+   0.16 MtaRoute objects (no hand-written settings).
 4. Migrate mailboxes BEFORE the MX switch (imapsync 2.314 is in nixpkgs);
    lower MX TTL first, keep Workspace alive ~2 weeks as rollback.
 5. evo-x2: enable `dmarc-monitor` against the `dmarc@` IMAP mailbox; drive
@@ -327,15 +366,16 @@ Gatus checks for the VPS (on evo-x2, external viewpoint):
    in the host config and fill the real IMAP-password secret - the sops
    wiring, onFailure alerting, and backup-freshness check are already layered
    and eval-tested there (see "SystemNix integration" above).
-6. Backups (VERIFIED against v0.15.5 source): the binary ships a NATIVE
-   consistent export - `stalwart --config ... --export <dir>` (offline op:
-   runs instead of serving, then exits) writes lz4-framed dumps of ALL store
-   families (data, directory, blob, config, changelog, queue, report,
-   telemetry, tasks); `--import <dir>` restores. This is the preferred
-   primitive - no RocksDB-crash-consistency folklore needed. It is offline,
-   so schedule it as a stop/export/start unit or accept btrfs-snapshot
-   fallback for hot copies. Pull results to the evo-x2 pool via
-   backup-coordination.
+6. Backups (0.16 WARNING): the 0.15-era native `stalwart --export`/
+   `--import` pair is REMOVED upstream in 0.16 with no replacement shipped
+   yet (0.16 has no export/import - upgrade-session transcript). The
+   0.15 procedure below is HISTORICAL; the 0.16 backup answer (datastore
+   snapshot mechanism / file-level copy with stalwart stopped) needs
+   re-research before the go-live - tracked on ROADMAP theme 1.
+   0.15-era record: `stalwart --config ... --export <dir>` (offline op)
+   wrote lz4-framed dumps of ALL store families; `--import <dir>` restored;
+   schedule as a stop/export/start unit or accept btrfs-snapshot fallback
+   for hot copies; pull results to the evo-x2 pool via backup-coordination.
 7. DR: sops secrets for the VPS must also encrypt to a repo-level recovery
    age key, not only the VPS host key - a rebuilt VPS gets a new host key
    and would otherwise lose every secret (chicken-and-egg).
@@ -368,9 +408,15 @@ inside nixpkgs are invisible to it, so the checks below are manual):
      imapclient 4.0.1 → 4.1.0 bump rode PR #566282 (merged 2026-10-13), so
      the first pin past `22579286` likely ships it - verify the version
      before reverting the pin.
-   - Watch for `services.stalwart` passing 0.15.5: the wrapper's verified key
-     set (relay IfBlocks, certificate tiers) must be re-verified against the
-     new source before riding the bump.
+   - Stalwart version surface (updated 2026-10-17): the wrapper no longer
+     uses nixpkgs' `services.stalwart` module - the 0.16 module is VENDORED
+     (`modules/stalwart-module/`, PR #552103 @ `9b15e1f`) and the binary is
+     the pin's `stalwart_0_16` (0.16.22). The re-verification surface at a
+     bump is now: (a) when PR #552103 merges into the pinned rev, retire the
+     vendored dir (restore `meta.doc` + `partOf`, drop the ExecStartPost
+     patch - checklist in the module header); (b) re-verify the wrapper's
+     0.16 object shapes if `stalwart_0_16` moves (schema.json diff + the
+     plan typecheck); (c) the 0.16.26 overlay question is decision C45.
      Expected noise during the bump's check evals: the `dovecot2.protocols`
      rename warning is nixpkgs-internal (`parsedmarc.nix` sets it under
      `provision.localMail.enable`; verdict 2026-09-16: not ours) and should
