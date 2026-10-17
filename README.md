@@ -453,37 +453,33 @@ Gate commands never wear pipes (`cmd \| tail` can print PASSED on a failing
 run) - redirect to a file and read it. See CONTRIBUTING.md for the
 verified-facts ledger rules and the architecture-diagram regen command.
 
-### Try it in a VM (demo stack, end-to-end verified 2026-09-22)
+### Try it in a VM (demo stack; reworked for 0.16, runtime smoke pending - see TODO_LIST)
 
 `nix run .#vm` (x86_64-linux) boots a throwaway QEMU VM with the full
-mail-server stack, a provisioned `demo@mail.demo.invalid` account, and a
-catch-all. All state dies with the process. Host-side endpoints (bound to
-127.0.0.1 only):
+mail-server stack, a declaratively provisioned `demo@mail.demo.test`
+account, and a catch-all. All state dies with the process. Host-side
+endpoints (bound to 127.0.0.1 only):
 
-| Host port | Guest | What it is                                                       |
-| --------- | ----- | ---------------------------------------------------------------- |
-| 18080     | 8080  | web admin / JMAP / REST API (`admin` / `demo-admin`)             |
-| 2525      | 25    | SMTP (unauthenticated inbound; catch-all accepts ANY local part) |
-| 2587      | 587   | submission, STARTTLS + AUTH (`demo@mail.demo.invalid` / `demo`)  |
-| 2593      | 993   | IMAPS (`demo@mail.demo.invalid` / `demo`)                        |
+| Host port | Guest | What it                                                                                      |
+| --------- | ----- | -------------------------------------------------------------------------------------------- |
+| 18080     | 8080  | web admin (`/admin` bundle) / JMAP - admin login `admin` / `demo-admin` (systemd credential) |
+| 2525      | 25    | SMTP (unauthenticated inbound; catch-all accepts ANY local part)                              |
+| 2587      | 587   | submission, STARTTLS + AUTH (`demo@mail.demo.test` / `demo-nixemail-2026`)                    |
+| 2593      | 993   | IMAPS (`demo@mail.demo.test` / `demo-nixemail-2026`)                                          |
 
-Verified from the host in one session (transcripts in the 2026-09-22 demo
-session log): `GET /api/principal` answers `200` in ~0.01 s; external mail
-via 2525 is accepted and **filed to Junk Mail** (`X-Spam-Status: Yes` - the
-spam filter visibly works on unauthenticated no-SPF senders); authenticated
-submission via 2587 delivers to the **INBOX** (`X-Spam-Status: No`); IMAPS
-login + fetch works for both folders. Two VM bugs were root-caused on the
-way (guest firewall never opened the non-loopback `httpBind` port - the
-"connects but never answers" hostfwd hang - and the provisioning oneshot's
-`curl` was unreachable under systemd's minimal PATH): both fixed, see the
-ledger below.
+0.16 notes: there is NO REST API (the 0.15-era `GET /api/principal` probe
+is dead) - provisioning is the declarative plan applied by
+`stalwart-provision` at boot, and the account password is
+`demo-nixemail-2026` (0.16 enforces zxcvbn strength; `demo` is rejected).
+The domain is `mail.demo.test`, not `mail.demo.invalid` - 0.16 hostname
+validation rejects the special-use `.invalid` TLD. The 2026-09-22 host-side
+smoke (port table, Junk-vs-INBOX filing, IMAPS fetch) was run against the
+0.15 stack; a fresh 0.16 smoke is a TODO_LIST row.
 
 Known cosmetic startup noise in the demo journal: `Spam classifier model
-not found`, 3x `Resource error` (the spam-filter resource's ASN/GeoIP CSV
-downloads from cdn.jsdelivr.net fail in the slirp NAT - non-fatal, the
-lookups just miss), and 1 `Configuration build error` + 6 `Configuration
-build warning` lines (bare, key-less; the stack's auth/listener/delivery
-paths are runtime-verified despite them).
+not found` and `Resource error` lines (the spam-filter resource's ASN/GeoIP
+CSV downloads from cdn.jsdelivr.net fail in the slirp NAT - non-fatal, the
+lookups just miss).
 
 One VM at a time per working directory: the demo disk is CWD-relative
 (`./demo.qcow2`) and QEMU takes a write lock on it, so a second concurrent
@@ -491,29 +487,32 @@ One VM at a time per working directory: the demo disk is CWD-relative
 the InboxClean spike, 2026-10-05). Run from separate scratch dirs or
 serialize.
 
-#### JMAP quickstart (live-verified 2026-10-05)
+#### JMAP quickstart (0.16 shape; transcript-pinned on the demo VM 2026-10-16/17)
 
-The same listener serves JMAP; the session document is the entry point.
-Basic-auth username is the FULL principal name, and every URL in the
-session points at the guest's hostname - rewrite it to
-`127.0.0.1:18080` before use:
+The session document MOVED in 0.16: `GET /jmap` is 404 for everyone; the
+entry point is `/.well-known/jmap` (307 -> `location: /jmap/session`).
+Anonymous session requests return 200 with `primaryAccounts: {}` (the real
+enforcement point is the API POST, which 401s unauthenticated). Basic-auth
+username is the FULL synthesized address (`name@<hostname>`), and every URL
+in the session is absolute - rewrite it to `127.0.0.1:18080` before use
+(or read `apiUrl` from the session doc and strip scheme+authority):
 
 ```sh
-# session document (capabilities, URL templates)
-curl -fsS -u demo@mail.demo.invalid:demo http://127.0.0.1:18080/.well-known/jmap
+# session document (capabilities, accounts, URL templates)
+curl -fsSL -u demo@mail.demo.test:demo-nixemail-2026 http://127.0.0.1:18080/.well-known/jmap
 
-# mailboxes for the account (Mailbox/query + Mailbox/get in one call)
-curl -fsS -u demo@mail.demo.invalid:demo http://127.0.0.1:18080/jmap/ \
+# mailboxes: take apiUrl from the session doc (ends in /jmap/), then
+curl -fsS -u demo@mail.demo.test:demo-nixemail-2026 http://127.0.0.1:18080/jmap/ \
   -H 'Content-Type: application/json' -d '{
     "using": ["urn:ietf:params:jmap:core", "urn:ietf:params:jmap:mail"],
-    "methodCalls": [["Mailbox/query", {"accountId": "c"}, "a"]]}'
+    "methodCalls": [["Mailbox/query", {"accountId": "<from primaryAccounts>"}, "a"]]}'
 ```
 
-Push is available as SSE: `GET
-/jmap/eventsource/?types=Email` (the `{closeafter}`/`{ping}` placeholders
-in the session template are REJECTED by this pin - send `types` only).
-The full verified contract lives in `docs/INBOXCLEAN.md`; transcripts in
-`docs/probes/2026-10-05-jmap-demo-vm/`.
+Push is SSE (`/jmap/eventsource/?types=Email`); the 0.15-era
+`{closeafter}`/`{ping}` rejection verdict needs re-verification on 0.16.
+The InboxClean contract (`docs/INBOXCLEAN.md`) describes the 0.15 probes
+and carries the 0.16 re-verification banner; transcripts in
+`docs/probes/2026-10-05-jmap-demo-vm/` are 0.15-historical.
 
 ## Platform support
 
@@ -528,9 +527,69 @@ json/yaml/markdown.
 
 ## Verified-facts ledger (do not re-derive from memory)
 
-- nixpkgs `services.stalwart` runs **0.15.5**; `stalwart_0_16` exists but is
-  module-incompatible. The report's "0.16.20" praise does not apply to the
-  module until nixpkgs moves.
+### Stalwart 0.16 (transcript-pinned during the 2026-10-16/17 upgrade)
+
+- **JMAP session endpoint moved**: `GET /jmap` -> 404 for everyone; session
+  = `/.well-known/jmap` -> 307 (`location: /jmap/session`) -> 200 authed.
+  ANONYMOUS session requests return 200 with `primaryAccounts: {}` (NOT
+  401 - the enforcement point is the API POST, which 401s). `apiUrl` is an
+  absolute `https://<host>/jmap/` URL (unusable in a DNS-less VM; tests
+  strip scheme+authority). Demo-VM transcripts, 2026-10-16/17.
+- **Account/User object schema (apply-transcript-pinned)**: `User.name` is
+  the LOCAL PART (a full address fails apply: "Invalid email local part");
+  there is NO `emailAddress` field (silently dropped); the synthesized
+  `name@<Domain.name>` address is the unique `email` index and the auth
+  identity (IMAP LOGIN and MAIL FROM both key on it); MAIL FROM outside
+  the address set = 501. `EmailAlias.name` also takes the local part only.
+- **Provision-plan dialect (`stalwart-cli apply`)**: ops apply SEQUENTIALLY;
+  `#id` references resolve ONLY against earlier ops in the SAME plan;
+  an upsert patching an existing object MUST carry its match property
+  (`name` for Domain - "match property `name` is missing from the object
+  body" otherwise); `credentials` must be the indexed-map form
+  `{"0":{...}}`, not a JSON array; `MtaInboundThrottle` has no `name` -
+  its implicit match key is `description` (wrapper emits
+  `match = ["description"]`); DkimSignature needs NO `publicKey` (server
+  derives it); Account match keys must be explicit (`match = ["name"]`) -
+  value-matching breaks once the server hashes stored secrets.
+- **Reload does NOT re-bind listeners on 0.16.22** (upstream #352, open
+  since 2024): the vendored unit's `ExecStartPost` stalwart restart is the
+  workaround; plan-changing deploys bounce the mail ports for seconds
+  (tolerance question = C46).
+- **0.16.22 ships broken default DNSBL rows**: 18 default
+  SpamDnsblServer rows carry `bit_and` tag expressions the 0.16.22 parser
+  rejects ("Invalid variable or constant"), failing EVERY reload validation
+  and silently preventing provisioned config from activating. Fixed
+  upstream in 0.16.23 (commit `87de8601`); the wrapper ALWAYS reconciles
+  the DNSBL set (empty by default), destroying the broken rows at apply.
+- **Reload validation resolves configured addresses through the system
+  resolver**: a DNS-less VM (or a black-hole dnsmasq upstream) fails the
+  SpamPyzor#singleton validation ("Invalid address: failed to lookup
+  address information") and the apply aborts before listeners spawn. VM
+  nodes provision `DnsResolver."@type" = "Cloudflare"` (same patch as the
+  upstream 0.16 NixOS test) and dnsmasq forwards upstream to 10.0.2.3.
+- **Misc 0.16 facts**: durations are integer milliseconds; account
+  passwords are zxcvbn-enforced; `.invalid` hostnames are REJECTED
+  ("Invalid hostname or IP address ... defaultHostname" - the demo renamed
+  to `.test`); `hostname` becomes the provisioned Domain value (accounts
+  synthesize `name@<hostname>`; keep them equal or addresses land outside
+  the local namespace: auth 535, MAIL FROM 501); `--export`/`--import` are
+  GONE (backup answer TBD); the web admin moved to `/admin` (downloadable
+  Application bundle; the bare `/` root is 4xx); the fallback admin is a
+  REQUIRED systemd credential (the provisioning CLI's only auth path);
+  `stalwart-cli` >= 1.0.2 required (pin ships 1.0.12).
+- **0.16 report features (upstream CHANGELOG-verified 2026-10-16)**:
+  DMARCbis - RFC 9989/9990/9991 - landed in 0.16.12 (2026-07-06); 0.16.x
+  natively imports inbound DMARC AND TLS aggregate reports;
+  `inboundReportMaxSize` bounds them. UNKNOWN (one docs fetch settles):
+  whether 0.16 parses inbound forensic/failure reports. This is the C42
+  evidence base (parsedmarc retire-or-keep).
+
+### Stalwart 0.15.5 era (historical facts; several are superseded above)
+
+- nixpkgs `services.stalwart` ran **0.15.5**; `stalwart_0_16` existed but
+  was module-incompatible - THIS FLAKE NOW VENDORS the 0.16 module (PR
+  #552103) and runs `stalwart_0_16`; the bullets below describe the 0.15.5
+  world unless marked otherwise.
 - TLS cert key is `certificate.self-signed` (NO `.default` level) - verified
   against the binary and a live handshake. Without any cert, implicit-TLS
   listeners log "No TLS certificates available" and serve nothing.
