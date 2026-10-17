@@ -34,6 +34,31 @@
       -addext "subjectAltName=DNS:bind.test"
     mkdir $out; cp key.pem cert.pem $out/
   '';
+  # Implicit-TLS probes (stdlib, not `openssl s_client`: its stdin/pipe
+  # shapes are flaky around server-first greetings - two probe
+  # iterations, 2026-10-17).
+  tlsProbe = pkgs.writeText "stalwart-bind-e2e-tls-probe.py" ''
+    import socket
+    import ssl
+    import sys
+
+    mode = sys.argv[1]
+    ctx = ssl.create_default_context()
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
+    if mode == "pop3":
+        with socket.create_connection(("127.0.0.1", 995), 5) as raw:
+            with ctx.wrap_socket(raw) as tls:
+                banner = tls.recv(64)
+        assert b"Stalwart POP3" in banner, banner
+        print(banner.decode(errors="replace").strip())
+    elif mode == "imaps-cert":
+        pem = ssl.get_server_certificate(("127.0.0.1", 993))
+        assert "bind.test" in pem, pem[:120]
+        print("imaps serves the manual cert (bind.test)")
+    else:
+        raise SystemExit(f"unknown mode {mode}")
+  '';
 in
   pkgs.testers.runNixOSTest {
     name = "stalwart-bind-e2e";
@@ -88,6 +113,7 @@ in
         pkgs.iproute2
         pkgs.jq
         pkgs.openssl
+        pkgs.python3
       ];
 
       virtualisation.memorySize = 1024;
@@ -131,20 +157,12 @@ in
               "grep -q 'upserted Certificate' /tmp/provision.log"
           )
           # ...and the merged pop3 listener is bound with implicit TLS
-          # answering a real POP3 greeting. -quiet + a bare stdin keep
-          # s_client alive past the handshake (a plain `echo |` pipe
-          # closes stdin and can drop the banner line).
+          # answering a real POP3 greeting.
           machine.wait_for_open_port(995, timeout=60)
-          machine.succeed(
-              "timeout 10 openssl s_client -quiet -connect 127.0.0.1:995"
-              " < /dev/null 2>/dev/null | head -1 | grep -q 'Stalwart POP3'"
-          )
+          machine.succeed("python3 ${tlsProbe} pop3 >&2")
           # The imaps listener serves the MANUAL certificate (subject
           # CN=bind.test), proving the File-typed PEM refs resolved.
-          machine.succeed(
-              "echo | timeout 10 openssl s_client -connect 127.0.0.1:993"
-              " 2>/dev/null | grep -q 'CN = bind.test'"
-          )
+          machine.succeed("python3 ${tlsProbe} imaps-cert >&2")
 
       with subtest("management: the dedicated bind serves the real API"):
           machine.succeed(
