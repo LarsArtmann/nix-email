@@ -108,10 +108,15 @@ are era-marked historical).
 - After editing ONE check, build THAT check first
   (`nix build .#checks.x86_64-linux.<name> -L`), then the full gate - a
   full-gate run just to discover a single subtest's typo costs ~9 min.
-- Adding/removing a flake check requires updating BOTH ci.yml guard lists
-  (the x86_64 lockstep `expected=` list AND the aarch64 shape-guard
-  `test ... = ...`) in the same change - the local `nix flake check`
-  does NOT run these CI-side guards, so a miss ships red CI.
+- Adding/removing a flake check requires updating THREE guard sites in
+  the same change: BOTH ci.yml lists (x86_64 lockstep `expected=` +
+  aarch64 shape-guard) AND `scripts/check-inventory.sh`, which carries
+  its OWN copy of both lists - the hook fails the push only AFTER
+  ci.yml passed, and daemon pushes bypass the hook entirely, so a
+  missed site ships red master (2026-10-17: bind-e2e shipped with two
+  of three sites; the hook caught the third on the next push). The
+  local `nix flake check` runs NONE of these guards. Pre-flight grep
+  before editing: `grep -rn '<existing-check-name>' .github scripts`.
 - A red CI run is NEVER "the known one" without reading the failing STEP
   name from `gh run view --log-failed` - two distinct causes can stack
   (a known red once masked a lockstep-guard red that had already shipped
