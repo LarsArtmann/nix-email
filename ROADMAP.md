@@ -23,14 +23,23 @@ Raw ideas:
 - Hetzner port-25/465 limit request the day the 1-month + first-invoice gate
   clears (verified policy, README ledger - calendar it)
 - Real ACME TLS replacing the self-signed default (DNS-01 or HTTP-01)
-- Unattended admin bootstrap: provisioning oneshot translating the verified
-  `POST /api/principal` recipe into a systemd unit
-- DKIM keygen automation (`POST /api/dkim`), keys into sops, selector rotation
-- Backup/DR: `stalwart --export` timer + offsite pull + recovery age key in
-  the sops key group + MONTHLY restore drill
-- Queue-depth/queue-age alerting via a consumer poll of `GET
-  /api/queue/messages` (0.15.5 exposes NO queue-depth/age Prometheus
-  series - transcript-proven 2026-09-22; MONITORING.md row 2 + §5.4)
+- Unattended admin bootstrap: SUPERSEDED 2026-10-17 - declarative
+  provisioning SHIPPED with the 0.16 upgrade (the wrapper renders
+  `services.stalwart.provision` plans; no management-API recipe needed)
+- DKIM keygen automation: 0.15's `POST /api/dkim` recipe is DEAD (REST
+  removed on 0.16); the 0.16 path is declarative `DkimSignature` objects
+  (the server derives public keys - e2e-verified); selector rotation into
+  sops stays an open idea
+- Backup/DR: RE-RESEARCH OWED on 0.16 - `stalwart --export`/`--import` is
+  REMOVED upstream with no replacement shipped (2026-10-16 transcript);
+  the 0.15 export-timer design below is historical until a 0.16 answer
+  (file-level cold copies vs a datastore snapshot mechanism) exists.
+  0.15-era record: `stalwart --export` timer + offsite pull + recovery age
+  key in the sops key group + MONTHLY restore drill
+- Queue-depth/queue-age alerting: the `GET /api/queue/messages` lever was
+  0.15.5-verified (transcript-proven 2026-09-22, MONITORING.md row 2 +
+  §5.4); 0.16 removed the REST family - the 0.16 queue-observability
+  surface needs re-verification before the consumer poll is built
 
 ### 2. DNS estate (gated on D1)
 
@@ -70,8 +79,10 @@ the verified-source work (what the wrapper OWNS) is done or specified in
   (`none → quarantine → reject`) driven by parsedmarc data
 - Stalwart telemetry: keys SOURCE-VERIFIED in the pinned 0.15.5
   (metrics.prometheus.enable, tracing.level._, tracing.history._ - README
-  ledger 2026-09-22); TLS-RPT reports ride the parsedmarc rua poll
-  (e2e-asserted same day)
+  ledger 2026-09-22); 0.16 CAVEAT (2026-10-17): re-verify against the
+  0.16.22 binary before wiring (TODO_LIST row); TLS-RPT reports ride the
+  parsedmarc rua poll (e2e-asserted 2026-09-22) - 0.16 also ingests TLS
+  aggregates natively (C42 watch)
 - Gatus external-view checks (starttls :25, tls :993, cert expiry) and
   Prometheus scrape of `/metrics/prometheus` via reverse proxy or tunnel
 - Blacklist (RBL) monitoring for the VPS IP
@@ -84,7 +95,8 @@ the verified-source work (what the wrapper OWNS) is done or specified in
   `GET /api/queue/messages` (0.15.5 ships NO queue-depth/age Prometheus
   series - transcript-proven 2026-09-22; MONITORING.md row 2 + §5.4;
   any series that IS used must transcribe from the stalwart-e2e metrics
-  dump, never be guessed)
+  dump, never be guessed). 0.16: the REST family is GONE - re-verify the
+  queue surface before building this
 - Failed-auth burst alerts from the tracing/journal surface; rate limits
   (`queue.limiter.inbound`) as the mechanized response
 - The non-mail-channel rule: alerts never ride the mail stack (C24)
@@ -92,13 +104,18 @@ the verified-source work (what the wrapper OWNS) is done or specified in
 **Respond** (runbooks):
 
 - Queue IR levers via the management API - pause/inspect/hold/drop, all
-  SOURCE-VERIFIED in the pinned 0.15.5 queue.rs (MONITORING.md §5.4)
-- Reload-smoke ops step for the live host: if management-API settings
-  changes are ever used operationally, check the reload response body's
-  `errors` before trusting the 200 - `/api/reload` silently no-ops while
-  ANY config error exists (source-verified 2026-09-16, README ledger)
-- Spam/Junk policy productization: 0.15.5 only TAGS spam (`X-Spam-Status`) and
-  delivers to INBOX; putting spam in Junk needs a sieve layer (open question 6)
+  SOURCE-VERIFIED in the pinned 0.15.5 queue.rs (MONITORING.md §5.4);
+  0.16 re-verification owed (REST removed)
+- Reload-smoke ops step for the live host: 0.15-verified
+  (`/api/reload` silently no-ops while ANY config error exists,
+  source-verified 2026-09-16, README ledger); on 0.16 the vendored unit
+  RESTARTS stalwart after every apply (listeners never re-bind on
+  reload - upstream #352), which changes the ops shape; flap tolerance is
+  decision C46
+- Spam/Junk policy productization: 0.15.5 only TAGS spam (`X-Spam-Status`)
+  and hard-coded INBOX-targeted spam to Junk (no setting name -
+  ingest.rs:344); 0.16's filing behavior is UNVERIFIED (the GTUBE subtest
+  rides the quota fix) - open question 6 re-opens only if 0.16 changed it
 
 **Verify** (prove the probes themselves):
 
@@ -122,14 +139,21 @@ the verified-source work (what the wrapper OWNS) is done or specified in
 
 - Stalwart OIDC (Pocket ID) for the admin UI - verified
   present in the 0.15.5 source (`common/src/auth/oauth/{openid,oidc}.rs`,
-  master plan §10 06c); settings-passthrough wiring when the D1 host exists
+  master plan §10 06c); re-verify on the 0.16 source before wiring;
+  settings-passthrough wiring when the D1 host exists
 - Post-cutover: retire-or-keep decision documentation for the Resend-only path
-- Retire the two in-repo nixpkgs workarounds once upstream fixes land (host-less
-  `[elasticsearch]` emission; imapclient on python 3.14) - re-check on every
-  nixpkgs bump; the module comments carry the revert conditions. TRIGGER
-  UPDATED 2026-10-16: nixpkgs PR #566282 (parsedmarc overhaul + OpenSearch
-  rename) MERGED 2026-10-13 (`22579286`) - the port procedure in the README
-  runbook step 2 is now mandatory at the first pin advance past it
+- Retire the in-repo workarounds once upstream fixes land - re-check on
+  every nixpkgs bump; module comments carry the revert conditions:
+  (a) the two parsedmarc workarounds (host-less `[elasticsearch]`
+  emission; imapclient on python 3.13) - TRIGGER UPDATED 2026-10-16:
+  nixpkgs PR #566282 (parsedmarc overhaul + OpenSearch rename) MERGED
+  2026-10-13 (`22579286`) - the port procedure in the README runbook
+  step 2 is mandatory at the first pin advance past it; (b) NEW 2026-10-17:
+  the VENDORED stalwart module (`modules/stalwart-module/`, PR #552103 @
+  `9b15e1f`) - retires when that PR merges into the pinned rev (restore
+  `meta.doc` + `partOf`, drop the ExecStartPost patch; checklist in the
+  module header); (c) the Stalwart version surface is decision C45
+  (0.16.22 vs overlay 0.16.26, which needs x86-64-v2)
 - Arch-diagram content-freshness audit (routed 2026-09-22 from the
   16_19-16 report): `docs/architecture-understanding/*.d2` renders are
   label-verified but the CONTENT vs module reality (relay, DKIM

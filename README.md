@@ -133,12 +133,12 @@ SystemNix (`6774f7bc`, NixOS 26.11):
   session at `/.well-known/jmap` -> `/jmap/session`, fallback admin via a
   systemd credential, authenticated submission on 587 delivering into a
   real INBOX fetched back over IMAPS, dual DKIM signatures asserted,
-  Prometheus metrics endpoint, journal hygiene, alias delivery, and the
+  Prometheus metrics endpoint, journal hygiene, alias delivery, the
   runtime catch-all via a second `stalwart-cli apply` (in-plan `#id`
-  ordering + match-property dialect). Open at the 0.16 upgrade's last
-  run: the over-quota subtest (the 0.15 retry-signature assertion needs
-  its 0.16 re-pin) and the subtests behind it (GTUBE, flood limiter,
-  native DMARC ingestion shape) - see TODO_LIST.
+  ordering + match-property dialect), and the over-quota contract
+  (SMTP-accept `250 Message queued with id`, IMAP absence, 0.16 journal
+  silence). GREEN end-to-end on 0.16.22 as of 2026-10-17 - all 17
+  subtests incl. GTUBE, native DMARC ingestion, and the flood limiter.
 - `stalwart-relay-e2e`: TWO-node VM - Stalwart with `relay` (SASL
   credentials) -> Mailpit smarthost node enforcing AUTH. Non-local
   submission lands in Mailpit through the generated 0.16 MtaRoute relay
@@ -222,11 +222,15 @@ IfBlocks).
 
 - **Quota** is `quotas.maxDiskQuota` (bytes) on the User object; there is
   no wrapper option because it is per-account data, not host config. An
-  over-quota message is ACCEPTED at RCPT but never delivered - the queue
-  retries (0.15's journal signature `Message rescheduled for delivery` has
-  NO confirmed 0.16 equivalent yet; the e2e re-pin is open - TODO_LIST).
-  Asserting the behavior means asserting delivery-absence over IMAP, never
-  SMTP refusal.
+  over-quota message is ACCEPTED at SMTP (0.16.22 exact acceptance:
+  `250 2.0.0 Message queued with id <id>`) but never delivered. 0.16
+  JOURNAL SILENCE (debug-driver transcript, 2026-10-17): 0.15's `Message
+  rescheduled for delivery` is GONE - across 200 s of post-accept
+  polling the journal carries no quota/retry/reschedule/4xx line and
+  never re-mentions the queue id (default verbosity logs nothing
+  per-message); the queue's long-term fate (0.15: retried forever) is
+  NOT journal-observable on 0.16. Asserting the behavior means asserting
+  delivery-absence over IMAP + journal silence, never SMTP refusal.
 - **Catch-all** is `Domain.catchAllAddress` pointing at an ACCOUNT's email
   address (0.16 object model; the 0.15 `"@<domain>"` principal shape is
   dead). It makes EVERY local part deliverable, which silently disables
@@ -733,15 +737,19 @@ json/yaml/markdown.
   renamed the UNIT: `systemd.services.dovecot` (was `dovecot2.service`) -
   `wait_for_unit "dovecot2.service"` fails with "inactive, no pending jobs"
   even though dovecot is running (observed in parsedmarc-e2e, 2026-09-15).
-- Per-account storage QUOTA (VERIFIED in VM, 2026-09-15): the `quota`
-  principal field is an integer byte count on any individual
-  (`POST /api/principal` with `"quota": 1`). An over-quota message is
-  ACCEPTED at RCPT but never delivered - the queue retries forever with
-  "Mailbox over quota." (delivery.rs:225, source-verified); there is no 5xx rejection at
-  SMTP time. Assert delivery-absence (IMAP), not SMTP refusal. JOURNAL GOTCHA
-  (VM-observed 2026-09-15): the reason string is NOT logged at default
-  verbosity - the retry's journal signature is `Message rescheduled for
-  delivery`; do not grep for the reason text.
+- Per-account storage QUOTA (VERIFIED in VM, 2026-09-15; 0.16.22 delta
+  2026-10-17): the `quota` principal field is an integer byte count on
+  any individual. An over-quota message is ACCEPTED at SMTP but never
+  delivered - there is no 5xx rejection at SMTP time (0.16.22 exact
+  acceptance line: `250 2.0.0 Message queued with id <id>`). Assert
+  delivery-absence (IMAP), not SMTP refusal. JOURNAL GOTCHA (0.15,
+  VM-observed 2026-09-15): the reason string "Mailbox over quota." was
+  never logged at default verbosity - the retry's journal signature was
+  `Message rescheduled for delivery`. 0.16.22 SUPERSEDES both facts: the
+  journal is SILENT on over-quota mail (no quota/retry/reschedule/4xx
+  line, the queue id is never re-mentioned, 200 s observation across
+  three debug-driver boots, 2026-10-17) - do not grep for EITHER string
+  on 0.16; assert journal silence instead (the e2e does).
 - CATCH-ALL vs unknown-recipient rejection is a TEST-ORDERING trap
   (observed 2026-09-15): a principal with the literal `"@<domain>"` address
   (AddressMapping retries the lookup with `@<domain>`) makes EVERY local
