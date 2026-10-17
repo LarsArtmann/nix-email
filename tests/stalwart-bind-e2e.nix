@@ -53,8 +53,20 @@
         assert b"Stalwart POP3" in banner, banner
         print(banner.decode(errors="replace").strip())
     elif mode == "imaps-cert":
-        pem = ssl.get_server_certificate(("127.0.0.1", 993))
-        assert "bind.test" in pem, pem[:120]
+        # getpeercert() returns {} under CERT_NONE, and module-level
+        # get_server_certificate() verifies against system CAs (a
+        # self-signed test cert fails) - so load the test cert as its own
+        # CA and read the decoded subject instead.
+        ctx2 = ssl.create_default_context(
+            cafile=sys.argv[2]
+        )
+        with socket.create_connection(("127.0.0.1", 993), 5) as raw:
+            with ctx2.wrap_socket(raw, server_hostname="bind.test") as tls:
+                cert = tls.getpeercert()
+        cn = [
+            v for k, v in cert.get("subject", ()) if k == "commonName"
+        ]
+        assert "bind.test" in cn, cert
         print("imaps serves the manual cert (bind.test)")
     else:
         raise SystemExit(f"unknown mode {mode}")
@@ -162,7 +174,9 @@ in
           machine.succeed("python3 ${tlsProbe} pop3 >&2")
           # The imaps listener serves the MANUAL certificate (subject
           # CN=bind.test), proving the File-typed PEM refs resolved.
-          machine.succeed("python3 ${tlsProbe} imaps-cert >&2")
+          machine.succeed(
+              "python3 ${tlsProbe} imaps-cert ${testCert}/cert.pem >&2"
+          )
 
       with subtest("management: the dedicated bind serves the real API"):
           machine.succeed(
