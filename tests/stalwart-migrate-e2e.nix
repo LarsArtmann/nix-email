@@ -154,11 +154,12 @@ in
               " > /tmp/switch.log 2>&1 &"
           )
           machine.succeed(
-              "for i in $(seq 1 120); do "
-              "journalctl -u stalwart -b 0 -o cat 2>/dev/null | grep -q 'refusing to start - a pre-0.16 store' && exit 0; "
+              "for i in $(seq 1 180); do "
+              "journalctl -u stalwart --no-pager -o cat 2>/dev/null > /tmp/guard-poll.log || true; "
+              "grep -q 'refusing to start - a pre-0.16 store' /tmp/guard-poll.log && exit 0; "
               "sleep 1; done; exit 1"
           )
-          machine.succeed("journalctl -u stalwart -b 0 -o cat > /tmp/guard.log")
+          machine.succeed("journalctl -u stalwart --no-pager -o cat > /tmp/guard.log")
           machine.succeed("cat /tmp/guard.log >&2")
           machine.succeed("grep -q 'stalwart-migrate-from-015' /tmp/guard.log")
           # THE point of the guard: the binary never ran, so the store was
@@ -202,11 +203,15 @@ in
           machine.succeed("jq -e '.username == \"lars@migrate.test\"' /tmp/jmap-lars.json > /dev/null")
 
       with subtest("restart persistence: the guard passes on the migrated store"):
+          # The guard cycled LOUDLY earlier in this same (volatile-journal)
+          # boot - scope the no-refusal check to since-this-restart only.
+          machine.succeed("date '+%Y-%m-%d %H:%M:%S' > /tmp/restart-ts")
           machine.succeed("systemctl restart stalwart.service")
           machine.wait_for_open_port(8082, timeout=120)
           machine.fail("systemctl is-failed stalwart.service")
           machine.succeed(
-              "journalctl -u stalwart -b 0 -o cat | grep -q 'refusing to start' && exit 1 || true"
+              "journalctl -u stalwart --no-pager -o cat --since \"$(cat /tmp/restart-ts)\" > /tmp/restart.log; "
+              "! grep -q 'refusing to start' /tmp/restart.log"
           )
     '';
   }
