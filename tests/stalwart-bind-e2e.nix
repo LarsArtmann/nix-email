@@ -23,6 +23,17 @@
 #   5. Journal hygiene: no configuration build errors
 {pkgs, ...}: let
   adminSecret = "test-admin-secret";
+  # SAN-carrying self-signed pair (binary-proven 2026-10-17: the manual
+  # Certificate upsert needs the SAN match key, and modern TLS validation
+  # rejects CN-only certs on reload).
+  testCert = pkgs.runCommand "stalwart-bind-e2e-cert" {
+    nativeBuildInputs = [pkgs.openssl];
+  } ''
+    openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem \
+      -days 2 -nodes -subj "/CN=bind.test" \
+      -addext "subjectAltName=DNS:bind.test"
+    mkdir $out; cp key.pem cert.pem $out/
+  '';
 in
   pkgs.testers.runNixOSTest {
     name = "stalwart-bind-e2e";
@@ -40,6 +51,22 @@ in
           # bind, exactly the consumer shape that wedged before the fix.
           httpBind = "127.0.0.1:8082";
           admin.secretFile = "/etc/test-admin-secret";
+          # Manual certificate mode: pins the subjectAlternativeNames
+          # match-key fix (upsert with matchOn null dies "match property
+          # missing" on 0.16.26 - the self-signed default never renders a
+          # Certificate object, so only this mode can catch it).
+          certificate.mode = "manual";
+          certificate.manual.certFile = "${testCert}/cert.pem";
+          certificate.manual.keyFile = "${testCert}/key.pem";
+        };
+        # STATIC LISTENER EXTRA (the documented 0.15 extension surface):
+        # 0.16 ignores config-file server.listener keys, so the wrapper
+        # must merge the extra into the provision plan's reconcile set -
+        # before the merge fix this listener was silently dropped.
+        stalwart.settings.server.listener.pop3 = {
+          bind = ["[::]:995"];
+          protocol = "pop3";
+          tls.implicit = true;
         };
         # Same DNS-less-VM reload-validation patches as stalwart-e2e (the
         # 0.16 reload validation reads the resolver config and fails the
@@ -60,6 +87,7 @@ in
         pkgs.curl
         pkgs.iproute2
         pkgs.jq
+        pkgs.openssl
       ];
 
       virtualisation.memorySize = 1024;
@@ -96,6 +124,26 @@ in
           machine.succeed("! grep -q ':8080 ' /tmp/ss-post-provision")
           machine.succeed("grep -q ':8082 ' /tmp/ss-post-provision")
           machine.succeed("grep -q ':25 ' /tmp/ss-post-provision")
+
+      with subtest("manual certificate + static-listener extra ride the plan"):
+          # The Certificate upsert (SAN match key) succeeded...
+          machine.succeed(
+              "grep -q 'upserted Certificate' /tmp/provision.log"
+          )
+          # ...and the merged pop3 listener is bound with implicit TLS
+          # answering a real POP3 greeting (openssl s_client speaks TLS
+          # first, then we read the banner).
+          machine.wait_for_open_port(995, timeout=60)
+          machine.succeed(
+              "echo | openssl s_client -connect 127.0.0.1:995 2>/dev/null"
+              " | grep -q 'Stalwart POP3'"
+          )
+          # The imaps listener serves the MANUAL certificate (subject
+          # CN=bind.test), proving the File-typed PEM refs resolved.
+          machine.succeed(
+              "echo | openssl s_client -connect 127.0.0.1:993 2>/dev/null"
+              " | grep -q 'CN = bind.test'"
+          )
 
       with subtest("management: the dedicated bind serves the real API"):
           machine.succeed(

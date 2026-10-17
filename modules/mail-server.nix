@@ -892,9 +892,10 @@ in {
               # the object body" (binary-proven 2026-10-17 on a virgin
               # store; the VM e2es never caught it - they run self-signed
               # mode, which provisions no Certificate object at all).
-              # Carrying match + the SAN set (map form; the server treats
-              # the entry as a MATCH KEY, not a write - server-set fields
-              # are rejected as writes) makes the first apply create and
+              # Carrying match + the SAN list (the lua sorter validates
+              # set-typed fields as unique arrays; the server treats the
+              # entry as a MATCH KEY, not a write - server-set fields are
+              # rejected as writes) makes the first apply create and
               # re-applies UPDATE in place: the cert-rotation story.
               Certificate = {
                 match = ["subjectAlternativeNames"];
@@ -903,7 +904,7 @@ in {
                   certificate.filePath = credentialPath "mail-server-certificate";
                   privateKey."@type" = "File";
                   privateKey.filePath = credentialPath "mail-server-certificate-key";
-                  subjectAlternativeNames.${cfg.hostname} = true;
+                  subjectAlternativeNames = [cfg.hostname];
                 };
               };
             }
