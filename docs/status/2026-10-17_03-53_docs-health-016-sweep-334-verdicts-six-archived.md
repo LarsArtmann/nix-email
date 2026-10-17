@@ -80,27 +80,27 @@
 
 ## b) PARTIALLY DONE
 
-1. **README freshness: section-level, not line-level.** Every section this
+~~1. **README freshness: section-level, not line-level.** Every section this~~ routed - README line-level verification landed 2026-10-17 (05-37 pass, 6 drift fixes); the external-link T15 re-run stays open - TODO_LIST row (added this pass)
    pass touched was rewritten against tree + transcript evidence, and the
    ledger's 0.15 clusters got era markers rather than a line-by-line
    re-verification (they are historical records now). The external-link
    re-verification (T15, 2026-10-05) was NOT re-run - TODO row stands.
-2. **CONTRIBUTING.md: verified generic, not re-read line-by-line** - the
+~~2. **CONTRIBUTING.md: verified generic, not re-read line-by-line** - the~~ done 2026-10-17 - CONTRIBUTING read + mapped in the 05-37 pass; release procedure needed no 0.16 edits (vendored-module notes live in README/ROADMAP)
    release procedure needs no 0.16 edits (the vendored-module notes live
    in README/ROADMAP).
-3. **The 03-34 report (live) was not annotated** - it is the freshest
+~~3. **The 03-34 report (live) was not annotated** - it is the freshest~~ current - 03-34 remains the live queue owner (this pass also leaves it live); its f-list is harvested into TODO_LIST
    snapshot and the next pass's HARVEST source; archiving it now would
    strip the live queue. Its f-list is already harvested into TODO_LIST.
-4. **The 07-18 plan stays live with a disruption note** (not archived): its
+~~4. **The 07-18 plan stays live with a disruption note** (not archived): its~~ current - the 07-18 plan stays live with its DISRUPTED note; owner sittings N1/N2 stand (TODO_LIST blocked-on-user row)
    owner sittings N1/N2 stand, and the TODO_LIST rebuild owns the re-mapped
    rows. A future pass may archive it once the sittings land.
 
 ## c) NOT STARTED (correctly parked; canonical list = TODO_LIST/decision-batch)
 
-1. The owner sitting: C42-C46 + C39/C40/C41 + ratifications + D1/D2 + the
+~~1. The owner sitting: C42-C46 + C39/C40/C41 + ratifications + D1/D2 + the~~ routed - decision-batch C42-C46 entries (+ C39/C41, adoptions ratification; TODO_LIST blocked-on-user row)
    standing batch (C18/C19/C22/C24/C29/C34, Q4/Q5, demo g1/g2, qcow2).
-2. v0.5.0 (C43-gated), the SystemNix pin advance, the push + CI watch.
-3. The 0.16 residue rows: backup story, delta table, MONITORING metric
+~~2. v0.5.0 (C43-gated), the SystemNix pin advance, the push + CI watch.~~ done 2026-10-17 (push half) - origin green, runs 39016232923 + 39072344502, statix fix landed 8aa9e81; v0.5.0 + pin advance routed - TODO_LIST 0.16-release-path rows (C43-gated)
+~~3. The 0.16 residue rows: backup story, delta table, MONITORING metric~~ routed - TODO_LIST rows: 0.16 backup story (research DONE 2026-10-17), C45 row (delta-table task folded), MONITORING metric row, local lockstep guard row, demo-smoke row, match-property audit row
    rule, lockstep guard, demo smoke + INBOXCLEAN re-verification, match
    property audit, provision-plan-eval - all routed, none executed here
    (docs pass).
@@ -159,20 +159,20 @@
 
 ## f) NEXT TASKS (the live queue; canonical list = TODO_LIST)
 
-1. Push + CI watch (the statix red streak heals with the local commits).
-2. C43 sitting → v0.5.0 (with the release dry-run) → SystemNix pin advance.
-3. The 0.16 backup story research (Critical - the largest UNVERIFIED claim).
-4. Demo smoke on the 0.16 closure + INBOXCLEAN full re-verification.
-5. MONITORING queue-metric alert rule (journal silence consequence).
-6. Match-property audit + provision-plan-eval + lockstep guard.
-7. Next docs-health pass: annotate + archive 03-34 when its items close.
+~~1. Push + CI watch (the statix red streak heals with the local commits).~~ done 2026-10-17 - pushed and green: runs 39016232923 (7m48s) + 39072344502 (6m49s), statix fix 8aa9e81
+~~2. C43 sitting → v0.5.0 (with the release dry-run) → SystemNix pin advance.~~ routed - decision-batch C43 + TODO_LIST v0.5.0 / SystemNix-pin rows
+~~3. The 0.16 backup story research (Critical - the largest UNVERIFIED claim).~~ routed - TODO_LIST "0.16 backup story" row (research DONE 2026-10-17: offline cp -a + MAIN-binary --export/--import + stalwart-cli snapshot; VM proof on the pin remains)
+~~4. Demo smoke on the 0.16 closure + INBOXCLEAN full re-verification.~~ routed - TODO_LIST demo-smoke row (rides the INBOXCLEAN re-verification)
+~~5. MONITORING queue-metric alert rule (journal silence consequence).~~ routed - TODO_LIST MONITORING row (extended this pass: provision-failure alert + verify-budget doc)
+~~6. Match-property audit + provision-plan-eval + lockstep guard.~~ routed - TODO_LIST rows: match-property audit; provision-plan-eval (extended this pass with the Exec* unit lint + 8080 pin); local lockstep guard
+~~7. Next docs-health pass: annotate + archive 03-34 when its items close.~~ partial - this pass annotated + archived the five superseded reports (03-53/04-09/05-37/06-05/06-12); 03-34 stays live until its items close
 
 ## g) QUESTIONS FOR YOU
 
-1. **C43-C46 one-sitting bundle** (plus C39/C40/C41 + ratifications): all
+~~1. **C43-C46 one-sitting bundle** (plus C39/C40/C41 + ratifications): all~~ routed - decision-batch C42-C46 entries with [rec]s
    recorded in decision-batch with [rec]s; answering clears the release
    path and ~6 blocked rows.
-2. **Push posture:** origin is red on a fix that has been local for ~6
+~~2. **Push posture:** origin is red on a fix that has been local for ~6~~ done 2026-10-17 - pushed, origin green (run 39072344502); the concurrent-session sub-question recorded as a C38 addendum
    hours (statix W20, `8f8ced8`); the daemon owns pushes (C38 posture) -
    want an explicit push now, or keep riding the cycle?
 
