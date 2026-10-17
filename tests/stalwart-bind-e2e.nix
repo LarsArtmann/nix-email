@@ -26,14 +26,15 @@
   # SAN-carrying self-signed pair (binary-proven 2026-10-17: the manual
   # Certificate upsert needs the SAN match key, and modern TLS validation
   # rejects CN-only certs on reload).
-  testCert = pkgs.runCommand "stalwart-bind-e2e-cert" {
-    nativeBuildInputs = [pkgs.openssl];
-  } ''
-    openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem \
-      -days 2 -nodes -subj "/CN=bind.test" \
-      -addext "subjectAltName=DNS:bind.test"
-    mkdir $out; cp key.pem cert.pem $out/
-  '';
+  testCert =
+    pkgs.runCommand "stalwart-bind-e2e-cert" {
+      nativeBuildInputs = [pkgs.openssl];
+    } ''
+      openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem \
+        -days 2 -nodes -subj "/CN=bind.test" \
+        -addext "subjectAltName=DNS:bind.test"
+      mkdir $out; cp key.pem cert.pem $out/
+    '';
   # Implicit-TLS probes (stdlib, not `openssl s_client`: its stdin/pipe
   # shapes are flaky around server-first greetings - two probe
   # iterations, 2026-10-17).
