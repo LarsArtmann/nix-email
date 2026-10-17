@@ -21,7 +21,8 @@ DMARC/TLS-RPT monitor, packaged as a NixOS flake for consumption by
 > [TODO_LIST.md](TODO_LIST.md), the transcript-pinned fact set in the
 > ledger's "Stalwart 0.16" section.
 
-Architecture (per `~/projects/reports/selfhosted-email-guide.md`): self-hosted
+Architecture (design note: the internal
+`~/projects/reports/selfhosted-email-guide.md` study): self-hosted
 **inbound** on a Hetzner VPS (residential evo-x2 can never be an MX),
 **outbound** relayed through Resend (clean-IP deliverability), DMARC reports
 polled and parsed on evo-x2. Heavy stacks (Mailcow 6-8 GiB, Elasticsearch for
@@ -102,12 +103,12 @@ the rendered current-state SVG sits next to it.
 
 ## What is built and verified
 
-| Piece                                          | State                                                                         |
-| ---------------------------------------------- | ----------------------------------------------------------------------------- |
-| `modules/mail-server.nix`                      | Done. VM-tested E2E (see below)                                               |
-| `modules/dmarc-monitor.nix`                    | Done. Eval contract-tested; needs a live IMAP mailbox to exercise             |
-| Mailpit for dev/CI                             | Use nixpkgs `services.mailpit.instances` directly - no wrapper adds value     |
-| VPS host, DNS cutover, migration, Gatus wiring | Planned - see "Go-live runbook" and ROADMAP.md (gated on the D1/D2 decisions) |
+| Piece                                          | State                                                                               |
+| ---------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `modules/mail-server.nix`                      | Done. VM-tested E2E (see below)                                                     |
+| `modules/dmarc-monitor.nix`                    | Done. VM-tested E2E (parsedmarc-e2e); a live production mailbox remains for go-live |
+| Mailpit for dev/CI                             | Use nixpkgs `services.mailpit.instances` directly - no wrapper adds value           |
+| VPS host, DNS cutover, migration, Gatus wiring | Planned - see "Go-live runbook" and ROADMAP.md (gated on the D1/D2 decisions)       |
 
 Open work lives in [TODO_LIST.md](TODO_LIST.md); the honest feature
 inventory in [FEATURES.md](FEATURES.md); long-term direction and the gating
@@ -159,6 +160,14 @@ SystemNix (`6774f7bc`, NixOS 26.11):
   `general.output` lands, `_secret` password survives the option types AND
   the real ini generation (the unit's config render is forced, so a wrong
   `_secret` shape fails here, not on a host).
+- `module-import-eval`: pure eval on BOTH arches - the full wrapper toplevel
+  (mail-server + dmarc-monitor merged in ONE nixosSystem), pinning the
+  export surface and the default-OFF hardening posture (`rateLimits` unset,
+  DNSBL reconcile set empty).
+- `demo-eval`: pure eval pinning the demo VM's human contract (quickstart
+  port pairs, provisioned account role + catch-all, fallback admin
+  credential, pyzor off) - the demo toplevel itself is already forced by
+  the gate.
 
 ## Module: `services.mail-server`
 
@@ -445,8 +454,10 @@ inside nixpkgs are invisible to it, so the checks below are manual):
 
 ## Development
 
-The devShell carries the tooling (`nix develop`): alejandra + python3 for
-formatters and scripts. The quality gates, in order of authority:
+The devShell carries the tooling (`nix develop`): alejandra, actionlint +
+shellcheck (actionlint without shellcheck on PATH is blind to shell
+findings), python3 for the scripts. The quality gates, in order of
+authority:
 
 - `nix flake check` - the full gate: eval contract + the VM E2E tests.
 - `nix fmt -- . --check` - what CI enforces (bare `nix fmt` forwards no
@@ -466,7 +477,7 @@ mail-server stack, a declaratively provisioned `demo@mail.demo.test`
 account, and a catch-all. All state dies with the process. Host-side
 endpoints (bound to 127.0.0.1 only):
 
-| Host port | Guest | What it                                                                                      |
+| Host port | Guest | Purpose                                                                                      |
 | --------- | ----- | -------------------------------------------------------------------------------------------- |
 | 18080     | 8080  | web admin (`/admin` bundle) / JMAP - admin login `admin` / `demo-admin` (systemd credential) |
 | 2525      | 25    | SMTP (unauthenticated inbound; catch-all accepts ANY local part)                             |
@@ -1055,9 +1066,9 @@ Mailcow/Mailu (Docker-first, heavy), Elasticsearch for parsedmarc (a search
 stack to read 16 domains' DMARC mail), a wrapper around
 `services.mailpit.instances` (single option, nothing to layer), direct-to-MX
 outbound (fresh-IP reputation; the Resend relay is the design). POP3 is
-compiled into Stalwart 0.15.5 but deliberately NOT in the wrapper's listener
-contract (25/465/587/993 only) - a consumer can add it via
-`services.stalwart.settings` if a legacy client ever needs it. Offloading
+deliberately NOT in the wrapper's listener contract (25/465/587/993 only) -
+a consumer can add it via `services.stalwart.settings` if a legacy client
+ever needs it. Offloading
 Stalwart's internal full-text search to Meilisearch or friends: same
 doctrine as the Elasticsearch rejection (the built-in Community FTS already
 serves a single-user deployment).

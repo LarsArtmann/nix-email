@@ -38,8 +38,9 @@ intuitions: REST recipes, provision-plan dialect, JMAP session path; the
   client-side forensics (swaks/SMTP sink, see below).
 - `nix run .#vm` (x86_64) - throwaway demo VM (`nixosConfigurations.demo`,
   reworked for 0.16: declarative plan, `mail.demo.test`, password
-  `demo-nixemail-2026`, admin `demo-admin` via /etc credential; a fresh
-  0.16 host-side smoke is pending - TODO_LIST): web/API host :18080,
+  `demo-nixemail-2026`, fallback-admin login `admin` with password
+  `demo-admin` via /etc credential; a fresh 0.16 host-side smoke is
+  pending - see TODO_LIST): web admin/JMAP host :18080,
   SMTP :2525, submission :2587, IMAPS :2593. Debug pattern that worked:
   FIFO console (`mkfifo in && cat in | <vm-closure>/bin/run-demo-vm > log`
   with a `sleep infinity > in` holder) - more reliable than the
@@ -129,7 +130,9 @@ intuitions: REST recipes, provision-plan dialect, JMAP session path; the
   literal `|` (journal transcripts, grep patterns) MUST escape it as
   `\|` - dprint re-splits unescaped pipes into phantom columns and DROPS
   the overflow content (two status-report rows were eaten and had to be
-  restored from git, 2026-09-23).
+  restored from git, 2026-09-23). Mechanized in CI:
+  `scripts/check-md-table-pipes.sh` (self-tested lint; run it locally
+  over edited .md files).
 - VM-test fixture traps (2026-09-15, both live-observed):
   - dovecot settings values must NOT use the `<path` prefix (that is
     dovecot's read-value-from-file syntax - the NixOS module then inlines
@@ -239,9 +242,12 @@ intuitions: REST recipes, provision-plan dialect, JMAP session path; the
   catch-all (`Domain.catchAllAddress` on 0.16) makes every local part
   deliverable, so it is applied AFTER any unknown-recipient-rejection
   probe (the e2e uses a second runtime plan). Over-quota mail is ACCEPTED
-  at RCPT and retried - assert IMAP absence, never SMTP refusal (the 0.15
-  journal signature `Message rescheduled for delivery` has NO confirmed
-  0.16 equivalent; the quota subtest re-pin is open).
+  at RCPT (`250 2.0.0 Message queued with id`) but never delivered - assert
+  IMAP absence + 0.16 JOURNAL SILENCE, never SMTP refusal (0.15's
+  `Message rescheduled for delivery` signature is GONE on 0.16: no
+  quota/retry/reschedule/4xx line ever appears, and the queue's long-term
+  fate is not journal-observable; the re-pinned quota subtest asserts
+  exactly this shape, green 2026-10-17).
 - SystemNix layers (sops, ports.nix, Gatus, onFailure, backup-coordination)
   belong to the CONSUMER wrapper, not here.
 
@@ -460,3 +466,10 @@ intuitions: REST recipes, provision-plan dialect, JMAP session path; the
   `docs/probes/<date-topic>/` with their own README manifests - and BOTH
   are docs-health sweep targets (a pass audits probe-dir manifests for
   staleness too, not just status/planning docs).
+- `docs/MONITORING.md` - monitoring/alerting taxonomy + coverage matrix;
+  owner split: wrapper-side sources here, alert routing/Gatus/scrape on the
+  CONSUMER host. Standing rules: alerts never ride the mail stack they
+  watch; every checker is itself monitored (dead-man switch).
+- `CONTRIBUTING.md` - verified-facts ledger rules (adding/correcting
+  bullets), wrapper-change rules, the gate, the release procedure, the
+  pre-push formatting hook, and the architecture-diagram regen command.

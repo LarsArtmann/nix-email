@@ -13,11 +13,11 @@
 > routed into the section below, five superseded reports annotated inline and
 > archived, decisions C42-C46 batched in decision-batch.md, and all six living
 > docs swept to the 0.16 truth (README/AGENTS/FEATURES/ROADMAP/CHANGELOG/
-> TODO_LIST). Upgrade state at sweep time: wrapper + tests rewritten onto the
-> 0.16 object model (vendored nixpkgs PR #552103 module), eval checks green,
-> relay-e2e fix landed unverified, stalwart-e2e one subtest from green
-> (quota), master ahead 9 unpushed with origin CI red (statix W20 fix local
-> in `8f8ced8`). Prior sweeps 2026-09-17/22/29, 2026-10-05/16: details in
+> TODO_LIST). Upgrade state, updated post-sweep (03-34 report, 2026-10-17):
+> full gate GREEN in a real run on the 0.16 tree (stalwart-e2e 17/17 incl.
+> the re-pinned quota subtest, relay-e2e 3/3, parsedmarc-e2e real run;
+> master pushed, origin CI green). Prior sweeps 2026-09-17/22/29,
+> 2026-10-05/16: details in
 > git history, CHANGELOG, and the archived reports.
 > The D1/D2 user decisions gate everything in ROADMAP, not here.
 

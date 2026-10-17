@@ -183,6 +183,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- Docs drift sweep (2026-10-17, post-03-34-report): README's check-set list
+  was missing `module-import-eval` and `demo-eval` (the flake exports six
+  checks - ci.yml lockstep is the authority); the dmarc-monitor status row
+  still said "eval contract-tested" though `parsedmarc-e2e` VM-tests it; the
+  demo port table carried a truncated "What it" header; the devShell list
+  omitted actionlint + shellcheck. AGENTS.md claimed the quota subtest
+  re-pin was "open" (it is re-pinned and green - journal-silence posture)
+  and said "web/API" for the 0.16 demo (REST is gone upstream); its
+  documentation map gained `docs/MONITORING.md` + CONTRIBUTING.md.
+  FEATURES.md rows (native ingestion, rate limiting, provisioning, relay)
+  still described pre-gate-green state and contradicted the gate row in the
+  same file - all updated to the 2026-10-17 green-run truth.
 - `stalwart-relay-e2e` boot starvation on 0.16: dnsmasq's black-hole
   upstream (192.0.2.1) made the SpamPyzor reload validation fail ("Invalid
   address: failed to lookup address information"), aborting the apply
