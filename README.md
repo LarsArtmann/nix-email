@@ -142,6 +142,14 @@ SystemNix (`6774f7bc`, NixOS 26.11):
   (SMTP-accept `250 Message queued with id`, IMAP absence, 0.16 journal
   silence). GREEN end-to-end on 0.16.22 as of 2026-10-17 - all 17
   subtests incl. GTUBE, native DMARC ingestion, and the flood limiter.
+- `stalwart-bind-e2e`: dedicated non-default `httpBind` (`127.0.0.1:8082`,
+  the pbx-artmann consumer shape) on a virgin store - the bootstrap class
+  `stalwart-e2e` cannot cover (its bind coincides with the built-in 8080,
+  so the deadlock was untestable there by construction): the provision
+  unit falls back to the built-in `127.0.0.1:8080`, applies against it,
+  restarts stalwart, and the plan's listener set replaces the built-ins
+  (8080 gone; 8082 + 25 bound; admin JMAP session served on the dedicated
+  port; plain-restart persistence). GREEN 2026-10-17 (nix-email#4).
 - `stalwart-relay-e2e`: TWO-node VM - Stalwart with `relay` (SASL
   credentials) -> Mailpit smarthost node enforcing AUTH. Non-local
   submission lands in Mailpit through the generated 0.16 MtaRoute relay
@@ -186,7 +194,8 @@ Options: `enable`, `hostname` (FQDN with a dot; on 0.16 it ALSO becomes the
 provisioned Domain value, so account addresses synthesize as
 `name@<hostname>` - it must pass 0.16 hostname validation, e.g. `.invalid`
 TLDs are rejected), `httpBind` (loopback default; a NixOS warning fires on
-non-loopback binds), `publicUrl` (0.16 renders absolute URLs from it;
+non-loopback binds; a non-8080 port bootstraps provisioning through the
+built-in 8080 endpoint and replaces it at apply), `publicUrl` (0.16 renders absolute URLs from it;
 defaults to `https://hostname`), `admin.username`/`admin.secretFile`
 (the 0.16 fallback admin is a REQUIRED systemd credential - it is the
 provisioning CLI's only auth path, so the wrapper refuses to eval without
@@ -568,6 +577,15 @@ json/yaml/markdown.
   `match = ["description"]`); DkimSignature needs NO `publicKey` (server
   derives it); Account match keys must be explicit (`match = ["name"]`) -
   value-matching breaks once the server hashes stored secrets.
+- **Static `server.listener` config keys are SILENTLY IGNORED** on 0.16
+  (binary-proven 2026-10-17): listeners live exclusively in the datastore,
+  and a VIRGIN store binds only the built-in default set (smtp 25 + http
+  8080). A non-8080 `httpBind` therefore bootstraps through the built-in
+  endpoint: the provision unit probes `cfg.url`, falls back to
+  `127.0.0.1:8080`, applies against whichever answered, restarts stalwart,
+  then verifies `cfg.url` - a wedge or a never-activated listener set
+  fails the unit at its 3-min bound instead of hanging forever (the
+  pbx-artmann 43-min burn, nix-email#4; `stalwart-bind-e2e` pins it).
 - **Reload does NOT re-bind listeners on 0.16.22** (upstream #352, open
   since 2024): the vendored unit's `ExecStartPost` stalwart restart is the
   workaround; plan-changing deploys bounce the mail ports for seconds

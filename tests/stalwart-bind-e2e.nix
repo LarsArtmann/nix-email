@@ -21,10 +21,7 @@
 #      back without the provision unit re-running (the STORED listener binds
 #      - every-boot posture for consumers)
 #   5. Journal hygiene: no configuration build errors
-{
-  pkgs,
-  ...
-}: let
+{pkgs, ...}: let
   adminSecret = "test-admin-secret";
 in
   pkgs.testers.runNixOSTest {

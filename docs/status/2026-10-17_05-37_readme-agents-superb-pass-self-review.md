@@ -9,9 +9,11 @@
 - **Prior episode cross-ref:** `2026-10-17_04-09_docs-health-self-review-forgotten-and-fixed.md`
   is the 03:53 sweep's self-review; its (b) items are the drift classes this
   session attacked. Not duplicated here — referenced where closed.
-- **Repo state at write time:** head `7fda2c0`, working tree carries this
-  session's uncommitted doc edits (auto-commit daemon picks them up; CI watch
-  is a next-task, not done).
+- **Repo state at write time:** head `265d06b` — the auto-commit daemon
+  committed the session's edits mid-flight (`ed8f06f`, `7949104`,
+  `265d06b`; expected repo behavior); tree now carries only this report
+  (untracked) + a TODO_LIST table-padding re-format. The CI runs over those
+  daemon commits are UNWATCHED - see f/6.
 
 ## Verdict in one line
 
@@ -45,8 +47,9 @@ structure decisions and a handful of un-swept sibling docs.
    `admin demo-admin` -> login `admin` + password `demo-admin` (demo-eval
    assertion shape); documentation map gained `docs/MONITORING.md` +
    `CONTRIBUTING.md`; table-pipe rule now cites its mechanized CI lint; NEW
-   lesson bullet: dprint re-indents prose whose continuation line starts
-   with `-` (nested-list misparse; recorded at discovery).
+   lesson bullet: dprint re-indents/rewrites prose whose continuation line
+   starts with a list marker (`-` or `+`; recorded at discovery, extended
+   after the second incident).
 4. **Cross-file contradiction fixes (6 rows/entries):** FEATURES rows for
    relay / native DMARC ingestion / rate limiting / provisioning still
    described pre-gate-green state and contradicted the gate row in the SAME
@@ -93,9 +96,10 @@ b/2 partially (CONTRIBUTING read + mapped).
 3. **Mechanizing the prose-wrap dash lint** — the new AGENTS lesson is
    prose-only doctrine today; the pipes lint could grow a sibling rule.
 4. **AGENTS.md size-pruning / README TOC** — parked behind g/1 + g/2.
-5. **CI watch of the daemon-committed docs tree** — the edits are uncommitted
-   in-tree at report time; the next CI run is unobserved (the repo's own
-   "never assume the known red" rule applies to greens too).
+5. **CI watch of the daemon-committed docs tree** — the daemon landed the
+   session's commits mid-flight (see header); their CI runs are unobserved
+   (the repo's own "never assume the known red" rule applies to greens
+   too).
 
 ## d) TOTALLY FUCKED UP (all self-caught; nothing shipped)
 
@@ -109,11 +113,11 @@ b/2 partially (CONTRIBUTING read + mapped).
    Working-rules bullet covering BOTH markers. Severity: zero (working tree
    only, never committed in a broken shape). Root cause: writing wraps by
    hand in marker-hostile positions, twice, after documenting the rule once.
-2. **Two edit-tool "modified since read" failures.** I ran `dprint fmt`
-   between reads and edits and then edited stale views — violating the
-   repo's own "register reads with view" session rule. Cost: two rejected
-   edits + two re-reads. Root cause: formatting pass interleaved with
-   editing without re-reading.
+2. **Four edit-tool "modified since read" rejections.** I repeatedly ran
+   `dprint fmt` between reads and edits and then edited stale views —
+   violating the repo's own "register reads with view" session rule. Cost:
+   four rejected edits (2x AGENTS.md, 2x this report) + re-reads. Root
+   cause: formatting passes interleaved with editing without re-reading.
 3. **Unpinned toolchain for a pin-doctrine repo.** d/3 in (b): the format
    verdict came from a floating dprint. Not a shipped defect, but a
    provenance failure by this repo's own standards — the exact class the
@@ -141,9 +145,10 @@ b/2 partially (CONTRIBUTING read + mapped).
    run's step names — cheap, and the repo's red-triage doctrine already
    demands the discipline in the other direction.
 
-## f) Next tasks (session-scoped; honest count: 14 — not padded to 50, the
+## f) Next tasks (session-scoped; honest count: 14 — not padded to 50)
 
-user's instruction forbade unrelated research)
+The user's instruction forbade unrelated research, so this list contains
+only work this session surfaced or touched.
 
 | #  | Task                                                                                               | Impact | Effort | Category      |
 | -- | -------------------------------------------------------------------------------------------------- | ------ | ------ | ------------- |

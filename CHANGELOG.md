@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- `stalwart-bind-e2e` check (2026-10-17): dedicated non-default `httpBind`
+  (`127.0.0.1:8082`, the pbx-artmann shape) against a virgin store - the
+  bootstrap class `stalwart-e2e` cannot cover (its bind coincides with the
+  built-in 8080, so the deadlock was untestable there by construction).
+  Pins the full fallback path: the apply journal names the built-in
+  endpoint, the plan's listener set replaces the built-ins (8080 gone,
+  8082 + 25 bound), the dedicated bind serves the admin JMAP session, and
+  a plain `systemctl restart` restores it without the provision unit
+  re-running.
 - `demo-eval` check (2026-10-06): pure-eval contract for the demo host
   (`nixosConfigurations.demo`). `nix flake check` already forces the demo
   toplevel (probe-verified), but the demo's human contract - the README
@@ -183,6 +192,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- Provision bootstrap deadlock on non-default `httpBind` (nix-email#4,
+  2026-10-17): 0.16 silently ignores static `server.listener` keys, so a
+  virgin store binds only the built-in set (smtp 25 + http 8080) while the
+  provision unit's probe waited for the consumer's `httpBind` - a
+  self-deadlock for every port other than 8080 (pbx-artmann's
+  `127.0.0.1:8082` wedged a real host switch for 43 minutes; a 3-min
+  bounded failure since 2026-10-17 morning). The unit now probes `cfg.url`
+  and then the built-in `127.0.0.1:8080`, applies against whichever
+  answered, restarts stalwart, and VERIFIES `cfg.url` came up - so
+  "provisioned listeners never activate" (the apply-succeeded
+  reload-validation class) fails the unit loudly instead of passing
+  silently. Multi-line unit scripts moved to `writeShellScript` store
+  paths: embedded newlines in `ExecStart` are rejected by systemd
+  ("Unbalanced quoting ... unit will not be started" - first bind-e2e
+  run).
 - Docs drift sweep (2026-10-17, post-03-34-report): README's check-set list
   was missing `module-import-eval` and `demo-eval` (the flake exports six
   checks - ci.yml lockstep is the authority); the dmarc-monitor status row
