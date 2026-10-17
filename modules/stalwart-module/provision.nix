@@ -154,6 +154,53 @@ in {
           gzip -d ${stalwart.package.src}/resources/schema/schema.json.gz -c > ./schema.json
           lua ${./provision-check-sort.lua} ${lib.escapeShellArg unsorted} $out ./schema.json ${lib.optionalString cfg.reloadSettings "--reload"}
         '';
+
+      # VENDOR PATCH (bootstrap endpoint, nix-email#4): the 0.16 binary
+      # ignores static server.listener keys, so on a VIRGIN store only the
+      # built-in default set is up (smtp 25 + http 8080) while cfg.url (the
+      # consumer's httpBind) binds only AFTER this unit applies the
+      # NetworkListener plan and restarts stalwart. Probing cfg.url alone
+      # self-deadlocks for every httpBind port other than 8080 (2026-10-17
+      # pbx burn: 43-min host wedge, bounded to a visible failure since).
+      # The probe therefore accepts EITHER endpoint, the apply runs against
+      # the one that answered, and the post-restart wait verifies cfg.url
+      # itself - "provisioned listeners never activate" (the apply-succeeded
+      # reload-validation class) now fails the unit instead of passing
+      # silently. If a future stalwart changes the built-in port, the
+      # fallback misses and behavior degrades to today's bounded visible
+      # failure - never a silent one.
+      # Scripts live on store PATHS (writeShellScript), not inline in the
+      # unit: systemd unit files are line-based and an embedded newline in
+      # ExecStart dies with "Unbalanced quoting ... unit will not be
+      # started" (first bind-e2e run, 2026-10-17).
+      applyScript = pkgs.writeShellScript "stalwart-provision-apply" ''
+        cfg_url=${lib.escapeShellArg cfg.url}
+        built_in_url='http://127.0.0.1:8080'
+        chosen=""
+        until [ -n "$chosen" ]; do
+          if ${pkgs.curl}/bin/curl --fail "$cfg_url" &> /dev/null; then
+            chosen="$cfg_url"
+          elif ${pkgs.curl}/bin/curl --fail "$built_in_url" &> /dev/null; then
+            chosen="$built_in_url"
+          else
+            sleep 0.25
+          fi
+        done
+        echo "stalwart-provision: management API answering at $chosen (configured: $cfg_url)"
+        STALWART_PASSWORD=`systemd-creds cat password` STALWART_URL="$chosen" ${lib.getExe pkgs.stalwart-cli} apply --file ${sorted}
+      '';
+      restartAndVerify = pkgs.writeShellScript "stalwart-provision-restart-verify" ''
+        ${pkgs.systemd}/bin/systemctl try-restart stalwart.service
+        i=0
+        until ${pkgs.curl}/bin/curl --fail ${lib.escapeShellArg cfg.url} &> /dev/null; do
+          i=$((i + 1))
+          if [ "$i" -ge 240 ]; then
+            echo "stalwart-provision: ${cfg.url} never came up within 60s of the post-apply restart - the provisioned listener set did not activate" >&2
+            exit 1
+          fi
+          sleep 0.25
+        done
+      '';
     in {
       assertions = [
         {
@@ -180,19 +227,18 @@ in {
         # a process restart (VM transcripts 2026-10-16: boot apply
         # "Done ... 0 failed" yet ss showed the DEFAULT listener set;
         # `systemctl restart stalwart` then bound the plan's listeners).
-        # The unit therefore restarts stalwart AFTER a successful apply.
+        # The unit therefore restarts stalwart AFTER a successful apply and
+        # then VERIFIES cfg.url came up (restartAndVerify above).
         # partOf MUST go with it: a stalwart restart would propagate back
         # into a provision restart (partOf semantics) and the unit would
         # restart stalwart again - an infinite loop. NixOS switch
         # semantics stay intact: a changed plan changes the unit file,
         # which restarts the provision unit on every deploy.
         after = ["stalwart.service"];
-        serviceConfig = let
-          shortBashScript = script: "${lib.getExe pkgs.bash} -c ${lib.escapeShellArg script}";
-        in {
+        serviceConfig = {
           Type = "oneshot";
-          # Bounded wait: the ExecStartPre probe must never wedge a NixOS
-          # switch forever — Type=oneshot defaults to an INFINITE start
+          # Bounded wait: the probe+apply in ExecStart must never wedge a
+          # NixOS switch forever — Type=oneshot defaults to an INFINITE start
           # timeout, so a management listener that never answers holds the
           # whole boot/switch transaction hostage (2026-10-17 pbx host
           # burn, 43-min hang). Fail visibly instead: a failed provision
@@ -206,11 +252,9 @@ in {
 
           # stalwart does not currently notify systemd that it has started
           # see https://github.com/stalwartlabs/stalwart/pull/2383
-          ExecStartPre = shortBashScript "until ${pkgs.curl}/bin/curl --fail ${lib.escapeShellArg cfg.url} &> /dev/null; do sleep 0.25; done";
-          ExecStart = shortBashScript "STALWART_PASSWORD=`systemd-creds cat password` ${lib.getExe pkgs.stalwart-cli} apply --file ${sorted}";
-          ExecStartPost = shortBashScript "${pkgs.systemd}/bin/systemctl try-restart stalwart.service";
+          ExecStart = "${applyScript}";
+          ExecStartPost = "${restartAndVerify}";
           Environment = [
-            "STALWART_URL=${lib.escapeShellArg cfg.url}"
             "STALWART_USER=${lib.escapeShellArg stalwart.admin.username}"
           ];
         };

@@ -52,6 +52,10 @@
           demoConfig = self.nixosConfigurations.demo.config;
         };
         stalwart-e2e = import ../tests/stalwart-e2e.nix {inherit pkgs;};
+        # Dedicated non-default httpBind bootstrap (nix-email#4): the
+        # virgin-store fallback class stalwart-e2e cannot cover (its bind
+        # coincides with the built-in 8080).
+        stalwart-bind-e2e = import ../tests/stalwart-bind-e2e.nix {inherit pkgs;};
         stalwart-relay-e2e = import ../tests/stalwart-relay-e2e.nix {inherit pkgs;};
         parsedmarc-e2e = import ../tests/parsedmarc-e2e.nix {inherit pkgs;};
       };

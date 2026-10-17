@@ -145,7 +145,7 @@ jobs:
           # No pipes on gate commands (repo rule): nix eval writes a file,
           # jq reads the file; any upstream failure fails the step directly.
           nix eval .#checks.x86_64-linux --json --apply 'builtins.attrNames' > /tmp/actual-checks.json
-          expected='["dmarc-eval","demo-eval","module-import-eval","parsedmarc-e2e","stalwart-e2e","stalwart-relay-e2e"]'
+          expected='["dmarc-eval","demo-eval","module-import-eval","parsedmarc-e2e","stalwart-bind-e2e","stalwart-e2e","stalwart-relay-e2e"]'
           if ! jq -e --argjson expected "$expected" 'sort == ($expected | sort)' /tmp/actual-checks.json > /dev/null; then
             echo "FATAL: flake checks and CI expected-checks list diverged."
             echo "--- flake declares: $(cat /tmp/actual-checks.json)"

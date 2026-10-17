@@ -631,13 +631,14 @@ in {
       # (NetworkListener plan objects; on a virgin store the built-in
       # default set binds, which is smtp 25 + http 8080 serving the SPA
       # for every path). The management httpBind is therefore plan-only,
-      # and the provision applier's prestart probe (cfg.url) can
-      # self-deadlock on any store where the plan has not been applied and
-      # httpBind is not 8080 — the 2026-10-17 pbx host switch burn (43-min
-      # wedge). The bootstrap-endpoint design (probe/apply fallback to the
-      # built-in port vs an API-enabled bootstrap listener) is the open
-      # upstream question; the unit's bounded start timeout below keeps
-      # the failure VISIBLE until it lands.
+      # which is why a non-8080 httpBind BOOTSTRAPS through the built-in
+      # endpoint: the provision unit probes cfg.url and then the built-in
+      # 127.0.0.1:8080, applies against whichever answered, restarts
+      # stalwart so the plan's listeners bind, and verifies cfg.url
+      # (provision.nix applyScript/restartAndVerify). That closes the
+      # 2026-10-17 pbx 43-min self-deadlock wedge (nix-email#4) and makes
+      # "listeners never activated" fail the unit loudly; the
+      # stalwart-bind-e2e check pins the non-default-bind class.
       inherit (cfg) stateVersion;
       # nixpkgs' openFirewall derives ports from provision listener binds,
       # which would punch the management port through the firewall on every

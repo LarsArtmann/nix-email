@@ -205,7 +205,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   fail-closed statix step - collapsed into nested attrsets across three
   files (`8f8ced8`), semantic identity proven three ways (pinned-statix
   exit 0, byte-identical eval captures, content-addressed VM output
-  identity). Follow-up: pinned-statix in the pre-push hook (TODO_LIST).
+  identity). HEALED 2026-10-17: the set pushed as `7fda2c0`, runs
+  38991468642 + 38994707702 green on master. Follow-up: pinned-statix in
+  the pre-push hook (TODO_LIST).
 - The standing EXIT:69 gate posture is RETIRED (2026-10-16): the
   home-manager buildflow profile has flipped to a build >= 15ea141d2
   (binary 83db580) and a FULL gate run verified EXIT:0 - the AGENTS
