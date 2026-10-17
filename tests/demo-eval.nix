@@ -48,7 +48,13 @@
     provisionType = provisionUnit.serviceConfig.Type;
     provisionAfter = lib.concatStringsSep "," provisionUnit.after;
     provisionWantedBy = lib.concatStringsSep "," provisionUnit.wantedBy;
-    provisionUsesCli = lib.hasInfix "stalwart-cli apply" provisionUnit.serviceConfig.ExecStart;
+    # nix-email#4: the cli invocation moved INSIDE a writeShellScript store
+    # path (multi-line text is rejected inline in the unit), so the
+    # assertion targets the script references instead of a literal
+    # "stalwart-cli apply" in the unit text.
+    provisionUsesCli =
+      lib.hasInfix "stalwart-provision-apply" provisionUnit.serviceConfig.ExecStart
+      && lib.hasInfix "stalwart-provision-restart-verify" provisionUnit.serviceConfig.ExecStartPost;
     demoIsUserVariant = (demoAccount."@type" or "") == "User";
     # 0.16 schema (apply-transcript-verified 2026-10-16): User.name is the
     # LOCAL PART; the primary address synthesizes as name@<Domain.name> -

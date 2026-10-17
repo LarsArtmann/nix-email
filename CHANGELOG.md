@@ -216,6 +216,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   re-pin was "open" (it is re-pinned and green - journal-silence posture)
   and said "web/API" for the 0.16 demo (REST is gone upstream); its
   documentation map gained `docs/MONITORING.md` + CONTRIBUTING.md.
+- AGENTS.md accuracy fix + prune (2026-10-17): the check-set restatement
+  said "three VM E2E tests" / "SIX defined" while the live set is seven
+  (`stalwart-bind-e2e` landed 05:34; `nix eval` attrNames verified) - the
+  set is now SINGLE-SOURCED from the ci.yml lockstep / README list instead
+  of restated in AGENTS (closing the split brain the 05-37 report's f/8
+  flagged); the duplicated Stalwart 0.16 plan-dialect paragraph now points
+  at the README ledger; provenance narration (commit hashes, incident
+  storytelling with verified homes in README/flake comments/status
+  reports) was stripped to standing rules + pointers (31.5 KB -> ~28 KB);
+  documentation map gained SECURITY.md and the README canonical check-set
+  note. TODO_LIST's gate-noise row updated 6 -> 7 to match.
   FEATURES.md rows (native ingestion, rate limiting, provisioning, relay)
   still described pre-gate-green state and contradicted the gate row in the
   same file - all updated to the 2026-10-17 green-run truth.
