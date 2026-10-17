@@ -229,6 +229,11 @@ are batched in `docs/planning/decision-batch.md` (2026-09-22) - answer there.
    management API), or does account state stay imperative/webadmin per
    Stalwart doctrine? Arguable either way (declarative drift vs operational
    simplicity).
+   OVERTAKEN BY EVENTS 2026-10-17: declarative provisioning SHIPPED with
+   the 0.16 upgrade (the wrapper renders `services.stalwart.provision`
+   plans; the demo + e2e provision declaratively) - the [rec] "add the
+   options" direction is reality. The only open residue is how much MORE
+   option surface to grow (see the 0.16-born ideas in theme 5).
 6. **Spam/Junk ownership:** 0.15.5 tags spam (`X-Spam-Status`) but never files
    it to Junk. The 2026-09-15 answer "wrapper-owned" hit a source-verified
    wall: settings-defined sieve scripts CANNOT fileinto in 0.15.5 (trusted

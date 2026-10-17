@@ -172,6 +172,10 @@ unset forever means a runaway stalwart is bounded only by the host.
 
 ### C40 — v0.5.0 release timing (new 2026-10-16, carried from the 11-14 report g/1)
 
+> SUPERSEDED-BY-SCOPE 2026-10-17: the release is now the BREAKING 0.16
+> upgrade - the timing question folded into **C43** (ship the vendored
+> module vs wait). Answer C43; this entry remains for the record.
+
 CHANGELOG `[Unreleased]` is release-ready: JMAP subtest + `docs/INBOXCLEAN.md`
 
 - probe transcripts, CI hardening pair (md-table-pipe lint, statix step,
