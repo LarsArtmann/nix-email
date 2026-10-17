@@ -191,6 +191,13 @@ in {
           shortBashScript = script: "${lib.getExe pkgs.bash} -c ${lib.escapeShellArg script}";
         in {
           Type = "oneshot";
+          # Bounded wait: the ExecStartPre probe must never wedge a NixOS
+          # switch forever — Type=oneshot defaults to an INFINITE start
+          # timeout, so a management listener that never answers holds the
+          # whole boot/switch transaction hostage (2026-10-17 pbx host
+          # burn, 43-min hang). Fail visibly instead: a failed provision
+          # unit is a red switch line, not a silent eternal loop.
+          TimeoutStartSec = "3min";
           LoadCredential = let
             uname = stalwart.admin.username;
           in [
