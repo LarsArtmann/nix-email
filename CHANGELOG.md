@@ -9,6 +9,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- 0.15 -> 0.16 store migration machinery (2026-10-17, the pbx-artmann
+  outage train): the 0.16 binary PANICS (exit 101,
+  `migration/lib.rs:95`) on a pre-0.16 store and every attempted boot
+  POISONS the settings subspace for 0.15.5 before panicking - a
+  restart-looping unit destroys its own recovery path (the sanctioned
+  dump runs through a live 0.15.x). Two pieces:
+  - Unit guard (`modules/stalwart-module/default.nix`, 0.16 packages
+    only): `ExecStartPre` fails with migration instructions when a
+    non-empty store lacks `<dataDir>/v016-store-migrated`; virgin
+    stores self-mark, pre-guard 0.16 stores self-mark once via the
+    printed escape hatch.
+  - `stalwart-migrate-from-015` (`modules/stalwart-module/migration.nix`
+    + the vendored upstream `migrate_v016.py`): owner-run root script -
+    poison preflight, `cp -a` backup, 0.15.x dump probe on a dedicated
+    port, dump+convert, recovery-mode 0.16 on port 18080 (never the
+    built-in 8080), `stalwart-cli apply` (accounts keep their 0.15 ids
+    via `restore-<id>`), marker. `--backup-dir` dumps from a pre-0.16
+    copy when the live store is already poisoned and still recovers it.
+  - `stalwart-migrate-e2e` check: phase-A 0.15.5 VM with a real
+    principal, the 0.16 switch trips the guard (journal instructions,
+    zero panics), the poison refusal, the `--backup-dir` migration, and
+    the 0.15 password authenticating on 0.16 + restart persistence.
 - `stalwart-bind-e2e` check (2026-10-17): dedicated non-default `httpBind`
   (`127.0.0.1:8082`, the pbx-artmann shape) against a virgin store - the
   bootstrap class `stalwart-e2e` cannot cover (its bind coincides with the

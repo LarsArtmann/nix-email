@@ -293,6 +293,41 @@ Outbound smarthost relaying (Stalwart -> Resend) needs nothing beyond the
 `relay` option on 0.16 - the object rendering is wrapper-owned (verified
 in the two-node VM test, not guessed).
 
+## Migrating from 0.15 (the store guard + `stalwart-migrate-from-015`)
+
+The 0.16 binary REFUSES to boot against a 0.15-era store (exit 101, panic
+in `crates/migration/src/lib.rs:95`), and every attempted boot POISONS the
+settings subspace for 0.15.5 before panicking - a crash-looping unit
+destroys its own recovery path, because the sanctioned migration dumps the
+old settings/principals through a running 0.15.x (upstream
+`UPGRADING/v0_16.md`, vendored here as `migrate_v016.py`). Both halves are
+covered:
+
+- **Unit guard** (0.16 packages only): `ExecStartPre` fails the unit with
+  migration instructions when a non-empty store exists without
+  `<dataDir>/v016-store-migrated`. Virgin stores self-mark, so fresh
+  installs never trip it; a store migrated before the guard shipped
+  self-marks once via the printed escape hatch.
+- **`stalwart-migrate-from-015`** (add
+  `config.services.stalwart.migrateFrom015.script` to
+  `environment.systemPackages`, run as root): poison preflight ->
+  `cp -a` backup -> 0.15.x dump probe on a dedicated loopback port ->
+  vendored `migrate_v016.py` dump+convert -> recovery-mode 0.16 on
+  `migrateFrom015.recoveryPort` (default 18080, NEVER the built-in 8080 -
+  real hosts own that port) -> `stalwart-cli apply` (accounts keep their
+  0.15 ids via the `restore-<id>` mechanism, so mail linkage survives) ->
+  marker. When the live store is already poisoned, `--backup-dir PATH`
+  dumps from an unpacked pre-0.16 copy instead and still recovers the
+  live store.
+
+Listeners, rate limits, and report settings do NOT ride the migration
+(0.16 objects) - the provision plan recreates them at the next start.
+Quota counters are reset by upstream's recovery mode; recalculate them
+from the webadmin's task panel afterwards. Pinned end to end (guard
+refusal, poison refusal, `--backup-dir` recovery, 0.15 password
+authenticating on 0.16, restart persistence) by
+`checks.x86_64-linux.stalwart-migrate-e2e`.
+
 ## Module: `services.dmarc-monitor`
 
 Enables nixpkgs `services.parsedmarc` (11.0.1) with the heavy sinks OFF:

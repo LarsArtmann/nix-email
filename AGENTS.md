@@ -236,6 +236,18 @@ are era-marked historical).
 
 ## Working rules (learned the hard way)
 
+- The 0.15 -> 0.16 store boundary is a POISON class (2026-10-17, pbx
+  outage): the 0.16 binary panics (exit 101, migration/lib.rs:95) on a
+  pre-0.16 store AND writes webui defaults into the settings subspace
+  BEFORE panicking, so every crash-loop iteration poisons the store for
+  0.15.5 ("Data corruption detected") - and the sanctioned dump needs a
+  live 0.15.x. Consequences: never boot 0.16 against an old store without
+  the unit guard (default.nix) having passed; the migration script's
+  poison preflight is a hard stop, and the dump then runs from a
+  pre-0.16 copy (--backup-dir) while recovery mode still fixes the LIVE
+  store (the wipe removes the poison with everything else in the
+  settings subspace). Recovery mode's port is STALWART_RECOVERY_MODE_PORT
+  - never assume 8080 (the built-in; consumer hosts own it).
 - NEVER "clean up" the flake outputs lambda signature: Nix ALWAYS passes
   `self` to outputs, and flake-parts additionally consumes the whole
   `inputs` set, so the pattern needs the ellipsis

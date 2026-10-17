@@ -56,6 +56,10 @@
         # virgin-store fallback class stalwart-e2e cannot cover (its bind
         # coincides with the built-in 8080).
         stalwart-bind-e2e = import ../tests/stalwart-bind-e2e.nix {inherit pkgs;};
+        # 0.15 -> 0.16 store migration (guard + script + poisoned-store
+        # recovery): the class that took the pbx host's mail down - no
+        # virgin-store test can see it by construction.
+        stalwart-migrate-e2e = import ../tests/stalwart-migrate-e2e.nix {inherit pkgs;};
         stalwart-relay-e2e = import ../tests/stalwart-relay-e2e.nix {inherit pkgs;};
         parsedmarc-e2e = import ../tests/parsedmarc-e2e.nix {inherit pkgs;};
       };

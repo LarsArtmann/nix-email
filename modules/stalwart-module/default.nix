@@ -24,11 +24,48 @@
     then "stalwart-mail"
     else "stalwart";
   stalwartIdentifierText = ''if lib.versionOlder config.services.stalwart.stateVersion "26.05" then "stalwart-mail" else "stalwart"'';
+
+  # 0.16 store guard (2026-10-17 pbx outage class): the 0.16 binary
+  # PANICS (exit 101, migration/lib.rs:95) on a pre-0.16 store, and
+  # every attempt POISONS the settings subspace for 0.15.5 before
+  # panicking - a restart loop destroys the dump path of the
+  # migration. Refuse loudly instead, BEFORE the binary runs. A
+  # virgin (missing/empty) store self-marks so fresh installs and
+  # every later boot pass; the migration script touches the same
+  # marker on success. Stores already migrated BEFORE this guard
+  # shipped self-mark once via the printed escape hatch.
+  storeGuard =
+    if since0_16
+    then let
+      probeDir =
+        if useLegacyStorage
+        then "${cfg.dataDir}/data"
+        else "${cfg.dataDir}/db";
+      marker = "${cfg.dataDir}/v016-store-migrated";
+    in
+      pkgs.writeShellScript "stalwart-v016-store-guard" ''
+        set -eu
+        marker=${lib.escapeShellArg marker}
+        probe=${lib.escapeShellArg probeDir}
+        if [ -e "$marker" ]; then exit 0; fi
+        if [ ! -d "$probe" ] || [ -z "$(${lib.getExe' pkgs.coreutils "ls"} -A "$probe" 2>/dev/null)" ]; then
+          # virgin store: self-mark so only pre-0.16 data ever trips
+          touch "$marker"
+          exit 0
+        fi
+        echo "stalwart: refusing to start - a pre-0.16 store exists at $probe without the v0.16 migration marker." >&2
+        echo "  The 0.16 binary panics on unmigrated stores (exit 101) and EVERY attempt poisons the store for 0.15.x." >&2
+        echo "  Run the migration as root: stalwart-migrate-from-015 (see the nix-email README, 'Migrating from 0.15')." >&2
+        echo "  If this store was already migrated before the guard shipped: touch $marker and restart." >&2
+        exit 1
+      ''
+    else null;
 in {
   imports = [
     # since 0.12.0 (2025-05-26) release, upstream re-branded project to 'stalwart' due to inclusion of collaboration features (CalDAV, CardDAV, and WebDAV)
     #  https://github.com/stalwartlabs/stalwart/releases/tag/v0.12.0
     (lib.mkRenamedOptionModule ["services" "stalwart-mail"] ["services" "stalwart"])
+    ./migration.nix
   ];
   options.services.stalwart = {
     enable = lib.mkEnableOption "the all-in-one collaboration and mail server, Stalwart";
@@ -349,13 +386,16 @@ in {
           SyslogIdentifier = stalwartIdentifier;
 
           ExecStartPre =
-            if useLegacyStorage
-            then ''
-              ${lib.getExe' pkgs.coreutils "mkdir"} -p ${cfg.dataDir}/data/blobs
-            ''
-            else ''
-              ${lib.getExe' pkgs.coreutils "mkdir"} -p ${cfg.dataDir}/db
-            '';
+            (
+              if useLegacyStorage
+              then [
+                "${lib.getExe' pkgs.coreutils "mkdir"} -p ${cfg.dataDir}/data/blobs"
+              ]
+              else [
+                "${lib.getExe' pkgs.coreutils "mkdir"} -p ${cfg.dataDir}/db"
+              ]
+            )
+            ++ (lib.optional (storeGuard != null) "${storeGuard}");
           ExecStart = let
             env = lib.optionalString cfg.admin.enable "STALWART_RECOVERY_ADMIN=${lib.escapeShellArg cfg.admin.username}:`systemd-creds cat ${lib.escapeShellArg cfg.admin.username}`";
             cmd = "${lib.getExe cfg.package} --config=${configFile}";
