@@ -143,6 +143,12 @@ Wait-for-push before yielding (verifiable CI-green handoff) or keep riding
 the auto-commit daemon's own cycle?
 
 - **[rec] Keep riding the cycle** (zero friction; the sync + CI-green state is verifiable at the NEXT session start — as verified 2026-10-05). Answering retires the recurring "push posture unknown at yield" note.
+- ADDENDUM 2026-10-17 (06-12 report g/2): a session push accelerated another
+  live session's committed-but-in-flight work (half-done AGENTS-diet files).
+  Open sub-question: hold pushes when the unpushed set contains a concurrent
+  session's files, or keep pushing everything the daemon has committed?
+  Cost of holding: master stays unhealed longer; cost of pushing: half-done
+  work ships. Unanswered.
 
 ### C14 — Rotate the 3 placeholder secrets (SystemNix `nix-email.yaml`)
 
@@ -197,6 +203,11 @@ deleting distinct paid-for lessons.
 - **[rec] Accept the current size as the floor** (no enforced budget, no
   gate); re-visit only if the flag threshold (30 KB) approaches.
 - Unblocks: retires the recurring F22.3 line from every docs pass.
+- ADDENDUM 2026-10-17: the 06-05 diet pass pruned 31,498 -> 28,040 B (11%,
+  rules kept); the 0.16 migration doctrine re-grew it to 29,220 B (still
+  under the flag). OPEN residue (06-05 report g/1): deeper cuts to <20 KB
+  by relocating the VM-debug-loop mechanics + command narration to a docs
+  page - a structure decision, not a mechanical cut.
 
 ## What is NOT a decision
 
@@ -315,3 +326,27 @@ restarts)?
 - **[rec] Accept for v0.5.0** (mail queues absorb a seconds-long flap; the
   hash gate adds statefulness for a single-host fleet).
 - Cost of delay: cosmetic.
+
+### C52 — README-as-ledger home (new 2026-10-17, from the 05-37 report g/2)
+
+The README (73 KB) owns the verified-facts ledger + the canonical check-set
+list, while global doctrine says README = end-user sales page. Multiple
+sessions have since single-sourced MORE docs into README (AGENTS points at
+the ledger + check list), so a move now rewrites many pointers.
+
+- **[rec] Accept README-as-ledger as permanent** (the pointer web is load-
+  bearing; a `docs/LEDGER.md` move buys audience purity at real churn cost).
+- Cost of delay: every new session deepens the coupling; decide before the
+  v0.5.0 docs pass if a move is ever wanted.
+
+### C53 — Bootstrap degradation doctrine (new 2026-10-17, from the 06-12 report g/3)
+
+The bind-e2e bootstrap fix falls back to the built-in `127.0.0.1:8080`
+listener. If upstream ever changes/removes that default, the fallback
+silently degrades to the bounded 3-minute visible failure (red unit, never
+a wedge) for non-8080 httpBind users.
+
+- **[rec] Accept degrade-visible as the end state** (bounded, loud, never
+  silent); add the eval-time port-set pin (folded into the provision-plan-eval
+  TODO row) only if the fleet grows non-8080 httpBind consumers.
+- Cost of delay: none (the failure mode is visible by construction).
