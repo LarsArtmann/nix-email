@@ -64,7 +64,22 @@ intuitions: REST recipes, provision-plan dialect, JMAP session path; the
   .#checks.x86_64-linux.stalwart-e2e` pins the test closure via the
   out-link so a background GC cannot yank the driver mid-loop (drop it
   with `rm /tmp/st-e2e-root`). CI-side gc-roots are pointless - runners
-  are ephemeral and flakehub-cache owns persistence there.
+  are ephemeral and flakehub-cache owns persistence there. DEBUG-SCRIPT
+  INSTRUMENT RULES (2026-10-17, three drivers' worth of evidence): (a)
+  long commands inside `machine.execute` return status -1/28 or die on a
+  guest-shell BrokenPipeError - wrap the payload in `machine.succeed(`
+  `"... > /tmp/f.log 2>&1; echo EXIT:$? >> /tmp/f.log")` and cat the
+  file; (b) NEVER `systemctl start stalwart-provision.service` manually
+  in a debug script - the boot apply already ran (oneshot completes ~10 s
+  after stalwart activates) and a manual RE-run's try-restart races the
+  probe: driver6 got a 535 on VALID credentials from exactly this; wait
+  for `stalwart.service` + `wait_for_open_port` instead; (c) journal
+  signature greps must exclude systemd noise words - `over` alone
+  matches every `Consumed ... over Ns wall clock` line (driver7 false
+  positive); quote concrete phrases (`over quota`, `rescheduled`) or
+  grep the queue id; (d) the driver can die mid-poll-loop
+  (BrokenPipeError at iteration ~7 of 16, driver8) - a rerun is the fix,
+  not a redesign.
 - Gate commands never wear pipes (`cmd | tail` can print PASSED on a failing
   run) - full redirect+echo-exit procedure in Working rules below; test
   assertions are transcribed from observed transcripts, not from
