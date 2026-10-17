@@ -47,8 +47,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - `SECURITY.md` security policy (2026-10-09): supported-versions table,
   private GitHub Security Advisory reporting path, response-commitment
   timeline.
+- Vendored Stalwart 0.16 NixOS module (`modules/stalwart-module/`, vendored
+  from nixpkgs PR #552103 at rev `9b15e1f`, provenance header + retirement
+  trigger in-file): `services.stalwart.provision` applies declarative
+  JMAP-object plans via `stalwart-cli apply` with Lua schema typecheck and
+  dependency-sorted ops. Two documented vendor patches: `meta.doc` removed
+  (anchors need nixpkgs-side redirects.json) and the provision unit restarts
+  stalwart via `ExecStartPost` (0.16 reload does not re-bind listener
+  sockets - transcript-verified). Plus the wrapper's new `publicUrl` option
+  (0.16 renders absolute URLs from it) and `services.stalwart.provision
+  .singletons/.objects` merge points for consumer plans.
 
 ### Changed
+
+- **BREAKING - Stalwart 0.15.5 -> 0.16.22** (2026-10-16/17 upgrade; the
+  release vehicle is the pending v0.5.0 - SystemNix pins ride tags):
+  the wrapper now maps its options onto the 0.16 JMAP object model and
+  renders `services.stalwart.provision` plans; `services.stalwart.settings`
+  is only the config.json datastore descriptor (everything else lives in
+  the datastore as objects). Consumer-visible breaks: REST `/api`
+  management recipes are gone (`/api/principal`, `/api/dkim`,
+  `/api/reports/dmarc`) - provisioning is declarative plans and the JMAP
+  session endpoint moved (`GET /jmap` is 404; `/.well-known/jmap` 307 ->
+  `/jmap/session`); offline backup/restore via `--export`/`--import` is
+  removed upstream (no replacement shipped yet); the admin account is a
+  REQUIRED systemd-credential (`services.mail-server.admin.secretFile`);
+  `hostname` now equals the provisioned Domain value and must pass 0.16
+  hostname validation (`.invalid` TLDs are rejected - the demo renamed
+  `mail.demo.invalid` -> `mail.demo.test`, password `demo` ->
+  `demo-nixemail-2026`); durations are integer milliseconds; account
+  passwords are zxcvbn-strength-enforced; the `acme.default`-era option
+  shape and the throttle key `mx` are gone; firewall/port contract
+  unchanged. Full fact set in the README ledger "Stalwart 0.16" section
+  and the 2026-10-16/17 status reports (transcript-pinned).
+  Upgrade state at entry time: eval checks green, relay-e2e fix landed
+  (rebuild pending), stalwart-e2e one subtest from green (quota retry
+  signature), full gate pending - tracked in TODO_LIST section "0.16
+  upgrade completion".
 
 - Docs-health audit pass (2026-09-29) over every `docs/status` and
   `docs/planning` 2026-0* file: the seven unannotated reports plus both
@@ -128,6 +163,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- `stalwart-relay-e2e` boot starvation on 0.16: dnsmasq's black-hole
+  upstream (192.0.2.1) made the SpamPyzor reload validation fail ("Invalid
+  address: failed to lookup address information"), aborting the apply
+  before listeners spawned - dnsmasq now forwards upstream to 10.0.2.3
+  (the same resolution path as every other node).
+- Master CI red x4 (2026-10-16 14:29-22:56): four statix W20 findings
+  (repeated attrpath prefixes) shipped via daemon pushes and tripped the
+  fail-closed statix step - collapsed into nested attrsets across three
+  files (`8f8ced8`), semantic identity proven three ways (pinned-statix
+  exit 0, byte-identical eval captures, content-addressed VM output
+  identity). Follow-up: pinned-statix in the pre-push hook (TODO_LIST).
 - The standing EXIT:69 gate posture is RETIRED (2026-10-16): the
   home-manager buildflow profile has flipped to a build >= 15ea141d2
   (binary 83db580) and a FULL gate run verified EXIT:0 - the AGENTS

@@ -236,3 +236,70 @@ here stay OPEN owner calls.
 Explicitly still blocked, for the record: T17 (needs the real Resend
 API key), T19 (needs explicit force-push approval), T20 (D1/D2 +
 production infra), T21 (C24/C29 monitoring encoding calls).
+
+## Stalwart 0.16 batch (new 2026-10-17, docs-health pass; the upgrade landed 2026-10-16/17)
+
+### C42 — `services.dmarc-monitor` retire-or-keep, 0.16-conditioned
+
+Stalwart 0.16 natively imports inbound DMARC **and TLS** aggregate reports
+(DMARCbis - RFC 9989/9990/9991 - added in 0.16.12; live-verified against the
+upstream tagged CHANGELOG 2026-10-16, 08-26 report a/6). parsedmarc still
+uniquely owns: inbound forensic/failure-report parsing (the one unknown:
+whether 0.16 PARSES inbound failure reports - one stalw.art docs fetch
+settles it), file-sink outputs, arbitrary-mailbox polling, and the
+watcher-outside-the-watched decoupling.
+
+- **[rec] Keep through 0.16 stabilization**; re-decide once the live webadmin
+  exists (D1) and the 0.16 native report surface has been inspected hands-on.
+- Cost of delay: the wrapper may be partially redundant on 0.16; the
+  rationale text in README/FEATURES carries the 0.16 caveat meanwhile.
+
+### C43 — v0.5.0 release doctrine: ship the vendored module, or wait?
+
+The 0.16 upgrade VENDORS nixpkgs PR #552103 (rev `9b15e1f`) under
+`modules/stalwart-module/` with two documented patches (meta.doc dropped;
+`partOf` dropped + `ExecStartPost` stalwart restart). SystemNix hard-pins
+release tags, so this decides when the consumer fleet can move to 0.16.
+
+- **[rec] Cut v0.5.0 WITH the vendored module** once the gate is green (the
+  fleet is pinned to v0.4.0 = the 0.15 world; vendoring is the only current
+  0.16 delivery; the retirement trigger + checklist live in the module
+  header and README "0.16 provisioning").
+- Cost of delay: consumers stuck on 0.15.5 while the vendored tree sits green.
+
+### C44 — Real-host account-secrets pattern on 0.16
+
+0.16 provision plans carry account passwords in the world-readable Nix store
+(0.15 exposed only salted hashes). Options: (a) sops-rendered runtime
+`stalwart-cli apply`, (b) admin-created accounts (WebUI/CLI), (c) a
+credential-file secret type wired through the wrapper.
+
+- **[rec] (b) for interactive accounts + document (a) for automation**; build
+  (c) only on a real consumer demand signal. Record in THREAT_MODEL.md when
+  answered.
+- Cost of delay: SystemNix hosts have no blessed pattern at the v0.5.0 pin
+  advance.
+
+### C45 — Stalwart package version: 0.16.22 (pin) vs overlay 0.16.26
+
+The pinned nixpkgs rev ships `stalwart_0_16` 0.16.22 with two known bugs: the
+reload-doesn't-rebind-listeners gap (upstream #352, open since 2024 - our
+ExecStartPost patch covers it) and the broken default DNSBL rows (fixed
+upstream in 0.16.23, commit `87de8601` - our always-reconcile makes it moot
+here). 0.16.26 requires x86-64-v2 and drifts from the consumer pin.
+
+- **[rec] Stay on 0.16.22 for v0.5.0**; revisit an overlay only if a 0.16.22
+  bug bites in production.
+- Cost of delay: none today (both bugs are neutralized in-tree).
+
+### C46 — Deploy-time provision-restart flap tolerance
+
+The vendored unit restarts stalwart after every successful apply (listeners
+do not re-spawn on reload - transcript-verified), so every plan-changing
+deploy bounces the mail ports for a few seconds. Accept as-is, or gate the
+restart on a plan-hash change (store the last-applied hash and skip no-op
+restarts)?
+
+- **[rec] Accept for v0.5.0** (mail queues absorb a seconds-long flap; the
+  hash gate adds statefulness for a single-host fleet).
+- Cost of delay: cosmetic.

@@ -726,32 +726,26 @@ in
               "> /tmp/swaks-quota.log 2>&1"
           )
           machine.succeed("cat /tmp/swaks-quota.log >&2")
-          # Accepted at RCPT/DATA: quota is an ingest-stage check (451 +
-          # queue retry), not an SMTP-stage rejection.
+          # Accepted at RCPT/DATA (0.16.22 transcript 2026-10-17: the exact
+          # acceptance line is `250 2.0.0 Message queued with id <id>`):
+          # quota is an ingest-stage decision, not an SMTP-stage rejection.
+          machine.succeed("grep -q 'queued with id' /tmp/swaks-quota.log")
           machine.succeed("! grep -q '<\\*\\*' /tmp/swaks-quota.log")
           machine.succeed(
               "imap-absent-probe needle-quota-9e3b user3@example.test '${testPass}' 21"
           )
-          # Transcript-backed (VM debug run 2026-09-15): the journal at
-          # default verbosity NEVER logs the code-level reason "Mailbox over
-          # quota." (delivery.rs:225) - the observable retry signature is
-          # `Message rescheduled for delivery`. Do not re-assert the reason
-          # string; it was tried and the gate caught it (the source-reading
-          # lesson again).
-          machine.wait_until_succeeds(
-              "journalctl -u stalwart.service -b 0 -o cat > /tmp/journal-quota.log "
-              + "&& grep -q 'Message rescheduled for delivery' /tmp/journal-quota.log",
-              timeout=60,
-          )
-          # A SECOND reschedule line proves the queue RETRIES (the loop),
-          # not a one-off requeue - "retried forever" previously rested on
-          # a single journal line. wait_until_succeeds polls, so a slow
-          # retry backoff costs time, not flake. File-based count (grep -c
-          # consumes its input; no EPIPE trap).
-          machine.wait_until_succeeds(
-              "journalctl -u stalwart.service -b 0 -o cat > /tmp/journal-quota-2.log "
-              + "&& test \"$(grep -c 'Message rescheduled for delivery' /tmp/journal-quota-2.log)\" -ge 2",
-              timeout=300,
+          # 0.16.22 JOURNAL SILENCE (debug-driver transcripts 2026-10-17,
+          # three independent boots): the 0.15 retry signature `Message
+          # rescheduled for delivery` is GONE - across 200 s of post-accept
+          # polling the journal carries NO quota/retry/reschedule/4xx line
+          # and never re-mentions the queue id; at default verbosity 0.16
+          # logs nothing per-message. The observable contract is therefore
+          # SMTP-accept + delivery-absence + journal silence; the queue's
+          # long-term fate (retry-forever vs deferred) is not
+          # journal-observable on 0.16 (README ledger carries the delta).
+          machine.succeed(
+              "journalctl -u stalwart.service -b 0 -o cat > /tmp/journal-quota.log"
+              "&& ! grep -qiE 'rescheduled|over quota' /tmp/journal-quota.log"
           )
 
       with subtest("spam: GTUBE message gets X-Spam-Status (no auto-Junk filing)"):
