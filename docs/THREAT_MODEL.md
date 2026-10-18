@@ -5,6 +5,36 @@ Scope: the two wrapper modules in this repo (`services.mail-server`,
 VERIFIED points at the README verified-facts ledger; ASSUMED means it rests
 on upstream defaults we have not independently probed.
 
+## 0.16 exposure delta (2026-10-18 revisit)
+
+The 0.16 object model moved the threat surface in BOTH directions:
+
+- SHRANK: the 0.15 REST management API (`/api/principal`, `/api/reports`,
+  `/api/dkim`) is GONE - the loopback listener now serves the web admin,
+  JMAP, and the management API the provisioning CLI speaks. The
+  "proxy forwards /api/" misconfiguration class below is historical
+  (0.15); a proxy must not forward the JMAP/management paths instead.
+- GREW: declarative provision plans carry account passwords in PLAINTEXT
+  in the world-readable Nix store (`credentials[].secret` in the plan
+  NDJSON; 0.15 exposed only salted hashes through the API). The demo
+  accepts this for a throwaway VM; REAL hosts must NOT - decision C44
+  (pending) owns the doctrine: admin-created accounts (b), sops-rendered
+  runtime apply (a), or credential-file secrets (c). Until C44 lands,
+  real-host plans should provision principals WITHOUT password
+  credentials.
+- GREW (operator-side, not network-side): the 0.15->0.16 migration
+  artifacts (`<dataDir>/migration-v016/`: settings.json, principals.json,
+  export.json) and `stalwart-cli snapshot --include-secrets` outputs
+  contain secrets - dataDir-local, root/stalwart-owned; do not copy them
+  off-host unencrypted (backup story: probe transcripts 2026-10-18).
+- Store-guard boundary: the wrapper's `ExecStartPre` guard makes the
+  poison-class (0.16 binary writing into a 0.15 store, destroying the
+  dump path) a loud refusal instead of a crash loop - integrity, not
+  confidentiality, but it is part of the 0.16 posture.
+- MemoryMax / resource caps on the stalwart unit: decision C39 (pending)
+  owns whether the wrapper ships one; currently unbounded (host OOM
+  risk lands on the consumer's own unit tuning).
+
 ## Assets and secrets
 
 | Secret                                 | Lives where                                          | How it reaches Stalwart                                                                                                                                                       |
@@ -91,10 +121,10 @@ template path string - see the ledger for the `_secret` string contract).
 | Probing the topology by mailing a not-yet-provisioned domain | Availability trap, not disclosure                        | The directory negatively caches `is_local_domain` misses for 1 h by default, misrouting later mail to the MX path (README ledger; the E2E carries a poisoning + low-TTL-recovery regression subtest).                                                                                                                                                |
 | SSRF via relay targets                                       | Refused for loopback                                     | Upstream refuses loopback-resolving relay targets; the wrapper additionally rejects IP literals at eval (above).                                                                                                                                                                                                                                     |
 | Anonymous admin API access, across restarts                  | 401                                                      | Asserted in the E2E, including after `systemctl restart`.                                                                                                                                                                                                                                                                                            |
-| Spam into user mailboxes                                     | Tagged, not auto-filed                                   | The GTUBE experiment (2026-09-15): 0.15.5 scans authenticated submission too and adds `X-Spam-Status`, but delivers spam to INBOX by default - Junk routing is consumer sieve territory. The E2E asserts the tagging contract.                                                                                                                       |
-| Secrets leaking through the Nix store or module system       | Prevented by construction                                | All secrets are files (LoadCredential / sops) referenced via `%{file:...}%`; the wrapper declares path options only.                                                                                                                                                                                                                                 |
+| Spam into user mailboxes                                     | Scored; filing varies                                    | 0.16 (VM-observed 2026-10-18): unauthenticated inbound landed INBOX on one boot and Junk Mail on another - filing is score-based, NOT a fixed "tag-only, INBOX" rule (the 0.15 GTUBE posture). The e2e still asserts X-Spam-Status tagging; Junk ROUTING defaults are consumer sieve/settings territory. |                                                                                                                       |
+| Secrets leaking through the Nix store or module system       | Split verdict on 0.16                                    | File-based secrets (LoadCredential/sops, `%{file:...}%`) remain prevented by construction; BUT 0.16 provision plans carry account passwords in the world-readable store NDJSON (see the 0.16 delta above) - real hosts are C44-gated, the throwaway demo accepts it explicitly. |                                                                                                                                                                                                                                 |
 | Oversized mail exhausting storage                            | Bounded per-principal                                    | Stalwart per-account quota; the E2E asserts an over-quota message is accepted at SMTP but never delivered (quota subtest).                                                                                                                                                                                                                           |
-| Enumerating valid local parts by recipient probing           | Impossible once a catch-all exists (deliberate tradeoff) | A principal holding the literal `"@domain"` address makes EVERY local part deliverable, so RCPT probing can no longer distinguish real mailboxes from invented ones. The E2E proves the delivery path; the ordering trap (create the catch-all AFTER any unknown-recipient probe, or the 550 assertion fails) is in the README ledger and AGENTS.md. |
+| Enumerating valid local parts by recipient probing           | Impossible once a catch-all exists (deliberate tradeoff) | 0.16: `Domain.catchAllAddress` makes EVERY local part deliverable, so RCPT probing can no longer distinguish real mailboxes from invented ones. The E2E proves the delivery path; the ordering trap (create the catch-all AFTER any unknown-recipient probe, or the 550 assertion fails) is in the README ledger and AGENTS.md. |
 
 ## Out of scope / consumer responsibilities
 
