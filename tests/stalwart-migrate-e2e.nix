@@ -150,8 +150,11 @@ in
 
       with subtest("handoff: the 0.15 store lands on the shared directory"):
           mig015.succeed("systemctl stop stalwart.service")
-          mig015.succeed("cp -a /var/lib/stalwart /tmp/shared/pre016-store")
-          mig015.succeed("test -d /tmp/shared/pre016-store/db")
+          # tar, not cp -a: virtfs rejects chown ("failed to preserve
+          # ownership ... Invalid argument") - ownership and modes travel
+          # INSIDE the archive and are restored at extraction time.
+          mig015.succeed("tar -C /var/lib -cf /tmp/shared/pre016-store.tar stalwart")
+          mig015.succeed("test -s /tmp/shared/pre016-store.tar")
 
       with subtest("mig016 baseline: the consumer shape provisions its own virgin store"):
           mig016.wait_for_unit("stalwart-provision.service", timeout=300)
@@ -166,7 +169,7 @@ in
           # virgin store, and a leftover marker would wrongly pass the
           # guard on top of 0.15 data (the poison class).
           mig016.succeed(
-              "rm -rf /var/lib/stalwart && cp -a /tmp/shared/pre016-store /var/lib/stalwart"
+              "rm -rf /var/lib/stalwart && tar -C /var/lib -xf /tmp/shared/pre016-store.tar"
           )
           # The guard fails ExecStartPre, the unit cycles under its
           # restart policy - never let that block the driver.
@@ -204,8 +207,13 @@ in
           mig016.succeed("grep -q 'POISONED for 0.15.5' /tmp/refuse.log")
 
       with subtest("--backup-dir migration: dump from the copy, recover the live store"):
+          # Extract a LOCAL pre-0.16 copy for the dump leg (never run the
+          # 0.15.5 probe against the virtfs share itself - RocksDB over
+          # 9p is neither fast nor trustworthy).
+          mig016.succeed("mkdir -p /tmp/pre016-copy")
+          mig016.succeed("tar -C /tmp/pre016-copy -xf /tmp/shared/pre016-store.tar")
           mig016.succeed(
-              "stalwart-migrate-from-015 --backup-dir /tmp/shared/pre016-store "
+              "stalwart-migrate-from-015 --backup-dir /tmp/pre016-copy/stalwart "
               "2>&1 | tee /tmp/migrate.log"
           )
           mig016.succeed("cat /tmp/migrate.log >&2")

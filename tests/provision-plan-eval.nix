@@ -139,9 +139,16 @@
     settingsCoherent = settingsCoherent;
     multilineExecs = builtins.length multilineExecs == 0;
     throttleOk = throttleOk;
-    assertionsClean = lib.all (a: a.assertion) base.config.assertions;
+    wrapperAssertionsClean = builtins.length wrapperAssertionFires == 0;
   };
   rendered = builtins.toJSON renderedAttrs;
+
+  # NixOS base assertions (fileSystems, bootloader) fire in any partial
+  # eval without a VM base - scope the cleanliness claim to the wrapper's
+  # own assertion surface (mail-server/stalwart messages).
+  wrapperAssertionFires = builtins.filter (
+    a: !a.assertion && (lib.hasInfix "mail-server" a.message || lib.hasInfix "stalwart" a.message)
+  ) base.config.assertions;
 in
   assert domainName == hostname || throw "provision-plan-eval: the wrapper Domain name (${domainName}) must equal services.mail-server.hostname (${hostname}) - addresses synthesize as name@<Domain.name>, a split lands them outside the local namespace.";
   assert builtins.length reconcileWithoutMatch == 0 || throw "provision-plan-eval: reconcile sets without an explicit match property: ${toString reconcileWithoutMatch} - reconcile DELETES by key, a null match is a footgun.";
@@ -151,7 +158,7 @@ in
   assert settingsCoherent || throw "provision-plan-eval: SystemSettings.defaultHostname/defaultDomainId drifted from the wrapper hostname/Domain id.";
   assert (builtins.length multilineExecs == 0) || throw "provision-plan-eval: multi-line text found in Exec* of ${toString multilineExecs} - systemd rejects it ('Unbalanced quoting'); scripts must stay on store paths.";
   assert throttleOk || throw "provision-plan-eval: the MtaInboundThrottle set lost its description match key / body key vocabulary.";
-  assert renderedAttrs.assertionsClean || throw "provision-plan-eval: the base config carries firing assertions.";
+  assert (builtins.length wrapperAssertionFires == 0) || throw "provision-plan-eval: the base config carries firing wrapper assertions: ${toString (map (a: a.message) wrapperAssertionFires)}";
     builtins.derivation {
       name = "provision-plan-eval-${system}";
       inherit system;
@@ -170,7 +177,7 @@ in
           grep -q '"settingsCoherent":true' "$renderedPath"
           grep -q '"multilineExecs":true' "$renderedPath"
           grep -q '"throttleOk":true' "$renderedPath"
-          grep -q '"assertionsClean":true' "$renderedPath"
+          grep -q '"wrapperAssertionsClean":true' "$renderedPath"
           touch "$out"
         ''
       ];
