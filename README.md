@@ -122,9 +122,11 @@ them - upstream mail software already has native/complementary answers
 options for them rot into a second implementation to maintain. That
 removal independently validates this repo's thin-wrapper doctrine:
 wrap only what needs NixOS wiring (listeners, certs, firewall, systemd
-units), pass everything else through the provision model. (Irony noted
-2026-10-17: 0.16 removed Stalwart's own `--export`/`--import` - the
-backup answer needs re-research; see ROADMAP.)
+units), pass everything else through the provision model. (Correction
+2026-10-18, VM-proven on the pin: 0.16 did NOT remove the main binary's
+`--export`/`--import` - only the `stalwart-cli --export` + REST
+variants; see the go-live backup step and
+`docs/probes/2026-10-18-demo-smoke-backup/`.)
 
 `nix flake check` runs the full check set against the SAME nixpkgs pin as
 SystemNix (`6774f7bc`, NixOS 26.11):
@@ -431,16 +433,31 @@ Gatus checks for the VPS (on evo-x2, external viewpoint):
    in the host config and fill the real IMAP-password secret - the sops
    wiring, onFailure alerting, and backup-freshness check are already layered
    and eval-tested there (see "SystemNix integration" above).
-6. Backups (0.16 WARNING): the 0.15-era native `stalwart --export`/
-   `--import` pair is REMOVED upstream in 0.16 with no replacement shipped
-   yet (0.16 has no export/import - upgrade-session transcript). The
-   0.15 procedure below is HISTORICAL; the 0.16 backup answer (datastore
-   snapshot mechanism / file-level copy with stalwart stopped) needs
-   re-research before the go-live - tracked on ROADMAP theme 1.
-   0.15-era record: `stalwart --config ... --export <dir>` (offline op)
-   wrote lz4-framed dumps of ALL store families; `--import <dir>` restored;
-   schedule as a stop/export/start unit or accept btrfs-snapshot fallback
-   for hot copies; pull results to the evo-x2 pool via backup-coordination.
+6. Backups (0.16, VM-VERIFIED 2026-10-18 on the pin - full transcripts:
+   `docs/probes/2026-10-18-demo-smoke-backup/`):
+   - **Full store**: stop stalwart, `stalwart --config <cfg> --export
+     <dir>` (offline; 20 `subspace_*` files), restart. Restore = wipe
+     `/var/lib/stalwart`, recreate `db/`, `--import <dir>` BEFORE the
+     first start (the binary refuses a store that was ever started:
+     "already contains data in the key ranges"), then `touch
+     /var/lib/stalwart/v016-store-migrated` or the wrapper's store
+     guard refuses the boot - verified end-to-end incl. listeners,
+     logins, mail counts, and post-restore delivery.
+   - **Config-only**: `stalwart-cli snapshot Domain Account Directory
+     DnsServer DnsResolver AcmeProvider Tenant --allow-unresolved
+     PublicKey,Role > plan.ndjson` (env `STALWART_URL/_USER/_PASSWORD`);
+     secrets stripped by default (`--include-secrets` to include);
+     restore via `stalwart-cli apply`. Snapshot enforces referential
+     closure and rejects cycles without `--allow-unresolved`.
+   - **Hot copy**: stop + `cp -a /var/lib/stalwart` + start is a valid
+     full backup (verified: mail intact after restart); schedule as a
+     stop/copy/start unit or accept btrfs-snapshot fallback; pull
+     results to the evo-x2 pool via backup-coordination.
+   - **Per-account mail**: Vandelay is NOT in the pinned nixpkgs
+     (eval-verified) - per-account export rides imapsync or a
+     source-built vandelay; unverified here.
+   The wrapper wires none of this (thin-wrapper doctrine); SystemNix
+   owns the scheduling + backup-coordination layer (their repo).
 7. DR: sops secrets for the VPS must also encrypt to a repo-level recovery
    age key, not only the VPS host key - a rebuilt VPS gets a new host key
    and would otherwise lose every secret (chicken-and-egg).

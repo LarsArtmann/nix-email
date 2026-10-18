@@ -172,8 +172,10 @@
                Provisioned declaratively by stalwart-provision.service
                (stalwart-cli apply; journal: systemctl status). The catch-all
                accepts mail for ANY local part.
-               Unauthenticated inbound lands in Junk Mail (spam filter);
-               authenticated submission lands in INBOX - both verified.
+               Unauthenticated inbound MAY land in Junk Mail (spam scoring
+               is score-based on 0.16, not a fixed rule - both INBOX and
+               Junk landings observed 2026-10-18); authenticated
+               submission lands in INBOX - both verified.
             ==================================================================
             BANNER
           '';
