@@ -566,13 +566,6 @@ def write_unmigrated_summary(unmigrated: list[str], path: str) -> None:
             f.write(f"  {prefix:<{width}}  {counts[prefix]:5d} keys\n")
 
 
-def group_settings_by_prefix(
-    settings: dict[str, str], prefix: str
-) -> dict[str, dict[str, str]]:
-
-    raise NotImplementedError
-
-
 def build_sub_trees(
     settings: dict[str, str],
     prefix: str,

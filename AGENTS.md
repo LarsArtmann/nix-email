@@ -307,7 +307,9 @@ are era-marked historical).
   accepted warning-severity noise (local developer forensic tool:
   subprocess runs developer-controlled nix commands without shell, and
   the /tmp default is the documented --out UX; the gate threshold is
-  error, so these never fail).
+  error, so these never fail). vulture's `unused attribute 'auth'` on
+  migrate_v016.py is a false positive (a requests.Session attribute -
+  assignment IS the usage; the library reads it).
 - Workflow edits need a LOCAL actionlint run WITH shellcheck on PATH:
   CI's actionlint runs WITH shellcheck (preinstalled on runners), but a
   shellcheck-less local machine is blind to shellcheck findings (a trap
