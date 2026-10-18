@@ -456,8 +456,8 @@ Gatus checks for the VPS (on evo-x2, external viewpoint):
    - **Per-account mail**: Vandelay is NOT in the pinned nixpkgs
      (eval-verified) - per-account export rides imapsync or a
      source-built vandelay; unverified here.
-   The wrapper wires none of this (thin-wrapper doctrine); SystemNix
-   owns the scheduling + backup-coordination layer (their repo).
+     The wrapper wires none of this (thin-wrapper doctrine); SystemNix
+     owns the scheduling + backup-coordination layer (their repo).
 7. DR: sops secrets for the VPS must also encrypt to a repo-level recovery
    age key, not only the VPS host key - a rebuilt VPS gets a new host key
    and would otherwise lose every secret (chicken-and-egg).

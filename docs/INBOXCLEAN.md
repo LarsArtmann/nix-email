@@ -10,8 +10,33 @@ pinned nixpkgs rev). The repo's transcript rule applies across the
 boundary: a claim without a transcript is a guess, and a pin advance
 that touches Stalwart re-runs the probe (see "Re-verification" below).
 
-> **0.16 BANNER (2026-10-17): Stalwart 0.16.22 landed in tree** - the
-> JMAP contract below is 0.15.5-historical until re-verified. Known 0.16
+> **0.16 RE-VERIFIED (2026-10-18, demo VM on the pin, Stalwart 0.16.22;**
+> transcripts: `docs/probes/2026-10-18-demo-smoke-backup/`): the wire
+> contract SURVIVES 0.16 with these deltas — `/.well-known/jmap` 307 →
+> `/jmap/session` (same as the 0.16 banner below stated); Basic-auth
+> identity = the SYNTHESIZED address `demo@mail.demo.test` (JMAP 200 +
+> SMTP AUTH 235 both verified — the 0.15 login-by-principal-name trap
+> stays gone); `accountId` is `"c"` (0.15 used `"e"` — the StateChange
+> `changed` key changed accordingly); `primaryAccounts` has NO
+> `urn:ietf:params:jmap:core` entry (mail/submission/vacation/
+> contacts/calendars/websocket/sieve/blob/quota/principals(+availability)/
+> filenode/mail:share plus `urn:stalwart:jmap` and
+> `urn:ietf:params:jmap:emailpush` — new on 0.16); EventSource accepts
+> `closeafter=no` (the 0.15.5 `400 Invalid parameters` quirk is GONE;
+> `ping` unprobed); the StateChange payload shape is unchanged. The
+> Junk-filing automation path verified end-to-end: `Email/set`
+> mailboxIds move to the `role:"junk"` mailbox (`updated`, Junk=1 /
+> Inbox=2, state saq→sau). IMAP LIST roles on 0.16: INBOX, Junk Mail
+> (\Junk), Drafts, Sent Items (\Sent), Deleted Items (\Trash).
+> Filing NOTE: unauthenticated inbound landed INBOX on one boot and
+> Junk Mail on another — 0.16 filing is score-based, not a fixed rule;
+> adapters must not assume inbox placement. The 0.15 sections below are
+> HISTORICAL (era-marked); the 0.15 probe transcripts stay under
+> `docs/probes/2026-10-05-jmap-demo-vm/`.
+
+> **0.16 BANNER (2026-10-17, superseded by the re-verification above):
+> Stalwart 0.16.22 landed in tree** - the JMAP contract below is
+> 0.15.5-historical. Known 0.16
 > deltas that touch THIS contract: the session endpoint moved
 > (`/.well-known/jmap` 307 -> `/jmap/session`; `GET /jmap` is 404), the
 > auth identity is the SYNTHESIZED address `name@<Domain>` (accounts are

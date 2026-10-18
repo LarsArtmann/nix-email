@@ -9,6 +9,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Fail-closed Python lint in CI (2026-10-18, the ruff-red incident
+  mechanized): error-class ruff findings shipped to master through three
+  gate runs because daemon pushes bypass the pre-push hook and CI had
+  NO Python linting at all. New ci.yml step: locked-rev nixpkgs ruff
+  over tracked `.py` files, `--select E4,E7,E9,F` (version-drift-proof
+  error floor; buildflow keeps owning the deeper PERF/FURB/BLE classes),
+  with a negative self-test (an unused import must fail) so the step can
+  never silently stop firing.
+- 0.16 backup story VM-proven on the pin (2026-10-18): offline `cp -a`
+  full copy, `stalwart-cli snapshot` config plans (secrets stripped by
+  default; referential closure enforced, cycles via
+  `--allow-unresolved`), MAIN-binary `--export/--import` (present on
+  0.16.22; import needs a never-started wiped store + the
+  `v016-store-migrated` marker touch), and a full restore drill
+  (listeners, logins, mail counts, post-restore delivery). Vandelay is
+  NOT in the pinned nixpkgs. README go-live backup step rewritten from
+  the verified procedure; FEATURES backup row updated; probe
+  transcripts + reproducible host scripts under
+  `docs/probes/2026-10-18-demo-smoke-backup/`.
+- JMAP contract re-verified on 0.16.22 (2026-10-18,
+  `docs/INBOXCLEAN.md`): discovery 307→`/jmap/session` unchanged,
+  auth identity = synthesized address, EventSource `StateChange` push
+  works and now ACCEPTS `closeafter` (0.15.5 rejected it), accountId
+  `c`, `urn:stalwart:jmap` + `emailpush` capabilities new, and the
+  Junk-filing automation path (`Email/set` mailboxIds move) verified
+  end-to-end.
 - 0.15 -> 0.16 store migration machinery (2026-10-17, the pbx-artmann
   outage train): the 0.16 binary PANICS (exit 101,
   `migration/lib.rs:95`) on a pre-0.16 store and every attempted boot
@@ -222,6 +248,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- Demo VM boot race: provision apply vs resolvconf (2026-10-18, found by
+  the fresh host-side runtime smoke the demo contract owed): on a fresh
+  boot the 0.16 reload-validation read the not-yet-written
+  `/etc/resolv.conf` ("no nameservers found in config"), the apply
+  failed at its trailing reload op, and the apply script aborted BEFORE
+  its restart step - stalwart stayed on the built-in listener set (no
+  587/465) with a failed `stalwart-provision.service`. The demo now pins
+  `DnsResolver."@type" = "Cloudflare"` (the e2e pattern); after the fix
+  the unit is Result=success and all five listeners bind. The demo
+  banner's "unauthenticated inbound lands in Junk Mail" claim was also
+  wrong for 0.16 (score-based: both INBOX and Junk landings observed) -
+  now says "may land". TODO row tracks the module-level ordering
+  question for real late-DNS hosts. Transcripts:
+  `docs/probes/2026-10-18-demo-smoke-backup/`.
 - Provision bootstrap deadlock on non-default `httpBind` (nix-email#4,
   2026-10-17): 0.16 silently ignores static `server.listener` keys, so a
   virgin store binds only the built-in set (smtp 25 + http 8080) while the
