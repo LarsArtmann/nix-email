@@ -303,7 +303,11 @@ are era-marked historical).
   strings/comments, downgrades privileged-port collisions) - do NOT "fix"
   this repo's Nix for the surviving warning pairs and do NOT skip the
   nix-checker step (it also owns stale-hash/input drift checks with real
-  signal).
+  signal). bandit's B404/B603/B108 on scripts/host-parse-fixture.py are
+  accepted warning-severity noise (local developer forensic tool:
+  subprocess runs developer-controlled nix commands without shell, and
+  the /tmp default is the documented --out UX; the gate threshold is
+  error, so these never fail).
 - Workflow edits need a LOCAL actionlint run WITH shellcheck on PATH:
   CI's actionlint runs WITH shellcheck (preinstalled on runners), but a
   shellcheck-less local machine is blind to shellcheck findings (a trap

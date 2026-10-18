@@ -717,7 +717,7 @@ def resolve_macros(
                 return ""
             return env
         try:
-            with open(arg, "r", encoding="utf-8") as fh:
+            with open(arg, encoding="utf-8") as fh:
                 return fh.read()
         except OSError as exc:
             errors.append(f"cannot read file {arg!r} (from %{{file:...}}%): {exc}")
@@ -1383,11 +1383,11 @@ class Converter:
         if stype == "fs":
             return self._build_fs(sub)
         if stype == "foundationdb":
-            return self._build_foundationdb(sub, for_blob=True)
+            return self._build_foundationdb(sub)
         if stype == "postgresql":
-            return self._build_postgresql(sub, for_blob=True)
+            return self._build_postgresql(sub)
         if stype == "mysql":
-            return self._build_mysql(sub, for_blob=True)
+            return self._build_mysql(sub)
         if stype in ("rocksdb", "sqlite"):
             if self._is_same_kv_store_as_data(sub):
                 return {"@type": "Default"}
@@ -1444,11 +1444,11 @@ class Converter:
         if stype == "meilisearch":
             return self._build_meilisearch(sub)
         if stype == "foundationdb":
-            return self._build_foundationdb(sub, for_search=True)
+            return self._build_foundationdb(sub)
         if stype == "postgresql":
-            return self._build_postgresql(sub, for_search=True)
+            return self._build_postgresql(sub)
         if stype == "mysql":
-            return self._build_mysql(sub, for_search=True)
+            return self._build_mysql(sub)
         if stype in ("rocksdb", "sqlite"):
             if self._is_same_kv_store_as_data(sub):
                 return {"@type": "Default"}
@@ -1547,13 +1547,7 @@ class Converter:
             body["poolWorkers"] = pw
         return body
 
-    def _build_foundationdb(
-        self,
-        sub: dict[str, str],
-        *,
-        for_blob: bool = False,
-        for_search: bool = False,
-    ) -> dict[str, Any]:
+    def _build_foundationdb(self, sub: dict[str, str]) -> dict[str, Any]:
         body: dict[str, Any] = {"@type": "FoundationDb"}
         cf = sub.get("cluster-file", "").strip()
         if cf:
@@ -1606,24 +1600,12 @@ class Converter:
             out["poolMaxConnections"] = pmc
         return out
 
-    def _build_postgresql(
-        self,
-        sub: dict[str, str],
-        *,
-        for_blob: bool = False,
-        for_search: bool = False,
-    ) -> dict[str, Any]:
+    def _build_postgresql(self, sub: dict[str, str]) -> dict[str, Any]:
         body = {"@type": "PostgreSql"}
         body.update(self._build_sql_common(sub))
         return body
 
-    def _build_mysql(
-        self,
-        sub: dict[str, str],
-        *,
-        for_blob: bool = False,
-        for_search: bool = False,
-    ) -> dict[str, Any]:
+    def _build_mysql(self, sub: dict[str, str]) -> dict[str, Any]:
         body = {"@type": "MySql"}
         body.update(self._build_sql_common(sub))
         map_ = parse_size_bytes(sub.get("max-allowed-packet"))
@@ -2087,14 +2069,14 @@ def build_export_ops(result: dict[str, Any]) -> list[dict[str, Any]]:
 
 
 def cmd_convert(args: argparse.Namespace) -> int:
-    with open(args.settings, "r", encoding="utf-8") as f:
+    with open(args.settings, encoding="utf-8") as f:
         settings = json.load(f)
     if not isinstance(settings, dict):
         print(f"error: {args.settings} is not a JSON object", file=sys.stderr)
         return 2
     settings = {str(k): ("" if v is None else str(v)) for k, v in settings.items()}
 
-    with open(args.principals, "r", encoding="utf-8") as f:
+    with open(args.principals, encoding="utf-8") as f:
         principals = json.load(f)
     if not isinstance(principals, list):
         print(f"error: {args.principals} is not a JSON array", file=sys.stderr)
