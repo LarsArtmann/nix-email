@@ -65,6 +65,14 @@
               # Tested posture from stalwart-e2e: pyzor's public host adds
               # network dependence + config-error risk for zero demo value.
               SpamPyzor.enable = false;
+              # 0.16 reload-validation reads the SYSTEM resolver config and
+              # fails the whole apply ("no nameservers found in config")
+              # when it beats resolvconf at boot - demo VM transcript
+              # 2026-10-18: op #7 (reload) failed, the apply aborted before
+              # its restart step, and stalwart kept the built-in listener
+              # set (no 587/465). Same pin the e2e uses
+              # (tests/stalwart-e2e.nix "DnsResolver").
+              DnsResolver."@type" = "Cloudflare";
             };
             objects = {
               Account = {
