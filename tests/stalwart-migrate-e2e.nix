@@ -22,10 +22,7 @@
 #   7. Post-migration: stalwart + provision units re-run, the plan's
 #      8082 listener binds, the 0.15 password authenticates on 0.16
 #   8. Restart persistence: the guard passes on the migrated store
-{
-  pkgs,
-  ...
-}: let
+{pkgs, ...}: let
   adminSecret = "test-admin-secret";
   larsPassword = "LarsE2EPassword123";
 in
@@ -82,10 +79,7 @@ in
       # The 0.16 consumer (the pbx shape from stalwart-bind-e2e: a
       # dedicated httpBind the built-in 8080 cannot shadow) plus the
       # migration script on PATH.
-      mig016 = {
-        config,
-        ...
-      }: {
+      mig016 = {config, ...}: {
         imports = [../modules/mail-server.nix];
 
         system.stateVersion = "26.05";

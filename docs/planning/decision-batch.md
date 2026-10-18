@@ -274,6 +274,18 @@ is the fleet pin, but the call stays owner-gated.
   exists (D1) and the 0.16 native report surface has been inspected hands-on
   (our e2e exercised AGGREGATE ingest on 0.16.22 only; failure-report parse
   is docs-verified, not runtime-verified).
+- Evidence RE-VERIFIED 2026-10-18 (fresh fetch, /docs/mta/reports/ +
+  /docs/mta/reports/analysis/ + /docs/ref/object/report-settings): the
+  overview lists "authentication-failure reports (DKIM, SPF, and DMARC
+  failures), and ARF reports" among the auto-analysed inbound types;
+  `inboundReportAddresses` (default `postmaster@*`, accepts wildcard-map
+  shape `{"dmarc@*": true}` - our list-shaped e2e value also applies
+  clean), `inboundReportForwarding` (default true),
+  `inboundReportMaxSize` 25 MB, retention via DataRetention
+  `holdMtaReportsFor` 30 d. The remaining runtime gap is ONE e2e probe:
+  mail an ARF/failure report to an `inboundReportAddresses` recipient
+  and assert consumed-not-delivered (same shape as the aggregate
+  subtest) - parked as test-polish, not evidence.
 - Cost of delay: the wrapper may be partially redundant on 0.16; the
   rationale text in README/FEATURES carries the 0.16 caveat meanwhile.
 
