@@ -60,11 +60,14 @@ ALL_PRINCIPAL_TYPES = [
 PAGE_SIZE = 200
 REQUEST_TIMEOUT = 60
 
+
 class ApiError(RuntimeError):
     pass
 
+
 class ConvertError(RuntimeError):
     pass
+
 
 class StalwartClient:
     def __init__(
@@ -218,6 +221,7 @@ class StalwartClient:
         quoted = urllib.parse.quote(name, safe="")
         return self.get(f"/api/principal/{quoted}")
 
+
 def _principal_name(p: dict[str, Any]) -> str:
     v = p.get("name")
     if isinstance(v, str):
@@ -232,6 +236,7 @@ def _principal_name(p: dict[str, Any]) -> str:
         return v[0]
     return ""
 
+
 def cmd_dump(args: argparse.Namespace) -> int:
     if args.token:
         client = StalwartClient(args.url, token=args.token, verify=False)
@@ -243,16 +248,17 @@ def cmd_dump(args: argparse.Namespace) -> int:
             verify=False,
         )
     else:
-        print("error: either --token or --username/--password is required",
-              file=sys.stderr)
+        print(
+            "error: either --token or --username/--password is required",
+            file=sys.stderr,
+        )
         return 2
 
     print("Fetching settings...", file=sys.stderr)
     settings = client.dump_all_settings()
     with open(args.settings, "w", encoding="utf-8") as f:
         json.dump(settings, f, indent=2, sort_keys=True, ensure_ascii=False)
-    print(f"  wrote {len(settings)} settings keys to {args.settings}",
-          file=sys.stderr)
+    print(f"  wrote {len(settings)} settings keys to {args.settings}", file=sys.stderr)
 
     print("Listing principals...", file=sys.stderr)
     names = client.list_principal_names()
@@ -263,8 +269,10 @@ def cmd_dump(args: argparse.Namespace) -> int:
         try:
             full = client.get_principal(name)
         except ApiError as exc:
-            print(f"  [{i}/{len(names)}] WARN failed to fetch {typ} {name!r}: {exc}",
-                  file=sys.stderr)
+            print(
+                f"  [{i}/{len(names)}] WARN failed to fetch {typ} {name!r}: {exc}",
+                file=sys.stderr,
+            )
             continue
         principals.append(full)
         if i % 50 == 0 or i == len(names):
@@ -279,10 +287,10 @@ def cmd_dump(args: argparse.Namespace) -> int:
 
     with open(args.principals, "w", encoding="utf-8") as f:
         json.dump(principals, f, indent=2, ensure_ascii=False)
-    print(f"  wrote {len(principals)} principals to {args.principals}",
-          file=sys.stderr)
+    print(f"  wrote {len(principals)} principals to {args.principals}", file=sys.stderr)
 
     return 0
+
 
 _DURATION_UNITS_MS = {
     "ms": 1,
@@ -301,6 +309,7 @@ _SIZE_UNITS_BYTES = {
     "gb": 1024 * 1024 * 1024,
 }
 
+
 def parse_duration_ms(s: str | None) -> int | None:
 
     if s is None:
@@ -315,6 +324,7 @@ def parse_duration_ms(s: str | None) -> int | None:
     unit = m.group(2) or "ms"
     return n * _DURATION_UNITS_MS[unit]
 
+
 def parse_size_bytes(s: str | None) -> int | None:
 
     if s is None:
@@ -327,6 +337,7 @@ def parse_size_bytes(s: str | None) -> int | None:
         raise ConvertError(f"Could not parse size {s!r}")
     return int(m.group(1)) * _SIZE_UNITS_BYTES[m.group(2) or ""]
 
+
 def parse_int(s: str | None) -> int | None:
     if s is None:
         return None
@@ -338,6 +349,7 @@ def parse_int(s: str | None) -> int | None:
     except ValueError as exc:
         raise ConvertError(f"Could not parse integer {s!r}") from exc
 
+
 def parse_bool(s: str | None) -> bool | None:
     if s is None:
         return None
@@ -347,6 +359,7 @@ def parse_bool(s: str | None) -> bool | None:
     if v in ("false", "0", "no", "off", ""):
         return False
     raise ConvertError(f"Could not parse bool {s!r}")
+
 
 def pv_string(v: Any) -> str:
     if v is None:
@@ -368,6 +381,7 @@ def pv_string(v: Any) -> str:
         return pv_string(v[0])
     return ""
 
+
 def pv_int(v: Any) -> int | None:
     if v is None:
         return None
@@ -385,6 +399,7 @@ def pv_int(v: Any) -> int | None:
         if isinstance(iv, int):
             return iv
     return None
+
 
 def pv_list(v: Any) -> list:
 
@@ -407,6 +422,7 @@ def pv_list(v: Any) -> list:
 
     return [v]
 
+
 def split_email(addr: str) -> tuple[str, str] | None:
 
     if "@" not in addr:
@@ -417,8 +433,10 @@ def split_email(addr: str) -> tuple[str, str] | None:
         return None
     return (local, domain)
 
+
 _LABEL_RE = re.compile(r"^[^\W_](?:(?:[^\W_]|-){0,61}[^\W_])?$")
 _RFC6761_RESERVED_TLDS = {"test", "local", "localhost", "invalid", "example"}
+
 
 def is_valid_domain_name(name: str) -> bool:
 
@@ -435,9 +453,11 @@ def is_valid_domain_name(name: str) -> bool:
             return False
     return True
 
+
 def is_valid_local_part(local: str) -> bool:
 
     return bool(local) and "@" not in local
+
 
 def parse_path_patch(arg: str) -> tuple[str, str]:
 
@@ -454,13 +474,14 @@ def parse_path_patch(arg: str) -> tuple[str, str]:
         )
     return (src, dst)
 
+
 def apply_path_patches(value: Any, patches: list[tuple[str, str]]) -> tuple[Any, int]:
 
     count = 0
     if isinstance(value, str):
         for src, dst in patches:
             if value == src or value.startswith(src + "/"):
-                return (dst + value[len(src):], 1)
+                return (dst + value[len(src) :], 1)
         return (value, 0)
     if isinstance(value, list):
         new_list: list[Any] = []
@@ -478,6 +499,7 @@ def apply_path_patches(value: Any, patches: list[tuple[str, str]]) -> tuple[Any,
         return (new_dict, count)
     return (value, 0)
 
+
 def detect_legacy_paths(settings: dict[str, str], prefix: str = "/opt/stalwart") -> int:
 
     needle = prefix.rstrip("/") + "/"
@@ -487,6 +509,7 @@ def detect_legacy_paths(settings: dict[str, str], prefix: str = "/opt/stalwart")
         for v in settings.values()
         if isinstance(v, str) and (needle in v or v.endswith(exact))
     )
+
 
 _CONSUMED_PREFIXES: tuple[str, ...] = (
     "acme.",
@@ -500,6 +523,7 @@ _CONSUMED_PREFIXES: tuple[str, ...] = (
     "version.",
 )
 
+
 def is_consumed_setting_key(key: str) -> bool:
 
     for prefix in _CONSUMED_PREFIXES:
@@ -509,9 +533,11 @@ def is_consumed_setting_key(key: str) -> bool:
             return True
     return False
 
+
 def compute_unmigrated_keys(settings: dict[str, str]) -> list[str]:
 
     return sorted(k for k in settings if not is_consumed_setting_key(k))
+
 
 def write_unmigrated_summary(unmigrated: list[str], path: str) -> None:
 
@@ -539,9 +565,13 @@ def write_unmigrated_summary(unmigrated: list[str], path: str) -> None:
         for prefix in sorted(counts):
             f.write(f"  {prefix:<{width}}  {counts[prefix]:5d} keys\n")
 
-def group_settings_by_prefix(settings: dict[str, str], prefix: str) -> dict[str, dict[str, str]]:
+
+def group_settings_by_prefix(
+    settings: dict[str, str], prefix: str
+) -> dict[str, dict[str, str]]:
 
     raise NotImplementedError
+
 
 def build_sub_trees(
     settings: dict[str, str],
@@ -554,7 +584,7 @@ def build_sub_trees(
     prefix_dot = prefix + "."
     for k in settings:
         if k.startswith(prefix_dot) and k.endswith(disc_suffix):
-            rid = k[len(prefix_dot):-len(disc_suffix)]
+            rid = k[len(prefix_dot) : -len(disc_suffix)]
             if rid:
                 record_ids.append(rid)
 
@@ -568,10 +598,11 @@ def build_sub_trees(
             if k in claimed:
                 continue
             if k.startswith(head):
-                sub = k[len(head):]
+                sub = k[len(head) :]
                 trees[rid][sub] = v
                 claimed.add(k)
     return trees
+
 
 def collect_array(sub: dict[str, str], field: str) -> list[str]:
 
@@ -579,11 +610,12 @@ def collect_array(sub: dict[str, str], field: str) -> list[str]:
     head = field + "."
     for k, v in sub.items():
         if k.startswith(head):
-            tail = k[len(head):]
+            tail = k[len(head) :]
             if tail.isdigit():
                 items.append((int(tail), v))
     items.sort()
     return [v for _, v in items]
+
 
 _PEM_RE = re.compile(
     r"-----BEGIN (?P<kind>[A-Z][A-Z0-9 ]*?)-----"
@@ -617,8 +649,10 @@ def _make_certificate_object(cert_pem: str, key_pem: str) -> dict[str, Any]:
 def is_app_password(secret: str) -> bool:
     return secret.startswith("$app$")
 
+
 def is_otpauth(secret: str) -> bool:
     return secret.startswith("otpauth://")
+
 
 def secret_key_optional(value: str | None) -> dict[str, Any]:
 
@@ -626,11 +660,13 @@ def secret_key_optional(value: str | None) -> dict[str, Any]:
         return {"@type": "None"}
     return {"@type": "Value", "secret": value}
 
+
 def public_string_optional(value: str | None) -> dict[str, Any]:
 
     if value is None or value == "":
         return {"@type": "None"}
     return {"@type": "Value", "value": value}
+
 
 def secret_key(value: str | None) -> dict[str, Any]:
 
@@ -638,13 +674,16 @@ def secret_key(value: str | None) -> dict[str, Any]:
         return {"@type": "None"}
     return {"@type": "Value", "secret": value}
 
+
 def secret_text(value: str | None) -> dict[str, Any]:
 
     if value is None or value == "":
         return {"@type": "None"}
     return {"@type": "Text", "secret": value}
 
+
 _MACRO_RE = re.compile(r"%\{(cfg|env|file):([^}]*)\}%")
+
 
 def resolve_macros(
     value: str | None,
@@ -655,7 +694,7 @@ def resolve_macros(
         return value, []
     errors: list[str] = []
 
-    def repl(m: "re.Match[str]") -> str:
+    def repl(m: re.Match[str]) -> str:
         kind = m.group(1)
         arg = m.group(2).strip()
         if kind == "cfg":
@@ -666,17 +705,14 @@ def resolve_macros(
             if raw is None:
                 errors.append(f"unknown setting referenced by %{{cfg:{arg}}}%")
                 return ""
-            nested, nested_errors = resolve_macros(
-                raw, settings, _seen | {arg}
-            )
+            nested, nested_errors = resolve_macros(raw, settings, _seen | {arg})
             errors.extend(nested_errors)
             return nested or ""
         if kind == "env":
             env = os.environ.get(arg)
             if env is None:
                 errors.append(
-                    f"environment variable {arg!r} (from %{{env:{arg}}}%) "
-                    f"is not set"
+                    f"environment variable {arg!r} (from %{{env:{arg}}}%) is not set"
                 )
                 return ""
             return env
@@ -695,38 +731,57 @@ def resolve_macros(
         prev = cur
     return prev, errors
 
+
 _REDIS_PROTOCOL_MAP = {
     "resp2": "resp2",
     "resp3": "resp3",
 }
 
 _S3_REGION_MAP = {
-    "us-east-1": "UsEast1", "us-east-2": "UsEast2",
-    "us-west-1": "UsWest1", "us-west-2": "UsWest2",
+    "us-east-1": "UsEast1",
+    "us-east-2": "UsEast2",
+    "us-west-1": "UsWest1",
+    "us-west-2": "UsWest2",
     "ca-central-1": "CaCentral1",
     "af-south-1": "AfSouth1",
-    "ap-east-1": "ApEast1", "ap-south-1": "ApSouth1",
-    "ap-northeast-1": "ApNortheast1", "ap-northeast-2": "ApNortheast2",
+    "ap-east-1": "ApEast1",
+    "ap-south-1": "ApSouth1",
+    "ap-northeast-1": "ApNortheast1",
+    "ap-northeast-2": "ApNortheast2",
     "ap-northeast-3": "ApNortheast3",
-    "ap-southeast-1": "ApSoutheast1", "ap-southeast-2": "ApSoutheast2",
-    "cn-north-1": "CnNorth1", "cn-northwest-1": "CnNorthwest1",
+    "ap-southeast-1": "ApSoutheast1",
+    "ap-southeast-2": "ApSoutheast2",
+    "cn-north-1": "CnNorth1",
+    "cn-northwest-1": "CnNorthwest1",
     "eu-north-1": "EuNorth1",
-    "eu-central-1": "EuCentral1", "eu-central-2": "EuCentral2",
-    "eu-west-1": "EuWest1", "eu-west-2": "EuWest2", "eu-west-3": "EuWest3",
+    "eu-central-1": "EuCentral1",
+    "eu-central-2": "EuCentral2",
+    "eu-west-1": "EuWest1",
+    "eu-west-2": "EuWest2",
+    "eu-west-3": "EuWest3",
     "il-central-1": "IlCentral1",
     "me-south-1": "MeSouth1",
     "sa-east-1": "SaEast1",
-    "do-nyc3": "DoNyc3", "do-ams3": "DoAms3",
-    "do-sgp1": "DoSgp1", "do-fra1": "DoFra1",
+    "do-nyc3": "DoNyc3",
+    "do-ams3": "DoAms3",
+    "do-sgp1": "DoSgp1",
+    "do-fra1": "DoFra1",
     "yandex": "Yandex",
-    "wa-us-east-1": "WaUsEast1", "wa-us-east-2": "WaUsEast2",
-    "wa-us-central-1": "WaUsCentral1", "wa-us-west-1": "WaUsWest1",
+    "wa-us-east-1": "WaUsEast1",
+    "wa-us-east-2": "WaUsEast2",
+    "wa-us-central-1": "WaUsCentral1",
+    "wa-us-west-1": "WaUsWest1",
     "wa-ca-central-1": "WaCaCentral1",
-    "wa-eu-central-1": "WaEuCentral1", "wa-eu-central-2": "WaEuCentral2",
-    "wa-eu-west-1": "WaEuWest1", "wa-eu-west-2": "WaEuWest2",
-    "wa-ap-northeast-1": "WaApNortheast1", "wa-ap-northeast-2": "WaApNortheast2",
-    "wa-ap-southeast-1": "WaApSoutheast1", "wa-ap-southeast-2": "WaApSoutheast2",
+    "wa-eu-central-1": "WaEuCentral1",
+    "wa-eu-central-2": "WaEuCentral2",
+    "wa-eu-west-1": "WaEuWest1",
+    "wa-eu-west-2": "WaEuWest2",
+    "wa-ap-northeast-1": "WaApNortheast1",
+    "wa-ap-northeast-2": "WaApNortheast2",
+    "wa-ap-southeast-1": "WaApSoutheast1",
+    "wa-ap-southeast-2": "WaApSoutheast2",
 }
+
 
 class Converter:
     def __init__(
@@ -855,7 +910,6 @@ class Converter:
                 if n:
                     names.add(n)
             elif t in ("individual", "group", "list"):
-
                 nm = pv_string(p.get("name"))
                 if "@" in nm:
                     add(nm)
@@ -1136,7 +1190,7 @@ class Converter:
 
     def _build_mailing_lists(self) -> dict[str, dict[str, Any]]:
         lists = [p for p in self.principals if p.get("type") == "list"]
-        lists.sort(key=lambda p: (pv_int(p.get("id")) or 0))
+        lists.sort(key=lambda p: pv_int(p.get("id")) or 0)
         out: dict[str, dict[str, Any]] = {}
         for p in lists:
             try:
@@ -1199,18 +1253,26 @@ class Converter:
             elif algo == "rsa-sha256":
                 tag = "Dkim1RsaSha256"
             else:
-                print(f"warning: skipping DKIM signature {sid!r}: "
-                      f"unknown algorithm {algo!r}", file=sys.stderr)
+                print(
+                    f"warning: skipping DKIM signature {sid!r}: "
+                    f"unknown algorithm {algo!r}",
+                    file=sys.stderr,
+                )
                 continue
             selector = sub.get("selector", "").strip()
             if not selector:
-                print(f"warning: skipping DKIM signature {sid!r}: no selector",
-                      file=sys.stderr)
+                print(
+                    f"warning: skipping DKIM signature {sid!r}: no selector",
+                    file=sys.stderr,
+                )
                 continue
             domain = sub.get("domain", "").strip().lower()
             if domain not in self.domain_name_to_cid:
-                print(f"warning: skipping DKIM signature {sid!r}: "
-                      f"unknown domain {domain!r}", file=sys.stderr)
+                print(
+                    f"warning: skipping DKIM signature {sid!r}: "
+                    f"unknown domain {domain!r}",
+                    file=sys.stderr,
+                )
                 continue
             dom_cid = self.domain_name_to_cid[domain]
             canon = sub.get("canonicalization", "relaxed/relaxed").strip().lower()
@@ -1291,7 +1353,10 @@ class Converter:
         data_sub = self._stores().get(data_sid)
         if data_sub is None:
             return False
-        if data_sub.get("type", "").strip().lower() != sub.get("type", "").strip().lower():
+        if (
+            data_sub.get("type", "").strip().lower()
+            != sub.get("type", "").strip().lower()
+        ):
             return False
         data_path = data_sub.get("path", "").strip()
         sub_path = sub.get("path", "").strip()
@@ -1601,7 +1666,6 @@ class Converter:
         elif region_raw in _S3_REGION_MAP:
             body["region"] = {"@type": _S3_REGION_MAP[region_raw]}
         elif region_raw:
-
             body["region"] = {
                 "@type": "Custom",
                 "customEndpoint": "",
@@ -1691,8 +1755,11 @@ class Converter:
         username = sub.get("auth.username", "").strip()
         secret = sub.get("auth.secret", "")
         if username:
-            return {"@type": "Basic", "username": username,
-                    "secret": secret_key(secret)}
+            return {
+                "@type": "Basic",
+                "username": username,
+                "secret": secret_key(secret),
+            }
         return {"@type": "Unauthenticated"}
 
     def _build_elasticsearch(self, sub: dict[str, str]) -> dict[str, Any]:
@@ -1762,12 +1829,8 @@ class Converter:
         for sid, sub in sorted(
             build_sub_trees(self.settings, "certificate", "cert").items()
         ):
-            cert, cert_errors = resolve_macros(
-                sub.get("cert", ""), self.settings
-            )
-            key, key_errors = resolve_macros(
-                sub.get("private-key", ""), self.settings
-            )
+            cert, cert_errors = resolve_macros(sub.get("cert", ""), self.settings)
+            key, key_errors = resolve_macros(sub.get("private-key", ""), self.settings)
             cert = (cert or "").strip()
             key = (key or "").strip()
             if cert_errors or key_errors:
@@ -1779,8 +1842,7 @@ class Converter:
                 continue
             if not cert or not key:
                 print(
-                    f"warning: skipping certificate.{sid}: "
-                    "missing cert or private-key",
+                    f"warning: skipping certificate.{sid}: missing cert or private-key",
                     file=sys.stderr,
                 )
                 continue
@@ -1793,9 +1855,7 @@ class Converter:
                 continue
             out[self._next_create_cid()] = _make_certificate_object(cert, key)
 
-        for sid, sub in sorted(
-            build_sub_trees(self.settings, "acme", "cert").items()
-        ):
+        for sid, sub in sorted(build_sub_trees(self.settings, "acme", "cert").items()):
             blob_b64 = sub.get("cert", "").strip()
             if not blob_b64:
                 continue
@@ -1821,9 +1881,7 @@ class Converter:
                     file=sys.stderr,
                 )
                 continue
-            out[self._next_create_cid()] = _make_certificate_object(
-                cert_pem, key_pem
-            )
+            out[self._next_create_cid()] = _make_certificate_object(cert_pem, key_pem)
 
         return out
 
@@ -1835,7 +1893,7 @@ class Converter:
         owners: dict[tuple[str, str], str] = {}
 
         def claim(local: str, domain_ref: str, owner: str) -> None:
-            d_cid = domain_ref[1:] if domain_ref.startswith("#") else domain_ref
+            d_cid = domain_ref.removeprefix("#")
             key = (local, d_cid)
             if key in owners:
                 dname = self.domain_cid_to_name.get(d_cid, d_cid)
@@ -1849,15 +1907,20 @@ class Converter:
             kind = obj.get("@type", "Account")
             claim(obj["name"], obj["domainId"], f"{kind} {cid} ({obj['name']})")
             for alias in obj.get("aliases", {}).values():
-                claim(alias["name"], alias["domainId"],
-                      f"alias of {kind} {cid} ({obj['name']})")
+                claim(
+                    alias["name"],
+                    alias["domainId"],
+                    f"alias of {kind} {cid} ({obj['name']})",
+                )
 
         for cid, obj in mailing_lists.items():
-            claim(obj["name"], obj["domainId"],
-                  f"MailingList {cid} ({obj['name']})")
+            claim(obj["name"], obj["domainId"], f"MailingList {cid} ({obj['name']})")
             for alias in obj.get("aliases", {}).values():
-                claim(alias["name"], alias["domainId"],
-                      f"alias of MailingList {cid} ({obj['name']})")
+                claim(
+                    alias["name"],
+                    alias["domainId"],
+                    f"alias of MailingList {cid} ({obj['name']})",
+                )
 
     def _validate_records(
         self,
@@ -1887,7 +1950,7 @@ class Converter:
             name = obj.get("name", "")
             kind = obj.get("@type", "Account")
             domain_ref = obj.get("domainId", "")
-            d_cid = domain_ref[1:] if domain_ref.startswith("#") else domain_ref
+            d_cid = domain_ref.removeprefix("#")
             if d_cid in bad_domain_cids:
                 print(
                     f"warning: dropping {kind} {name!r}: its domain was rejected",
@@ -1918,7 +1981,7 @@ class Converter:
             new_aliases: dict[str, dict[str, Any]] = {}
             for idx, alias in obj.get("aliases", {}).items():
                 a_dom = alias.get("domainId", "")
-                a_dcid = a_dom[1:] if a_dom.startswith("#") else a_dom
+                a_dcid = a_dom.removeprefix("#")
                 if a_dcid in bad_domain_cids:
                     print(
                         f"warning: dropping alias of {kind} {name!r}: domain rejected",
@@ -1938,7 +2001,7 @@ class Converter:
         for cid in list(mailing_lists.keys()):
             obj = mailing_lists[cid]
             domain_ref = obj.get("domainId", "")
-            d_cid = domain_ref[1:] if domain_ref.startswith("#") else domain_ref
+            d_cid = domain_ref.removeprefix("#")
             if d_cid in bad_domain_cids:
                 print(
                     f"warning: dropping MailingList {obj.get('name')!r}: domain rejected",
@@ -1950,10 +2013,10 @@ class Converter:
         for cid in list(dkim_signatures.keys()):
             obj = dkim_signatures[cid]
             domain_ref = obj.get("domainId", "")
-            d_cid = domain_ref[1:] if domain_ref.startswith("#") else domain_ref
+            d_cid = domain_ref.removeprefix("#")
             if d_cid and d_cid in bad_domain_cids:
                 print(
-                    f"warning: dropping DkimSignature for rejected domain",
+                    "warning: dropping DkimSignature for rejected domain",
                     file=sys.stderr,
                 )
                 del dkim_signatures[cid]
@@ -1972,6 +2035,7 @@ class Converter:
                 "and rerun if any of the rejections are unintentional.",
                 file=sys.stderr,
             )
+
 
 SINGLETON_ORDER = [
     "SystemSettings",
@@ -1992,6 +2056,7 @@ COLLECTION_ORDER = [
     "Certificate",
 ]
 
+
 def build_export_ops(result: dict[str, Any]) -> list[dict[str, Any]]:
     ops: list[dict[str, Any]] = []
     for name in COLLECTION_ORDER:
@@ -2011,12 +2076,15 @@ def build_export_ops(result: dict[str, Any]) -> list[dict[str, Any]]:
             ops.append({"@type": "create", "object": name, "value": records})
     for name in SINGLETON_ORDER:
         if name in result:
-            ops.append({
-                "@type": "update",
-                "object": name,
-                "value": result[name],
-            })
+            ops.append(
+                {
+                    "@type": "update",
+                    "object": name,
+                    "value": result[name],
+                }
+            )
     return ops
+
 
 def cmd_convert(args: argparse.Namespace) -> int:
     with open(args.settings, "r", encoding="utf-8") as f:
@@ -2063,8 +2131,10 @@ def cmd_convert(args: argparse.Namespace) -> int:
 
     with open(args.config, "w", encoding="utf-8") as f:
         json.dump(data_store, f, indent=2, ensure_ascii=False)
-    print(f"wrote {args.config} (DataStore: @type={data_store.get('@type')!r})",
-          file=sys.stderr)
+    print(
+        f"wrote {args.config} (DataStore: @type={data_store.get('@type')!r})",
+        file=sys.stderr,
+    )
 
     ops = build_export_ops(result)
     if patches:
@@ -2081,8 +2151,7 @@ def cmd_convert(args: argparse.Namespace) -> int:
         if kind == "update":
             print(f"  update {name}", file=sys.stderr)
         else:
-            print(f"  create {name}: {len(op['value'])} records",
-                  file=sys.stderr)
+            print(f"  create {name}: {len(op['value'])} records", file=sys.stderr)
 
     if args.unmigrated_output:
         unmigrated = compute_unmigrated_keys(settings)
@@ -2095,6 +2164,7 @@ def cmd_convert(args: argparse.Namespace) -> int:
             )
     return 0
 
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         description="Dump / migrate a Stalwart server via its management API.",
@@ -2102,47 +2172,78 @@ def build_parser() -> argparse.ArgumentParser:
     sub = p.add_subparsers(dest="command", required=True)
 
     d = sub.add_parser("dump", help="Dump settings and principals to JSON files.")
-    d.add_argument("--url", required=True,
-                   help="Base URL of the Stalwart server, e.g. https://mail.example.com")
+    d.add_argument(
+        "--url",
+        required=True,
+        help="Base URL of the Stalwart server, e.g. https://mail.example.com",
+    )
     d.add_argument("--token", help="Bearer token.")
     d.add_argument("--username", help="Admin username for HTTP Basic auth.")
     d.add_argument("--password", help="Admin password for HTTP Basic auth.")
-    d.add_argument("--settings", default="settings.json",
-                   help="Output file for settings (default: settings.json).")
-    d.add_argument("--principals", default="principals.json",
-                   help="Output file for principals (default: principals.json).")
+    d.add_argument(
+        "--settings",
+        default="settings.json",
+        help="Output file for settings (default: settings.json).",
+    )
+    d.add_argument(
+        "--principals",
+        default="principals.json",
+        help="Output file for principals (default: principals.json).",
+    )
     d.set_defaults(func=cmd_dump)
 
-    c = sub.add_parser("convert",
-                       help="Convert dumped JSON into the new JMAP-object format.")
-    c.add_argument("--settings", default="settings.json",
-                   help="Input settings JSON (default: settings.json).")
-    c.add_argument("--principals", default="principals.json",
-                   help="Input principals JSON (default: principals.json).")
-    c.add_argument("--config", default="config.json",
-                   help="Output file for the DataStore object "
-                        "(default: config.json).")
-    c.add_argument("--output", default="export.json",
-                   help="Output NDJSON file with one operation per line "
-                        "(default: export.json).")
-    c.add_argument("--patch-paths", action="append", type=parse_path_patch,
-                   metavar="SOURCE=DEST",
-                   help="Rewrite paths beginning with SOURCE to DEST in both "
-                        "config.json and export.json. May be passed multiple "
-                        "times. Use to migrate Docker deployments from "
-                        "/opt/stalwart to /var/lib/stalwart.")
-    c.add_argument("--keep-paths", action="store_true",
-                   help="Suppress the legacy-path detection notice. Use when "
-                        "the on-disk paths in the v0.15 deployment are also "
-                        "valid for the v0.16 deployment (typical for binary "
-                        "installs).")
-    c.add_argument("--unmigrated-output", default="unmigrated.txt",
-                   help="Output file listing v0.15 setting prefixes that the "
-                        "script did not migrate (default: unmigrated.txt). "
-                        "Pass an empty string to skip writing this file.")
+    c = sub.add_parser(
+        "convert", help="Convert dumped JSON into the new JMAP-object format."
+    )
+    c.add_argument(
+        "--settings",
+        default="settings.json",
+        help="Input settings JSON (default: settings.json).",
+    )
+    c.add_argument(
+        "--principals",
+        default="principals.json",
+        help="Input principals JSON (default: principals.json).",
+    )
+    c.add_argument(
+        "--config",
+        default="config.json",
+        help="Output file for the DataStore object (default: config.json).",
+    )
+    c.add_argument(
+        "--output",
+        default="export.json",
+        help="Output NDJSON file with one operation per line (default: export.json).",
+    )
+    c.add_argument(
+        "--patch-paths",
+        action="append",
+        type=parse_path_patch,
+        metavar="SOURCE=DEST",
+        help="Rewrite paths beginning with SOURCE to DEST in both "
+        "config.json and export.json. May be passed multiple "
+        "times. Use to migrate Docker deployments from "
+        "/opt/stalwart to /var/lib/stalwart.",
+    )
+    c.add_argument(
+        "--keep-paths",
+        action="store_true",
+        help="Suppress the legacy-path detection notice. Use when "
+        "the on-disk paths in the v0.15 deployment are also "
+        "valid for the v0.16 deployment (typical for binary "
+        "installs).",
+    )
+    c.add_argument(
+        "--unmigrated-output",
+        default="unmigrated.txt",
+        help="Output file listing v0.15 setting prefixes that the "
+        "script did not migrate (default: unmigrated.txt). "
+        "Pass an empty string to skip writing this file.",
+    )
     c.set_defaults(func=cmd_convert)
 
     return p
+
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
@@ -2153,6 +2254,7 @@ def main(argv: list[str] | None = None) -> int:
         return 1
     except KeyboardInterrupt:
         return 130
+
 
 if __name__ == "__main__":
     sys.exit(main())

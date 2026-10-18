@@ -74,40 +74,40 @@ of flagging the miss; all three self-caught, none shipped broken.
 
 ## b) PARTIALLY DONE
 
-1. **The prune vs its stated ambition.** g/1 proposed "halves context
-   cost"; delivered is 11% (31.5 -> 28.0 KB). My own todo line promised
-   "~16 KB" and I re-anchored to the quality guide's "15-30 KB acceptable
-   band" mid-task without flagging the miss. Deeper cuts are available
-   (Commands-section narration, the ~30-line VM-debug-loop mechanics)
-   but they relocate standing rules out of AGENTS - a structure decision
-   the user has not taken, not a mechanical cut I should make alone.
-   Effort: M per decision. Priority: High (context cost is paid every
-   session).
-2. **Claim-verification chain.** Claims my edits touched were
-   independently re-verified; claims I merely KEPT ride on the 05-37
-   session's verification (demo VM ports/credentials, devShell tool list,
-   CONTRIBUTING sections, the demo-eval "absolute-curl" phrasing).
-   Chain-of-custody, not primary evidence - acceptable, but it should
-   have been disclosed at yield time, not under interrogation.
-3. **"~2-4 min" full-gate duration in AGENTS:** kept unverified for the
-   7-check set (it was verified for 6; the fourth VM test adds unknown
-   time). Effort: S (one timed full-gate run). Priority: Low.
+~~1. **The prune vs its stated ambition.** g/1 proposed "halves context~~ routed - the prune EXECUTED 06-05 same-day (31,498 -> 28,040 B); deeper <20 KB cuts = decision-batch C41 addendum (user-gated)
+cost"; delivered is 11% (31.5 -> 28.0 KB). My own todo line promised
+"~16 KB" and I re-anchored to the quality guide's "15-30 KB acceptable
+band" mid-task without flagging the miss. Deeper cuts are available
+(Commands-section narration, the ~30-line VM-debug-loop mechanics)
+but they relocate standing rules out of AGENTS - a structure decision
+the user has not taken, not a mechanical cut I should make alone.
+Effort: M per decision. Priority: High (context cost is paid every
+session).
+~~2. **Claim-verification chain.** Claims my edits touched were~~ current - provenance disclosure adopted as practice; this pass cites primary evidence per verdict (runs, rows, transcripts)
+independently re-verified; claims I merely KEPT ride on the 05-37
+session's verification (demo VM ports/credentials, devShell tool list,
+CONTRIBUTING sections, the demo-eval "absolute-curl" phrasing).
+Chain-of-custody, not primary evidence - acceptable, but it should
+have been disclosed at yield time, not under interrogation.
+~~3. **"~2-4 min" full-gate duration in AGENTS:** kept unverified for the~~ done 2026-10-17 - AGENTS now says ~4-6 min (CI step-timed runs 39016232923 + 39072344502, this pass)
+7-check set (it was verified for 6; the fourth VM test adds unknown
+time). Effort: S (one timed full-gate run). Priority: Low.
 
 ## c) NOT STARTED (correctly parked; canonical list = TODO_LIST)
 
-1. **CI watch of the daemon-committed docs tree** - this session's commits
-   included (the repo's "never assume the known red" rule applies to
-   greens too; 05-37 f/6 same class).
-2. **HARVEST of this report's (f) rows** into TODO_LIST/ROADMAP
-   (docs-health loop closure; the f-table carries routing columns to
-   make it mechanical).
-3. **Sibling-doc sweeps** from 05-37 (ROADMAP to 0.16 truth, INBOXCLEAN
-   0.16 banner, SECURITY.md glance) - out of this session's scope.
-4. **Mechanized prose-wrap marker lint** (05-37 f/5) - still prose-only
-   doctrine; see d/2 for why that stings.
-5. **Pinned dprint** (05-37 b/3/g/3) - I REPEATED the floating-toolchain
-   provenance (`nix shell nixpkgs#dprint`) instead of closing it; two
-   sessions in a row now.
+~~1. **CI watch of the daemon-committed docs tree** - this session's commits~~ done 2026-10-17 - origin green (runs 39016232923, 39072344502); step names read
+included (the repo's "never assume the known red" rule applies to
+greens too; 05-37 f/6 same class).
+~~2. **HARVEST of this report's (f) rows** into TODO_LIST/ROADMAP~~ done 2026-10-17 - THIS pass harvested all f rows + b/c/g items into TODO_LIST/decision-batch and archived this report
+(docs-health loop closure; the f-table carries routing columns to
+make it mechanical).
+~~3. **Sibling-doc sweeps** from 05-37 (ROADMAP to 0.16 truth, INBOXCLEAN~~ done 2026-10-17 - ROADMAP at 0.16 truth; INBOXCLEAN 0.16 banner verified; SECURITY.md glanced
+0.16 banner, SECURITY.md glance) - out of this session's scope.
+~~4. **Mechanized prose-wrap marker lint** (05-37 f/5) - still prose-only~~ routed - TODO_LIST prose-wrap list-marker lint row (added this pass)
+doctrine; see d/2 for why that stings.
+~~5. **Pinned dprint** (05-37 b/3/g/3) - I REPEATED the floating-toolchain~~ done - canonical pinned invocation = buildflow -s dprint-format (AGENTS archive-policy line; buildflow owns the toolchain)
+provenance (`nix shell nixpkgs#dprint`) instead of closing it; two
+sessions in a row now.
 
 ## d) TOTALLY FUCKED UP (all self-caught; nothing shipped broken)
 
@@ -163,38 +163,38 @@ of flagging the miss; all three self-caught, none shipped broken.
 
 ## f) Next tasks (session-scoped; honest count: 14 - not padded to 50)
 
-| #  | Task                                                                                                                                                                               | Impact | Effort | Category      | Route                    |
-| -- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ------ | ------------- | ------------------------ |
-| 1  | AGENTS prune-depth decision: keep 28 KB, or cut to <20 KB by moving VM-debug-loop mechanics + command narration to a docs page with one-line pointers                              | High   | M      | Decision      | user (g/1 residue)       |
-| 2  | Watch the next CI run over this session's daemon-committed docs tree; read failing STEP names if red                                                                               | Med    | S      | Quality       | TODO_LIST                |
-| 3  | Pin dprint: add to devShell or record the canonical pinned invocation (closes floating provenance; 2 sessions)                                                                     | Med    | S      | Quality       | TODO_LIST (05-37 f/4)    |
-| 4  | Mechanize the prose-wrap dash/plus lint (sibling rule in the CI markdown lint; three incidents now)                                                                                | Med    | M      | Quality       | TODO_LIST (05-37 f/5)    |
-| 5  | Verify the "~2-4 min" full-gate duration claim against a timed 7-check run                                                                                                         | Low    | S      | Documentation | TODO_LIST                |
-| 6  | Single-source demo VM ports/credentials between README quickstart and AGENTS (split brain left standing)                                                                           | Med    | S      | Cleanup       | TODO_LIST                |
-| 7  | Check-set drift alarm: lint that fails when AGENTS/README restate check names instead of pointing at the ci.yml lockstep (mechanizes the single-sourcing this session did by hand) | Med    | M      | Quality       | TODO_LIST                |
-| 8  | HARVEST this report's (f) rows into TODO_LIST/ROADMAP (docs-health loop closure)                                                                                                   | Med    | S      | Documentation | TODO_LIST                |
-| 9  | ROADMAP sweep to the 0.16/gate-green truth (05-37 f/1, unharvested)                                                                                                                | Med    | S      | Documentation | TODO_LIST (05-37 f/1)    |
-| 10 | Verify docs/INBOXCLEAN.md 0.16 banner against current re-verification state (05-37 f/3)                                                                                            | Med    | S      | Documentation | TODO_LIST (05-37 f/3)    |
-| 11 | SECURITY.md freshness glance (05-37 f/9)                                                                                                                                           | Low    | S      | Documentation | TODO_LIST (05-37 f/9)    |
-| 12 | Primary-evidence pass: 03-34 report verdict section + the kept-on-faith claims (absolute-curl, CONTRIBUTING release procedure)                                                     | Med    | M      | Documentation | TODO_LIST (05-37 c/1)    |
-| 13 | Local lockstep guard: eval check asserting attrNames == ci.yml expected (would have caught the 6->7 drift at landing time)                                                         | Med    | S      | Quality       | TODO_LIST (existing row) |
-| 14 | Resolve the full-gate "running 4 flake checks" log-count mystery (now 4-vs-7; TODO row updated this session)                                                                       | Low    | S      | Quality       | TODO_LIST (row 80)       |
+| #  | Task | Impact                                                                                                                                                                             | Effort | Category | Route         |
+| -- | ---- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | -------- | ------------- |
+| ~~ | 1    | AGENTS prune-depth decision: keep 28 KB, or cut to <20 KB by moving VM-debug-loop mechanics + command narration to a docs page with one-line pointers                              | High   | M        | Decision      |
+| ~~ | 2    | Watch the next CI run over this session's daemon-committed docs tree; read failing STEP names if red                                                                               | Med    | S        | Quality       |
+| ~~ | 3    | Pin dprint: add to devShell or record the canonical pinned invocation (closes floating provenance; 2 sessions)                                                                     | Med    | S        | Quality       |
+| ~~ | 4    | Mechanize the prose-wrap dash/plus lint (sibling rule in the CI markdown lint; three incidents now)                                                                                | Med    | M        | Quality       |
+| ~~ | 5    | Verify the "~2-4 min" full-gate duration claim against a timed 7-check run                                                                                                         | Low    | S        | Documentation |
+| ~~ | 6    | Single-source demo VM ports/credentials between README quickstart and AGENTS (split brain left standing)                                                                           | Med    | S        | Cleanup       |
+| ~~ | 7    | Check-set drift alarm: lint that fails when AGENTS/README restate check names instead of pointing at the ci.yml lockstep (mechanizes the single-sourcing this session did by hand) | Med    | M        | Quality       |
+| ~~ | 8    | HARVEST this report's (f) rows into TODO_LIST/ROADMAP (docs-health loop closure)                                                                                                   | Med    | S        | Documentation |
+| ~~ | 9    | ROADMAP sweep to the 0.16/gate-green truth (05-37 f/1, unharvested)                                                                                                                | Med    | S        | Documentation |
+| ~~ | 10   | Verify docs/INBOXCLEAN.md 0.16 banner against current re-verification state (05-37 f/3)                                                                                            | Med    | S        | Documentation |
+| ~~ | 11   | SECURITY.md freshness glance (05-37 f/9)                                                                                                                                           | Low    | S        | Documentation |
+| ~~ | 12   | Primary-evidence pass: 03-34 report verdict section + the kept-on-faith claims (absolute-curl, CONTRIBUTING release procedure)                                                     | Med    | M        | Documentation |
+| ~~ | 13   | Local lockstep guard: eval check asserting attrNames == ci.yml expected (would have caught the 6->7 drift at landing time)                                                         | Med    | S        | Quality       |
+| ~~ | 14   | Resolve the full-gate "running 4 flake checks" log-count mystery (now 4-vs-7; TODO row updated this session)                                                                       | Low    | S        | Quality       |
 
 ## g) Questions (cannot self-answer)
 
-1. **Prune depth (f/1):** is 28 KB the intended landing - the
-   provenance-lean compendium as permanent shape - or should the next pass
-   cut to <20 KB by relocating the VM-debug-loop mechanics and long
-   command narration to a docs page, leaving AGENTS one-line pointers?
-   (Rules-kept vs bytes-saved are different success criteria; I optimized
-   the first and quietly dropped the second.)
-2. **README-as-ledger (05-37 g/2, still unanswered):** this session
-   single-sourced AGENTS DEEPER into README (check set, 0.16 dialect,
-   ledger letters). If the ledger later moves to `docs/LEDGER.md`, every
-   one of those pointers moves too - decide the ledger's home now, or
-   accept README as permanent and record that as doctrine?
-3. **Drift-alarm enforcement level (f/7):** should restated check names in
-   AGENTS/README fail CI red (fail-closed, like the pipes lint), or stay a
-   local/pre-push lint only (CI stays doc-shape-agnostic)?
+~~1. **Prune depth (f/1):** is 28 KB the intended landing - the~~ routed - decision-batch C41 addendum (prune-depth residue)
+provenance-lean compendium as permanent shape - or should the next pass
+cut to <20 KB by relocating the VM-debug-loop mechanics and long
+command narration to a docs page, leaving AGENTS one-line pointers?
+(Rules-kept vs bytes-saved are different success criteria; I optimized
+the first and quietly dropped the second.)
+~~2. **README-as-ledger (05-37 g/2, still unanswered):** this session~~ routed - decision-batch C52 (new entry, [rec] README-as-ledger permanent)
+single-sourced AGENTS DEEPER into README (check set, 0.16 dialect,
+ledger letters). If the ledger later moves to `docs/LEDGER.md`, every
+one of those pointers moves too - decide the ledger's home now, or
+accept README as permanent and record that as doctrine?
+~~3. **Drift-alarm enforcement level (f/7):** should restated check names in~~ routed - TODO_LIST check-set drift alarm row (added this pass; enforcement level is that row's open decision)
+AGENTS/README fail CI red (fail-closed, like the pipes lint), or stay a
+local/pre-push lint only (CI stays doc-shape-agnostic)?
 
 Awaiting instructions.

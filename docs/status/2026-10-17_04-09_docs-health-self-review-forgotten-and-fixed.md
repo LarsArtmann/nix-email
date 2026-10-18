@@ -51,39 +51,39 @@
 ## b) PARTIALLY DONE
 
 ~~1. **README freshness is section-level, not line-level.** The untouched~~ routed - README line-level verification landed 2026-10-17 (05-37 pass, six drift fixes); the external-link T15 re-run stays open - TODO_LIST row (added this pass)
-   ledger 0.15 clusters carry era markers instead of line-by-line
-   re-verification; the external-link re-verification (T15, 2026-10-05)
-   was not re-run.
+ledger 0.15 clusters carry era markers instead of line-by-line
+re-verification; the external-link re-verification (T15, 2026-10-05)
+was not re-run.
 ~~2. **CONTRIBUTING.md was NOT read at all this session.** The 03-53~~ done 2026-10-17 - read + mapped in the 05-37 pass; the release procedure needed no 0.16 edits (vendored-module notes live in README/ROADMAP)
-   report's b/2 said "verified generic, not re-read line-by-line" - that
-   is an oxymoron and overstated. Honest state: unread; nothing in this
-   session's scope touched it, but the claim was too strong.
+report's b/2 said "verified generic, not re-read line-by-line" - that
+is an oxymoron and overstated. Honest state: unread; nothing in this
+session's scope touched it, but the claim was too strong.
 ~~3. **The archived 06-58 b/6/f/27 verdicts OVERSTATE what was done.** They~~ routed - the TODO_LIST row-by-row CHANGELOG diff row owns the real content diff
-   say the CHANGELOG vs git-log diff was "closed 2026-10-17 ... diffed" -
-   in reality I skimmed daemon commit SUBJECTS (which are all
-   "chore: auto-commit N files" and prove nothing). A TODO row now owns
-   the real content diff, but the archived verdict text is stronger than
-   the work was.
+say the CHANGELOG vs git-log diff was "closed 2026-10-17 ... diffed" -
+in reality I skimmed daemon commit SUBJECTS (which are all
+"chore: auto-commit N files" and prove nothing). A TODO row now owns
+the real content diff, but the archived verdict text is stronger than
+the work was.
 ~~4. **THREAT_MODEL.md got a TODO row but no caveat banner** - inconsistent~~ routed - TODO_LIST THREAT_MODEL 0.16 revisit row (the caveat banner rides it)
-   with INBOXCLEAN/MONITORING/TELEMETRY, which all got inline 0.16
-   banners. A reader of THREAT_MODEL alone gets no 0.16 signal.
+with INBOXCLEAN/MONITORING/TELEMETRY, which all got inline 0.16
+banners. A reader of THREAT_MODEL alone gets no 0.16 signal.
 ~~5. **The 07-18 plan carries a disruption note but its R01-R32 inventory~~ 5@**The 07-18 plan carries a disruption current - the plan is disrupted-but-alive; the TODO_LIST rebuild owns the re-mapped rows
-   table still cites pre-0.16 premises row-by-row** (only the header was
-   annotated). Deferrable while the plan is disrupted-but-alive.
+table still cites pre-0.16 premises row-by-row** (only the header was
+annotated). Deferrable while the plan is disrupted-but-alive.
 ~~6. **The annotation specs live only in /tmp** - the row-repair was only~~ done - the docs-health skill now mandates preserving specs beside the manifest (2026-10-15 canon); this pass preserved /tmp/specs-archive-*.tsv copies
-   possible because they survived; they will vanish on the next /tmp
-   clean. The lesson is recorded; the artifacts were not preserved.
+possible because they survived; they will vanish on the next /tmp
+clean. The lesson is recorded; the artifacts were not preserved.
 
 ## c) NOT STARTED (correctly parked; canonical list = TODO_LIST/decision-batch)
 
 ~~1. The owner sitting: C42-C46 (+C39/C40/C41, ratifications), D1/D2, the~~ routed - decision-batch C42-C46 entries + the TODO_LIST blocked-on-user row
-   standing batch. Nothing executed here - docs pass.
+standing batch. Nothing executed here - docs pass.
 ~~2. Push + CI watch; v0.5.0 + release dry-run; SystemNix pin advance.~~ done 2026-10-17 (push half) - origin green, runs 39016232923 + 39072344502; v0.5.0 + pin advance routed - TODO_LIST release-path rows (C43-gated)
 ~~3. The 0.16 residue rows (backup story, delta table, MONITORING metric~~ routed - TODO_LIST rows: 0.16 backup story, C45 row (delta folded), MONITORING metric, lockstep guard, demo smoke, match-property audit, provision-plan-eval
-   rule, lockstep guard, demo smoke + INBOXCLEAN re-verification,
-   match-property audit, provision-plan-eval, e2e polish).
+rule, lockstep guard, demo smoke + INBOXCLEAN re-verification,
+match-property audit, provision-plan-eval, e2e polish).
 ~~4. Archiving 03-34 (it stays live as the queue owner until its items~~ 4@Archiving 03-34 (it stays live as the current - 03-34 stays live as queue owner; this pass archived the five OTHER 2026-10-17 reports
-   close).
+close).
 
 ## d) TOTALLY FUCKED UP (all self-caught this pass; nothing shipped broken)
 
@@ -163,67 +163,67 @@
 **Owner-gated (minutes each, huge unlock):**
 
 ~~1. One sitting over `docs/planning/decision-batch.md`: C43 (release~~ routed - decision-batch C42-C46 (+ C39/C41, adoptions ratification)
-   doctrine), C45 (0.16.22 vs 0.16.26 + the delta-table deliverable),
-   C44 (account secrets), C42 (parsedmarc retire-or-keep), C39/C41,
-   ratifications (C35/C17a/C20/C38/Q6), C46, C18/C19/C22/C24/C29/C34,
-   Q4/Q5-residue, demo g1/g2, qcow2.
+doctrine), C45 (0.16.22 vs 0.16.26 + the delta-table deliverable),
+C44 (account secrets), C42 (parsedmarc retire-or-keep), C39/C41,
+ratifications (C35/C17a/C20/C38/Q6), C46, C18/C19/C22/C24/C29/C34,
+Q4/Q5-residue, demo g1/g2, qcow2.
 ~~2. Push the local commits; watch CI heal on master (statix `8f8ced8`).~~ done 2026-10-17 - origin green (runs 39016232923, 39072344502); statix fix 8aa9e81
 ~~3. Cut v0.5.0 (C43; dry-run the CONTRIBUTING procedure on a scratch tag;~~ routed - TODO_LIST v0.5.0 row (dry-run step included)
-   Unreleased date/link pass), then SystemNix's pin advance.
+Unreleased date/link pass), then SystemNix's pin advance.
 
 **Repo work (unblocked, bounded):**
 
 ~~4. **0.16 backup story research** (Critical: the largest UNVERIFIED~~ done 2026-10-17 (research half) - stalw.art docs + UPGRADING/v0_16.md reconciled into FEATURES/TODO_LIST; the VM proof on the pin remains (TODO row)
-   product claim; FEATURES row is BROKEN; SystemNix coordination may
-   need real work).
+product claim; FEATURES row is BROKEN; SystemNix coordination may
+need real work).
 ~~5. Demo smoke on the 0.16 closure + regenerate JMAP probes under~~ routed - TODO_LIST demo-smoke row
-   `docs/probes/` + the INBOXCLEAN full re-verification + the README
-   quickstart live walk.
+`docs/probes/` + the INBOXCLEAN full re-verification + the README
+quickstart live walk.
 ~~6. MONITORING queue-depth METRIC alert rule (the journal is silent -~~ routed - TODO_LIST MONITORING row (extended this pass: provision-failure alert + verify-budget doc)
-   series names from the metrics-subtest dump, transcript-first).
+series names from the metrics-subtest dump, transcript-first).
 ~~7. Match-property audit + eval-time lint; provision-plan-eval fast check~~ routed - TODO_LIST match-property row + provision-plan-eval row (extended this pass: Exec* unit lint + built-in-8080 pin)
-   (+ the ci.yml both-lists rule); local lockstep guard; the Domain
-   upsert/dkimManagement ride-alongs.
+(+ the ci.yml both-lists rule); local lockstep guard; the Domain
+upsert/dkimManagement ride-alongs.
 ~~8. AGENTS.md diet pass (30,190 B > the 30 KB trigger; new TODO row).~~ done 2026-10-17 - the 06-05 pass pruned 31,498 -> 28,040 B; migration doctrine re-grew it to 29,220 B, still under the flag (C41 addendum)
 ~~9. THREAT_MODEL.md 0.16 revisit (+ add the missing inline 0.16 caveat~~ routed - TODO_LIST THREAT_MODEL revisit row
-   banner while there).
+banner while there).
 ~~10. The real row-by-row CHANGELOG vs `git log --stat` diff~~ diff routed - TODO_LIST row-by-row CHANGELOG diff row
-    (2026-10-05..HEAD) - reopening what 06-58 b/6 claimed.
+(2026-10-05..HEAD) - reopening what 06-58 b/6 claimed.
 
 ~~11. 0.16.22→0.16.26 delta table (rides C45).~~ routed - TODO_LIST C45 row (the delta-table deliverable is folded into the decision)
 ~~12. Relay bounce-path test on 0.16 (Mailpit/queue-state assertions).~~ routed - TODO_LIST relay bounce-path row
 ~~13. Flood-limiter robustness (pre-wait or relaxed bounds).~~ routed - TODO_LIST flood-limiter row
 ~~14. E2E polish batch (runtime trim investigation without weakening~~ routed - TODO_LIST e2e polish row
-    defaults; restart-persistence provision-idempotence assert).
+defaults; restart-persistence provision-idempotence assert).
 ~~15. JMAP anti-rot set (eventSource 0.16, Junk-filing automation,~~ routed - TODO_LIST JMAP anti-rot row
-    StateChange assert).
+StateChange assert).
 ~~16. Architecture-understanding diagrams: regenerate for 0.16 +~~ routed - ROADMAP theme-5 arch-diagram audit item (regen trigger recorded)
-    post-flake-split (the 2026-09-15 renders are stale - flagged here
-    first; the ROADMAP idea gains this trigger).
+post-flake-split (the 2026-09-15 renders are stale - flagged here
+first; the ROADMAP idea gains this trigger).
 ~~17. Archive 03-34 + annotate the 07-18 plan's R-table (or archive it)~~ current - 03-34 stays live; the 07-18 plan stays disrupted-but-alive (see b/5)
-    once the sittings land.
+once the sittings land.
 ~~18. Write the grep-L calibration into the docs-health workflow notes.~~ done - recorded in the docs-health skill's repair-tooling canon (2026-10-15 batch-repair section)
 ~~19. BuildFlow upstream batch (their repo): gate reds, 12-vs-2 gap,~~ routed - TODO_LIST BuildFlow upstream follow-ups row
-    masking docs, threshold config.
+masking docs, threshold config.
 ~~20. buildflow local-noise batch + skip-rationale re-evals (mypy/pytest).~~ routed - TODO_LIST buildflow local-noise row
 ~~21. T13b dprint pipe-cell upstream - MY 120-row incident is fresh,~~ routed - TODO_LIST T13b row
-    transcript-backed evidence for the filing (verify-before-filing).
+transcript-backed evidence for the filing (verify-before-filing).
 ~~22. Upstream: post the ExecStartPost-restart transcript on PR #552103;~~ routed - TODO_LIST upstream-watch row (extended this pass with the bootstrap-fallback transcript)
-    the dnsmasq lesson on the PR thread (verify-before-filing first).
+the dnsmasq lesson on the PR thread (verify-before-filing first).
 ~~23. `docs/probes/` manifests audit (the 2026-10-05 dir gains a staleness~~ a routed - probe-manifest staleness is a standing docs-health sweep target (AGENTS); rides the demo-smoke TODO row
-    pointer once item 5 lands).
+pointer once item 5 lands).
 ~~24. `scripts/check-md-table-pipes.sh` argless mode + indented fences.~~ routed - TODO_LIST check-md-table-pipes argless row
 ~~25. `host-parse-fixture.py` flake app + closure re-check.~~ routed - TODO_LIST host-parse row
 ~~26. TLS-node coverage for the Netease/LinkedIn fixtures.~~ routed - TODO_LIST TLS-node row
 ~~27. Debug-driver recipe as a script (with the succeed-capture +~~ routed - TODO_LIST debug-driver row
-    no-manual-provision-restart rules baked in).
+no-manual-provision-restart rules baked in).
 ~~28. `apps.vm` store-closure eval guard.~~ routed - TODO_LIST apps.vm row
 ~~29. dmarc-eval IFD cleanup.~~ routed - TODO_LIST dmarc-eval IFD row
 ~~30. Fixture dedup decision (testHash + sample URL/hash + testPass).~~ routed - TODO_LIST fixture-dedup row
 ~~31. metadata.yaml fate (keep or gitignore).~~ routed - TODO_LIST metadata.yaml row (the file changed again 2026-10-17: an importance field landed)
 ~~32. "running 4 flake checks" gate-log line reconciliation.~~ routed - TODO_LIST gate-log reconciliation row (updated to 7 checks, live-verified)
 ~~33. Fault-injection proof for the apply-log dump + the repo-wide~~ routed - TODO_LIST apply-log dump row
-    dump-on-failure audit.
+dump-on-failure audit.
 ~~34. Pinned-statix in the pre-push hook.~~ routed - TODO_LIST pinned-statix row
 ~~35. Refactor-identity dating script.~~ routed - TODO_LIST refactor-identity row
 36. The 19-23 strike reconciliation (`git log -S '~~'`). routed - TODO_LIST 19-23 reconcile row (hand verdict: this line carries a literal `~~`, which the tool refuses to strike by design)
@@ -231,12 +231,12 @@
 ~~38. dmarc-eval hardening-pin assertion.~~ routed - TODO_LIST dmarc-eval hardening row
 ~~39. SystemNix residue rows (their repo).~~ routed - TODO_LIST SystemNix CI-debt row
 ~~40. Deep sweep for 0.15-only API references beyond the era-marked~~ routed - TODO_LIST 0.15-reference sweep row
-    clusters.
+clusters.
 
 **Standing watch (fire on trigger):**
 
 ~~41. nixpkgs #563651/#563652/#563777 + mailsuite#65; #566282 port~~ port routed - TODO_LIST upstream-watch row (#566282 MERGED 2026-10-13 recorded there)
-    procedure at the next pin; #552103 merge → vendored-dir retirement.
+procedure at the next pin; #552103 merge → vendored-dir retirement.
 ~~42. Dependabot weekly bumps (approval-gated).~~ current - standing watch, green (FEATURES row)
 ~~43. Renovate install-or-drop; Discussions; branch-protection policy.~~ routed - TODO_LIST blocked-on-user rows (C18/C19/C22)
 ~~44. qcow2 history purge or accept-verdict.~~ routed - TODO_LIST qcow2 row
@@ -245,24 +245,24 @@
 ~~47. Demo g2 (dmarc-monitor vs a local Mailpit sink) after D1.~~ routed - TODO_LIST D1-gated rows
 ~~48. C24/C29-gated monitoring encoding (Discord routing, canary).~~ routed - TODO_LIST D1-gated rows + ROADMAP theme 4
 ~~49. Next docs-health pass: annotate + archive 03-34 when its items~~ current - this pass archived the five superseded reports; 03-34 remains until its items close
-    close; verify the six 2026-10-17 archive markers age well.
+close; verify the six 2026-10-17 archive markers age well.
 ~~50. AGENTS diet re-check becomes a standing post-edit measurement (the~~ done - the wc -c measurement is part of the docs-pass ritual now (this pass measured: AGENTS 29,220 B, under the flag)
-    C41 lesson, mechanized into the ritual).
+C41 lesson, mechanized into the ritual).
 
 ## g) QUESTIONS FOR YOU (not answerable from the repo)
 
 ~~1. **Push posture:** origin has been red for ~6+ hours on a fix that is~~ done 2026-10-17 - pushed and green (run 39072344502); the concurrent-session sub-question is a C38 addendum
-   local and verified (statix `8f8ced8` + e2e fixes + this docs sweep);
-   the daemon owns pushes (C38 posture). Explicit push now, or keep
-   riding the daemon's cycle?
+local and verified (statix `8f8ced8` + e2e fixes + this docs sweep);
+the daemon owns pushes (C38 posture). Explicit push now, or keep
+riding the daemon's cycle?
 ~~2. **C43 release doctrine** (the one call gating everything): cut v0.5.0~~ routed - decision-batch C43 (with [rec])
-   WITH the vendored 0.16 module now that the gate is green, or hold
-   until nixpkgs PR #552103 lands in our pin? [rec] ship vendored - say
-   the word and the release dry-run starts.
+WITH the vendored 0.16 module now that the gate is green, or hold
+until nixpkgs PR #552103 lands in our pin? [rec] ship vendored - say
+the word and the release dry-run starts.
 ~~3. **AGENTS.md diet:** the file crossed the 30 KB flag this pass~~ done 2026-10-17 - executed by the 06-05 pass (31,498 -> 28,040 B); deeper <20 KB cuts parked as the C41 addendum
-   (30,190 B). Want a compression pass now (target ~25 KB, cutting the
-   pre-0.16 loop noise that the ledger now owns), or accept the size
-   until the next natural docs touch?
+(30,190 B). Want a compression pass now (target ~25 KB, cutting the
+pre-0.16 loop noise that the ledger now owns), or accept the size
+until the next natural docs touch?
 
 ---
 

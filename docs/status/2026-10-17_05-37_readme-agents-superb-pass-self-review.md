@@ -69,37 +69,37 @@ b/2 partially (CONTRIBUTING read + mapped).
 
 ## b) PARTIALLY DONE
 
-1. **"As superb as possible" itself.** Accuracy: restored. Structure:
-   deliberately untouched (no TOC — new rot surface with no anchor gate; no
-   AGENTS.md pruning — see g/1). The honest framing: this pass made the docs
-   TRUE, not newly-shaped; structural superb-ness is a user decision, not
-   mine to impose. Remaining effort: S per decision once taken.
-2. **Cross-file consistency sweep.** FEATURES/TODO/CHANGELOG done; NOT
-   opened: ROADMAP.md (15 KB — the 03-34 sweep claims it was swept, but the
-   TODO header proved that class of claim can lag), docs/INBOXCLEAN.md's
-   0.16 banner, SECURITY.md. Blocker: session scope. Effort: S each.
-3. **dprint verdict provenance.** "dprint clean" was proven with
-   registry-floating `nix shell nixpkgs#dprint` (0.61.1), NOT a pinned
-   toolchain — and the devShell carries no dprint at all. CI runs no dprint
-   step (alejandra + pipes lint only), and buildflow's dprint step is
-   `--fix`, so no red CI can result; but the verdict is toolchain-relative.
-   Effort to close: S (devShell gains dprint, or document the canonical
-   invocation).
+~~1. **"As superb as possible" itself.** Accuracy: restored. Structure:~~ routed - accuracy restored was the deliverable; structure calls split: AGENTS prune executed 06-05 (31,498 -> 28,040 B), README TOC + ledger home parked as decision-batch C52
+deliberately untouched (no TOC — new rot surface with no anchor gate; no
+AGENTS.md pruning — see g/1). The honest framing: this pass made the docs
+TRUE, not newly-shaped; structural superb-ness is a user decision, not
+mine to impose. Remaining effort: S per decision once taken.
+~~2. **Cross-file consistency sweep.** FEATURES/TODO/CHANGELOG done; NOT~~ done 2026-10-17 - ROADMAP swept (03-53 + migration passes), INBOXCLEAN carries the 0.16 banner (verified this pass), SECURITY.md glanced (v0.4.0-current table is factual)
+opened: ROADMAP.md (15 KB — the 03-34 sweep claims it was swept, but the
+TODO header proved that class of claim can lag), docs/INBOXCLEAN.md's
+0.16 banner, SECURITY.md. Blocker: session scope. Effort: S each.
+~~3. **dprint verdict provenance.** "dprint clean" was proven with~~ done - buildflow -s dprint-format is the canonical pinned invocation (buildflow owns the toolchain; recorded in the AGENTS archive-policy line); the devShell deliberately carries only CI-parity tools
+registry-floating `nix shell nixpkgs#dprint` (0.61.1), NOT a pinned
+toolchain — and the devShell carries no dprint at all. CI runs no dprint
+step (alejandra + pipes lint only), and buildflow's dprint step is
+`--fix`, so no red CI can result; but the verdict is toolchain-relative.
+Effort to close: S (devShell gains dprint, or document the canonical
+invocation).
 
 ## c) NOT STARTED (correctly parked; canonical list = TODO_LIST)
 
-1. **Primary-evidence read of the 03-34 report.** My FEATURES status flips
-   rest on triple citation (FEATURES gate row + README banner + test-file
-   content) — the report's own verdict section was never opened this
-   session. Effort: S. Priority: Medium (weakens otherwise-solid flips).
-2. **ROADMAP/INBOXCLEAN/SECURITY sweeps** (b/2 above).
-3. **Mechanizing the prose-wrap dash lint** — the new AGENTS lesson is
-   prose-only doctrine today; the pipes lint could grow a sibling rule.
-4. **AGENTS.md size-pruning / README TOC** — parked behind g/1 + g/2.
-5. **CI watch of the daemon-committed docs tree** — the daemon landed the
-   session's commits mid-flight (see header); their CI runs are unobserved
-   (the repo's own "never assume the known red" rule applies to greens
-   too).
+~~1. **Primary-evidence read of the 03-34 report.** My FEATURES status flips~~ done 2026-10-17 - the 03-34 report's verdict section was read in full THIS pass; 17/17 + relay 3/3 quotes confirmed behind the FEATURES flips
+rest on triple citation (FEATURES gate row + README banner + test-file
+content) — the report's own verdict section was never opened this
+session. Effort: S. Priority: Medium (weakens otherwise-solid flips).
+~~2. **ROADMAP/INBOXCLEAN/SECURITY sweeps** (b/2 above).~~ done 2026-10-17 - ROADMAP swept; INBOXCLEAN 0.16 banner verified; SECURITY.md glanced (see b/2)
+~~3. **Mechanizing the prose-wrap dash lint** — the new AGENTS lesson is~~ routed - TODO_LIST prose-wrap list-marker lint row (added this pass)
+prose-only doctrine today; the pipes lint could grow a sibling rule.
+~~4. **AGENTS.md size-pruning / README TOC** — parked behind g/1 + g/2.~~ routed - AGENTS prune executed 06-05; deeper <20 KB cuts are the C41 addendum; README TOC is C52-adjacent (user-gated)
+~~5. **CI watch of the daemon-committed docs tree** — the daemon landed the~~ done 2026-10-17 - origin green verified (runs 39016232923 + 39072344502)
+session's commits mid-flight (see header); their CI runs are unobserved
+(the repo's own "never assume the known red" rule applies to greens
+too).
 
 ## d) TOTALLY FUCKED UP (all self-caught; nothing shipped)
 
@@ -150,40 +150,40 @@ b/2 partially (CONTRIBUTING read + mapped).
 The user's instruction forbade unrelated research, so this list contains
 only work this session surfaced or touched.
 
-| #  | Task                                                                                               | Impact | Effort | Category      |
-| -- | -------------------------------------------------------------------------------------------------- | ------ | ------ | ------------- |
-| 1  | Sweep ROADMAP.md to the 0.16/gate-green truth (TODO header proved sweep claims can lag)            | High   | S      | Documentation |
-| 2  | Read the 03-34 report's verdict section; confirm 17/17 + relay 3/3 quotes behind my status flips   | Med    | S      | Documentation |
-| 3  | Verify docs/INBOXCLEAN.md 0.16 banner matches the current re-verification state                    | Med    | S      | Documentation |
-| 4  | Add dprint to the devShell + record the canonical pinned invocation in AGENTS                      | Med    | S      | Quality       |
-| 5  | Extend the CI markdown lint with the prose-wrap dash/plus rule (nested-list misparse class)        | Med    | M      | Quality       |
-| 6  | Watch the next CI run over the daemon-committed docs tree; read step names if red                  | Med    | S      | Quality       |
-| 7  | HARVEST this report's (f) rows into TODO_LIST (docs-health loop closure)                           | Med    | S      | Documentation |
-| 8  | Single-source the check-set list (AGENTS points at README instead of restating)                    | Low    | S      | Cleanup       |
-| 9  | SECURITY.md freshness glance (unopened this session)                                               | Low    | S      | Documentation |
-| 10 | AGENTS.md size-pruning decision (g/1) — user-gated                                                 | Med    | M      | Decision      |
-| 11 | README TOC decision + anchor-lint gate if yes (g/2-adjacent)                                       | Low    | M      | Decision      |
-| 12 | Re-verify the 03-53 sweep's "all six living docs swept" claim line-level (b/2 residue)             | Med    | M      | Documentation |
-| 13 | Confirm no other doc quotes the retired "re-pin is open"/"web/API" phrasings (repo-wide grep)      | Low    | S      | Cleanup       |
-| 14 | Consider archiving rule tweak: sweep headers that narrate state should carry a "updated when" hook | Low    | M      | Documentation |
+| #  | Task | Impact                                                                                             | Effort | Category |
+| -- | ---- | -------------------------------------------------------------------------------------------------- | ------ | -------- |
+| ~~ | 1    | Sweep ROADMAP.md to the 0.16/gate-green truth (TODO header proved sweep claims can lag)            | High   | S        |
+| ~~ | 2    | Read the 03-34 report's verdict section; confirm 17/17 + relay 3/3 quotes behind my status flips   | Med    | S        |
+| ~~ | 3    | Verify docs/INBOXCLEAN.md 0.16 banner matches the current re-verification state                    | Med    | S        |
+| ~~ | 4    | Add dprint to the devShell + record the canonical pinned invocation in AGENTS                      | Med    | S        |
+| ~~ | 5    | Extend the CI markdown lint with the prose-wrap dash/plus rule (nested-list misparse class)        | Med    | M        |
+| ~~ | 6    | Watch the next CI run over the daemon-committed docs tree; read step names if red                  | Med    | S        |
+| ~~ | 7    | HARVEST this report's (f) rows into TODO_LIST (docs-health loop closure)                           | Med    | S        |
+| ~~ | 8    | Single-source the check-set list (AGENTS points at README instead of restating)                    | Low    | S        |
+| ~~ | 9    | SECURITY.md freshness glance (unopened this session)                                               | Low    | S        |
+| ~~ | 10   | AGENTS.md size-pruning decision (g/1) — user-gated                                                 | Med    | M        |
+| ~~ | 11   | README TOC decision + anchor-lint gate if yes (g/2-adjacent)                                       | Low    | M        |
+| ~~ | 12   | Re-verify the 03-53 sweep's "all six living docs swept" claim line-level (b/2 residue)             | Med    | M        |
+| ~~ | 13   | Confirm no other doc quotes the retired "re-pin is open"/"web/API" phrasings (repo-wide grep)      | Low    | S        |
+| ~~ | 14   | Consider archiving rule tweak: sweep headers that narrate state should carry a "updated when" hook | Low    | M        |
 
 ## g) Questions (cannot self-answer)
 
-1. **AGENTS.md is 30,190 bytes — the bloat boundary the quality guide sets
-   (30 KB), already flagged by the 04-09 report.** Prune it (move
-   provenance-dated incident narratives into archived status reports, keep
-   standing rules + pointers — halves context cost for every session), or is
-   the provenance-dated compendium the deliberate permanent shape? This is a
-   doctrine call, not a fact I can grep.
-2. **README (68 KB) owns the verified-facts ledger** while global doctrine
-   says README = end-user sales page. Move the ledger to
-   `docs/LEDGER.md` with a README index (cleaner audience split; breaks the
-   "READ THE LEDGER in README.md" muscle memory recorded in AGENTS +
-   SystemNix-side references), or is README-as-ledger permanent?
-3. **Canonical dprint home:** should the devShell carry dprint so `nix
+~~1. **AGENTS.md is 30,190 bytes — the bloat boundary the quality guide sets~~ routed - AGENTS prune EXECUTED 06-05 (28,040 B); the deeper-cut question = C41 addendum
+(30 KB), already flagged by the 04-09 report.** Prune it (move
+provenance-dated incident narratives into archived status reports, keep
+standing rules + pointers — halves context cost for every session), or is
+the provenance-dated compendium the deliberate permanent shape? This is a
+doctrine call, not a fact I can grep.
+~~2. **README (68 KB) owns the verified-facts ledger** while global doctrine~~ routed - decision-batch C52 (new entry, [rec] accept README-as-ledger as permanent)
+says README = end-user sales page. Move the ledger to
+`docs/LEDGER.md` with a README index (cleaner audience split; breaks the
+"READ THE LEDGER in README.md" muscle memory recorded in AGENTS +
+SystemNix-side references), or is README-as-ledger permanent?
+~~3. **Canonical dprint home:** should the devShell carry dprint so `nix~~ routed - buildflow -s dprint-format is the canonical pinned path (AGENTS); the devShell gains nothing
    develop` is the one formatting environment (my (e)/1 default), or do you
-   prefer buildflow's internal dprint stays the only one (keeping the
-   devShell minimal) and AGENTS documents `buildflow -s dprint-format` as
-   the pinned path?
+prefer buildflow's internal dprint stays the only one (keeping the
+devShell minimal) and AGENTS documents `buildflow -s dprint-format` as
+the pinned path?
 
 Awaiting instructions.
