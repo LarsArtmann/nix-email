@@ -125,6 +125,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- Docs-truth corrections (2026-10-18): the archived 06-58 report's
+  "CHANGELOG vs git-log diffed" verdict overstated a subjects-only skim -
+  a theme-coverage audit of every non-daemon commit since 2026-10-05 now
+  backs the `[Unreleased]` set (no missing major theme; correction
+  recorded here per the append-only rule). The 19-23 plan strike-marker
+  reconcile is moot (the plan is archived; no living doc restates the
+  ~350-markers claim). `.config/metadata.yaml` (a local tool artifact
+  the auto-commit daemon had swallowed into history, referenced nowhere)
+  is untracked and gitignored.
 - **BREAKING - Stalwart 0.15.5 -> 0.16.22** (2026-10-16/17 upgrade; the
   release vehicle is the pending v0.5.0 - SystemNix pins ride tags):
   the wrapper now maps its options onto the 0.16 JMAP object model and
