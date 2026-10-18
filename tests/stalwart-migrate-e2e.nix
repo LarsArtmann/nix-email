@@ -70,10 +70,6 @@ in
         ];
 
         virtualisation.memorySize = 1536;
-        virtualisation.sharedDirectories.share = {
-          source = "/tmp/migrate-e2e-share";
-          target = "/mnt/share";
-        };
       };
 
       # The 0.16 consumer (the pbx shape from stalwart-bind-e2e: a
@@ -111,18 +107,13 @@ in
         ];
 
         virtualisation.memorySize = 1536;
-        virtualisation.sharedDirectories.share = {
-          source = "/tmp/migrate-e2e-share";
-          target = "/mnt/share";
-        };
       };
     };
 
     testScript = ''
-      import os
-
-      os.makedirs("/tmp/migrate-e2e-share", exist_ok=True)
-
+      # The store travels between nodes through the testers framework's
+      # built-in WRITABLE shared directory (/tmp/shared, virtfs to the
+      # driver's xchg dir) - no custom share, no in-VM switch.
       start_all()
 
       mig015.wait_for_unit("stalwart.service", timeout=180)
@@ -159,8 +150,8 @@ in
 
       with subtest("handoff: the 0.15 store lands on the shared directory"):
           mig015.succeed("systemctl stop stalwart.service")
-          mig015.succeed("cp -a /var/lib/stalwart /mnt/share/pre016-store")
-          mig015.succeed("test -d /mnt/share/pre016-store/db")
+          mig015.succeed("cp -a /var/lib/stalwart /tmp/shared/pre016-store")
+          mig015.succeed("test -d /tmp/shared/pre016-store/db")
 
       with subtest("mig016 baseline: the consumer shape provisions its own virgin store"):
           mig016.wait_for_unit("stalwart-provision.service", timeout=300)
@@ -175,7 +166,7 @@ in
           # virgin store, and a leftover marker would wrongly pass the
           # guard on top of 0.15 data (the poison class).
           mig016.succeed(
-              "rm -rf /var/lib/stalwart && cp -a /mnt/share/pre016-store /var/lib/stalwart"
+              "rm -rf /var/lib/stalwart && cp -a /tmp/shared/pre016-store /var/lib/stalwart"
           )
           # The guard fails ExecStartPre, the unit cycles under its
           # restart policy - never let that block the driver.
@@ -214,7 +205,7 @@ in
 
       with subtest("--backup-dir migration: dump from the copy, recover the live store"):
           mig016.succeed(
-              "stalwart-migrate-from-015 --backup-dir /mnt/share/pre016-store "
+              "stalwart-migrate-from-015 --backup-dir /tmp/shared/pre016-store "
               "2>&1 | tee /tmp/migrate.log"
           )
           mig016.succeed("cat /tmp/migrate.log >&2")
