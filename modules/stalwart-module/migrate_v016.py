@@ -918,7 +918,7 @@ class Converter:
                         add(addr)
 
         sigs = build_sub_trees(self.settings, "signature", "algorithm")
-        for _, sub in sigs.items():
+        for sub in sigs.values():
             d = sub.get("domain", "").strip().lower()
             if d:
                 names.add(d)
@@ -973,11 +973,11 @@ class Converter:
             if d is not None:
                 counts[d] += 1
         if not counts:
-            first = sorted(self.domain_name_to_cid.keys())[0]
+            first = min(self.domain_name_to_cid)
             self.default_domain_cid = self.domain_name_to_cid[first]
             return
 
-        best = sorted(counts.items(), key=lambda kv: (-kv[1], kv[0]))[0][0]
+        best = min(counts, key=lambda d: (-counts[d], d))
         self.default_domain_cid = self.domain_name_to_cid[best]
 
     def _infer_primary_domain(self, p: dict[str, Any]) -> str | None:
@@ -1865,7 +1865,7 @@ class Converter:
                 try:
                     blob = decoder(padded).decode("latin-1")
                     break
-                except Exception as exc:
+                except ValueError as exc:
                     last_err = exc
             if blob is None:
                 print(

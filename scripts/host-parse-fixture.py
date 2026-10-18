@@ -26,7 +26,7 @@ from pathlib import Path
 
 
 def sh(*cmd: str) -> str:
-    result = subprocess.run(cmd, capture_output=True, text=True)
+    result = subprocess.run(cmd, capture_output=True, text=True, check=False)
     if result.returncode != 0:
         raise SystemExit(
             f"command failed ({result.returncode}): {' '.join(cmd)}\n"
@@ -84,7 +84,11 @@ print(json.dumps({{"parsedmarc_version": parsedmarc.__version__,
                    **result}}, default=str))
 """
     result = subprocess.run(
-        [str(python), "-c", code], capture_output=True, text=True, env=env
+        [str(python), "-c", code],
+        capture_output=True,
+        text=True,
+        env=env,
+        check=False,
     )
     if result.returncode != 0:
         print(result.stdout, file=sys.stderr)
