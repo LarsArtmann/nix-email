@@ -19,9 +19,10 @@ DMARC/TLS-RPT monitor, packaged as a NixOS flake for consumption by
 > `nix flake check` passes all checks on the 0.16 tree (stalwart-e2e 17/17
 > subtests in a real run, relay-e2e 3/3, buildflow EXIT:0, alejandra
 > clean; the 03-34 status report). What remains is release doctrine (C43)
+>
 > - live status in
-> [TODO_LIST.md](TODO_LIST.md), the transcript-pinned fact set in the
-> ledger's "Stalwart 0.16" section.
+>   [TODO_LIST.md](TODO_LIST.md), the transcript-pinned fact set in the
+>   ledger's "Stalwart 0.16" section.
 
 Architecture (design note: the internal
 `~/projects/reports/selfhosted-email-guide.md` study): self-hosted
@@ -590,11 +591,13 @@ not found` and `Resource error` lines (the spam-filter resource's ASN/GeoIP
 CSV downloads from cdn.jsdelivr.net fail in the slirp NAT - non-fatal, the
 lookups just miss).
 
-One VM at a time per working directory: the demo disk is CWD-relative
-(`./demo.qcow2`) and QEMU takes a write lock on it, so a second concurrent
-`nix run .#vm` from the same directory dies on the lock (observed during
-the InboxClean spike, 2026-10-05). Run from separate scratch dirs or
-serialize.
+One VM at a time per user: the demo disk lives at
+`~/.cache/nix-email-demo/demo.qcow2` (2026-10-18: the app wrapper pins
+`NIX_DISK_IMAGE` there - it is no longer CWD-relative, so boots never
+pollute the working directory) and QEMU takes a write lock on it, so a
+second concurrent `nix run .#vm` by the same user dies on the lock
+(observed during the InboxClean spike, 2026-10-05). Serialize, or set
+`NIX_DISK_IMAGE` yourself before `nix run .#vm`.
 
 #### JMAP quickstart (0.16 shape; transcript-pinned on the demo VM 2026-10-16/17)
 

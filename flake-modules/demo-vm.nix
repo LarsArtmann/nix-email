@@ -190,12 +190,37 @@
     ...
   }: {
     # Throwaway demo VM: `nix run .#vm` (x86_64-linux only - same
-    # constraint as the VM tests above).
+    # constraint as the VM tests above). The disk is NOT CWD-relative
+    # anymore (2026-10-18, the demo.qcow2-in-git-status footgun): the
+    # wrapper pins NIX_DISK_IMAGE to a per-user cache path so boots are
+    # stable across runs and never pollute the working directory. The
+    # runner's own NIX_DISK_IMAGE override (qemu-vm.nix) carries it.
     apps = pkgs.lib.optionalAttrs (system == "x86_64-linux") {
       vm = {
         type = "app";
-        program = "${self.nixosConfigurations.demo.config.system.build.vm}/bin/run-demo-vm";
-        meta.description = "Boot the demo mail stack as a throwaway QEMU VM";
+        program = "${pkgs.writeShellScript "run-demo-vm-app" ''
+          set -eu
+          if [ -z "''${HOME:-}" ]; then
+            echo "nix-email demo: HOME unset - falling back to the CWD-relative disk" >&2
+            exec ${self.nixosConfigurations.demo.config.system.build.vm}/bin/run-demo-vm
+          fi
+          disk_dir="''${XDG_CACHE_HOME:-$HOME/.cache}/nix-email-demo"
+          mkdir -p "$disk_dir"
+          export NIX_DISK_IMAGE="$disk_dir/demo.qcow2"
+          exec ${self.nixosConfigurations.demo.config.system.build.vm}/bin/run-demo-vm
+        ''}";
+        meta.description = "Boot the demo mail stack as a throwaway QEMU VM (disk: ~/.cache/nix-email-demo/)";
+      };
+      # Host-side parsedmarc dry-run (V25): the script walks the check
+      # closure itself, so the app only supplies the interpreter - the
+      # nix CLI must come from the caller's PATH (it is what ran `nix
+      # run` in the first place).
+      host-parse-fixture = {
+        type = "app";
+        program = "${pkgs.writeShellScript "host-parse-fixture-app" ''
+          exec ${pkgs.python3}/bin/python3 ${../scripts/host-parse-fixture.py} "$@"
+        ''}";
+        meta.description = "Run the PINNED parsedmarc parser on a fixture file (~30 s host-side dry-run; --check parsedmarc-e2e)";
       };
     };
   };

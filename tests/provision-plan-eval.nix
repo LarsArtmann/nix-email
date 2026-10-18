@@ -21,27 +21,30 @@
   system,
   nixpkgs,
 }: let
-  mkConfig = extra: (import (nixpkgs + "/nixos/lib/eval-config.nix")) {
-    inherit system;
-    modules = [
-      ../modules/mail-server.nix
-      (
-        {config, ...}: {
-          system.stateVersion = "26.05";
-          services.mail-server = {
-            enable = true;
-            hostname = "mail.check.test";
-            httpBind = "127.0.0.1:8082";
-            admin.secretFile = "/etc/check-admin-secret";
-          } // extra;
-          services.stalwart.provision.singletons = {
-            DnsResolver."@type" = "Cloudflare";
-            SpamPyzor.enable = false;
-          };
-        }
-      )
-    ];
-  };
+  mkConfig = extra:
+    (import (nixpkgs + "/nixos/lib/eval-config.nix")) {
+      inherit system;
+      modules = [
+        ../modules/mail-server.nix
+        (
+          {config, ...}: {
+            system.stateVersion = "26.05";
+            services.mail-server =
+              {
+                enable = true;
+                hostname = "mail.check.test";
+                httpBind = "127.0.0.1:8082";
+                admin.secretFile = "/etc/check-admin-secret";
+              }
+              // extra;
+            services.stalwart.provision.singletons = {
+              DnsResolver."@type" = "Cloudflare";
+              SpamPyzor.enable = false;
+            };
+          }
+        )
+      ];
+    };
 
   base = mkConfig {};
   throttled = mkConfig {rateLimits.enable = true;};
@@ -58,13 +61,17 @@
   implicitKeyAllowlist = ["Domain" "MtaRoute" "AcmeProvider"];
   setNames = builtins.attrNames objects;
 
-  reconcileWithoutMatch = builtins.filter (
-    name: (objects.${name}.reconcile or false) && (objects.${name}.match or null) == null
-  ) setNames;
+  reconcileWithoutMatch =
+    builtins.filter (
+      name: (objects.${name}.reconcile or false) && (objects.${name}.match or null) == null
+    )
+    setNames;
 
-  noMatchOutsideAllowlist = builtins.filter (
-    name: (objects.${name}.match or null) == null && !builtins.elem name implicitKeyAllowlist
-  ) setNames;
+  noMatchOutsideAllowlist =
+    builtins.filter (
+      name: (objects.${name}.match or null) == null && !builtins.elem name implicitKeyAllowlist
+    )
+    setNames;
 
   accountSetMatchWrong = let
     accountMatch = objects.Account.match or null;
@@ -102,14 +109,18 @@
   stalwartServices = builtins.filter (name: lib.hasPrefix "stalwart" name) (
     builtins.attrNames base.config.systemd.services
   );
-  multilineExecs = builtins.filter (
-    svc: builtins.any (
-      key: let
-        value = base.config.systemd.services.${svc}.serviceConfig.${key} or null;
-      in
-        value != null && (builtins.isString value) && lib.hasInfix "\n" value
-    ) execKeys
-  ) stalwartServices;
+  multilineExecs =
+    builtins.filter (
+      svc:
+        builtins.any (
+          key: let
+            value = base.config.systemd.services.${svc}.serviceConfig.${key} or null;
+          in
+            value != null && (builtins.isString value) && lib.hasInfix "\n" value
+        )
+        execKeys
+    )
+    stalwartServices;
 
   # SystemSettings singleton coherence (defaultDomainId points at the
   # wrapper Domain id; defaultHostname == hostname).
@@ -124,7 +135,8 @@
   # set id is "wrapper-sustained").
   throttleSet = throttled.config.services.stalwart.provision.objects.MtaInboundThrottle or null;
   throttleOk =
-    throttleSet != null
+    throttleSet
+    != null
     && throttleSet.match == ["description"]
     && (throttleSet.objects ? "wrapper-sustained")
     && throttleSet.objects."wrapper-sustained" ? description
@@ -146,9 +158,11 @@
   # NixOS base assertions (fileSystems, bootloader) fire in any partial
   # eval without a VM base - scope the cleanliness claim to the wrapper's
   # own assertion surface (mail-server/stalwart messages).
-  wrapperAssertionFires = builtins.filter (
-    a: !a.assertion && (lib.hasInfix "mail-server" a.message || lib.hasInfix "stalwart" a.message)
-  ) base.config.assertions;
+  wrapperAssertionFires =
+    builtins.filter (
+      a: !a.assertion && (lib.hasInfix "mail-server" a.message || lib.hasInfix "stalwart" a.message)
+    )
+    base.config.assertions;
 in
   assert domainName == hostname || throw "provision-plan-eval: the wrapper Domain name (${domainName}) must equal services.mail-server.hostname (${hostname}) - addresses synthesize as name@<Domain.name>, a split lands them outside the local namespace.";
   assert builtins.length reconcileWithoutMatch == 0 || throw "provision-plan-eval: reconcile sets without an explicit match property: ${toString reconcileWithoutMatch} - reconcile DELETES by key, a null match is a footgun.";

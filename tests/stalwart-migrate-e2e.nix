@@ -234,6 +234,13 @@ in
           mig016.succeed("cat /tmp/migrate.log >&2")
           mig016.succeed("grep -q '\\[DONE\\] migration complete' /tmp/migrate.log")
           mig016.succeed("test -f /var/lib/stalwart/v016-store-migrated")
+          # Artifacts on stdout: the datastore path inside convert's
+          # config.json decides WHICH store recovery mode wiped - the
+          # post-migration boot panic ("multi-step process", run 6,
+          # 2026-10-18) means the live store was not the one migrated.
+          mig016.succeed("cat /var/lib/stalwart/migration-v016/config.json >&2")
+          mig016.succeed("cat /var/lib/stalwart/migration-v016/recovery.log >&2")
+          mig016.succeed("ls -la /var/lib/stalwart/db /var/lib/stalwart.v015-premigrate/db >&2")
 
       with subtest("post-migration: the 0.15 password authenticates on 0.16"):
           # The provision oneshot has not run since the store swap: start

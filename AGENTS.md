@@ -27,7 +27,8 @@ transcript-pinned dialect).
   <path>` sending the path string vs `@path` reading it).
 - `nix run .#vm` (x86_64) - throwaway demo VM; ports/credentials live in
   the README quickstart and the login banner (single source). Demo disk
-  is CWD-relative ./demo.qcow2 - run from a scratch dir. Debug pattern:
+  lives at ~/.cache/nix-email-demo/ (the app pins NIX_DISK_IMAGE; no
+  CWD pollution). Debug pattern:
   FIFO console (`mkfifo in && cat in | <vm-closure>/bin/run-demo-vm >
   log` + a `sleep infinity > in` holder) - more reliable than the driver
   for ad-hoc runs. Probe LAYERED: guest service -> guest loopback ->
