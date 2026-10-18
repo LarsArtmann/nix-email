@@ -161,7 +161,7 @@ in
           # house pattern: stalwart.service + port + the unit's Result.
           mig016.wait_for_unit("stalwart.service", timeout=180)
           mig016.wait_for_open_port(8082, timeout=240)
-          mig016.succeed("test "$(systemctl show -p Result --value stalwart-provision.service)" = success")
+          mig016.succeed('test "$(systemctl show -p Result --value stalwart-provision.service)" = success')
 
       with subtest("the 0.15 store swap trips the guard, never the binary"):
           mig016.succeed(
@@ -231,7 +231,7 @@ in
           mig016.succeed("systemctl start stalwart-provision.service")
           mig016.wait_for_unit("stalwart.service", timeout=180)
           mig016.wait_for_open_port(8082, timeout=240)
-          mig016.succeed("test "$(systemctl show -p Result --value stalwart-provision.service)" = success")
+          mig016.succeed('test "$(systemctl show -p Result --value stalwart-provision.service)" = success')
           mig016.wait_for_open_port(25, timeout=120)
           # 0.16 session path (probe-verified 2026-10-18: the 0.15
           # /.well-known/jmap document fetch is now a 307).

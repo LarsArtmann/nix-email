@@ -105,11 +105,11 @@ transcript-pinned dialect).
   priority 100 there, so mkDefault lists are discarded wholesale.
   Hardening defaults OFF by design (`rateLimits`, `spamFilter.dnsbl`)
   - do NOT "fix" to ON; the DNSBL plan section ALWAYS carries the
-  (empty-by-default) reconcile set destroying 0.16.22's 18
-  shipped-broken default rows. Limiter identity:
-  `MtaInboundThrottle` matches on `description` (no `name`); key
-  vocabulary `authenticated_as` (NOT auth_as); dnsbl zone/tag are
-  QUOTED expression constants.
+    (empty-by-default) reconcile set destroying 0.16.22's 18
+    shipped-broken default rows. Limiter identity:
+    `MtaInboundThrottle` matches on `description` (no `name`); key
+    vocabulary `authenticated_as` (NOT auth_as); dnsbl zone/tag are
+    QUOTED expression constants.
 - Tests: VM E2E for behavior, eval contract for wiring. Never weaken
   module defaults to make a test deterministic - fix the test.
 - STALWART 0.16 DOCTRINE: the wrapper renders `services.stalwart.provision`
@@ -126,7 +126,7 @@ transcript-pinned dialect).
   1 h TTL); catch-all applies AFTER unknown-recipient probes (runtime
   second plan). Over-quota mail is ACCEPTED at RCPT but never delivered
   - assert IMAP absence + 0.16 JOURNAL SILENCE, never SMTP refusal
-  (0.15's `Message rescheduled` signature is GONE).
+    (0.15's `Message rescheduled` signature is GONE).
 - SystemNix layers (sops, ports, Gatus, onFailure, backup-coordination)
   belong to the CONSUMER wrapper, not here.
 

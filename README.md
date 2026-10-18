@@ -11,13 +11,15 @@ DMARC/TLS-RPT monitor, packaged as a NixOS flake for consumption by
 > (breaking; release vehicle = the pending v0.5.0). The wrapper now maps its
 > options onto the 0.16 JMAP object model and renders declarative
 > `services.stalwart.provision` plans through a vendored 0.16 module
-> (nixpkgs PR #552103). REST `/api` management recipes and
-> `--export`/`--import` backup are GONE upstream; the demo renamed to
+> (nixpkgs PR #552103). REST `/api` management recipes are GONE upstream
+> (CORRECTED 2026-10-18: only the CLI/REST export variants died - the
+> MAIN-binary `--export`/`--import` exists and is VM-proven, see the
+> backup step in the go-live runbook); the demo renamed to
 > `mail.demo.test`. State at this banner's date: **GATE GREEN** -
 > `nix flake check` passes all checks on the 0.16 tree (stalwart-e2e 17/17
 > subtests in a real run, relay-e2e 3/3, buildflow EXIT:0, alejandra
 > clean; the 03-34 status report). What remains is release doctrine (C43)
-> and the 0.16 backup-story gap - live status in
+> - live status in
 > [TODO_LIST.md](TODO_LIST.md), the transcript-pinned fact set in the
 > ledger's "Stalwart 0.16" section.
 
@@ -221,6 +223,24 @@ server. Firewall: the wrapper opens exactly 25/465/587/993, plus the
 `httpBind` port when the bind is non-loopback (nixpkgs' `openFirewall` is
 off - it would also open the loopback admin port on every interface);
 consumer port lists merge additively.
+
+### Stalwart 0.16.22 -> 0.16.26 delta (evidence for C45, fetched
+
+### 2026-10-18 from the upstream CHANGELOG/releases)
+
+| Version | Headline changes relevant to THIS wrapper                                                                                                                                                                                                                                                                                                                                                 |
+| ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0.16.23 | ADDS the `bit_and` expression function - the exact function 0.16.22's 18 shipped default DNSBL rows reference (and the .22 parser rejects; the wrapper's empty-reconcile workaround predates this fix). Mailing-list-of-lists, DMARC aggregate `spf`/`version`, DSN fixes.                                                                                                                |
+| 0.16.24 | Spam-rule UPDATES are insert-only in .22-.23 ("upstream changes to existing rules, DNSBL servers, HTTP lookups ... never reach an existing installation") - a second argument for the wrapper's declarative reconcile posture. JMAP push VAPID `aud` signing fix (security-adjacent). PowerDNS provider added.                                                                            |
+| 0.16.25 | DNSBL multi-return-code scoring (Spamhaus ZEN SBL+PBL) + negative-TTL caching fixes; three DKIM ROTATION bugs (we are declarative/Manual, unaffected); the GLOBAL queue quota created on first start is never enforced on .22-.24.                                                                                                                                                        |
+| 0.16.26 | **BREAKING: x86_64 builds (except musl) require x86-64-v2 CPUs and REFUSE to start otherwise** (QEMU default CPU models affected - a 0.16.26 overlay must set VM `host` cpu; real hosts need a v2 CPU check first). Adds `sd_notify` support (relevant to the vendored module's "stalwart does not notify systemd" comment); RocksDB blob-GC rewrite fix; OIDC email-claim account build. |
+
+No CVEs in the window (CVE-2026-81036 affects through 0.16.19 only; the
+pin's 0.16.22 is past it). C45 (stay on the pin's 0.16.22 vs overlay a
+newer 0.16.x) stays owner-gated; the delta above is the decision input -
+the wrapper's VM tests run on QEMU's default CPU model on CI, so any
+0.16.26+ overlay ALSO needs a VM cpu-type change before the gate can
+even boot it.
 
 ### Rate-limit sizing (`rateLimits`)
 

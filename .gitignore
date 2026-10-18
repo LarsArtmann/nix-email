@@ -70,3 +70,4 @@ htmlcov/
 
 ## VM run artifacts
 *.qcow2
+.config/
