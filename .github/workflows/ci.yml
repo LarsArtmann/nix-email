@@ -57,6 +57,34 @@ jobs:
           # point.
           nix run nixpkgs#actionlint
 
+      - name: Lint Python files (ruff, fail-closed)
+        run: |
+          # RUFF (the 2026-10-18 incident, mechanized): error-class python
+          # lint findings shipped to master through three gate runs because
+          # daemon pushes bypass the pre-push hook AND CI had NO python
+          # lint step at all (verified 2026-10-18: zero ruff/bandit/vulture
+          # invocations in this file before this step landed). Rules are
+          # pinned via --select so a newer ruff cannot silently widen the
+          # gate; the binary is the LOCKED nixpkgs rev (statix pattern) so
+          # any red is reproducible locally. Deeper rule classes
+          # (PERF/FURB/BLE) stay owned by buildflow's ruff step - keep this
+          # the stable error floor. Self-test first (never-firing-lint
+          # doctrine): an unused import MUST fail before the real files run.
+          set -eu
+          rev="$(nix flake metadata --json . | jq -r '.locks.nodes.nixpkgs.locked.rev')"
+          fixture="$(mktemp /tmp/ruff-selftest-XXXXXX.py)"
+          # Deferred expansion is intentional (fixture path fixed at set
+          # time anyway); shellcheck's SC2016 fires on the quoted form.
+          # shellcheck disable=SC2016
+          trap 'rm -f "$fixture"' EXIT
+          printf 'import os\nprint("x")\n' > "$fixture"
+          if nix run "github:NixOS/nixpkgs/$rev#ruff" -- check --select E4,E7,E9,F --output-format concise "$fixture" > /dev/null 2>&1; then
+            echo "FATAL: ruff step accepted an unused import (never-firing lint)"
+            exit 1
+          fi
+          git ls-files -z '*.py' > /tmp/py-files.list
+          xargs -0 -r nix run "github:NixOS/nixpkgs/$rev#ruff" -- check --select E4,E7,E9,F --output-format concise < /tmp/py-files.list
+
       - name: Enforce alejandra formatting (fail-closed)
         run: nix fmt -- . --check
 
