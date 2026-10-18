@@ -344,15 +344,20 @@ covered:
 
 Listeners, rate limits, and report settings do NOT ride the migration
 (0.16 objects) - the provision plan recreates them at the next start.
-Quota counters are reset by upstream's recovery mode; recalculate them
-from the webadmin's task panel afterwards. The migration path is
-exercised by `tests/stalwart-migrate-e2e.nix` (guard refusal, poison
+CAVEAT (migrate-e2e run-5 lesson, 2026-10-18): the converted store DOES
+carry the 0.15 listener objects, and the provision unit's probe only
+looks for `cfg.url` and the built-in `127.0.0.1:8080` - a 0.15 host
+whose ONLY http listener was on a NON-standard port leaves the migrated
+server unreachable by provision (apply times out). Standard installs
+(webadmin on 8080) are fine; exotic binds need a one-time manual
+`STALWART_URL=http://127.0.0.1:<port> stalwart-cli apply --file <plan>`
+after migration. Quota counters are reset by upstream's recovery mode;
+recalculate them from the webadmin's task panel afterwards. The
+migration path is exercised by `tests/stalwart-migrate-e2e.nix` as a
+TWO-NODE VM test (phase-A 0.15.5 node seeds the store, the 0.16 consumer
+node boots with it via the shared test directory): guard refusal, poison
 refusal, `--backup-dir` recovery, 0.15 password authenticating on 0.16,
-restart persistence) - CORRECTED 2026-10-17: that check is currently
-UNREGISTERED (known-broken: the in-VM switch to the foreign-eval toplevel
-wedges the test driver; TODO row "migrate-e2e repair" owns the two-node
-redesign), so treat the path as scripted-and-reviewed, not CI-proven,
-until it re-registers.
+provision re-apply, restart persistence.
 
 ## Module: `services.dmarc-monitor`
 

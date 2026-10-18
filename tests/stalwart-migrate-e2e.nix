@@ -52,8 +52,20 @@ in
           stateVersion = "26.05";
           provision.enable = false;
           settings = {
+            # A REALISTIC 0.15 install shape: webadmin on the default
+            # 8080 PLUS the dedicated api listener. Post-migration, the
+            # converted store binds these listener objects - the 0.16
+            # provision unit's probe (cfg.url, then the built-in 8080)
+            # can then reach the migrated server and apply the consumer
+            # plan. A store whose ONLY management listener was
+            # nonstandard leaves provision unreachable (run-5 lesson,
+            # 2026-10-18) - documented in the README migration section.
             server.listener.api = {
               bind = ["127.0.0.1:18098"];
+              protocol = "http";
+            };
+            server.listener.webadmin = {
+              bind = ["127.0.0.1:8080"];
               protocol = "http";
             };
             authentication.fallback-admin = {
