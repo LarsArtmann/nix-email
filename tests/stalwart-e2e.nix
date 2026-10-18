@@ -717,6 +717,33 @@ in
               "imap-probe needle-catchall-7d1a catchall@example.test '${testPass}'"
           )
 
+      with subtest("dkim survival: both signatures still stamp AFTER the Domain patch"):
+          # The catch-all subtest patched the wrapper's Domain object at
+          # runtime (an upsert carrying only name + catchAllAddress). If
+          # that patch had REPLACED the object instead of merging into
+          # it, dkimManagement."@type" = "Manual" would be gone and
+          # signing would silently stop - assert the BEHAVIOR (both
+          # declarative signatures on a fresh post-patch submission)
+          # rather than the store shape (no `stalwart-cli get` transcript
+          # exists for the object shape). Same probe patterns as the
+          # pre-patch dual-signature subtest.
+          machine.succeed(
+              "swaks --timeout 120 --server 127.0.0.1:587 --tls --auth PLAIN "
+              "--auth-user user1@example.test --auth-password '${testPass}' "
+              "--from user1@example.test --to user2@example.test "
+              "--header 'Subject: post-patch-sign' --body 'needle-dkimsurv-31c4' "
+              "> /tmp/swaks-dkimsurv.log 2>&1"
+          )
+          machine.succeed("cat /tmp/swaks-dkimsurv.log >&2")
+          machine.succeed("! grep -q '<\\*\\*' /tmp/swaks-dkimsurv.log")
+          machine.succeed("imap-probe needle-dkimsurv-31c4")
+          machine.succeed(
+              "imap-header-probe needle-dkimsurv-31c4 'a=rsa-sha256'"
+          )
+          machine.succeed(
+              "imap-header-probe needle-dkimsurv-31c4 'a=ed25519-sha256'"
+          )
+
       with subtest("quota: over-quota message accepted at SMTP, never delivered"):
           machine.succeed(
               "swaks --timeout 120 --server 127.0.0.1:587 --tls --auth PLAIN "

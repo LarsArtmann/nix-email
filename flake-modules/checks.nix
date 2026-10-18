@@ -40,6 +40,17 @@
           inherit system;
           inherit (inputs) nixpkgs;
         };
+        # Provision-plan structure contract (2026-10-18): hostname/Domain
+        # coherence, match-property posture (reconcile sets MUST match;
+        # no-match sets only on the documented implicit-key allowlist),
+        # the fallback listener port set, the Exec* multi-line lint, and
+        # the MtaInboundThrottle description identity - the paid-for
+        # plan-dialect bug classes caught at eval speed (~10 s) instead of
+        # a VM build. Pure eval, arch-independent.
+        provision-plan-eval = import ../tests/provision-plan-eval.nix {
+          inherit system;
+          inherit (inputs) nixpkgs;
+        };
       }
       // pkgs.lib.optionalAttrs (system == "x86_64-linux") {
         # Demo-host contract (2026-10-06): flake check already forces the
