@@ -77,6 +77,47 @@ runs pipefail, so grep -q's early exit can EPIPE the producer (observed as
 curl exit 23 on a matching payload, 2026-09-15) - and `! producer | grep -q`
 can phantom-green. Dump the producer to a file, then grep the file.
 
+## VM debug loops
+
+Distilled from the FIFO-console and 0.16-upgrade sessions (2026-10).
+AGENTS.md keeps only pointers to this section.
+
+Demo VM (`nix run .#vm`): debug via a FIFO console (`mkfifo in && cat in |
+<vm-closure>/bin/run-demo-vm > log`, with a `sleep infinity > in` holder) -
+more reliable than the driver for ad-hoc runs. Probe LAYERED: guest service
+-> guest loopback -> HOST port; "connects but never answers" behind a port
+forward is a FIREWALL signature (ledger (k)).
+
+VM-test debug loop: realize the driver from the e2e closure's references
+(binary at `<output>/bin/nixos-test-driver`; `--test-script /tmp/debug.py`;
+`-o` needs an EXISTING dir). Driver python runs on the HOST - VM-port work
+must be packaged scripts or `machine.succeed`, never host socket code. Keep
+a GC root (`nix build -o /tmp/root .#checks...stalwart-e2e`). Rules:
+
+(a) long `machine.execute` payloads die silently (status -1/28) - capture via
+`succeed("... > /tmp/f.log 2>&1")` and `cat` the file.
+
+(b) NEVER `systemctl start stalwart-provision.service` manually mid-test - a
+manual RE-run's try-restart races the probe (535 on VALID creds). Wait for
+`stalwart.service` + `wait_for_open_port`.
+
+(c) journal greps must quote concrete phrases (bare `over` matches every
+"Consumed ... over Ns" line).
+
+(d) BrokenPipeError driver death = rerun.
+
+0.16-upgrade loop: (a) PROBE BEFORE RERUN - boot the FIFO console before
+rerunning a failed VM test; (b) NEVER trust a sibling report's "green" - read
+the stored log / `nix path-info --json registrationTime`; (c) NO SCHEMA CLAIM
+without an apply transcript (Rust doc comments lied once: `User.name`); (d)
+let provisioning settle before probing (port-open != server-ready; the
+ExecStartPost restart window eats connections); (e) logged artifacts dump on
+failure by default; (f) dnsmasq must FORWARD upstream (10.0.2.3) - 0.16
+reload validation resolves via the system resolver (the demo's 2026-10-18
+boot race was this class; the demo pins DnsResolver = Cloudflare); (g)
+serialize heavy VM builds ACROSS repos (concurrent builds OOM-killed a run
+once).
+
 ## Release procedure
 
 Distilled from the v0.3.0/v0.3.1 cuts (2026-09-17). The auto-commit daemon

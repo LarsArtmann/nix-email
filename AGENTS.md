@@ -16,42 +16,32 @@ transcript-pinned dialect).
 - `nix flake check` - the full gate: eval contract checks + x86_64-only
   VM E2E (~4-6 min CI). Check set is SINGLE-SOURCED: canonical list =
   ci.yml lockstep `expected=` / README "What is built and verified" -
-  never restate it here (a restated count rotted within hours once); live
+  never restate it here; live
   truth: `nix eval .#checks.x86_64-linux --apply builtins.attrNames`.
   Failed results are CACHED (`--no-build` = fast eval-noise triage).
   After editing ONE check, build THAT check first
   (`nix build .#checks.x86_64-linux.<name> -L`), then the full gate.
 - Host binary spike = DEAD END for Stalwart (listeners never bind on the
   host); host loops are fine for client-side forensics only (swaks + a
-  tiny python SMTP sink; pass swaks attachments as `@path` not `<path>`
-  - the latter sends the path STRING).
+  tiny python SMTP sink; swaks attachments take `@path` - `<path>` sends
+  the path STRING).
 - `nix run .#vm` (x86_64) - throwaway demo VM; ports/credentials live in
   the README quickstart + login banner (single source); demo disk at
   ~/.cache/nix-email-demo/ (app pins NIX_DISK_IMAGE; no CWD pollution).
-  Debug: FIFO console (`mkfifo in && cat in | <vm-closure>/bin/run-demo-vm
-  > log`+`sleep infinity > in` holder) beats the driver for ad-hoc runs.
-  > Probe LAYERED: guest service -> guest loopback -> HOST port; "connects
-  > but never answers" behind a forward is a FIREWALL signature (ledger (k)).
-- VM debug loop: realize the driver from the e2e closure's references
-  (binary at `<output>/bin/nixos-test-driver`; `--test-script
-  /tmp/debug.py`; `-o` needs an EXISTING dir); driver python runs on the
-  HOST - VM-port work must be packaged scripts or machine.succeed, never
-  host socket code. KEEP A GC ROOT (`nix build -o /tmp/root
-  .#checks...stalwart-e2e`). Rules: (a) long `machine.execute` payloads
-  die silently (status -1/28) - capture via succeed("... > /tmp/f.log
-  2>&1") and cat; (b) NEVER `systemctl start stalwart-provision.service`
-  manually mid-test - a manual RE-run's try-restart races the probe (535
-  on VALID creds); wait for `stalwart.service` + `wait_for_open_port`;
-  (c) journal greps quote concrete phrases (bare `over` matches every
-  "Consumed ... over Ns" line); (d) BrokenPipeError driver death = rerun.
+  Debug: FIFO console - CONTRIBUTING "VM debug loops". Probe LAYERED:
+  guest service -> guest loopback -> HOST port; "connects but never
+  answers" behind a forward is a FIREWALL signature (ledger (k)).
+- VM-test/demo debug loops (driver realization, GC root, payload/probe
+  rules (a)-(d)) and the 0.16-upgrade loop rules (a)-(g) live in
+  CONTRIBUTING "VM debug loops" - consult BEFORE rerunning a failed VM
+  test or debugging a demo VM.
 - Gate commands redirect, never pipe (`cmd | tail` can print PASSED on a
   failing run): `nix flake check > /tmp/gate.log 2>&1; echo "EXIT:$?" >>
   /tmp/gate.log`. Never run `buildflow` and `nix flake check`
   CONCURRENTLY. An EMPTY `nix build` log means CACHE HIT - force with
   `--rebuild` when execution is the claim.
 - Repo-tool traps: `rg -rln` is NOT "recursive + line-number" (`-r`
-  REPLACES matches with the next arg and corrupts output - bit this repo
-  twice; use `rg -l -n`); bare `nix fmt` forwards no paths and dies on
+  REPLACES matches with the next arg and corrupts output; use `rg -l -n`); bare `nix fmt` forwards no paths and dies on
   STDIN (check-mode: `nix fmt -- . --check`; run before yielding on any
   session that touched `.nix` - the daemon pushes mid-session); extract
   cross-file identifiers mechanically (`grep -o`, `git diff` read-back),
@@ -76,9 +66,8 @@ transcript-pinned dialect).
 - HOST-SIDE PARSER DRY-RUN before any VM test feeding a fixture to a
   python service: `python3 scripts/host-parse-fixture.py <fixture>
   --check parsedmarc-e2e` (~30 s, reproduces VM parser reds in seconds;
-  when a fixture fails to parse, diff the newest upstream copy first -
-  upstream "samples" have been malformed and later repaired).
-- VM-test fixture traps (live-observed): dovecot settings values must NOT
+  when a fixture fails to parse, diff the newest upstream copy first).
+- VM-test fixture traps: dovecot settings values must NOT
   use the `<path` prefix (read-from-file syntax inlines file CONTENTS
   into dovecot.conf); parsedmarc ini bools render Python-style
   (`ssl=True`); `arrival_date_utc` assertions are timezone-normalization
@@ -112,8 +101,8 @@ transcript-pinned dialect).
   auth_as); dnsbl zone/tag are QUOTED expression constants.
 - Tests: VM E2E for behavior, eval contract for wiring. Never weaken
   module defaults to make a test deterministic - fix the test.
-- Shared VM-test/demo blocks live in tests/common.nix (2026-10-19 dedup):
-  the DNS-less-VM provision patches (DnsResolver Cloudflare + pyzor off -
+- Shared VM-test/demo blocks live in tests/common.nix: the DNS-less-VM
+  provision patches (DnsResolver Cloudflare + pyzor off -
   nodes with a REAL resolver, e.g. relay-e2e's dnsmasq, must NOT import
   it), the /etc/test-admin-secret fallback-admin file, and the upstream
   DMARC aggregate fixture each have ONE canonical copy there - import,
@@ -172,9 +161,9 @@ transcript-pinned dialect).
   blind); heredocs with quoted delimiters dissolve the SC2016/2064/1012
   quoting crab-walk. statix W20 is FIXED, not tolerated: collapse
   `services = { stalwart = { ... }; }` blocks ALL the way down in VM-test
-  node configs. vulnix crashes fleet-wide (NVD retired the legacy feeds)
-  - skipped in .buildflow.yml; BuildFlow's "unscannable store path" hint
-    is a misdiagnosis of that crash.
+  node configs. vulnix crashes fleet-wide (NVD retired the legacy feeds),
+  skipped in .buildflow.yml (BuildFlow's "unscannable store path" hint is
+  a misdiagnosis of that crash).
 - Release procedure: CONTRIBUTING owns the checklist. The daemon races
   explicit commits on release-critical files - edit and commit in the
   SAME tool call. `core.hooksPath` can dangle silently - when touching
@@ -191,17 +180,6 @@ transcript-pinned dialect).
 - Known gate noise: the gate log's "running N flake checks" count line
   can disagree with the defined set - trust the attrNames eval. Before
   creating a repo-root file, `ls` the WHOLE repo incl. `docs/` first.
-- 0.16-upgrade loop rules: (a) PROBE BEFORE RERUN - boot the FIFO console
-  before rerunning a failed VM test; (b) NEVER trust a sibling report's
-  "green" - read the stored log / registrationTime; (c) NO SCHEMA CLAIM
-  without an apply transcript (Rust doc comments lied once: `User.name`);
-  (d) let provisioning settle before probing (port-open != server-ready;
-  the ExecStartPost restart window eats connections); (e) logged
-  artifacts dump on failure by default; (f) dnsmasq must FORWARD upstream
-  (10.0.2.3) - 0.16 reload validation resolves via the system resolver
-  (the demo's 2026-10-18 boot race was this class; the demo pins
-  DnsResolver = Cloudflare); (g) serialize heavy VM builds ACROSS repos
-  (concurrent builds OOM-killed a run once).
 - Session-start baseline ritual: `git status --short`, `pgrep -af crush`,
   scan `ls docs/status` for same-day reports BEFORE the first edit; never
   edit a file another session is mid-iterating on - hand off via
@@ -210,8 +188,7 @@ transcript-pinned dialect).
   formatter-fragile (dprint REWRAPS struck rows and EATS overflow cells):
   strike rows in the per-cell canonical form, run `annotate.go
   check-rows` after every formatter pass.
-- Stalwart source-assessment discipline (2026-10-19 contacts review):
-  ground every "pinned version" claim in flake.lock (parse rev, then
+- Stalwart source-assessment discipline: ground every "pinned version" claim in flake.lock (parse rev, then
   `nix eval github:NixOS/nixpkgs/<rev>#stalwart_0_16.version`) - bare
   `nix eval nixpkgs#...` answers the REGISTRY, not this deployment (a
   whole review ran against 0.16.26 while the lock ships 0.16.22).

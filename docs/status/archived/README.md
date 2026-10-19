@@ -85,8 +85,8 @@ green) supersedes the upgrade-state facts and stays live.
 
 ## Manifest — 2026-10-19 late docs-health pass (5 files + specs)
 
-All ANNOTATE→ARCHIVE: every b/c/f/g item carries an inline verdict (182
-tool-applied + 8 hand for literal-`~~`/bullet lines); tables in per-cell
+All ANNOTATE→ARCHIVE: every b/c/f/g item carries an inline verdict (174
+tool-applied + 8 hand for literal-`~~`/bullet lines = 182 total); tables in per-cell
 form with `check-rows:ledger` exemptions where routed rows are the point;
 a/d/e historical by policy. The daemon's mid-pass dprint run mangled
 whole-line table strikes twice — rebuilt per-cell from the preserved specs
