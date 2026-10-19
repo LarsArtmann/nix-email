@@ -51,6 +51,17 @@
           inherit system;
           inherit (inputs) nixpkgs;
         };
+        # Convert-smoke for the vendored migrate_v016.py (2026-10-19):
+        # the migration script's first FUNCTIONAL test - the real convert
+        # subcommand against a minimal 0.15 dump fixture, pinning the
+        # DataStore descriptor, the Domain/Account/SystemSettings plan
+        # shape (local-part names, restore-<id> account ids), and the
+        # --patch-paths rewrite the migration script depends on. Pure
+        # derivation + build-time python, arch-independent.
+        migrate-convert-eval = import ../tests/migrate-convert-eval.nix {
+          inherit system;
+          inherit (inputs) nixpkgs;
+        };
       }
       // pkgs.lib.optionalAttrs (system == "x86_64-linux") {
         # Demo-host contract (2026-10-06): flake check already forces the

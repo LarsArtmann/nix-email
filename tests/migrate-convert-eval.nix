@@ -17,6 +17,9 @@
   system,
 }: let
   pkgs = nixpkgs.legacyPackages.${system};
+  # migrate_v016.py imports requests unconditionally (the dump side);
+  # the convert path itself is stdlib-only, but the module import needs it.
+  pythonWithRequests = pkgs.python3.withPackages (p: [p.requests]);
 
   # Minimal but faithful 0.15 dump: flat settings map (as served by
   # /api/settings/list) + principal records (as served by /api/principal).
@@ -61,7 +64,7 @@
 in
   pkgs.stdenv.mkDerivation {
     name = "migrate-convert-eval";
-    nativeBuildInputs = [pkgs.python3 pkgs.jq];
+    nativeBuildInputs = [pythonWithRequests pkgs.jq];
     dontUnpack = true;
     buildPhase = ''
       runHook preBuild
@@ -89,7 +92,7 @@ in
         and (.value | to_entries | any(
           .key == "restore-2"
           and .value.name == "lars"
-          and (.value.domainId | startswith("#"))))))' export.json > /dev/null
+          and (.value.domainId | startswith("#"))))' export.json > /dev/null
       grep -q 'restore-' export.json
 
       echo "[*] convert with --patch-paths (the dump-copy -> live rewrite)"
