@@ -10,9 +10,10 @@ transcript-pinned dialect).
 ## Commands
 
 - `buildflow` - the quality gate wrapper (skips with rationale in
-  `.buildflow.yml`). Tools run inside the flake devShell (must stay
+  `.buildflow.yml`; tools run inside the flake devShell - must stay
   resolvable). Warning-level findings do NOT fail the gate (threshold:
-  error); "N tools unavailable" is expected noise for a Nix-only repo.
+  error); "N tools unavailable" = expected noise for a Nix-only repo.
+  Budget `--max-time` >= 30m - the per-step deadline kills VM-e2e builds.
 - `nix flake check` - the full gate: eval contract checks + x86_64-only
   VM E2E (~4-6 min CI). Check set is SINGLE-SOURCED: canonical list =
   ci.yml lockstep `expected=` / README "What is built and verified" -
@@ -23,8 +24,8 @@ transcript-pinned dialect).
   (`nix build .#checks.x86_64-linux.<name> -L`), then the full gate.
 - Host binary spike = DEAD END for Stalwart (listeners never bind on the
   host); host loops are fine for client-side forensics only (swaks + a
-  tiny python SMTP sink; swaks attachments take `@path` - `<path>` sends
-  the path STRING).
+  python SMTP sink; swaks attachments take `@path`, not `<path>` - that
+  sends the path STRING).
 - `nix run .#vm` (x86_64) - throwaway demo VM; ports/credentials live in
   the README quickstart + login banner (single source); demo disk at
   ~/.cache/nix-email-demo/ (app pins NIX_DISK_IMAGE; no CWD pollution).
