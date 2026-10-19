@@ -713,6 +713,12 @@ json/yaml/markdown.
   `match = ["description"]`); DkimSignature needs NO `publicKey` (server
   derives it); Account match keys must be explicit (`match = ["name"]`) -
   value-matching breaks once the server hashes stored secrets.
+  DIVERGENCE (VM-proven 2026-10-18, backup-transcript probes):
+  `stalwart-cli snapshot` generates plans with NO Account matchOn
+  (id-keyed upserts) - both shapes work; the wrapper deliberately sets
+  `match = ["name"]` for e2e/demo idempotence (pinned by
+  `provision-plan-eval`), so do not "fix" snapshot-derived plans to match
+  the wrapper or vice versa.
 - **Static `server.listener` config keys are SILENTLY IGNORED** on 0.16
   (binary-proven 2026-10-17): listeners live exclusively in the datastore,
   and a VIRGIN store binds only the built-in default set (smtp 25 + http

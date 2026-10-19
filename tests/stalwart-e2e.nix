@@ -52,13 +52,55 @@
 #      inboundReportForwarding=false is CONSUMED (no INBOX delivery; the
 #      pre-0.16 /api/reports store read is gone with the REST API)
 #  17. JMAP: session, mailboxes, and the delivered needle over the API
+#  17b. JMAP push: EventSource delivers StateChange on a new mail
 #  18. Nothing panics in the journal
 # 19. Wrapper rate limiter trips at runtime (flood node, M14 evidence)
+# 20. Restart persistence: INBOX survives, admin stays locked, AND the
+#      provision oneshot does NOT re-run (active-enter timestamp pinned)
 #
 # NOT covered (needs DNS + external relay creds): outbound smarthost relay
 # (see stalwart-relay-e2e). Those stay live-host go-live checks - see
 # README verified-facts ledger for the keys.
 {pkgs}: let
+  # JMAP EventSource listener (W6.6): raw-socket long-poll of the
+  # eventSourceUrl path on the loopback listener; exits 0 as soon as a
+  # StateChange event arrives (probe-proven shape, demo VM 2026-10-18:
+  # StateChange fires on delivery; t+7.65s worst case there).
+  esListener = pkgs.writers.writePython3Bin "es-listen" {} ''
+    import base64
+    import socket
+    import sys
+    import time
+
+    path, creds = sys.argv[1], sys.argv[2]
+    token = base64.b64encode(creds.encode()).decode()
+    request = (
+        "GET "
+        + path
+        + " HTTP/1.1\r\nHost: 127.0.0.1\r\n"
+        + "Authorization: Basic "
+        + token
+        + "\r\nAccept: text/event-stream\r\nConnection: close\r\n\r\n"
+    )
+    deadline = time.time() + 25
+    stream = socket.create_connection(("127.0.0.1", 8080), timeout=5)
+    stream.sendall(request.encode())
+    stream.settimeout(5)
+    buffered = b""
+    while time.time() < deadline:
+        try:
+            chunk = stream.recv(4096)
+        except socket.timeout:
+            continue
+        if not chunk:
+            break
+        buffered += chunk
+        if b"StateChange" in buffered:
+            sys.stdout.buffer.write(buffered)
+            sys.exit(0)
+    sys.stdout.buffer.write(buffered)
+    sys.exit(1)
+  '';
   # Account identity contract (0.16 schema, apply-transcript-verified
   # 2026-10-16): User.name is the LOCAL PART (a full address fails apply
   # with "Invalid email local part | Properties: name"); the primary
@@ -444,6 +486,7 @@ in
       };
 
       environment.systemPackages = [
+        pkgs.python3
         pkgs.swaks
         pkgs.openssl
         pkgs.curl
@@ -915,7 +958,45 @@ in
               "/tmp/jmap-email.json > /dev/null"
           )
 
+      with subtest("JMAP push: EventSource delivers StateChange on a new mail"):
+          # W6.6: the point-in-time needle query above cannot see stale-cache
+          # classes; the PUSH side can. Extract the eventSourceUrl path the
+          # same way as apiUrl (absolute https URL, DNS-less VM -> loopback),
+          # listen in the background, deliver a fresh needle, and require a
+          # StateChange event to arrive over the stream.
+          machine.succeed(
+              "jq -j '.eventSourceUrl | sub(\"^https?://[^/]+\"; \"\")' "
+              "/tmp/jmap-session.json > /tmp/es-path.txt"
+          )
+          machine.succeed("cat /tmp/es-path.txt >&2")
+          machine.execute(
+              "nohup python3 ${esListener}/bin/es-listen \"$(cat /tmp/es-path.txt)\" "
+              "'user2@example.test:${testPass}' > /tmp/es.log 2>&1 &"
+          )
+          machine.succeed(
+              "swaks --timeout 120 --server 127.0.0.1:587 --tls --auth PLAIN "
+              "--auth-user user1@example.test --auth-password '${testPass}' "
+              "--from user1@example.test --to user2@example.test "
+              "--header 'Subject: e2e-push' --body 'needle-push-9c3f1a' "
+              "> /tmp/swaks-push.log 2>&1"
+          )
+          machine.succeed("cat /tmp/swaks-push.log >&2")
+          machine.succeed(
+              "for i in $(seq 1 30); do "
+              "grep -q StateChange /tmp/es.log 2>/dev/null && exit 0; "
+              "sleep 1; done; "
+              "cat /tmp/es.log >&2; exit 1"
+          )
+
       with subtest("restart persistence: INBOX survives, admin stays locked"):
+          # W6.5: restarting the SERVER must not re-run the provision
+          # oneshot (an apply on every restart would fight runtime state;
+          # the unit is ordered After=stalwart.service but is not bound to
+          # its restarts) - pin the active-enter timestamp across it.
+          machine.succeed(
+              "systemctl show -p ActiveEnterTimestamp --value stalwart-provision.service "
+              "> /tmp/prov-ts-before.txt"
+          )
           machine.succeed("systemctl restart stalwart.service")
           machine.wait_for_unit("stalwart.service", timeout=120)
           machine.wait_for_open_port(993, timeout=180)
@@ -925,6 +1006,11 @@ in
               "-o /tmp/jmap-anon-session2.json"
               "&& jq -e '.primaryAccounts == {}' /tmp/jmap-anon-session2.json > /dev/null"
           )
+          machine.succeed(
+              "systemctl show -p ActiveEnterTimestamp --value stalwart-provision.service "
+              "> /tmp/prov-ts-after.txt"
+          )
+          machine.succeed("diff /tmp/prov-ts-before.txt /tmp/prov-ts-after.txt")
 
       with subtest("no crashes"):
           machine.succeed(
