@@ -113,6 +113,14 @@ transcript-pinned dialect).
     QUOTED expression constants.
 - Tests: VM E2E for behavior, eval contract for wiring. Never weaken
   module defaults to make a test deterministic - fix the test.
+- Shared VM-test/demo blocks live in tests/common.nix (2026-10-19
+  dedup): the DNS-less-VM provision patches (DnsResolver Cloudflare +
+  pyzor off - nodes with a REAL resolver, e.g. relay-e2e's dnsmasq,
+  must NOT import it), the /etc/test-admin-secret fallback-admin file,
+  and the upstream DMARC aggregate fixture each have ONE canonical
+  copy there - import, never restate. flake8 E501 guards python inside
+  writers'' strings: keep lines <= 79 chars AFTER the nix 4-space strip
+  (<= 83 in the .nix file).
 - STALWART 0.16 DOCTRINE: the wrapper renders `services.stalwart.provision`
   plans; `services.stalwart.settings` is ONLY the config.json datastore
   descriptor; the admin is a REQUIRED systemd credential. FULL dialect
