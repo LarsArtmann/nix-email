@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- `check-set-lockstep` check + `tests/check-expected.json` canonical
+  check list (2026-10-19): the declared check set must equal the JSON
+  list on BOTH arches or `nix flake check` throws with both sets
+  spelled out. ci.yml's lockstep/shape steps and the pre-push
+  `scripts/check-inventory.sh` now read the SAME file, collapsing the
+  four restated copies of the list to one machine source plus the
+  README prose row (the 2026-09-23 missing-entry class now fails
+  locally regardless of pre-push hook state). Negative-tested (drifted
+  name throws; restore passes).
 - `provision-plan-eval` check (2026-10-18, the paid-for plan-dialect bug
   classes caught at eval speed): hostname == provisioned-Domain
   coherence, match-property posture (reconcile sets MUST carry an
