@@ -49,14 +49,10 @@ transcript-pinned dialect).
   session that touched `.nix` - the daemon pushes mid-session); extract
   cross-file identifiers mechanically (`grep -o`, `git diff` read-back),
   never from memory.
-- Adding/removing a flake check = TWO sites in the same change:
-  `tests/check-expected.json` (the canonical list - ci.yml,
-  `scripts/check-inventory.sh`, and the `check-set-lockstep` check all
-  read it, so no other copies exist) AND the README check list
-  (CI-enforced: the anti-drift step fails when a check is not named in
-  README.md); a missed site ships red master (daemon pushes bypass the
-  hook). Pre-flight: `grep -rn '<existing-check-name>' .github scripts
-  tests README.md`.
+- Adding/removing a flake check = TWO sites: edit
+  `tests/check-expected.json` AND the README check list (CI-enforced
+  anti-drift); a missed site ships red master (daemon pushes bypass the
+  hook). Pre-flight: `grep -rn '<name>' .github scripts tests README.md`.
 - A red CI run is NEVER "the known one" without reading the failing STEP
   name (`gh run view --log-failed`); two causes can stack. A working-tree
   gate red may belong to ANOTHER session's in-flight fix: check
