@@ -181,4 +181,50 @@ compared across protocols.
 
 ---
 
+## Addendum (2026-10-19, ~08:05): f)-addendum benchmark DONE — verdict CLOSE; f)1 delta table; knob facts
+
+**Benchmark (f)1-addendum filing-grade path, DONE — CLOSE.** 10k
+deterministic vCards seeded on the demo VM
+(`docs/probes/2026-10-19-carddav-demo-vm/benchmark-verdict.md`): filtered
+addressbook-query over 10k cards = **74 ms median** (host loadavg 20–42 at
+measurement time, so conservative); PROPFIND Depth:1 (2000 hrefs) 21 ms;
+multiget-100 2 ms; single GET 0.5 ms. No measured victim, no harmful
+latency at any personal scale ⇒ **do not file**; the path reopens only on
+measured production harm.
+
+**Load-bearing side discovery**: DAV result sets cap at
+`WebDav.maxResults` default **2000** (the 10k count PROPFIND returned
+exactly 2000 hrefs; source-verified registry `WebDav` defaults). Clients
+must not treat a full PROPFIND as complete on larger books.
+
+**f)1 delta table (0.16.22 pin ↔ 0.16.26 registry)** — realized the exact
+pinned source via the flake-lock nixpkgs input; every contacts-relevant
+file is **byte-identical**:
+
+| File (crates/)                                  | 0.16.22 ↔ 0.16.26 |
+| ----------------------------------------------- | ----------------- |
+| dav/src/card/{mod,query,mkcol,update,delete,get}.rs | identical      |
+| dav/src/common/{mod,uri,propfind}.rs            | identical         |
+| dav-proto/src/requests/report.rs (sync parser)  | identical         |
+| dav-proto/src/schema/request.rs                 | identical         |
+| common/src/config/groupware.rs                  | identical         |
+| jmap/src/contact/{get,set}.rs                   | identical         |
+| registry `AddressBook` struct + defaults        | identical         |
+| registry `WebDav` defaults (maxResults 2000)    | identical         |
+
+Every [SRC] claim in the 02:35 report (read from 0.16.26) holds verbatim
+for the deployed pin, and every [LIVE] pin behavior will hold at 0.16.26.
+
+**Knobs (f)6, source-verified, defaults healthy — document, do not
+expose)**: `AddressBook.maxVCardSize` default 512 KiB (enforced on JMAP
+set + DAV address-data), `AddressBook.vCardVersion` default V4,
+`maxAddressBooks` 250, `maxContacts` unlimited; module exposure = registry
+`AddressBook` object via the provision pattern if ever needed. **Spam ×
+contacts (checked for the CRM plan)**: ZERO coupling — no contact/
+addressbook reference anywhere in spam-filter or SMTP delivery crates; the
+addressbook does not influence classification (consistent with the 10-18
+"may land in Junk Mail" finding).
+
+---
+
 _Point-in-time snapshot. Session modified no project files; the auto-commit daemon owns this file's landing._
