@@ -26,6 +26,17 @@ fit together, and a recommended baseline that avoids the known footguns.
 > `/metrics/prometheus` dump (the stalwart-e2e build log carries one)
 > before writing rules.
 >
+> **UPDATE 2026-10-19 (0.16.22 spot-check, first full gate):** the
+> endpoint side is re-verified on 0.16.22 through the WRAPPER path - the
+> e2e enables the wrapper's `services.mail-server.metrics.enable` and
+> `/metrics/prometheus` answers 200 (unauthenticated, loopback HTTP
+> listener) with the full 37-series payload transcribed in
+> docs/MONITORING.md §5.5. Series names for alert rules come from THERE,
+> never from this doc. The raw `metrics.*` settings keys below remain
+> 0.15.5-verified only - 0.16 renders telemetry through provision
+> objects/Settings; re-derive exact object shapes from the pinned binary
+> before wiring webhooks/alerts/retention.
+>
 > **UPDATE 2026-10-05: webhook + alert support is now binary-verified
 > present in 0.15.5** (`strings` over the pinned
 > `/nix/store/nzdwhgmch2d8xvrbab3418mh1gqmr4ff-stalwart-0.15.5/bin/stalwart`):

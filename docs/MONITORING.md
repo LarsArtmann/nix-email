@@ -131,7 +131,7 @@ management surface is JMAP + `stalwart-cli`; a queue-inspect equivalent
 was NOT verified against 0.16.22 (verify `stalwart-cli --help` on the
 pin before wiring anything here):
 
-| Lever           | Call (0.15.5 only)                                      | Effect                                                |
+| Lever           | Call (0.15.5 only)                                       | Effect                                                |
 | --------------- | -------------------------------------------------------- | ----------------------------------------------------- |
 | Inspect         | `GET /api/queue/messages`                                | list queued messages (id, sender, recipients, status) |
 | Pause delivery  | `PATCH /api/queue/status/stop`                           | queue-wide pause (`QueueEvent::Paused(true)`)         |
