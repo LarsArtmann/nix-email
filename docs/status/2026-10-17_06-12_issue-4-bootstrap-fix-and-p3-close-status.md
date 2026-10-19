@@ -38,13 +38,13 @@ Direct answers up front: **What did I forget?** Nothing user-visible broke, but 
 
 (All still wanted; priorities per the P-plan. Nothing here was started this session.)
 
-- **P1 + P2 owner sittings** (C42-C46, policy batch, D1/D2 timeline, Resend key) - blocked on 👤 you; unlocks ~51% of the plan.
-- **P4 cut v0.5.0** (Unreleased pass -> gates -> scratch-tag dry-run -> tag -> release) - gated on P1 (C43) + push (now green).
-- **P5 SystemNix pin advance to v0.5.0** - gated on P4.
-- **P6 0.16 backup story** (`--export/--import` gone upstream; FEATURES row 🔴 BROKEN) - unblocked, highest-value non-release task; NOT started.
-- **P7-P12, P14-P18** (20% batch: demo smoke, MONITORING metric rule, match-property audit, eval lint, THREAT_MODEL, C42 evidence, flood/bounce, dmarc-eval hardening, 0.16.23-26 delta table, JMAP anti-rot, 0.15-reference sweep) - untouched.
-- **P19-P26** (docs-truth residue, upstream filings, BuildFlow/SystemNix batches, test/repo hygiene, D1 slice) - untouched.
-- Session-born (new, see f29-f36): pbx 0.16.26 cross-validation, eval-time unit lint, guard-site grep institutionalization - none started.
+- ~~**P1 + P2 owner sittings** (C42-C46, policy batch, D1/D2 timeline, Resend key) - blocked on 👤 you; unlocks ~51% of the plan.~~ routed - decision-batch C42-C46 + the TODO_LIST blocked-on-user row
+- ~~**P4 cut v0.5.0** (Unreleased pass -> gates -> scratch-tag dry-run -> tag -> release) - gated on P1 (C43) + push (now green).~~ routed - TODO_LIST v0.5.0 row (C43-gated)
+- ~~**P5 SystemNix pin advance to v0.5.0** - gated on P4.~~ routed - TODO_LIST SystemNix pin row
+- ~~**P6 0.16 backup story** (`--export/--import` gone upstream; FEATURES row 🔴 BROKEN) - unblocked, highest-value non-release task; NOT started.~~ routed - TODO_LIST 0.16 backup story row; the FEATURES row is since corrected to 🟡 PARTIALLY_FUNCTIONAL (research DONE 2026-10-17; the VM proof remains)
+- ~~**P7-P12, P14-P18** (20% batch: demo smoke, MONITORING metric rule, match-property audit, eval lint, THREAT_MODEL, C42 evidence, flood/bounce, dmarc-eval hardening, 0.16.23-26 delta table, JMAP anti-rot, 0.15-reference sweep) - untouched.~~ routed - TODO_LIST rows per P-number (all verified present this pass)
+- ~~**P19-P26** (docs-truth residue, upstream filings, BuildFlow/SystemNix batches, test/repo hygiene, D1 slice) - untouched.~~ routed - TODO_LIST rows per P-number
+- ~~Session-born (new, see f29-f36): pbx 0.16.26 cross-validation, eval-time unit lint, guard-site grep institutionalization - none started.~~ done 2026-10-17 (2 of 3) - the pbx 0.16.26 cross-validation is DONE (f27, their gate on lock d7e1334); the guard-site grep is institutionalized in AGENTS (3d5c11b); the eval-time unit lint routed - TODO_LIST provision-plan-eval row (hand verdicts: plain bullets the tool does not key)
 
 ## d) TOTALLY FUCKED UP
 
