@@ -233,27 +233,28 @@
                     body = b"".join(
                         part[1] for part in msg if isinstance(part, tuple)
                     )
-                    if needle in body:
-                        if mode == "absent":
-                            print(
-                                "over-quota message WAS delivered (definitive)",
-                                file=sys.stderr,
-                            )
-                            sys.exit(1)
-                        if mode == "header":
-                            head = body.split(b"\r\n\r\n", 1)[0]
-                            if header in head:
-                                print("header present on needle message")
-                                sys.exit(0)
-                            print(
-                                "needle arrived but {} missing (definitive)".format(
-                                    header
-                                ),
-                                file=sys.stderr,
-                            )
-                            sys.exit(1)
-                        print("needle found in INBOX")
-                        sys.exit(0)
+                    if needle not in body:
+                        continue
+                    if mode == "absent":
+                        print(
+                            "over-quota message WAS delivered (definitive)",
+                            file=sys.stderr,
+                        )
+                        sys.exit(1)
+                    if mode == "header":
+                        head = body.split(b"\r\n\r\n", 1)[0]
+                        if header in head:
+                            print("header present on needle message")
+                            sys.exit(0)
+                        print(
+                            "needle arrived but {} missing (definitive)".format(
+                                header
+                            ),
+                            file=sys.stderr,
+                        )
+                        sys.exit(1)
+                    print("needle found in INBOX")
+                    sys.exit(0)
                 imap.close()
         except Exception as err:
             last_err = err
