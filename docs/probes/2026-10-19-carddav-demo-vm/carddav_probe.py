@@ -104,7 +104,8 @@ def req(
             text if len(text) <= 1200 else text[:1200] + "\n... (truncated)", flush=True
         )
     conn.close()
-    return resp.status, dict(resp.getheaders()), data
+    lower = {k.lower(): v for k, v in resp.getheaders()}
+    return resp.status, lower, data
 
 
 def hrefs(xml_bytes: bytes, tag: str, ns: str = DAV) -> list[str]:
@@ -113,6 +114,19 @@ def hrefs(xml_bytes: bytes, tag: str, ns: str = DAV) -> list[str]:
     except ET.ParseError:
         return []
     return [e.text or "" for e in root.iter(f"{{{ns}}}{tag}")]
+
+
+def prop_href(xml_bytes: bytes, container: str, ns: str = DAV) -> str | None:
+    """First DAV:href child text inside <container> (property-value extraction)."""
+    try:
+        root = ET.fromstring(xml_bytes)
+    except ET.ParseError:
+        return None
+    for element in root.iter(f"{{{ns}}}{container}"):
+        child = element.find(f"{{{DAV}}}href")
+        if child is not None and child.text:
+            return child.text
+    return None
 
 
 def prop(xml_bytes: bytes, local: str, ns: str = DAV) -> str | None:
@@ -128,7 +142,7 @@ def main() -> int:
 
     # T17.1: well-known redirect (any method, incl. unauthenticated)
     status, headers, _ = req("GET", "/.well-known/carddav", auth=False)
-    loc = headers.get("Location", "")
+    loc = headers.get("location", "")
     record(
         "T17.1 well-known/carddav 307->/dav/card",
         "PASS"
@@ -144,7 +158,7 @@ def main() -> int:
         "</D:prop></D:propfind>"
     )
     status, headers, data = req("PROPFIND", "/dav/card/", propfind_cup, depth="0")
-    principal = prop(data, "href")
+    principal = prop_href(data, "current-user-principal")
     record(
         "T17.1b current-user-principal",
         f"PASS ({principal})"
@@ -160,7 +174,7 @@ def main() -> int:
         "<D:prop><C:addressbook-home-set/><D:displayname/></D:prop></D:propfind>"
     )
     status, headers, data = req("PROPFIND", principal_path, propfind_home, depth="0")
-    home = prop(data, "href", CARD)
+    home = prop_href(data, "addressbook-home-set", CARD)
     record(
         "T17.1c addressbook-home-set",
         f"PASS ({home})" if status == 207 and home else f"SEE-TRANSCRIPT ({status})",
@@ -201,7 +215,7 @@ def main() -> int:
     status, headers, _ = req(
         "PUT", card1, VCARD_4, extra={"Content-Type": "text/vcard; charset=utf-8"}
     )
-    etag1 = headers.get("ETag", headers.get("Etag", ""))
+    etag1 = headers.get("etag", "")
     record(
         "T04.2b PUT vCard 4.0 -> 201 + ETag",
         f"PASS ({etag1})"
@@ -283,7 +297,7 @@ def main() -> int:
     hits = [h for h in hrefs(data, "href") if h.endswith(".vcf")]
     record(
         "T04.5 query EMAIL contains 'kith'",
-        f"PASS ({len(hits)} hits: card1+card4)"
+        f"PASS ({len(hits)} hits: card1+card2)"
         if status == 207 and len(hits) == 2
         else f"SEE-TRANSCRIPT ({status}, {len(hits)} hits)",
     )
@@ -342,14 +356,20 @@ def main() -> int:
         else f"SEE-TRANSCRIPT ({status}, {len(hits)})",
     )
 
-    # T04.8: sync-collection round-trip
-    sync_empty = (
+    # T04.8: sync-collection round-trip. sync-level 1 is ALWAYS sent: run 1
+    # (carddav-probe-run1-nolevel.log + carddav-diag.log) proved the pin
+    # defaults the body-depth to 0 when sync-level is omitted, silently
+    # returning no members/changes (RFC 6578 makes sync-level a required
+    # element; the omission behavior is characterized in the diag transcript).
+    sync_body = (
         '<?xml version="1.0"?>'
         '<D:sync-collection xmlns:D="DAV:">'
+        "<D:sync-level>1</D:sync-level>"
         "<D:prop><D:getetag/></D:prop>"
-        "<D:sync-token/>"
+        "{token}"
         "</D:sync-collection>"
     )
+    sync_empty = sync_body.replace("{token}", "<D:sync-token/>")
     status, headers, data = req("REPORT", book_path, sync_empty, depth="1")
     token1 = prop(data, "sync-token")
     n_initial = len([h for h in hrefs(data, "href") if h.endswith(".vcf")])
@@ -365,9 +385,7 @@ def main() -> int:
     status, headers, data = req(
         "REPORT",
         book_path,
-        sync_empty.replace(
-            "<D:sync-token/>", f"<D:sync-token>{token1 or ''}</D:sync-token>"
-        ),
+        sync_body.replace("{token}", f"<D:sync-token>{token1 or ''}</D:sync-token>"),
         depth="1",
     )
     token2 = prop(data, "sync-token")
@@ -411,7 +429,7 @@ def main() -> int:
         "PASS" if status == 412 else f"SEE-TRANSCRIPT ({status})",
     )
     _, headers_now, _ = req("GET", card1)
-    etag_now = headers_now.get("ETag", headers_now.get("Etag", ""))
+    etag_now = headers_now.get("etag", "")
     status, headers, data = req(
         "PUT",
         card1,
