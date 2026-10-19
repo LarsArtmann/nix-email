@@ -68,9 +68,9 @@ Stalwart ships a webadmin, not a user webmail. Roundcube/SnappyMail would be a n
 - **[rec] Non-goal for the wrapper** (consume via IMAP/JMAP clients; revisit only on a real demand signal). Record in ROADMAP non-goals.
 - **RESOLVED 2026-10-19 (owner, "set it up")**: non-goal for THIS flake stands — the webmail
   lives on the consumer host as **Bulwark** (JMAP-native, AGPL, in nixpkgs as `services.bulwark`
-  + package), wired in pbx-artmann (hosts/pbx/bulwark.nix, external-IdP OAuth via the Pocket IdP
-  train, runbook §12 there). Zero wrapper surface here: the nixpkgs module IS the integration.
-  The old "revisit on demand" trigger fired via Bulwark's existence, not a wrapper need.
+  - package), wired in pbx-artmann (hosts/pbx/bulwark.nix, external-IdP OAuth via the Pocket IdP
+    train, runbook §12 there). Zero wrapper surface here: the nixpkgs module IS the integration.
+    The old "revisit on demand" trigger fired via Bulwark's existence, not a wrapper need.
 
 ## ROADMAP Q-answers (30-sec each)
 

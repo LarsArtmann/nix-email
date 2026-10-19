@@ -23,8 +23,8 @@
 >   37-series inventory in MONITORING §5.5). V13 DONE 2026-10-18 (451 to
 >   229 lines; the 220-cap blessing stays C41). V14 DONE. V15 DONE (delta
 >   table). V16 PENDING as W6. V17 DONE 2026-10-19 (as W9: hardening pins
->   + IFD cleanup). V18 PROBE SIDE DONE 2026-10-18 (EventSource,
->   closeafter=no, Junk-filing; e2e assertions pending as W6).
+>   - IFD cleanup). V18 PROBE SIDE DONE 2026-10-18 (EventSource,
+>     closeafter=no, Junk-filing; e2e assertions pending as W6).
 > - V19 DONE 2026-10-18 (0.15 sweep). V20 DONE 2026-10-19 (as W11,
 >   empirically scoped against real dprint behavior). V21 DONE 2026-10-18.
 >   V22 PENDING as W12. V23 PENDING as W13. V24 PENDING as W16. V25
