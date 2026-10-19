@@ -22,7 +22,8 @@
 #      - every-boot posture for consumers)
 #   5. Journal hygiene: no configuration build errors
 {pkgs, ...}: let
-  adminSecret = "test-admin-secret";
+  common = import ./common.nix;
+  adminSecret = common.testAdminSecret;
   # SAN-carrying self-signed pair (binary-proven 2026-10-17: the manual
   # Certificate upsert needs the SAN match key, and modern TLS validation
   # rejects CN-only certs on reload).
@@ -80,7 +81,11 @@ in
     name = "stalwart-bind-e2e";
 
     nodes.machine = {...}: {
-      imports = [../modules/mail-server.nix];
+      imports = [
+        ../modules/mail-server.nix
+        common.dnslessVmPatches
+        common.testAdminSecretModule
+      ];
 
       system.stateVersion = "26.05";
 
@@ -111,19 +116,9 @@ in
           protocol = "pop3";
           tls.implicit = true;
         };
-        # Same DNS-less-VM reload-validation patches as stalwart-e2e (the
-        # 0.16 reload validation reads the resolver config and fails the
-        # whole apply without a nameserver; the pyzor default host is
-        # unresolvable here).
-        stalwart.provision.singletons = {
-          DnsResolver."@type" = "Cloudflare";
-          SpamPyzor.enable = false;
-        };
-      };
-
-      environment.etc."test-admin-secret" = {
-        mode = "0600";
-        text = adminSecret;
+        # DNS-less-VM reload-validation patches (DnsResolver Cloudflare +
+        # pyzor off) and the fallback-admin password file ride the
+        # imports above (tests/common.nix).
       };
 
       environment.systemPackages = [

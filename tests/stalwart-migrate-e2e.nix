@@ -23,7 +23,8 @@
 #      8082 listener binds, the 0.15 password authenticates on 0.16
 #   8. Restart persistence: the guard passes on the migrated store
 {pkgs, ...}: let
-  adminSecret = "test-admin-secret";
+  common = import ./common.nix;
+  adminSecret = common.testAdminSecret;
   larsPassword = "LarsE2EPassword123";
 in
   pkgs.testers.runNixOSTest {
@@ -88,7 +89,11 @@ in
       # dedicated httpBind the built-in 8080 cannot shadow) plus the
       # migration script on PATH.
       mig016 = {config, ...}: {
-        imports = [../modules/mail-server.nix];
+        imports = [
+          ../modules/mail-server.nix
+          common.dnslessVmPatches
+          common.testAdminSecretModule
+        ];
 
         system.stateVersion = "26.05";
         services.mail-server = {
@@ -97,18 +102,7 @@ in
           httpBind = "127.0.0.1:8082";
           admin.secretFile = "/etc/test-admin-secret";
         };
-        services.stalwart.provision.singletons = {
-          # 0.16 reload-validation reads the system resolver config and
-          # fails the apply in DNS-less VMs (see the demo boot race,
-          # 2026-10-18) - same pin the other e2e nodes use.
-          DnsResolver."@type" = "Cloudflare";
-          SpamPyzor.enable = false;
-        };
 
-        environment.etc."test-admin-secret" = {
-          mode = "0600";
-          text = adminSecret;
-        };
         environment.systemPackages = [
           # the migration script is per-config; pull it from THIS node's
           # eval so its embedded paths (dataDir, ports, package) match

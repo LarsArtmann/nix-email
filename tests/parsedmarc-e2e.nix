@@ -34,11 +34,11 @@
 #             skip_certificate_verification, default off; mailsuite uses
 #             create_default_context() - full chain + hostname checks)
 {pkgs}: let
-  dmarcTestReport = pkgs.fetchurl {
-    name = "dmarc-test-report";
-    url = "https://github.com/domainaware/parsedmarc/raw/f45ab94e0608088e0433557608d9f4e9517d3afe/samples/aggregate/estadocuenta1.infonacot.gob.mx!example.com!1536853302!1536939702!2940.xml.zip";
-    sha256 = "0dq64cj49711kbja27pjl2hy0d3azrjxg91kqrh40x46fkn1dwkx";
-  };
+  common = import ./common.nix;
+
+  # Shared fixture (tests/common.nix dmarcAggregateReport) - the same
+  # upstream aggregate sample the header above describes.
+  dmarcTestReport = common.dmarcAggregateReport pkgs;
 
   # RFC 6591 DMARC failure (forensic) report fixture: upstream's own
   # sample (multipart/report carrying a message/feedback-report part -

@@ -33,6 +33,8 @@
 # The username==null emission shape is pinned by the eval assertions in the
 # let block (this VM runs the SASL shape).
 {pkgs}: let
+  common = import ./common.nix;
+
   # 0.16 account secrets are PLAINTEXT at provision time (apply hashes
   # server-side); strength is enforced (zxcvbn), hence the length.
   testPass = "testpass-x7Kk-9mQw";
@@ -79,7 +81,7 @@ in
 
     nodes = {
       smtp = {...}: {
-        imports = [../modules/mail-server.nix];
+        imports = [../modules/mail-server.nix common.testAdminSecretModule];
 
         services = {
           mail-server = {
@@ -165,13 +167,11 @@ in
           };
         };
 
-        # Test-only credential files (real hosts: sops-rendered paths).
+        # Test-only credential files (real hosts: sops-rendered paths);
+        # the fallback-admin password file rides the import above
+        # (tests/common.nix).
         environment = {
           etc."relay-secret".text = "relaypass";
-          etc."test-admin-secret" = {
-            mode = "0600";
-            text = "test-admin-secret";
-          };
           systemPackages = [
             pkgs.swaks
             pkgs.curl
