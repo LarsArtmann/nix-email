@@ -1,0 +1,25 @@
+routed - the prune EXECUTED 06-05 same-day (31,498 -> 28,040 B); deeper <20 KB cuts = decision-batch C41 addendum (user-gated)
+current - provenance disclosure adopted as practice; this pass cites primary evidence per verdict (runs, rows, transcripts)
+done 2026-10-17 - AGENTS now says ~4-6 min (CI step-timed runs 39016232923 + 39072344502, this pass)
+done 2026-10-17 - origin green (runs 39016232923, 39072344502); step names read
+done 2026-10-17 - THIS pass harvested all f rows + b/c/g items into TODO_LIST/decision-batch and archived this report
+done 2026-10-17 - ROADMAP at 0.16 truth; INBOXCLEAN 0.16 banner verified; SECURITY.md glanced
+routed - TODO_LIST prose-wrap list-marker lint row (added this pass)
+done - canonical pinned invocation = buildflow -s dprint-format (AGENTS archive-policy line; buildflow owns the toolchain)
+routed - AGENTS prune executed 06-05; deeper cuts = C41 addendum
+done 2026-10-17 - origin green (runs 39016232923, 39072344502)
+done - buildflow -s dprint-format recorded as the canonical pinned invocation (AGENTS)
+routed - TODO_LIST prose-wrap list-marker lint row (added this pass)
+done 2026-10-17 - AGENTS updated to ~4-6 min with CI step timings (this pass)
+routed - TODO_LIST demo-ports single-sourcing row (added this pass)
+routed - TODO_LIST check-set drift alarm row (added this pass)
+done 2026-10-17 - this pass (harvest + archive of all five superseded reports)
+done 2026-10-17 - ROADMAP verified at the 0.16/gate-green truth
+done 2026-10-17 - INBOXCLEAN 0.16 banner verified present
+done 2026-10-17 - SECURITY.md glanced: the v0.4.0-current table is factual
+done 2026-10-17 - the 03-34 verdict section read in full this pass; 17/17 + relay 3/3 confirmed
+routed - TODO_LIST local lockstep guard row
+routed - TODO_LIST gate-log reconciliation row (updated to 7)
+routed - decision-batch C41 addendum (prune-depth residue)
+routed - decision-batch C52 (new entry, [rec] README-as-ledger permanent)
+routed - TODO_LIST check-set drift alarm row (added this pass; enforcement level is that row's open decision)

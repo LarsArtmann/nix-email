@@ -103,11 +103,6 @@
     "AF_INET"
     "AF_INET6"
   ];
-  hardeningOk =
-    unit.DynamicUser
-    == true
-    && syscallDrops == []
-    && familyDrops == [];
 in
   assert versionOk || throw "dmarc-monitor contract is verified against parsedmarc >= 11 (got ${parsedmarcVersion}) - re-verify the [imap]/_secret/output semantics before touching the floor.";
   assert lib.isList execStartPre || throw "dmarc-eval: parsedmarc ExecStartPre is not a list - lib.last would return a character, not the strip script; re-verify the unit shape.";

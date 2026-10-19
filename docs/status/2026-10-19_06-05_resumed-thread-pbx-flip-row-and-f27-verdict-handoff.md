@@ -5,11 +5,11 @@
 > upstream-watch, contacts-assessment) own their own reports. Format `.md`
 > per standing instruction.
 
-| Field   | Value                                                                     |
-| ------- | ------------------------------------------------------------------------- |
-| Date    | 2026-10-19 06:05 CEST (`date` CLI)                                        |
-| HEAD    | `4c51fb7`, master CI green (run 39191414206); concurrent sessions active  |
-| Session | repo triage + one TODO row + this report; no code touched                 |
+| Field   | Value                                                                    |
+| ------- | ------------------------------------------------------------------------ |
+| Date    | 2026-10-19 06:05 CEST (`date` CLI)                                       |
+| HEAD    | `4c51fb7`, master CI green (run 39191414206); concurrent sessions active |
+| Session | repo triage + one TODO row + this report; no code touched                |
 
 ## a) DONE (this thread)
 

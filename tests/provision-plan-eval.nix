@@ -21,7 +21,7 @@
   system,
   nixpkgs,
 }: let
-  dnslessVmPatches = (import ./common.nix).dnslessVmPatches;
+  inherit ((import ./common.nix)) dnslessVmPatches;
 
   mkConfig = extra:
     (import (nixpkgs + "/nixos/lib/eval-config.nix")) {

@@ -152,20 +152,20 @@ only work this session surfaced or touched.
 
 | #  | Task | Impact                                                                                             | Effort | Category |
 | -- | ---- | -------------------------------------------------------------------------------------------------- | ------ | -------- |
-| ~~ | 1    | Sweep ROADMAP.md to the 0.16/gate-green truth (TODO header proved sweep claims can lag)            | High   | S        |
-| ~~ | 2    | Read the 03-34 report's verdict section; confirm 17/17 + relay 3/3 quotes behind my status flips   | Med    | S        |
-| ~~ | 3    | Verify docs/INBOXCLEAN.md 0.16 banner matches the current re-verification state                    | Med    | S        |
-| ~~ | 4    | Add dprint to the devShell + record the canonical pinned invocation in AGENTS                      | Med    | S        |
-| ~~ | 5    | Extend the CI markdown lint with the prose-wrap dash/plus rule (nested-list misparse class)        | Med    | M        |
-| ~~ | 6    | Watch the next CI run over the daemon-committed docs tree; read step names if red                  | Med    | S        |
-| ~~ | 7    | HARVEST this report's (f) rows into TODO_LIST (docs-health loop closure)                           | Med    | S        |
-| ~~ | 8    | Single-source the check-set list (AGENTS points at README instead of restating)                    | Low    | S        |
-| ~~ | 9    | SECURITY.md freshness glance (unopened this session)                                               | Low    | S        |
-| ~~ | 10   | AGENTS.md size-pruning decision (g/1) — user-gated                                                 | Med    | M        |
-| ~~ | 11   | README TOC decision + anchor-lint gate if yes (g/2-adjacent)                                       | Low    | M        |
-| ~~ | 12   | Re-verify the 03-53 sweep's "all six living docs swept" claim line-level (b/2 residue)             | Med    | M        |
-| ~~ | 13   | Confirm no other doc quotes the retired "re-pin is open"/"web/API" phrasings (repo-wide grep)      | Low    | S        |
-| ~~ | 14   | Consider archiving rule tweak: sweep headers that narrate state should carry a "updated when" hook | Low    | M        |
+| ~~1~~ done — 2026-10-17 - ROADMAP is at the 0.16/gate-green truth (03-53 pass + migration-session updates, verified this pass) | ~~Sweep ROADMAP.md to the 0.16/gate-green truth (TODO header proved sweep claims can lag)~~ | ~~High~~ | ~~S~~ |
+| ~~2~~ done — 2026-10-17 - the 03-34 verdict section read in full this pass; 17/17 + relay 3/3 confirmed | ~~Read the 03-34 report's verdict section; confirm 17/17 + relay 3/3 quotes behind my status flips~~ | ~~Med~~ | ~~S~~ |
+| ~~3~~ done — 2026-10-17 - INBOXCLEAN 0.16 BANNER verified present; the full re-verification gates on the demo-smoke TODO row | ~~Verify docs/INBOXCLEAN.md 0.16 banner matches the current re-verification state~~ | ~~Med~~ | ~~S~~ |
+| ~~4~~ done — canonical pinned invocation recorded: buildflow -s dprint-format (AGENTS archive-policy line); devShell stays CI-parity-minimal | ~~Add dprint to the devShell + record the canonical pinned invocation in AGENTS~~ | ~~Med~~ | ~~S~~ |
+| 5 **→ TODO_LIST prose-wrap list-marker lint row (added this pass)** | Extend the CI markdown lint with the prose-wrap dash/plus rule (nested-list misparse class) | Med | M |
+| ~~6~~ done — 2026-10-17 - origin green (runs 39016232923, 39072344502), step names read via gh run view | ~~Watch the next CI run over the daemon-committed docs tree; read step names if red~~ | ~~Med~~ | ~~S~~ |
+| ~~7~~ done — 2026-10-17 - this pass harvested the b/c/f/g items of all five superseded reports into TODO_LIST/decision-batch and archived them | ~~HARVEST this report's (f) rows into TODO_LIST (docs-health loop closure)~~ | ~~Med~~ | ~~S~~ |
+| ~~8~~ done — 2026-10-17 - AGENTS names the check set SINGLE-SOURCED (ci.yml lockstep / README list canonical; no restated counts) | ~~Single-source the check-set list (AGENTS points at README instead of restating)~~ | ~~Low~~ | ~~S~~ |
+| ~~9~~ done — 2026-10-17 - glanced: supported-versions table says v0.4.0 current (factual; the latest release IS v0.4.0 pending v0.5.0) | ~~SECURITY.md freshness glance (unopened this session)~~ | ~~Low~~ | ~~S~~ |
+| 10 **→ AGENTS prune executed 06-05; deeper cuts = C41 addendum (user-gated)** | AGENTS.md size-pruning decision (g/1) — user-gated | Med | M |
+| 11 **→ README TOC = structure decision, parked with C52 (README-as-ledger home)** | README TOC decision + anchor-lint gate if yes (g/2-adjacent) | Low | M |
+| ~~12~~ done — 2026-10-17 - the morning migration session + this pass re-verified the living docs line-level (README/FEATURES/AGENTS/TODO_LIST claims checked against code) | ~~Re-verify the 03-53 sweep's "all six living docs swept" claim line-level (b/2 residue)~~ | ~~Med~~ | ~~M~~ |
+| ~~13~~ done — 2026-10-17 - repo-wide grep clean outside the CHANGELOG historical narration | ~~Confirm no other doc quotes the retired "re-pin is open"/"web/API" phrasings (repo-wide grep)~~ | ~~Low~~ | ~~S~~ |
+| ~~14~~ done — the TODO_LIST header carries "Last verification sweep" + date (the convention exists) | ~~Consider archiving rule tweak: sweep headers that narrate state should carry a "updated when" hook~~ | ~~Low~~ | ~~M~~ |
 
 ## g) Questions (cannot self-answer)
 

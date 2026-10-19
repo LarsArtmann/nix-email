@@ -1,0 +1,25 @@
+routed - accuracy restored was the deliverable; structure calls split: AGENTS prune executed 06-05 (31,498 -> 28,040 B), README TOC + ledger home parked as decision-batch C52
+done 2026-10-17 - ROADMAP swept (03-53 + migration passes), INBOXCLEAN carries the 0.16 banner (verified this pass), SECURITY.md glanced (v0.4.0-current table is factual)
+done - buildflow -s dprint-format is the canonical pinned invocation (buildflow owns the toolchain; recorded in the AGENTS archive-policy line); the devShell deliberately carries only CI-parity tools
+done 2026-10-17 - the 03-34 report's verdict section was read in full THIS pass; 17/17 + relay 3/3 quotes confirmed behind the FEATURES flips
+done 2026-10-17 - ROADMAP swept; INBOXCLEAN 0.16 banner verified; SECURITY.md glanced (see b/2)
+routed - TODO_LIST prose-wrap list-marker lint row (added this pass)
+routed - AGENTS prune executed 06-05; deeper <20 KB cuts are the C41 addendum; README TOC is C52-adjacent (user-gated)
+done 2026-10-17 - origin green verified (runs 39016232923 + 39072344502)
+done 2026-10-17 - ROADMAP is at the 0.16/gate-green truth (03-53 pass + migration-session updates, verified this pass)
+done 2026-10-17 - the 03-34 verdict section read in full this pass; 17/17 + relay 3/3 confirmed
+done 2026-10-17 - INBOXCLEAN 0.16 BANNER verified present; the full re-verification gates on the demo-smoke TODO row
+done - canonical pinned invocation recorded: buildflow -s dprint-format (AGENTS archive-policy line); devShell stays CI-parity-minimal
+routed - TODO_LIST prose-wrap list-marker lint row (added this pass)
+done 2026-10-17 - origin green (runs 39016232923, 39072344502), step names read via gh run view
+done 2026-10-17 - this pass harvested the b/c/f/g items of all five superseded reports into TODO_LIST/decision-batch and archived them
+done 2026-10-17 - AGENTS names the check set SINGLE-SOURCED (ci.yml lockstep / README list canonical; no restated counts)
+done 2026-10-17 - glanced: supported-versions table says v0.4.0 current (factual; the latest release IS v0.4.0 pending v0.5.0)
+routed - AGENTS prune executed 06-05; deeper cuts = C41 addendum (user-gated)
+routed - README TOC = structure decision, parked with C52 (README-as-ledger home)
+done 2026-10-17 - the morning migration session + this pass re-verified the living docs line-level (README/FEATURES/AGENTS/TODO_LIST claims checked against code)
+done 2026-10-17 - repo-wide grep clean outside the CHANGELOG historical narration
+done - the TODO_LIST header carries "Last verification sweep" + date (the convention exists)
+routed - AGENTS prune EXECUTED 06-05 (28,040 B); the deeper-cut question = C41 addendum
+routed - decision-batch C52 (new entry, [rec] accept README-as-ledger as permanent)
+routed - buildflow -s dprint-format is the canonical pinned path (AGENTS); the devShell gains nothing

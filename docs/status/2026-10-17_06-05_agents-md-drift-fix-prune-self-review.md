@@ -165,20 +165,20 @@ sessions in a row now.
 
 | #  | Task | Impact                                                                                                                                                                             | Effort | Category | Route         |
 | -- | ---- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | -------- | ------------- |
-| ~~ | 1    | AGENTS prune-depth decision: keep 28 KB, or cut to <20 KB by moving VM-debug-loop mechanics + command narration to a docs page with one-line pointers                              | High   | M        | Decision      |
-| ~~ | 2    | Watch the next CI run over this session's daemon-committed docs tree; read failing STEP names if red                                                                               | Med    | S        | Quality       |
-| ~~ | 3    | Pin dprint: add to devShell or record the canonical pinned invocation (closes floating provenance; 2 sessions)                                                                     | Med    | S        | Quality       |
-| ~~ | 4    | Mechanize the prose-wrap dash/plus lint (sibling rule in the CI markdown lint; three incidents now)                                                                                | Med    | M        | Quality       |
-| ~~ | 5    | Verify the "~2-4 min" full-gate duration claim against a timed 7-check run                                                                                                         | Low    | S        | Documentation |
-| ~~ | 6    | Single-source demo VM ports/credentials between README quickstart and AGENTS (split brain left standing)                                                                           | Med    | S        | Cleanup       |
-| ~~ | 7    | Check-set drift alarm: lint that fails when AGENTS/README restate check names instead of pointing at the ci.yml lockstep (mechanizes the single-sourcing this session did by hand) | Med    | M        | Quality       |
-| ~~ | 8    | HARVEST this report's (f) rows into TODO_LIST/ROADMAP (docs-health loop closure)                                                                                                   | Med    | S        | Documentation |
-| ~~ | 9    | ROADMAP sweep to the 0.16/gate-green truth (05-37 f/1, unharvested)                                                                                                                | Med    | S        | Documentation |
-| ~~ | 10   | Verify docs/INBOXCLEAN.md 0.16 banner against current re-verification state (05-37 f/3)                                                                                            | Med    | S        | Documentation |
-| ~~ | 11   | SECURITY.md freshness glance (05-37 f/9)                                                                                                                                           | Low    | S        | Documentation |
-| ~~ | 12   | Primary-evidence pass: 03-34 report verdict section + the kept-on-faith claims (absolute-curl, CONTRIBUTING release procedure)                                                     | Med    | M        | Documentation |
-| ~~ | 13   | Local lockstep guard: eval check asserting attrNames == ci.yml expected (would have caught the 6->7 drift at landing time)                                                         | Med    | S        | Quality       |
-| ~~ | 14   | Resolve the full-gate "running 4 flake checks" log-count mystery (now 4-vs-7; TODO row updated this session)                                                                       | Low    | S        | Quality       |
+| 1 **→ AGENTS prune executed 06-05; deeper cuts = C41 addendum** | AGENTS prune-depth decision: keep 28 KB, or cut to <20 KB by moving VM-debug-loop mechanics + command narration to a docs page with one-line pointers | High | M | Decision |
+| ~~2~~ done — 2026-10-17 - origin green (runs 39016232923, 39072344502) | ~~Watch the next CI run over this session's daemon-committed docs tree; read failing STEP names if red~~ | ~~Med~~ | ~~S~~ | ~~Quality~~ |
+| ~~3~~ done — buildflow -s dprint-format recorded as the canonical pinned invocation (AGENTS) | ~~Pin dprint: add to devShell or record the canonical pinned invocation (closes floating provenance; 2 sessions)~~ | ~~Med~~ | ~~S~~ | ~~Quality~~ |
+| 4 **→ TODO_LIST prose-wrap list-marker lint row (added this pass)** | Mechanize the prose-wrap dash/plus lint (sibling rule in the CI markdown lint; three incidents now) | Med | M | Quality |
+| ~~5~~ done — 2026-10-17 - AGENTS updated to ~4-6 min with CI step timings (this pass) | ~~Verify the "~2-4 min" full-gate duration claim against a timed 7-check run~~ | ~~Low~~ | ~~S~~ | ~~Documentation~~ |
+| 6 **→ TODO_LIST demo-ports single-sourcing row (added this pass)** | Single-source demo VM ports/credentials between README quickstart and AGENTS (split brain left standing) | Med | S | Cleanup |
+| 7 **→ TODO_LIST check-set drift alarm row (added this pass)** | Check-set drift alarm: lint that fails when AGENTS/README restate check names instead of pointing at the ci.yml lockstep (mechanizes the single-sourcing this session did by hand) | Med | M | Quality |
+| ~~8~~ done — 2026-10-17 - this pass (harvest + archive of all five superseded reports) | ~~HARVEST this report's (f) rows into TODO_LIST/ROADMAP (docs-health loop closure)~~ | ~~Med~~ | ~~S~~ | ~~Documentation~~ |
+| ~~9~~ done — 2026-10-17 - ROADMAP verified at the 0.16/gate-green truth | ~~ROADMAP sweep to the 0.16/gate-green truth (05-37 f/1, unharvested)~~ | ~~Med~~ | ~~S~~ | ~~Documentation~~ |
+| ~~10~~ done — 2026-10-17 - INBOXCLEAN 0.16 banner verified present | ~~Verify docs/INBOXCLEAN.md 0.16 banner against current re-verification state (05-37 f/3)~~ | ~~Med~~ | ~~S~~ | ~~Documentation~~ |
+| ~~11~~ done — 2026-10-17 - SECURITY.md glanced: the v0.4.0-current table is factual | ~~SECURITY.md freshness glance (05-37 f/9)~~ | ~~Low~~ | ~~S~~ | ~~Documentation~~ |
+| ~~12~~ done — 2026-10-17 - the 03-34 verdict section read in full this pass; 17/17 + relay 3/3 confirmed | ~~Primary-evidence pass: 03-34 report verdict section + the kept-on-faith claims (absolute-curl, CONTRIBUTING release procedure)~~ | ~~Med~~ | ~~M~~ | ~~Documentation~~ |
+| 13 **→ TODO_LIST local lockstep guard row** | Local lockstep guard: eval check asserting attrNames == ci.yml expected (would have caught the 6->7 drift at landing time) | Med | S | Quality |
+| 14 **→ TODO_LIST gate-log reconciliation row (updated to 7)** | Resolve the full-gate "running 4 flake checks" log-count mystery (now 4-vs-7; TODO row updated this session) | Low | S | Quality |
 
 ## g) Questions (cannot self-answer)
 

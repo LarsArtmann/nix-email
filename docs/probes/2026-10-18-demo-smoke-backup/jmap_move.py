@@ -4,6 +4,7 @@ filing automation path. Discovers the session, finds the Junk-role
 mailbox, queries the target email, moves it via Email/set, and re-checks
 the mailbox message counts via Mailbox/get.
 """
+
 import base64
 import json
 import urllib.request
@@ -23,7 +24,9 @@ def jmap(method_calls):
             "methodCalls": method_calls,
         }
     ).encode()
-    req = urllib.request.Request(f"{BASE}/jmap/", data=body, headers=HDRS, method="POST")
+    req = urllib.request.Request(
+        f"{BASE}/jmap/", data=body, headers=HDRS, method="POST"
+    )
     with urllib.request.urlopen(req, timeout=15) as resp:
         return json.loads(resp.read())["methodResponses"]
 
@@ -61,21 +64,25 @@ res = jmap(
             "Email/set",
             {
                 "accountId": account_id,
-                "update": {
-                    email_id: {"mailboxIds": {junk_id: True, inbox_id: False}}
-                },
+                "update": {email_id: {"mailboxIds": {junk_id: True, inbox_id: False}}},
             },
             "s1",
         ],
         [
             "Mailbox/get",
-            {"accountId": account_id, "ids": [junk_id, inbox_id], "properties": ["name", "totalEmails"]},
+            {
+                "accountId": account_id,
+                "ids": [junk_id, inbox_id],
+                "properties": ["name", "totalEmails"],
+            },
             "g1",
         ],
     ]
 )
 print(f"Email/set: {json.dumps(res[0][1])}")
 if res[0][1].get("oldState"):
-    print(f"  oldState={res[0][1]['oldState']} -> will read StateChange via eventsource separately")
+    print(
+        f"  oldState={res[0][1]['oldState']} -> will read StateChange via eventsource separately"
+    )
 for mb in res[1][1]["list"]:
     print(f"mailbox {mb['name']!r}: totalEmails={mb.get('totalEmails')}")

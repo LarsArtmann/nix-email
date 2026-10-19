@@ -7,6 +7,7 @@ flow) instead of the live store. Recovery mode must migrate the LIVE
 store; any other target leaves the first normal boot at the 0.16
 multi-step panic (migrate-e2e run 6, 2026-10-18).
 """
+
 import json
 import sys
 
