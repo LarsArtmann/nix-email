@@ -173,6 +173,12 @@ SystemNix (`6774f7bc`, NixOS 26.11):
   `general.output` lands, `_secret` password survives the option types AND
   the real ini generation (the unit's config render is forced, so a wrong
   `_secret` shape fails here, not on a host).
+- `migrate-convert-eval`: the vendored upstream `migrate_v016.py`'s first
+  functional test - the real `convert` subcommand runs at build time
+  against a minimal 0.15 dump fixture, pinning the DataStore descriptor,
+  the Domain/Account/SystemSettings plan shape (local-part names,
+  restore-<id> account ids, `#id` references), and the `--patch-paths`
+  rewrite the migration script depends on. Arch-independent.
 - `module-import-eval`: pure eval on BOTH arches - the full wrapper toplevel
   (mail-server + dmarc-monitor merged in ONE nixosSystem), pinning the
   export surface and the default-OFF hardening posture (`rateLimits` unset,
