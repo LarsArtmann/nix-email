@@ -72,6 +72,14 @@ deployed pin) via the FIFO-console pattern; host-side probes against
    come back upper-cased (`TYPE=WORK`, `TYPE=CELL`); v3 input is
    re-emitted as v4; unknown properties round-trip verbatim; CATEGORIES
    preserved as written.
+7. **SOCIALPROFILE-without-uri is safe on the pin (plan T06)**: uri-less
+   `SOCIALPROFILE;SERVICE-TYPE=…;USERNAME=…:` round-trips byte-verbatim via
+   CardDAV, and JMAP `ContactCard/get` renders it as an `onlineServices`
+   entry with empty uri + preserved service/user (`social-edge.log`).
+   Route facts: PUT into the home collection (no addressbook parent) → 409;
+   JMAP posts to `/jmap/` (trailing slash) with
+   `urn:ietf:params:jmap:contacts`; JMAP card ids are server-assigned, uid
+   preserved.
 
 ## Reproduce
 
