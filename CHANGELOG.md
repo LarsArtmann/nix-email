@@ -216,6 +216,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- External-link sweep re-run over the living docs (2026-10-19,
+  first full pass since the 0.16 rewrite): 30 unique targets,
+  ZERO dead links - the single lychee red is the known private-repo
+  404 false positive (`LarsArtmann/InboxClean` exists, PRIVATE).
 - Match-property audit CLOSED (2026-10-19): the wrapper option-surface
   review found ZERO dead/no-op options - all 34 `services.mail-server`
   options verified consumed (plan emission, settings, credentials,
