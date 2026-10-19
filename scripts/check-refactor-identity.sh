@@ -20,8 +20,8 @@ set -eu
 for attr in "$@"; do
 	out="$(nix eval --raw "${attr}.outPath")"
 	if [ -d "$out" ]; then
-		registered="$(nix path-info --json "$out" | jq -r '.[] | .registrationTime')"
-		narhash="$(nix path-info --json "$out" | jq -r '.[] | .narHash')"
+		registered="$(nix path-info --json-format 1 --json "$out" | jq -r '.[] | .registrationTime')"
+		narhash="$(nix path-info --json-format 1 --json "$out" | jq -r '.[] | .narHash')"
 	else
 		registered="not-built"
 		narhash="not-built"

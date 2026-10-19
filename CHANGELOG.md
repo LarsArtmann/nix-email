@@ -44,6 +44,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   for all of it incl. the PINNED statix (the 4x-red W20 class).
   Every new CI step self-tests on planted fixtures first (the
   never-firing-lint-is-a-false-green doctrine).
+- `migrate-convert-eval` check (2026-10-19, W10.1): the vendored
+  migrate_v016.py's first FUNCTIONAL test - the real `convert`
+  subcommand against a minimal 0.15 dump fixture at build time,
+  pinning the DataStore descriptor, the Domain/Account/SystemSettings
+  plan shape (local-part names, restore-<id> account ids, #id
+  references), and the `--patch-paths` rewrite the migration script
+  now depends on. Arch-independent; the check set is 10 (all four
+  guard sites updated in the same change).
+- Test-hygiene decisions (2026-10-19, W10): the host-parse-fixture
+  flake app dry-ran end-to-end (`nix run .#host-parse-fixture --
+  <fixture> --check parsedmarc-e2e` - note the `--` separator); the
+  apps.vm store-closure eval guard is RESOLVED-AS-REDUNDANT (a runtime
+  VM smoke proves the closure by construction - boot failure); fixture
+  dedup is DECIDED AGAINST (per-test fetchurl pins localize the
+  upstream-samples-rot blast radius - a shared fixtures.nix couples
+  every bump).
+- Refactor-identity proof as a script (2026-10-19, W18.2):
+  `scripts/check-refactor-identity.sh` prints outPath +
+  registrationTime + narHash per attr; run before/after a refactor and
+  diff - identical outPath is the bit-identity proof (the 3-command
+  hand-rolled recipe mechanized).
 - `dmarc-eval` unit-hardening pins (2026-10-19, W9): the pinned
   nixpkgs parsedmarc module's sandbox shape is now DROP-detected at
   eval (DynamicUser, SystemCallFilter, RestrictAddressFamilies -
