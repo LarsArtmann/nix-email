@@ -7,18 +7,24 @@
 # Code fences toggle the lint off (journal transcripts quote pipes).
 # Fail-closed: prints every offender as file:line and exits nonzero.
 #
-# Limitations (deliberate): fences are recognized only at column 0
-# (backtick form) - this repo's markdown keeps fences at column 0.
+# Argless mode lints every git-tracked *.md (assumes no spaces in paths -
+# this repo's convention). Fences are recognized INDENTED too (list-nested
+# fences), matching dprint's own markdown parser.
 set -eu
 
-[ "$#" -ge 1 ] || {
-	echo "usage: $0 <markdown-file>..." >&2
-	exit 2
-}
+if [ "$#" -lt 1 ]; then
+	for f in $(git ls-files -- '*.md'); do
+		set -- "$@" "$f"
+	done
+	[ "$#" -ge 1 ] || {
+		echo "no markdown files tracked - nothing to check"
+		exit 0
+	}
+fi
 
 awk '
   FNR == 1 { expected = 0 }
-  /^```/ { fence = !fence; next }
+  /^[[:space:]]*```/ { fence = !fence; next }
   fence { next }
   /^[[:space:]]*\|/ {
     line = $0

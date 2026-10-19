@@ -246,6 +246,12 @@ in {
       # SAME datastore the dump read (path carried from the old settings),
       # so no module-internal configFile exposure is needed.
       echo "[*] booting ${cfg.package.version} in recovery mode (port ${toString mig.recoveryPort})"
+      # A root-run 0.16 boot attempt (the poison class) leaves root-owned
+      # RocksDB files (MANIFEST/WAL/OPTIONS) the service-user recovery
+      # cannot append to - mid-apply writes then fail with jmap 503
+      # serverUnavailable (migrate-e2e run 8, 2026-10-19). Normalize BEFORE
+      # the boot; upstream's Docker flow does the same chown on import.
+      chown -R ${lib.escapeShellArg cfg.user}:${lib.escapeShellArg cfg.group} "$store_dir"
       recovery_password="$(head -c 32 /dev/urandom | base64 | tr -d '=+/' | cut -c1-24)"
       STALWART_RECOVERY_MODE=1 \
       STALWART_RECOVERY_ADMIN="${cfg.admin.username}:$recovery_password" \
@@ -266,22 +272,26 @@ in {
         exit 3
       fi
       echo "[+] recovery mode is up"
+      # The one-shot migration path (subspace wipe + spam-model migration)
+      # keeps running briefly after the HTTP endpoint answers; let it
+      # settle before driving the apply through the same store.
+      sleep 5
 
       echo "[*] applying the converted plan (accounts keep their 0.15 ids)"
-      STALWART_URL="http://127.0.0.1:${toString mig.recoveryPort}" \
+      if ! STALWART_URL="http://127.0.0.1:${toString mig.recoveryPort}" \
       STALWART_USER="${cfg.admin.username}" \
       STALWART_PASSWORD="$recovery_password" \
-        ${lib.getExe cfg.provision.package} apply --file "$work/export.json"
+        ${lib.getExe cfg.provision.package} apply --file "$work/export.json"; then
+        echo "FATAL: the plan apply failed - recovery.log tail:" >&2
+        tail -40 "$work/recovery.log" >&2 || true
+        exit 4
+      fi
 
       echo "[*] stopping recovery mode"
       kill -INT "$recovery_pid" 2>/dev/null || true
       for _ in $(seq 1 20); do kill -0 "$recovery_pid" 2>/dev/null || break; sleep 0.5; done
       kill -9 "$recovery_pid" 2>/dev/null || true
       wait "$recovery_pid" 2>/dev/null || true
-
-      # Recovery wiped + rewrote subspaces; normalize any root-owned strays
-      # a root-run 0.16 boot attempt left in the live store.
-      chown -R ${lib.escapeShellArg cfg.user}:${lib.escapeShellArg cfg.group} "$store_dir"
 
       touch "$marker"
       chown ${lib.escapeShellArg cfg.user}:${lib.escapeShellArg cfg.group} "$marker"
