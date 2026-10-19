@@ -67,36 +67,36 @@ in {
           # dmarc-monitor stays OFF: parsedmarc polls a real rua mailbox,
           # which a throwaway .invalid VM cannot have (ROADMAP D1).
           stalwart.provision.objects = {
-              Account = {
-                reconcile = true;
-                match = ["name"];
-                objects = {
-                  demo = {
-                    # 0.16 schema: User.name is the LOCAL PART; the quickstart
-                    # login demo@mail.demo.test synthesizes as
-                    # name@<Domain(domain).name> (hostname = mail.demo.test).
-                    "@type" = "User";
-                    name = "demo";
-                    domainId = "#domain";
-                    roles."@type" = "User";
-                    # Strength-checked by stalwart at apply time (zxcvbn):
-                    # a bare "demo" is rejected - keep the passphrase long.
-                    credentials = [
-                      {
-                        "@type" = "Password";
-                        secret = "demo-nixemail-2026";
-                      }
-                    ];
-                  };
-                  catchall = {
-                    "@type" = "User";
-                    name = "catchall";
-                    domainId = "#domain";
-                    roles."@type" = "User";
-                  };
+            Account = {
+              reconcile = true;
+              match = ["name"];
+              objects = {
+                demo = {
+                  # 0.16 schema: User.name is the LOCAL PART; the quickstart
+                  # login demo@mail.demo.test synthesizes as
+                  # name@<Domain(domain).name> (hostname = mail.demo.test).
+                  "@type" = "User";
+                  name = "demo";
+                  domainId = "#domain";
+                  roles."@type" = "User";
+                  # Strength-checked by stalwart at apply time (zxcvbn):
+                  # a bare "demo" is rejected - keep the passphrase long.
+                  credentials = [
+                    {
+                      "@type" = "Password";
+                      secret = "demo-nixemail-2026";
+                    }
+                  ];
+                };
+                catchall = {
+                  "@type" = "User";
+                  name = "catchall";
+                  domainId = "#domain";
+                  roles."@type" = "User";
                 };
               };
-              Domain.objects.domain.catchAllAddress = "catchall@mail.demo.test";
+            };
+            Domain.objects.domain.catchAllAddress = "catchall@mail.demo.test";
           };
           getty.autologinUser = "root";
         };

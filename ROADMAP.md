@@ -139,7 +139,24 @@ the verified-source work (what the wrapper OWNS) is done or specified in
   (probe transcripts, push-vs-poll verdict, `docs/INBOXCLEAN.md`, e2e
   subtest); production enablement stays D1-gated, topology by C36
 
-### 5. Repo excellence
+### 5. Contacts mirror (CardDAV, fed from Kith CRM)
+
+Owner decision 2026-10-19: Kith CRM is the CONTACTS SOURCE OF TRUTH;
+Stalwart's built-in CardDAV becomes the MIRROR phone/IMAP clients read.
+Direction matters: nothing writes contacts into Kith from Stalwart (a
+mirror target is a read-only source at best); the bridge work lives in
+the crm repo (TODO_LIST "Stalwart CardDAV mirror"). Stalwart-side raw
+ideas, all D1-gated:
+
+- Enable the CardDAV surface on the go-live host (0.16 ships it in the
+  all-in-one binary; address books need no extra service)
+- Provision a dedicated CardDAV account for the bridge (stalwart-cli
+  apply plan; credentials ride the sops flow like the other secrets)
+- Collect-wide contacts share ONE address book; per-device write scopes
+  stay OUT unless a client genuinely needs them (keep the mirror
+  read-mostly)
+
+### 6. Repo excellence
 
 - Stalwart OIDC (Pocket ID) for the admin UI - verified
   present in the 0.15.5 source (`common/src/auth/oauth/{openid,oidc}.rs`,
