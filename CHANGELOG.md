@@ -337,6 +337,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- `stalwart-migrate-from-015` post-migration exit-101 panic (2026-10-19,
+  migrate-e2e runs 6-10, each root cause transcript-pinned): THREE
+  stacked causes. (1) convert's `config.json` DataStore path carried
+  the DUMP store - the 0.15 management API serves the probe's EFFECTIVE
+  settings, so the probe toml's `store.db.path` (the `--backup-dir`
+  COPY) leaked into the converted plan and recovery mode migrated the
+  copy while the live store stayed pre-0.16; the script now rewrites
+  dump-store paths (`--patch-paths` plus a forced
+  DataStore-at-live-store pass, `rewrite-datastore-path.py`). (2) The
+  0.15 probe and the 0.16 recovery boot now run as the SERVICE USER
+  (setpriv) with ownership normalization before the boot - root-run
+  boots litter root-owned RocksDB files (MANIFEST/WAL) that block
+  writes mid-apply (jmap 503 serverUnavailable, run 8). (3) Recovery
+  mode's one-shot wipe only triggers on a CLEAN pre-0.16 store: a
+  poisoned live store skips the wipe, the built-in Role objects are
+  never re-seeded, and the apply dies on `x:Account/set` "Role not
+  found" (run 9); the script now RESTORES the clean dump copy into the
+  live store path before recovery (upstream doctrine - the poison
+  refusal says exactly this; the freshest poisoned-live mail survives
+  in the `.v015-premigrate` backup). The script also VERIFIES the end
+  state before claiming it - stable `stalwart.service` boot (settle
+  window + zero restarts) plus the provision apply, `[DONE]` only after
+  both, and a failed verification removes the marker so the guard
+  refuses further boots. `stalwart-migrate-e2e` GREEN end-to-end (9/9
+  subtests, run 10).
+- Statix findings in `provision-plan-eval.nix` (2026-10-19, the CI red
+  on `b598703`): four assignment-instead-of-inherit warnings and one
+  redundant-parentheses finding shipped via daemon pushes past the
+  pre-push hook; fixed with CI's exact pinned statix locally (the
+  pre-push hook now runs it too).
 - Demo VM boot race: provision apply vs resolvconf (2026-10-18, found by
   the fresh host-side runtime smoke the demo contract owed): on a fresh
   boot the 0.16 reload-validation read the not-yet-written

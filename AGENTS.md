@@ -209,6 +209,22 @@ transcript-pinned dialect).
   cells): strike rows in the per-cell canonical form, run
   `annotate.go check-rows` after every formatter pass.
 
+- Stalwart source-assessment discipline (2026-10-19 contacts review): ground
+  every "pinned version" claim in flake.lock (parse rev, then `nix eval
+  github:NixOS/nixpkgs/<rev>#stalwart_0_16.version`); bare `nix eval
+  nixpkgs#...` answers the REGISTRY, not this deployment (a whole review ran
+  against 0.16.26 while the lock ships 0.16.22). Contacts wire-claims stay
+  source-level until a demo-VM transcript set exists under docs/probes/ - the
+  INBOXCLEAN transcript rule extends to CardDAV/JMAP-contacts. Recorded
+  source facts: GroupwareCache caches resource-tree METADATA only (no vCard
+  payloads, no etags); a filtered addressbook-query reads every card via
+  SEQUENTIAL per-card store awaits (worst on FDB/Postgres/MySQL network
+  stores); CardDAV TextMatch is substring collation, so the Contacts FTS
+  index cannot serve it faithfully. Upstream issue deliberately NOT filed (no
+  measured victim; fix candidates were semantics-breaking or micro-opts) -
+  filing gate = demo-VM benchmark at 10k+ cards; verdict + citations:
+  docs/status/2026-10-19_02-35_stalwart-contacts-assessment.md.
+
 ## Documentation map
 
 - `README.md` - architecture, module docs, go-live runbook, VERIFIED-FACTS
