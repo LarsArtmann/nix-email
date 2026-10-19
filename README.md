@@ -390,6 +390,26 @@ node boots with it via the shared test directory): guard refusal, poison
 refusal, `--backup-dir` recovery, 0.15 password authenticating on 0.16,
 provision re-apply, restart persistence.
 
+**Module verdict: DNS-arrival race (decided 2026-10-19).** On hosts
+whose resolver config arrives LATE (DHCP-written `/etc/resolv.conf`,
+the demo's resolvconf ordering), 0.16's reload validation reads an
+empty resolver config during the provision apply, the apply fails at
+the reload op BEFORE its restart step, and stalwart keeps the built-in
+listener set with a failed provision unit (probe transcript
+`docs/probes/2026-10-18-demo-smoke-backup/`). The fix is NOT unit
+ordering: `network-online.target` is a no-op under dhcpcd - precisely
+the late-DNS case - so ordering after it guarantees nothing. The
+required pattern for late-DNS hosts is the resolver singleton the e2e
+nodes and the demo all pin:
+
+```nix
+services.stalwart.provision.singletons.DnsResolver."@type" = "Cloudflare";
+```
+
+Static-DNS hosts (the consumer VPS shape) never see the race. The
+wrapper deliberately does NOT default the singleton: DNS policy
+(all lookups via Cloudflare) belongs to the consumer.
+
 ## Module: `services.dmarc-monitor`
 
 Enables nixpkgs `services.parsedmarc` (11.0.1) with the heavy sinks OFF:

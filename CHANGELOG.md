@@ -175,6 +175,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- DNS-arrival race module verdict (2026-10-19, W14): the
+  provision-vs-resolv.conf race is CLOSED as DOCUMENTED DOCTRINE, not a
+  unit reorder - `network-online.target` is a no-op under dhcpcd
+  (exactly the late-DNS case), so ordering guarantees nothing; the
+  required pattern for late-DNS hosts is the DnsResolver singleton
+  (README module section: probe transcript pointer + deliberate
+  no-default rationale - DNS policy belongs to the consumer).
 - THREAT_MODEL.md 0.16 revisit (2026-10-18): new "0.16 exposure delta"
   section (REST removal shrinks the attack surface; provision-plan
   secrets in the world-readable Nix store GROW it - C44-gated, real
