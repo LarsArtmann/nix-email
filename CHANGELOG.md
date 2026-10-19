@@ -65,6 +65,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   registrationTime + narHash per attr; run before/after a refactor and
   diff - identical outPath is the bit-identity proof (the 3-command
   hand-rolled recipe mechanized).
+- Demo VM runtime smoke re-verified post disk-relocation (2026-10-19,
+  W10.5): HTTP 200 on the forwarded 18080 within seconds of boot, the
+  disk lives at `~/.cache/nix-email-demo/demo.qcow2`, and a STALE
+  pre-relocation `demo.qcow2` left in the repo root from an old boot
+  was trashed (the CWD-pollution class the relocation closed).
+- Upstream evidence comment filed on nixpkgs PR #552103 (2026-10-19,
+  W12.2, after the verify-before-filing + github-voice gates): the
+  restart-after-apply requirement and the virgin-store built-in-8080
+  bootstrap fallback, both 0.16.22-VM-proven here
+  (docs/drafts/552103-evidence-comment.md; the comment is
+  <https://github.com/NixOS/nixpkgs/pull/552103#issuecomment-6258512488>).
 - `dmarc-eval` unit-hardening pins (2026-10-19, W9): the pinned
   nixpkgs parsedmarc module's sandbox shape is now DROP-detected at
   eval (DynamicUser, SystemCallFilter, RestrictAddressFamilies -
