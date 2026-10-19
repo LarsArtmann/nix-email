@@ -164,6 +164,7 @@ sessions in a row now.
 ## f) Next tasks (session-scoped; honest count: 14 - not padded to 50)
 
 <!-- check-rows:ledger -->
+
 | #                                                                                                        | Task                                                                                                                                                                               | Impact  | Effort | Category          | Route |
 | -------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | ------ | ----------------- | ----- |
 | 1 **→ AGENTS prune executed 06-05; deeper cuts = C41 addendum**                                          | AGENTS prune-depth decision: keep 28 KB, or cut to <20 KB by moving VM-debug-loop mechanics + command narration to a docs page with one-line pointers                              | High    | M      | Decision          |       |
