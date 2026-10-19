@@ -9,6 +9,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- `provision-plan-eval` check (2026-10-18, the paid-for plan-dialect bug
+  classes caught at eval speed): hostname == provisioned-Domain
+  coherence, match-property posture (reconcile sets MUST carry an
+  explicit match; no-match sets only on the documented implicit-key
+  allowlist Domain/MtaRoute/AcmeProvider; Account sets match
+  `["name"]`), the fallback listener port set pin (smtp 25 / submission
+  587 / submissions 465 / imaps 993 / http httpBind), a systemd Exec*
+  multi-line lint (the "Unbalanced quoting" class), and the
+  MtaInboundThrottle description identity. Pure eval, arch-independent
+  (the aarch64 shape grew to three checks; all three guard sites
+  updated in the same change).
+- `stalwart-migrate-e2e` re-registered with the TWO-NODE redesign
+  (2026-10-18): the 0.15.5 phase-A node seeds a real store, the store
+  travels as a tar through the testers framework's writable `/tmp/shared`
+  virtfs dir, and the 0.16 consumer node swaps it in, trips the store
+  guard, simulates the poison + `--backup-dir` recovery, and asserts
+  the 0.15 password authenticating on 0.16 - no in-VM
+  switch-to-configuration ever runs (the 2026-10-17 single-node wedge).
+  Six real runs debugged the harness (read-only share, virtfs chown,
+  oneshot wait race, python quoting, unrealistic 0.15 listener set);
+  subtests 1-6 are green. ONE product bug remains open and is tracked,
+  not hidden: the post-migration normal boot still panics with the
+  upstream "multi-step process" refusal - the migration script's
+  recovery-mode apply does not complete the binary's store migration on
+  the live store in at least one flow (02-16 status report b/1; root
+  cause pending the instrumented artifact dumps).
+- Demo-VM disk relocation (2026-10-18): `apps.vm` pins `NIX_DISK_IMAGE`
+  to `~/.cache/nix-email-demo/demo.qcow2` (HOME-unset fallback kept) -
+  the demo disk is no longer CWD-relative and can never pollute the
+  working tree again (the write-lock footgun now also documented
+  accurately in the quickstart).
+- `apps.host-parse-fixture` (2026-10-18): the pinned-parser dry-run is
+  now a flake app (interpreter supplied, nix CLI from the caller's
+  PATH).
 - Fail-closed Python lint in CI (2026-10-18, the ruff-red incident
   mechanized): error-class ruff findings shipped to master through three
   gate runs because daemon pushes bypass the pre-push hook and CI had
@@ -125,6 +159,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- THREAT_MODEL.md 0.16 revisit (2026-10-18): new "0.16 exposure delta"
+  section (REST removal shrinks the attack surface; provision-plan
+  secrets in the world-readable Nix store GROW it - C44-gated, real
+  hosts must not ship passwords in plans until answered; migration
+  artifacts and `--include-secrets` snapshots are secrets-on-disk;
+  MemoryMax stays C39-gated), the "secrets prevented by construction"
+  row split into an honest 0.16 verdict, the spam row re-scored
+  ("Scored; filing varies" - filing is not a fixed INBOX rule on 0.16),
+  and the catch-all row moved to `Domain.catchAllAddress`.
+- AGENTS.md diet (2026-10-18): 451 -> 229 lines (-49%) - every distinct
+  concept either compressed in place or pointed at its owning doc
+  (README quickstart, archived-README archive policy, flake.nix
+  mechanism comments); demo ports, the DNS-race fix, and
+  provision-plan-eval refreshed while in there. The last 9 lines vs
+  the BuildFlow 220 cap are decision C41's call.
+- README status banner corrected (2026-10-18): only the CLI/REST export
+  variants died in 0.16 - the MAIN-binary `--export`/`--import` exists
+  and is VM-proven (the living 0.15-reference sweep found exactly one
+  stale claim; everything else was already era-marked).
 - Docs-truth corrections (2026-10-18): the archived 06-58 report's
   "CHANGELOG vs git-log diffed" verdict overstated a subjects-only skim -
   a theme-coverage audit of every non-daemon commit since 2026-10-05 now
