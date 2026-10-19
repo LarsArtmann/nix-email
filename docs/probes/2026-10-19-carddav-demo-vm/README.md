@@ -24,6 +24,16 @@ deployed pin) via the FIFO-console pattern; host-side probes against
   plus the no-sync-level server behavior, both since characterized.
 - `carddav_diag.py` / `carddav-diag.log` — follow-up diagnostics D1–D3 +
   E1–E2 that source-verified the deviations.
+- `carddav_bench.py` / `carddav-bench.log` — T05 10k-card benchmark (seed
+  10k deterministic cards paced under the server's rate limit
+  `"requests";q=1000`, then 3-run medians; run 1 without pacing lives in
+  `carddav-bench-run1-ratelimited.log` and documents the 429 shape:
+  `retry-after` honored, ~1000-request bucket).
+- `benchmark-verdict.md` — T05.4 file-or-close verdict: **CLOSE** (74 ms
+  filtered query over 10k cards; no victim), plus the `WebDav.maxResults`
+  2000-cap discovery (count PROPFIND returns exactly 2000 of 10k).
+- `social_edge_probe.py` / `social-edge.log` — T06 SOCIALPROFILE edge
+  (verdict 7 below).
 
 ## Key verdicts (all transcript-backed)
 

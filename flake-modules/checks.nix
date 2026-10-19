@@ -29,6 +29,40 @@
     # test below is arch-independent and runs everywhere.
     checks =
       {
+        # Check-set lockstep (2026-10-19): the declared check set must
+        # equal tests/check-expected.json EXACTLY - the canonical machine
+        # list that ci.yml and scripts/check-inventory.sh also read, so a
+        # check add/remove edits ONE file (plus the README prose row).
+        # builtins.attrNames forces only attribute names, so referencing
+        # self.checks here stays lazy (no recursion) and the throw below
+        # fires from `nix flake check` with the drift spelled out. Pure
+        # eval, arch-independent.
+        check-set-lockstep =
+          let
+            expected =
+              builtins.fromJSON (builtins.readFile ../tests/check-expected.json);
+            sorted = builtins.sort (a: b: a < b);
+            driftX =
+              sorted (builtins.attrNames self.checks.x86_64-linux)
+              != sorted expected.x86_64-linux;
+            driftA =
+              sorted (builtins.attrNames self.checks.aarch64-linux)
+              != sorted expected.aarch64-linux;
+          in
+          if driftX || driftA then
+            throw ''
+              check-set lockstep: the declared flake checks diverge from
+              tests/check-expected.json (x86_64 drift: ${
+                pkgs.lib.boolToString driftX
+              }, aarch64 drift: ${pkgs.lib.boolToString driftA}).
+              flake declares x86_64: ${builtins.toJSON (builtins.attrNames self.checks.x86_64-linux)}
+              expected        x86_64: ${builtins.toJSON expected.x86_64-linux}
+              flake declares aarch64: ${builtins.toJSON (builtins.attrNames self.checks.aarch64-linux)}
+              expected        aarch64: ${builtins.toJSON expected.aarch64-linux}
+              Edit tests/check-expected.json in the same commit that
+              adds/removes a check, and add the README prose row.
+            ''
+          else pkgs.runCommand "check-set-lockstep" { } "touch $out";
         dmarc-eval = import ../tests/dmarc-eval.nix {
           inherit system;
           inherit (inputs) nixpkgs;

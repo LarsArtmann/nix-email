@@ -1,0 +1,22 @@
+{
+  "aarch64-linux": [
+    "check-set-lockstep",
+    "dmarc-eval",
+    "migrate-convert-eval",
+    "module-import-eval",
+    "provision-plan-eval"
+  ],
+  "x86_64-linux": [
+    "check-set-lockstep",
+    "dmarc-eval",
+    "demo-eval",
+    "migrate-convert-eval",
+    "module-import-eval",
+    "parsedmarc-e2e",
+    "provision-plan-eval",
+    "stalwart-bind-e2e",
+    "stalwart-e2e",
+    "stalwart-migrate-e2e",
+    "stalwart-relay-e2e"
+  ]
+}
