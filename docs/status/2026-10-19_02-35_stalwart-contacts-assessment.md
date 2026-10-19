@@ -114,4 +114,17 @@ CRM-relevant takeaway (Kith CRM's `Source` seam, "CardDAV later"): viable sync t
 
 ---
 
+## Addendum (2026-10-19, ~02:50): addressbook-query scan drill-down — filing verdict: DO NOT FILE (yet)
+
+Follow-up question: "are the cards in memory all the time? worth filing an issue?" Verified at source level across v0.16.22 (deployed), v0.16.26, and upstream `main`:
+
+- **What is cached:** `GroupwareCache`/`DavResources` (`crates/common/src/lib.rs`) holds only the resource tree — paths, document ids, names, ACLs, sizes. **No vCard payloads, no etags.** Card contents are NOT in memory.
+- **What happens per filtered query:** `crates/dav/src/common/propfind.rs` (`'outer: for item in paths` loop) reads every card of the queried addressbook via a **sequential** `store().get_value::<Archive<AlignedBytes>>().await` per card, then applies `vcard_query` (pure in-memory string matching). No batching, no concurrency, no early exit under `limit`.
+- **Impact by backend:** RocksDB/SQLite (in-process + block cache) — milliseconds at personal scale; FoundationDB/PostgreSQL/MySQL (network stores) — N serial network RTTs per query, the genuinely affected configuration.
+- **Upstream state:** identical code on `main` (unfixed); no existing open or closed issue about addressbook-query performance (searched `addressbook-query`, `carddav performance`, `contact search`).
+- **Why NOT filing (verify-before-filing Gate 4 fail):** no measured victim — Lars's deployments are personal-scale, and the tempting fix ("push filters into the Contacts FTS index") is semantically unfaithful: `TextMatch` implements substring/equals/starts/ends collations (`dav-proto/src/schema/mod.rs`), which a tokenized index cannot serve exactly (infix `contains` impossible). The semantics-preserving ask (batch/concurrent the reads) is a micro-opt nobody has demonstrated needing. Filing now would be a professional-looking issue whose core premise ("this hurts someone") is unverified — plus upstream redirects bug reports to support.stalw.art and has closed-not-planned this class before (#3265).
+- **Filing-grade path (new next-task, supersedes nothing):** benchmark on the demo VM — seed 10k/50k cards, time a filtered `addressbook-query` REPORT vs plain PROPFIND. If latency is genuinely bad at realistic scale, file with numbers + the verbatim source citations above (quote code, pin commit).
+
+---
+
 _Point-in-time snapshot. Session modified no project files; the auto-commit daemon owns this file's landing._

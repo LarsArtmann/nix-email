@@ -24,10 +24,16 @@
 #   script  - `stalwart-migrate-from-015` (run as root on the host):
 #             poison preflight -> backup -> boot 0.15.5 against the
 #             store (or an unpacked pre-0.16 copy when the live store
-#             is already poisoned) -> upstream dump+convert ->
-#             recovery-mode 0.16 on a dedicated port -> stalwart-cli
-#             apply -> marker. Accounts keep their 0.15 ids (the
-#             `restore-<id>` mechanism), so mail linkage survives.
+#             is already poisoned) -> upstream dump+convert (paths
+#             rewritten to the LIVE store: the dump serves the probe's
+#             effective settings, so an unrewritten DataStore path
+#             migrated the copy while the live store stayed pre-0.16 -
+#             the run-6 exit-101) -> recovery-mode 0.16 on a dedicated
+#             port -> stalwart-cli apply -> marker -> VERIFIED end
+#             state (stable normal boot + provision apply; no [DONE]
+#             before the store actually boots). Accounts keep their
+#             0.15 ids (the `restore-<id>` mechanism), so mail linkage
+#             survives.
 {
   config,
   lib,
@@ -200,11 +206,23 @@ in {
         --username "${cfg.admin.username}" --password "$secret" \
         --settings "$work/settings.json" --principals "$work/principals.json"
       echo "[*] converting to the 0.16 plan"
+      # The dump captured the PROBE's EFFECTIVE settings: every path the
+      # 0.15 API served - including store.<id>.path, which the probe toml
+      # pointed at the DUMP store - lands in convert's output verbatim.
+      # Rewrite dump-store paths to their live equivalents everywhere.
+      patch_args=()
+      if [ "$dump_store" != "$store_dir" ]; then
+        patch_args=(--patch-paths "$dump_store=$store_dir")
+      fi
       ${lib.getExe mig.pythonEnv} ${./migrate_v016.py} convert \
         --settings "$work/settings.json" \
         --principals "$work/principals.json" \
         --config "$work/config.json" \
-        --output "$work/export.json"
+        --output "$work/export.json" \
+        ''${patch_args[@]}
+      # Belt and braces: whatever convert emitted, the recovery boot MUST
+      # target the LIVE store - migrating any other path is worthless.
+      ${lib.getExe mig.pythonEnv} ${./rewrite-datastore-path.py} "$work/config.json" "$store_dir"
 
       echo "[*] stopping the 0.15.x probe"
       kill -INT "$preflight_pid" 2>/dev/null || true
@@ -252,11 +270,50 @@ in {
       touch "$marker"
       chown ${lib.escapeShellArg cfg.user}:${lib.escapeShellArg cfg.group} "$marker"
 
+      # The marker is a STORE-FORMAT claim; [DONE] is an END-STATE claim.
+      # Verify the end state before claiming it: boot the unit (the guard
+      # passes on the marker) and require STABLE active - Restart=on-failure
+      # cycles a panicking binary through brief active windows, so settle
+      # and check the restart counter too - then run the provision apply,
+      # whose own ExecStartPost restarts stalwart and verifies cfg.url.
+      echo "[*] verifying the end state: normal boot + provision apply"
+      systemctl reset-failed stalwart.service 2>/dev/null || true
+      systemctl start stalwart.service
+      boot_ok=0
+      for _ in $(seq 1 60); do
+        [ "$(systemctl is-active stalwart.service)" = "active" ] && { boot_ok=1; break; }
+        sleep 2
+      done
+      if [ "$boot_ok" = 1 ]; then
+        sleep 8
+        [ "$(systemctl is-active stalwart.service)" = "active" ] || boot_ok=0
+        [ "$(systemctl show -p NRestarts --value stalwart.service)" = "0" ] || boot_ok=0
+      fi
+      if [ "$boot_ok" != 1 ]; then
+        echo "FATAL: the migrated store did not boot cleanly." >&2
+        echo "       Removing $marker so the unit guard refuses further boots (no crash-looping a half-migrated store)." >&2
+        rm -f "$marker"
+        journalctl -u stalwart --no-pager -n 40 >&2 || true
+        echo "       Forensics: $work (recovery.log, config.json, export.json)" >&2
+        exit 5
+      fi
+      echo "[+] stalwart.service is stable on the migrated store"
+
+      if ! systemctl start stalwart-provision.service; then
+        echo "FATAL: stalwart-provision failed on the migrated store (the server is up; the listener plan did not apply)." >&2
+        journalctl -u stalwart-provision --no-pager -n 40 >&2 || true
+        echo "       Forensics: $work" >&2
+        exit 6
+      fi
+
       echo ""
-      echo "[DONE] migration complete. Next steps:"
-      echo "  1. systemctl start stalwart.service (the provision unit applies the listener plan)"
-      echo "  2. Recalculate disk quotas (webadmin -> Tasks) - the migration resets them"
-      echo "  3. Artifacts kept for forensics: $work"
+      echo "[DONE] migration complete and verified:"
+      echo "  - the live store boots ${cfg.package.version} (stalwart.service stable)"
+      echo "  - the provision plan applied (stalwart-provision.service = success)"
+      echo "  - accounts keep their 0.15 ids and passwords"
+      echo "  Next steps:"
+      echo "  1. Recalculate disk quotas (webadmin -> Tasks) - the migration resets them"
+      echo "  2. Artifacts kept for forensics: $work"
     '';
   in {
     services.stalwart.migrateFrom015.script = migrateScript;
