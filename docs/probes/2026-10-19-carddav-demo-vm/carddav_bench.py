@@ -47,6 +47,18 @@ def req(method, path, body=None, depth=None, extra=None, timeout=300):
     return resp.status, lower, data
 
 
+def req_throttled(method, path, body=None, depth=None, extra=None, timeout=300):
+    """req + 429 handling: honor Retry-After, retry up to 30 times."""
+    for attempt in range(30):
+        status, headers, data = req(method, path, body, depth, extra, timeout)
+        if status != 429:
+            return status, headers, data
+        wait = float(headers.get("retry-after", "5")) + 0.5
+        print(f"  429 (attempt {attempt + 1}), sleeping {wait:.0f}s", flush=True)
+        time.sleep(wait)
+    return status, headers, data
+
+
 def card(n: int) -> str:
     domain = "example.net" if n % 10 == 0 else "example.com"
     org = f"Bench Org {n % 37}" if n % 3 == 0 else ""
@@ -74,7 +86,7 @@ def main() -> int:
     load = open("/proc/loadavg").read().strip()
     print(f"# host loadavg at start: {load}", flush=True)
 
-    # Fresh book.
+    # Fresh book (run-1 leftovers are deleted by the operator; new timestamp).
     mkcol = (
         '<?xml version="1.0"?>'
         '<D:mkcol xmlns:D="DAV:" xmlns:C="urn:ietf:params:xml:ns:carddav">'
@@ -83,33 +95,38 @@ def main() -> int:
         f"<D:displayname>{BOOK}</D:displayname>"
         "</D:prop></D:set></D:mkcol>"
     )
-    status, _, _ = req("MKCOL", BOOK_URL, mkcol)
+    status, _, _ = req_throttled("MKCOL", BOOK_URL, mkcol)
     print(f"MKCOL {status}", flush=True)
     if status not in (200, 201):
         return 1
 
-    # Seed N cards, rate-limited (25ms pause every 200 PUTs).
+    # Seed N cards, paced under the server's "requests";q=1000 bucket
+    # (~15 req/s) with 429 Retry-After handling.
     t0 = time.perf_counter()
-    created = 0
+    created = updated = 0
     for i in range(N):
-        status, _, _ = req(
+        status, _, _ = req_throttled(
             "PUT",
             f"{BOOK_URL}c{i:05d}.vcf",
             card(i),
             extra={"Content-Type": "text/vcard; charset=utf-8"},
         )
-        if status in (200, 201):
+        if status == 201:
             created += 1
-        elif status not in (412,):
+        elif status in (200, 204):
+            updated += 1
+        else:
             print(f"!! PUT {i} -> {status}", flush=True)
-        if i % 200 == 199:
-            time.sleep(0.025)
-            if i % 2000 == 1999:
-                el = time.perf_counter() - t0
-                print(f"seeded {i + 1}/{N} ({el:.0f}s elapsed)", flush=True)
+        time.sleep(1 / 15)
+        if i % 1000 == 999:
+            el = time.perf_counter() - t0
+            print(f"seeded {i + 1}/{N} ({el:.0f}s elapsed)", flush=True)
     seed_s = time.perf_counter() - t0
-    print(f"SEED done: {created}/{N} created in {seed_s:.1f}s "
-          f"({created / seed_s:.0f} PUT/s incl. rate-limit pauses)", flush=True)
+    print(f"SEED done: {created} created, {updated} updated in {seed_s:.1f}s "
+          f"({N / seed_s:.1f} PUT/s incl. pacing)", flush=True)
+
+    # Let the rate bucket refill before the measurement phase.
+    time.sleep(10)
 
     # Count via PROPFIND Depth:1 (this is also B2's first run).
     propfind_body = (
@@ -117,7 +134,7 @@ def main() -> int:
         "<D:resourcetype/><D:getetag/></D:prop></D:propfind>"
     )
     t0 = time.perf_counter()
-    status, _, data = req("PROPFIND", BOOK_URL, propfind_body, depth="1", timeout=600)
+    status, _, data = req_throttled("PROPFIND", BOOK_URL, propfind_body, depth="1", timeout=600)
     propfind_s = time.perf_counter() - t0
     n_cards = data.count(b".vcf")
     print(f"COUNT via PROPFIND: status {status}, {n_cards} card hrefs, {propfind_s:.2f}s, "
@@ -137,9 +154,11 @@ def main() -> int:
     )
     runs = []
     hits = -1
-    for _ in range(3):
+    while len(runs) < 3:
         t0 = time.perf_counter()
-        status, _, data = req("REPORT", BOOK_URL, query, depth="1", timeout=600)
+        status, _, data = req_throttled("REPORT", BOOK_URL, query, depth="1", timeout=600)
+        if status == 429:
+            continue
         runs.append(time.perf_counter() - t0)
         hits = data.count(b".vcf")
     print(f"B1 filtered query: median {statistics.median(runs):.3f}s "
@@ -147,9 +166,11 @@ def main() -> int:
 
     # B2: plain PROPFIND Depth:1 timing (count pass above was warm-up run 0).
     runs = []
-    for _ in range(3):
+    while len(runs) < 3:
         t0 = time.perf_counter()
-        status, _, data = req("PROPFIND", BOOK_URL, propfind_body, depth="1", timeout=600)
+        status, _, data = req_throttled("PROPFIND", BOOK_URL, propfind_body, depth="1", timeout=600)
+        if status == 429:
+            continue
         runs.append(time.perf_counter() - t0)
     print(f"B2 PROPFIND Depth:1: median {statistics.median(runs):.3f}s "
           f"(runs {'/'.join(f'{r:.3f}' for r in runs)}), {data.count(b'.vcf')} hrefs", flush=True)
@@ -163,9 +184,11 @@ def main() -> int:
         f"{h100}</C:addressbook-multiget>"
     )
     runs = []
-    for _ in range(3):
+    while len(runs) < 3:
         t0 = time.perf_counter()
-        status, _, data = req("REPORT", BOOK_URL, multiget, depth="1", timeout=600)
+        status, _, data = req_throttled("REPORT", BOOK_URL, multiget, depth="1", timeout=600)
+        if status == 429:
+            continue
         runs.append(time.perf_counter() - t0)
     print(f"B3 multiget 100: median {statistics.median(runs):.3f}s "
           f"(runs {'/'.join(f'{r:.3f}' for r in runs)}), "
@@ -173,9 +196,11 @@ def main() -> int:
 
     # B4: single GET reference.
     runs = []
-    for _ in range(3):
+    while len(runs) < 3:
         t0 = time.perf_counter()
-        status, _, _ = req("GET", f"{BOOK_URL}c00042.vcf")
+        status, _, _ = req_throttled("GET", f"{BOOK_URL}c00042.vcf")
+        if status == 429:
+            continue
         runs.append(time.perf_counter() - t0)
     print(f"B4 single GET: median {statistics.median(runs) * 1000:.1f}ms "
           f"(runs {'/'.join(f'{r * 1000:.1f}' for r in runs)}ms)", flush=True)

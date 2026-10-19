@@ -160,4 +160,25 @@ boot (pin 0.16.22) — transcripts + verdicts at
 
 ---
 
+## Addendum (2026-10-19, ~07:55): f)3 SOCIALPROFILE-without-uri — PASS, non-issue on the pin
+
+`social-edge.log` in the probe dir: variant cards PUT inside an addressbook,
+compared across protocols.
+
+- **CardDAV**: `SOCIALPROFILE;SERVICE-TYPE=Mastodon;USERNAME=edgeuser:`
+  (uri-less, svc+user) and `SOCIALPROFILE;SERVICE-TYPE=Mastodon:` (uri-less,
+  service only) both round-trip **byte-verbatim** via PUT→GET. A uri-full
+  SOCIALPROFILE also round-trips.
+- **JMAP**: `ContactCard/get` renders the uri-less property as
+  `onlineServices: {k1: {uri: "", service: "Mastodon", user: "edgeuser"}}` —
+  no drop, no parse error, no mangling. The #2884-class edge is a non-issue
+  on 0.16.22.
+- Route facts learned while probing: PUT directly into the home collection
+  (no addressbook parent) → 409; JMAP request URL is `/jmap/` (trailing
+  slash; `/jmap` returns `notRequest`); JMAP card ids are server-assigned
+  (`"edh"`) while `uid` is preserved; capability is
+  `urn:ietf:params:jmap:contacts`.
+
+---
+
 _Point-in-time snapshot. Session modified no project files; the auto-commit daemon owns this file's landing._
