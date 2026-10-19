@@ -224,16 +224,17 @@ jobs:
       - name: Assert CI expected-checks match the flake (lockstep, fail-closed)
         run: |
           # LOCKSTEP GUARD: the flake's declared check set (builtins.attrNames
-          # is sorted by definition) and CI's expected list must be EXACTLY
-          # equal. Catches BOTH drift directions: a check that vanished from
-          # the flake (the gate would silently run less than it claims) AND a
-          # check added to the flake but never registered here (its later
-          # disappearance would go unnoticed). Update the expected list IN
-          # THE SAME COMMIT that adds/removes a check in flake.nix.
+          # is sorted by definition) and the canonical expected list must be
+          # EXACTLY equal. Catches BOTH drift directions: a check that vanished
+          # from the flake (the gate would silently run less than it claims)
+          # AND a check added to the flake but never registered. The expected
+          # list lives in tests/check-expected.json - the SINGLE source also
+          # read by scripts/check-inventory.sh and the check-set-lockstep
+          # flake check, so a check add/remove edits one list, not four.
           # No pipes on gate commands (repo rule): nix eval writes a file,
           # jq reads the file; any upstream failure fails the step directly.
           nix eval .#checks.x86_64-linux --json --apply 'builtins.attrNames' > /tmp/actual-checks.json
-          expected='["dmarc-eval","demo-eval","migrate-convert-eval","module-import-eval","parsedmarc-e2e","provision-plan-eval","stalwart-bind-e2e","stalwart-e2e","stalwart-migrate-e2e","stalwart-relay-e2e"]'
+          expected="$(jq -c '.["x86_64-linux"]' tests/check-expected.json)"
           if ! jq -e --argjson expected "$expected" 'sort == ($expected | sort)' /tmp/actual-checks.json > /dev/null; then
             echo "FATAL: flake checks and CI expected-checks list diverged."
             echo "--- flake declares: $(cat /tmp/actual-checks.json)"
@@ -247,8 +248,16 @@ jobs:
           # stays arch-independent (forcing outPath would need to BUILD the
           # aarch64 strip script - "platform mismatch" on the x86_64 runner;
           # the deep eval is verified locally with emulation, 2026-09-15).
-          # Catches wiring regressions in the flake's system gating.
-          test "$(nix eval .#checks.aarch64-linux --apply 'builtins.attrNames')" = '[ "dmarc-eval" "migrate-convert-eval" "module-import-eval" "provision-plan-eval" ]'
+          # Catches wiring regressions in the flake's system gating. The
+          # expected shape comes from tests/check-expected.json (single
+          # source, same file the lockstep step reads).
+          nix eval .#checks.aarch64-linux --json --apply 'builtins.attrNames' > /tmp/actual-aarch64.json
+          if ! jq -e --slurpfile expected tests/check-expected.json 'sort == ($expected[0]["aarch64-linux"] | sort)' /tmp/actual-aarch64.json > /dev/null; then
+            echo "FATAL: aarch64 check set drifted from tests/check-expected.json."
+            echo "--- flake declares: $(cat /tmp/actual-aarch64.json)"
+            echo "--- expected:       $(jq -c '.["aarch64-linux"]' tests/check-expected.json)"
+            exit 1
+          fi
 
       - name: Run nix flake check (eval contract + VM tests)
         run: nix flake check --print-build-logs

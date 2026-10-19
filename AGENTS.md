@@ -15,9 +15,11 @@ transcript-pinned dialect).
   error); "N tools unavailable" = expected noise for a Nix-only repo.
   Budget `--max-time` >= 30m - the per-step deadline kills VM-e2e builds.
 - `nix flake check` - the full gate: eval contract checks + x86_64-only
-  VM E2E (~4-6 min CI). Check set is SINGLE-SOURCED: canonical list =
-  ci.yml lockstep `expected=` / README "What is built and verified" -
-  never restate it here; live
+  VM E2E (~4-6 min CI). Check set is SINGLE-SOURCED: canonical machine
+  list = `tests/check-expected.json` (read by ci.yml's lockstep steps,
+  `scripts/check-inventory.sh`, and the `check-set-lockstep` check,
+  which throws on drift); README "What is built and verified" owns the
+  prose restatement - never restate the list here; live
   truth: `nix eval .#checks.x86_64-linux --apply builtins.attrNames`.
   Failed results are CACHED (`--no-build` = fast eval-noise triage).
   After editing ONE check, build THAT check first
@@ -47,13 +49,14 @@ transcript-pinned dialect).
   session that touched `.nix` - the daemon pushes mid-session); extract
   cross-file identifiers mechanically (`grep -o`, `git diff` read-back),
   never from memory.
-- Adding/removing a flake check = FOUR guard sites in the same change:
-  BOTH ci.yml lists (x86_64 lockstep + aarch64 shape),
-  `scripts/check-inventory.sh` (own copies), AND the README check list
+- Adding/removing a flake check = TWO sites in the same change:
+  `tests/check-expected.json` (the canonical list - ci.yml,
+  `scripts/check-inventory.sh`, and the `check-set-lockstep` check all
+  read it, so no other copies exist) AND the README check list
   (CI-enforced: the anti-drift step fails when a check is not named in
   README.md); a missed site ships red master (daemon pushes bypass the
   hook). Pre-flight: `grep -rn '<existing-check-name>' .github scripts
-  README.md`.
+  tests README.md`.
 - A red CI run is NEVER "the known one" without reading the failing STEP
   name (`gh run view --log-failed`); two causes can stack. A working-tree
   gate red may belong to ANOTHER session's in-flight fix: check

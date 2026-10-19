@@ -132,8 +132,17 @@ variants; see the go-live backup step and
 `docs/probes/2026-10-18-demo-smoke-backup/`.)
 
 `nix flake check` runs the full check set against the SAME nixpkgs pin as
-SystemNix (`6774f7bc`, NixOS 26.11):
+SystemNix (`6774f7bc`, NixOS 26.11). The canonical machine list is
+`tests/check-expected.json` - one file read by ci.yml's lockstep steps,
+`scripts/check-inventory.sh` (pre-push), and the `check-set-lockstep`
+check itself; a check add/remove edits that list plus the prose row here,
+and nothing else:
 
+- `check-set-lockstep`: pure-eval guard asserting the declared check set
+  equals the JSON canonical list on BOTH arches - drift throws from
+  `nix flake check` with both sets spelled out (eval-time, so it fails
+  before any VM build). Makes the 2026-09-23 missing-entry class fail
+  locally regardless of pre-push hook state.
 - `stalwart-e2e`: real Stalwart 0.16.22 in a VM - declarative provisioning
   plan applied clean (accounts incl. quota + alias, dual declarative DKIM
   rsa+ed25519, listeners, singletons; idempotent second apply),
