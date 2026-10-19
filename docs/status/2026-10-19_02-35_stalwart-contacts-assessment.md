@@ -127,4 +127,37 @@ Follow-up question: "are the cards in memory all the time? worth filing an issue
 
 ---
 
+## Addendum (2026-10-19, ~07:45): CardDAV probe transcripts landed — claims upgraded to [LIVE]
+
+f) items 2, 4, and 16 are DONE: the full probe set ran against a fresh demo
+boot (pin 0.16.22) — transcripts + verdicts at
+`docs/probes/2026-10-19-carddav-demo-vm/` (README indexes them). Upgrades:
+
+- **Discovery chain [LIVE]** (f)16): `/.well-known/carddav` → 307 `/dav/card`
+  (anon); `current-user-principal` → `/dav/pal/<email>/`; carddav
+  `addressbook-home-set` → `/dav/card/<email>/`; Depth:1 PROPFIND enumerates
+  books incl. MKCOL-created ones.
+- **UID-uniqueness + ETag/If-Match [LIVE]** (f)4): duplicate-UID PUT → 412
+  `no-uid-conflict` naming the conflicting href; stale If-Match → 412; real
+  etag → 204 + new etag, UID preserved. PUT/GET/MKCOL all return `etag`
+  headers (lowercase — clients must do case-insensitive lookups).
+- **PUT-time validation is LENIENT [LIVE, new fact]:** a garbage card (no
+  VERSION, no FN, unknown property) is ACCEPTED and stored with `VERSION:4.0`
+  injected, unknown property preserved verbatim. "Strict parse" applies to
+  the query path, not PUT storage.
+- **sync-collection needs `<D:sync-level>1</D:sync-level>` [LIVE + SRC]:**
+  without it the parsed body-depth defaults to `Depth::None` → 0 → initial
+  sync returns zero members and PUT-deltas return zero changes (deletes still
+  surface). With it, RFC 6578 behaves fully (initial = all members; mixed
+  delta = changes with etags + deletions as 404 markers). Body depth wins;
+  the HTTP `Depth` header is ignored for this report
+  (`crates/dav-proto/src/requests/report.rs` init + `crates/dav/src/common/mod.rs:252`).
+- **Normalization [LIVE]:** v3 input stored as v4 (TYPE upper-cased,
+  `TYPE=INTERNET` preserved); query filters are case-insensitive; anyof/allof
+  correct; multiget returns etags + CDATA bodies.
+- f)3 (SOCIALPROFILE edge) and the f)-addendum benchmark (file-or-close) are
+  the next probe tasks on the same boot.
+
+---
+
 _Point-in-time snapshot. Session modified no project files; the auto-commit daemon owns this file's landing._

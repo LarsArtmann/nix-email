@@ -63,11 +63,11 @@ deployed pin) via the FIFO-console pattern; host-side probes against
    after PUTs return zero changes (deletions still surface — the
    tombstone path is depth-independent). Source-verified at
    `crates/dav-proto/src/requests/report.rs` (init `depth: Depth::None`)
-   + `crates/dav/src/common/mod.rs:252` (`changes()` maps the BODY depth,
-   not the HTTP `Depth` header — the header is ignored for this report).
-   RFC 6578's DTD marks sync-level required, so omission is client
-   malformation — but 207-with-empty-results (instead of a 400) is the
-   interop-hostile part. The CRM client will always send sync-level 1.
+   - `crates/dav/src/common/mod.rs:252` (`changes()` maps the BODY depth,
+     not the HTTP `Depth` header — the header is ignored for this report).
+     RFC 6578's DTD marks sync-level required, so omission is client
+     malformation — but 207-with-empty-results (instead of a 400) is the
+     interop-hostile part. The CRM client will always send sync-level 1.
 6. **Normalization notes for the emitter (plan T10)**: stored TYPE params
    come back upper-cased (`TYPE=WORK`, `TYPE=CELL`); v3 input is
    re-emitted as v4; unknown properties round-trip verbatim; CATEGORIES
