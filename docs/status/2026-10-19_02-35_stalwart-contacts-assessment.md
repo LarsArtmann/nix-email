@@ -201,16 +201,16 @@ must not treat a full PROPFIND as complete on larger books.
 pinned source via the flake-lock nixpkgs input; every contacts-relevant
 file is **byte-identical**:
 
-| File (crates/)                                  | 0.16.22 ↔ 0.16.26 |
-| ----------------------------------------------- | ----------------- |
-| dav/src/card/{mod,query,mkcol,update,delete,get}.rs | identical      |
-| dav/src/common/{mod,uri,propfind}.rs            | identical         |
-| dav-proto/src/requests/report.rs (sync parser)  | identical         |
-| dav-proto/src/schema/request.rs                 | identical         |
-| common/src/config/groupware.rs                  | identical         |
-| jmap/src/contact/{get,set}.rs                   | identical         |
-| registry `AddressBook` struct + defaults        | identical         |
-| registry `WebDav` defaults (maxResults 2000)    | identical         |
+| File (crates/)                                      | 0.16.22 ↔ 0.16.26 |
+| --------------------------------------------------- | ----------------- |
+| dav/src/card/{mod,query,mkcol,update,delete,get}.rs | identical         |
+| dav/src/common/{mod,uri,propfind}.rs                | identical         |
+| dav-proto/src/requests/report.rs (sync parser)      | identical         |
+| dav-proto/src/schema/request.rs                     | identical         |
+| common/src/config/groupware.rs                      | identical         |
+| jmap/src/contact/{get,set}.rs                       | identical         |
+| registry `AddressBook` struct + defaults            | identical         |
+| registry `WebDav` defaults (maxResults 2000)        | identical         |
 
 Every [SRC] claim in the 02:35 report (read from 0.16.26) holds verbatim
 for the deployed pin, and every [LIVE] pin behavior will hold at 0.16.26.

@@ -216,6 +216,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- buildflow local-noise batch (2026-10-19): `interrogate` skipped
+  with rationale (procedural probe scripts, minimal devShell is
+  deliberate); the stale mypy rationale ("only Python is the
+  test-driver template") replaced with the honest accepted-noise
+  verdict; `BUILDFLOW_TELEMETRY_DISABLED` opt-out note added
+  (verified in the binary env surface). Verified no-ops: jest
+  self-skips on missing package.json (a skip_steps entry would
+  restate a default), `buildflow timings --regressions` reports
+  clean, the nix-hash-fix preflight WARN only fires in the
+  self-heal path after a nix-build failure.
 - `scripts/vm-debug.sh` - the VM debug-driver dance mechanized
   (2026-10-19): GC root, per-test driver discovery (extracted from the
   check derivation's buildCommand - the `runNixOSTest` output is an

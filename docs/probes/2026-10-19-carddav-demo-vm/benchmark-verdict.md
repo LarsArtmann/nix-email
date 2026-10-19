@@ -7,12 +7,12 @@ VM, book `kith-bench-1792388705`, 10,000 deterministic vCards seeded at
 
 ## Numbers (3 runs, median)
 
-| Measurement                              | Median  | Notes                                    |
-| ---------------------------------------- | ------- | ---------------------------------------- |
+| Measurement                                      | Median      | Notes                                                        |
+| ------------------------------------------------ | ----------- | ------------------------------------------------------------ |
 | B1 filtered addressbook-query (10k cards, 1 hit) | **0.074 s** | the sequential per-card scan path (the drill-down's concern) |
-| B2 PROPFIND Depth:1 (2,000 hrefs, 480 KiB) | 0.021 s | result set capped, see below             |
-| B3 addressbook-multiget 100 (etags + bodies) | 0.002 s |                                          |
-| B4 single card GET                       | 0.5 ms  |                                          |
+| B2 PROPFIND Depth:1 (2,000 hrefs, 480 KiB)       | 0.021 s     | result set capped, see below                                 |
+| B3 addressbook-multiget 100 (etags + bodies)     | 0.002 s     |                                                              |
+| B4 single card GET                               | 0.5 ms      |                                                              |
 
 ## Verdict
 
