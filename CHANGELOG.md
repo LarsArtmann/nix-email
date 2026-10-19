@@ -216,6 +216,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- `scripts/vm-debug.sh` - the VM debug-driver dance mechanized
+  (2026-10-19): GC root, per-test driver discovery (extracted from the
+  check derivation's buildCommand - the `runNixOSTest` output is an
+  empty dir, so the old `<output>/bin/nixos-test-driver` recipe never
+  matched), starter test-script with the capture/settle/no-manual-provision
+  rules baked in. Smoke-verified through driver invocation.
 - External-link sweep re-run over the living docs (2026-10-19,
   first full pass since the 0.16 rewrite): 30 unique targets,
   ZERO dead links - the single lychee red is the known private-repo

@@ -32,15 +32,28 @@ if ! nix eval ".#checks.x86_64-linux.$CHECK" --apply 'd: d.outPath' >/dev/null 2
 	echo "VM e2e checks: $(nix eval .#checks.x86_64-linux --json --apply 'builtins.attrNames' | jq -r 'map(select(test("e2e"))) | join(", ")')" >&2
 	exit 1
 fi
+case "$CHECK" in
+*-e2e) ;;
+*)
+	echo "warning: $CHECK is not a *-e2e check - if it is pure-eval it has no driver" >&2
+	;;
+esac
 
 ROOT="/tmp/nix-email-vm-debug-$CHECK"
 echo ">>> building GC root $ROOT (instant when the check is cached)"
 nix build -o "$ROOT" ".#checks.x86_64-linux.$CHECK" -L
 
-DRIVER="$ROOT/bin/nixos-test-driver"
-if [ ! -x "$DRIVER" ]; then
-	echo "error: $CHECK has no test driver at $DRIVER" >&2
-	echo "       pure-eval checks (dmarc-eval, *-eval) have no VM to debug." >&2
+# Driver discovery: a testers.runNixOSTest check output is an EMPTY dir -
+# the per-test driver (which preloads the machine configs) appears in the
+# check derivation's buildCommand as an absolute /nix/store path.
+DRIVER="$(
+	nix derivation show ".#checks.x86_64-linux.$CHECK" 2>/dev/null |
+		jq -r '.derivations[].env.buildCommand' |
+		grep -o '/nix/store/[a-z0-9]*-nixos-test-driver-[^/ ]*/bin/nixos-test-driver' |
+		head -1
+)"
+if [ -z "$DRIVER" ] || [ ! -x "$DRIVER" ]; then
+	echo "error: no test driver found for $CHECK (pure-eval checks have no VM to debug)" >&2
 	exit 1
 fi
 

@@ -94,6 +94,13 @@ VM-test debug loop: realize the driver from the e2e closure's references
 must be packaged scripts or `machine.succeed`, never host socket code. Keep
 a GC root (`nix build -o /tmp/root .#checks...stalwart-e2e`). Rules:
 
+The dance is MECHANIZED: `scripts/vm-debug.sh [check] [test-script]` builds
+the GC root, extracts the per-test driver from the check derivation's
+buildCommand (the check output itself is an EMPTY dir; `runNixOSTest` puts
+no bin/ there), generates a starter script with the rules below baked in,
+and runs the driver (`--test-script ... -o ...`). Verified 2026-10-19
+through driver invocation (smoke script, no boot).
+
 (a) long `machine.execute` payloads die silently (status -1/28) - capture via
 `succeed("... > /tmp/f.log 2>&1")` and `cat` the file.
 
