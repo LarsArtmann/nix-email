@@ -216,6 +216,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- Match-property audit CLOSED (2026-10-19): the wrapper option-surface
+  review found ZERO dead/no-op options - all 34 `services.mail-server`
+  options verified consumed (plan emission, settings, credentials,
+  assertions, or warnings; the wrapper is a fresh 0.16 rewrite, so no
+  0.15-era carry-overs exist). The snapshot-vs-wrapper Account matchOn
+  divergence line was already in the README ledger (VM-proven
+  2026-10-18); the dkim-survival e2e subtest it rode on is green in the
+  full gate.
 - DNS-arrival race module verdict (2026-10-19, W14): the
   provision-vs-resolv.conf race is CLOSED as DOCUMENTED DOCTRINE, not a
   unit reorder - `network-online.target` is a no-op under dhcpcd
