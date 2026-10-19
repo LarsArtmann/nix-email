@@ -1,10 +1,18 @@
 # SUPERB Pareto Backlog-Burn Plan — nix-email, 2026-10-17 (P-generation)
 
-> **STATUS: ACTIVE PLAN (2026-10-17 04:18 CEST).** Point-in-time snapshot over the
+> **STATUS: SUPERSEDED (2026-10-18) - first by the V-generation plan
+> (10-18 22:20, which executed the overlapping task set ~60%), then by
+> the W-generation plan (10-19 02:34, which owns every remainder).**
+> Point-in-time snapshot over the
 > TODO_LIST state rebuilt by the 03:53 docs-health pass and corrected by the
 > 04:09 self-review (same day, both verified against code + the 03-34
-> gate-green report). Living truth stays in `TODO_LIST.md`; this plan feeds
-> docs-health HARVEST/ANNOTATE later. Customer = Lars (owner), SystemNix (the
+> gate-green report). Living truth stays in `TODO_LIST.md`; dispositions for
+> the P-tasks live in the V-plan's annotation (task-for-task mapping: the
+> V-plan renumbered this set 1:1 - P3→V3-class CI work, P4/P5→W4/W5,
+> P6→V6, P7→V11, P8→V12/W7, P9/P10→V9/V10, P11→V13, P12→V14,
+> P13→V7, P14→V16/W6, P15→V17/W9, P16→V15, P17→V18, P18→V19,
+> P19→V21, P20→V22/W12, and the tail lanes → W13/W16/W17).
+> Customer = Lars (owner), SystemNix (the
 > one consumer), future agent sessions.
 >
 > Format note: `.md` with mermaid per the user's explicit instruction (the

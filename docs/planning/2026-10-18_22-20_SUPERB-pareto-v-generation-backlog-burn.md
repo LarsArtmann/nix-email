@@ -1,10 +1,36 @@
 # SUPERB Pareto Backlog-Burn Plan — nix-email, 2026-10-18 (V-generation)
 
-> **STATUS: ACTIVE PLAN (2026-10-18 22:20 CEST).** Point-in-time snapshot over
-> the TODO_LIST state (living doc, last full verification sweep 2026-10-17;
-> three rows added by the 2026-10-18 09:49 gate-recovery session). Living truth
-> stays in `TODO_LIST.md`; this plan feeds docs-health HARVEST/ANNOTATE later.
-> Customer = Lars (owner), SystemNix (the one consumer), future agent sessions.
+> **STATUS: EXECUTED ~60% (2026-10-18 22:20 → 10-19 02:16) then SUPERSEDED
+> by the W-generation plan** (2026-10-19 02:34,
+> `2026-10-19_02-34_SUPERB-pareto-w-generation-migration-fix-release-unlock.md`).
+> Point-in-time snapshot over the TODO_LIST state (living doc, last full
+> verification sweep 2026-10-17; three rows added by the 2026-10-18 09:49
+> gate-recovery session). Living truth stays in `TODO_LIST.md`. Per-task
+> dispositions (annotated 2026-10-19, the W15.1 pass):
+>
+> - V1, V2 (owner sittings): NEVER HELD - routed to W3/W8 (owner-gated).
+> - V3 DONE 2026-10-18 (fail-closed ruff step, CI green twice, EXE001
+>   root-caused). V4/V5 PENDING as W4/W5 (gated W2+W3; the full gate went
+>   green for the first time 2026-10-19). V6 DONE 2026-10-18 (backup story
+>   VM-proven). V7 DONE (C42 recorded). V8 DONE - redesign shipped +
+>   registered, and the residual post-migration boot bug was closed
+>   2026-10-19 (migrate-e2e runs 6-10, three stacked root causes, 9/9
+>   subtests green). V9/V10 DONE 2026-10-18 (provision-plan-eval green;
+>   the count-line reconciliation closed as documented CLI noise - the
+>   first full gate says "running 7" vs 9 defined, attrNames is truth).
+> - V11 DONE 2026-10-18 (layered probes; the demo DNS boot race found +
+>   fixed). V12 DONE 2026-10-19 (as W7: no-gauge verdict transcript-pinned,
+>   37-series inventory in MONITORING §5.5). V13 DONE 2026-10-18 (451 to
+>   229 lines; the 220-cap blessing stays C41). V14 DONE. V15 DONE (delta
+>   table). V16 PENDING as W6. V17 DONE 2026-10-19 (as W9: hardening pins
+>   + IFD cleanup). V18 PROBE SIDE DONE 2026-10-18 (EventSource,
+>   closeafter=no, Junk-filing; e2e assertions pending as W6).
+> - V19 DONE 2026-10-18 (0.15 sweep). V20 DONE 2026-10-19 (as W11,
+>   empirically scoped against real dprint behavior). V21 DONE 2026-10-18.
+>   V22 PENDING as W12. V23 PENDING as W13. V24 PENDING as W16. V25
+>   PARTIAL - V25.3 (host-parse-fixture app) shipped 2026-10-18, the
+>   remainder rides W10. V26 DONE 2026-10-18. V27 PENDING as W17 (D1+W8
+>   gated).
 >
 > Format note: `.md` with mermaid per the user's explicit instruction (the
 > skill's styled-HTML default is overridden - precedent: the 11-53 report, the
