@@ -15,6 +15,12 @@
         pkgs.actionlint
         pkgs.python3
         pkgs.shellcheck
+        # BuildFlow resolves its tool runners inside this shell; without a
+        # pin each run falls back to `nix run nixpkgs#<tool>` and picks up
+        # registry-latest versions (lint/format results drift).
+        pkgs.dprint
+        pkgs.lychee
+        pkgs.ruff
         # The contention-vs-failure bisect (06-12 f40): when any nix
         # command dies with EMPTY output under concurrent sessions, run
         # `nix-health` BEFORE debugging your diff.

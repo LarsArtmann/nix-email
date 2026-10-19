@@ -150,6 +150,7 @@ too).
 The user's instruction forbade unrelated research, so this list contains
 only work this session surfaced or touched.
 
+<!-- check-rows:ledger -->
 | #                                                                                                                                                                          | Task                                                                                                   | Impact   | Effort | Category |
 | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ | -------- | ------ | -------- |
 | ~~1~~ done — 2026-10-17 - ROADMAP is at the 0.16/gate-green truth (03-53 pass + migration-session updates, verified this pass)                                             | ~~Sweep ROADMAP.md to the 0.16/gate-green truth (TODO header proved sweep claims can lag)~~            | ~~High~~ | ~~S~~  |          |
