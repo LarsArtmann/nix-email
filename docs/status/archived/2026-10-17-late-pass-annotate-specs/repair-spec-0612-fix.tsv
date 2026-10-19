@@ -1,0 +1,44 @@
+docs/status/2026-10-17_06-12_issue-4-bootstrap-fix-and-p3-close-status.md	32	r	the P-plan (04-18) is canonical; P3 closed this session, P11 landed 06-05; the remaining tasks route via TODO_LIST/decision-batch
+docs/status/2026-10-17_06-12_issue-4-bootstrap-fix-and-p3-close-status.md	33	v	done 2026-10-17 - the pbx-artmann stalwart-host-wiring gate re-ran on their lock d7e1334 (0.16.26): provision FINISHED at boot, the deadlock class is gone (see f27)
+docs/status/2026-10-17_06-12_issue-4-bootstrap-fix-and-p3-close-status.md	34	v	done 2026-10-17 - AGENTS carries the THREE-guard-sites rule + the pre-flight grep (commit 3d5c11b)
+docs/status/2026-10-17_06-12_issue-4-bootstrap-fix-and-p3-close-status.md	35	r	process note; e/4 is the standing mitigation
+docs/status/2026-10-17_06-12_issue-4-bootstrap-fix-and-p3-close-status.md	76	r	decision-batch C43/C45/C44/C42/C39/C41 + adoptions ratification (blocked-on-user row)
+docs/status/2026-10-17_06-12_issue-4-bootstrap-fix-and-p3-close-status.md	77	r	TODO_LIST blocked-on-user row (C18/C19/C22/C24/C29/C34, Q4, demo g1/g2, qcow2, D1/D2, Resend key)
+docs/status/2026-10-17_06-12_issue-4-bootstrap-fix-and-p3-close-status.md	78	r	TODO_LIST v0.5.0 row
+docs/status/2026-10-17_06-12_issue-4-bootstrap-fix-and-p3-close-status.md	79	r	TODO_LIST SystemNix pin row
+docs/status/2026-10-17_06-12_issue-4-bootstrap-fix-and-p3-close-status.md	80	r	TODO_LIST 0.16 backup story row
+docs/status/2026-10-17_06-12_issue-4-bootstrap-fix-and-p3-close-status.md	81	r	TODO_LIST demo-smoke row
+docs/status/2026-10-17_06-12_issue-4-bootstrap-fix-and-p3-close-status.md	82	r	TODO_LIST MONITORING row (extended this pass)
+docs/status/2026-10-17_06-12_issue-4-bootstrap-fix-and-p3-close-status.md	83	r	TODO_LIST match-property audit row
+docs/status/2026-10-17_06-12_issue-4-bootstrap-fix-and-p3-close-status.md	84	r	TODO_LIST provision-plan-eval row (extended this pass: Exec* lint + 8080 pin)
+docs/status/2026-10-17_06-12_issue-4-bootstrap-fix-and-p3-close-status.md	85	r	TODO_LIST THREAT_MODEL revisit row
+docs/status/2026-10-17_06-12_issue-4-bootstrap-fix-and-p3-close-status.md	86	r	decision-batch C42 + TODO_LIST
+docs/status/2026-10-17_06-12_issue-4-bootstrap-fix-and-p3-close-status.md	87	r	TODO_LIST flood-limiter + relay bounce-path rows
+docs/status/2026-10-17_06-12_issue-4-bootstrap-fix-and-p3-close-status.md	88	r	TODO_LIST dmarc-eval hardening + IFD rows
+docs/status/2026-10-17_06-12_issue-4-bootstrap-fix-and-p3-close-status.md	89	r	TODO_LIST C45 row (delta table folded)
+docs/status/2026-10-17_06-12_issue-4-bootstrap-fix-and-p3-close-status.md	90	r	TODO_LIST JMAP anti-rot row
+docs/status/2026-10-17_06-12_issue-4-bootstrap-fix-and-p3-close-status.md	91	r	TODO_LIST 0.15-reference sweep row
+docs/status/2026-10-17_06-12_issue-4-bootstrap-fix-and-p3-close-status.md	92	r	TODO_LIST rows: CHANGELOG diff + 19-23 reconcile + metadata.yaml (grep-L calibration landed in the skill canon)
+docs/status/2026-10-17_06-12_issue-4-bootstrap-fix-and-p3-close-status.md	93	r	TODO_LIST upstream-watch + T13b rows
+docs/status/2026-10-17_06-12_issue-4-bootstrap-fix-and-p3-close-status.md	94	r	TODO_LIST BuildFlow upstream row
+docs/status/2026-10-17_06-12_issue-4-bootstrap-fix-and-p3-close-status.md	95	r	TODO_LIST buildflow local-noise row
+docs/status/2026-10-17_06-12_issue-4-bootstrap-fix-and-p3-close-status.md	96	r	TODO_LIST SystemNix CI-debt row
+docs/status/2026-10-17_06-12_issue-4-bootstrap-fix-and-p3-close-status.md	97	r	TODO_LIST rows: fixture dedup, host-parse app, debug-driver, apps.vm guard, TLS-node
+docs/status/2026-10-17_06-12_issue-4-bootstrap-fix-and-p3-close-status.md	98	r	TODO_LIST repo-hygiene row
+docs/status/2026-10-17_06-12_issue-4-bootstrap-fix-and-p3-close-status.md	99	r	TODO_LIST D1-gated rows
+docs/status/2026-10-17_06-12_issue-4-bootstrap-fix-and-p3-close-status.md	100	v	done 2026-10-17 - the diet landed 06-05 (31,498 -> 28,040 B); verified this pass: 29,220 B after the migration doctrine, under the flag, dprint-clean
+docs/status/2026-10-17_06-12_issue-4-bootstrap-fix-and-p3-close-status.md	101	v	done 2026-10-17 - the trailing run went GREEN (39001519446 success); the latest master run is also green (39072344502)
+docs/status/2026-10-17_06-12_issue-4-bootstrap-fix-and-p3-close-status.md	103	v	done 2026-10-17 - AGENTS carries the THREE-sites rule (commit 3d5c11b)
+docs/status/2026-10-17_06-12_issue-4-bootstrap-fix-and-p3-close-status.md	104	v	done 2026-10-17 - the pre-flight grep is INSIDE the AGENTS guard rule text (3d5c11b)
+docs/status/2026-10-17_06-12_issue-4-bootstrap-fix-and-p3-close-status.md	105	r	TODO_LIST provision-plan-eval row (extended this pass with the Exec* unit lint)
+docs/status/2026-10-17_06-12_issue-4-bootstrap-fix-and-p3-close-status.md	106	r	TODO_LIST provision-plan-eval row (extended this pass with the built-in port-set pin)
+docs/status/2026-10-17_06-12_issue-4-bootstrap-fix-and-p3-close-status.md	107	v	done 2026-10-17 - repo-wide grep clean: no "three VM E2E tests"/"SIX defined" outside the CHANGELOG historical narration
+docs/status/2026-10-17_06-12_issue-4-bootstrap-fix-and-p3-close-status.md	108	v	done 2026-10-17 - THIS pass harvested all f/b/c/g items and archived this report
+docs/status/2026-10-17_06-12_issue-4-bootstrap-fix-and-p3-close-status.md	109	r	decision-batch C53 (new entry, [rec] accept degrade-visible)
+docs/status/2026-10-17_06-12_issue-4-bootstrap-fix-and-p3-close-status.md	110	r	TODO_LIST upstream-watch row (extended this pass with the bootstrap-fallback transcript)
+docs/status/2026-10-17_06-12_issue-4-bootstrap-fix-and-p3-close-status.md	111	v	done 2026-10-17 - the FEATURES vendored-module row now counts THREE vendor patch sites (verified in-file this pass)
+docs/status/2026-10-17_06-12_issue-4-bootstrap-fix-and-p3-close-status.md	112	r	TODO_LIST check-inventory runner-side twin row (added this pass)
+docs/status/2026-10-17_06-12_issue-4-bootstrap-fix-and-p3-close-status.md	113	r	TODO_LIST MONITORING row (extended this pass with the provision-failure alert)
+docs/status/2026-10-17_06-12_issue-4-bootstrap-fix-and-p3-close-status.md	114	r	TODO_LIST MONITORING row (extended this pass with the verify-budget doc)
+docs/status/2026-10-17_06-12_issue-4-bootstrap-fix-and-p3-close-status.md	115	r	TODO_LIST nix health-check bisect helper row (added this pass)
+docs/status/2026-10-17_06-12_issue-4-bootstrap-fix-and-p3-close-status.md	102	v	done 2026-10-17 - on their lock d7e1334 (0.16.26): stalwart.service went ACTIVE and provision FINISHED at boot - the bootstrap fix is validated on the issue version, deadlock class gone; the remaining red is the file's OWN deliberate deadlock-pin (machine.fail on a manual re-start) whose comment prescribes flip-to-success + TLS/webadmin/admin leg re-adds (new pbx-artmann work item, TODO row added this pass)
