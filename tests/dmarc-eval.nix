@@ -7,6 +7,12 @@
 # ([imap] connection section, `_secret` paths, no SQLite sink). Pin the
 # floor here so an accidental nixpkgs pin move below 11 fails loudly
 # instead of rendering a config against changed semantics.
+#
+# The unit-hardening readout (DynamicUser / SystemCallFilter /
+# RestrictAddressFamilies) is a DROP detector for pin advances: the
+# nixpkgs module owns that hardening (pin 6774f7bc, parsedmarc.nix), and
+# a pin move that silently drops it must fail HERE, not in production.
+# Additions (stricter than the pin) deliberately pass - only drops fail.
 {
   nixpkgs,
   system,
@@ -52,12 +58,12 @@
   };
 
   cfg = eval.config;
+  unit = cfg.systemd.services.parsedmarc.serviceConfig;
 
   # Options-docs rendering drift check (never built before 2026-09-16):
-  # forcing the full CommonMark options render proves every wrapper option
-  # description survives the NixOS docs pipeline instead of breaking it
-  # (unbalanced code fences etc. fail HERE, not in a manual build), and the
-  # greps below prove the wrapper's own docs content actually rendered.
+  # the options doc is grepped BUILD-TIME (below) - referencing its store
+  # path does not force the derivation during eval (the old readFile/
+  # passAsFile shape was an IFD: eval built the doc to read it).
   inherit ((pkgs.nixosOptionsDoc {inherit (eval) options;})) optionsCommonMark;
 
   rendered = builtins.toJSON {
@@ -65,8 +71,10 @@
     settings = cfg.services.parsedmarc.settings;
     elasticsearch = cfg.services.parsedmarc.provision.elasticsearch;
     geoIp = cfg.services.parsedmarc.provision.geoIp;
-    stateDirectory = cfg.systemd.services.parsedmarc.serviceConfig.StateDirectory;
-    execStart = cfg.systemd.services.parsedmarc.serviceConfig.ExecStart;
+    stateDirectory = unit.StateDirectory;
+    execStart = unit.ExecStart;
+    dynamicUser = unit.DynamicUser;
+    inherit (unit) SystemCallFilter RestrictAddressFamilies;
     inherit parsedmarcVersion;
   };
 
@@ -78,20 +86,40 @@
   # non-list entry lib.last would return a CHARACTER), hence the length
   # assertion below. If nixpkgs changes the unit shape or the workaround is
   # removed, this fails loudly instead of crashing parsedmarc at start.
-  execStartPre = cfg.systemd.services.parsedmarc.serviceConfig.ExecStartPre;
+  execStartPre = unit.ExecStartPre;
   execStartPreCount = builtins.length execStartPre;
-  stripScript = builtins.readFile (lib.last execStartPre);
+  # Store PATH (never the contents - no IFD), with the systemd privilege
+  # escape prefix stripped in case a future nixpkgs adds one to ours.
+  stripScript = lib.removePrefix "+" (lib.last execStartPre);
 
   versionOk = lib.versionAtLeast parsedmarcVersion "11";
+  syscallDrops = builtins.filter (f: !builtins.elem f unit.SystemCallFilter) [
+    "@system-service"
+    "~@privileged"
+    "~@resources"
+  ];
+  familyDrops = builtins.filter (f: !builtins.elem f unit.RestrictAddressFamilies) [
+    "AF_UNIX"
+    "AF_INET"
+    "AF_INET6"
+  ];
+  hardeningOk =
+    unit.DynamicUser
+    == true
+    && syscallDrops == []
+    && familyDrops == [];
 in
   assert versionOk || throw "dmarc-monitor contract is verified against parsedmarc >= 11 (got ${parsedmarcVersion}) - re-verify the [imap]/_secret/output semantics before touching the floor.";
   assert lib.isList execStartPre || throw "dmarc-eval: parsedmarc ExecStartPre is not a list - lib.last would return a character, not the strip script; re-verify the unit shape.";
   assert execStartPreCount >= 2 || throw "dmarc-eval: ExecStartPre must hold the module's ini step plus the wrapper's strip script (>= 2 entries, strip last) - got ${toString execStartPreCount}, which makes lib.last an invalid ordering proof.";
+  assert unit.DynamicUser == true || throw "dmarc-eval: the pinned parsedmarc module dropped DynamicUser hardening (got ${toString unit.DynamicUser}) - re-verify the unit sandbox before advancing the pin.";
+  assert syscallDrops == [] || throw "dmarc-eval: the pinned parsedmarc module dropped SystemCallFilter entries ${toString syscallDrops} (has ${toString unit.SystemCallFilter}) - re-verify the unit sandbox before advancing the pin.";
+  assert familyDrops == [] || throw "dmarc-eval: the pinned parsedmarc module dropped RestrictAddressFamilies entries ${toString familyDrops} (has ${toString unit.RestrictAddressFamilies}) - re-verify the unit sandbox before advancing the pin.";
     builtins.derivation {
       name = "dmarc-eval";
       inherit system;
-      PATH = "${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin";
-      passAsFile = ["rendered" "stripScript" "optionsCommonMark"];
+      PATH = "${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin:${pkgs.gnused}/bin";
+      passAsFile = ["rendered"];
       inherit rendered stripScript optionsCommonMark;
       builder = "/bin/sh";
       args = [
@@ -105,11 +133,22 @@ in
           grep -q '"offline":true' "$renderedPath"
           grep -q '"stateDirectory":"parsedmarc"' "$renderedPath"
           grep -q 'python3.13-parsedmarc' "$renderedPath"
-          grep -q '"\\[elasticsearch\\]"' "$stripScriptPath"
-          grep -q 'keep' "$stripScriptPath"
-          grep -q 'dmarc-monitor' "$optionsCommonMarkPath"
-          grep -q 'RETENTION' "$optionsCommonMarkPath"
-          grep -q 'parsedmarc.ini' "$optionsCommonMarkPath"
+          grep -q '"dynamicUser":true' "$renderedPath"
+          grep -q '"~@privileged"' "$renderedPath"
+          grep -q '"AF_INET6"' "$renderedPath"
+          grep -q '\[elasticsearch\]' "$stripScript"
+          grep -q 'keep' "$stripScript"
+          grep -q 'dmarc-monitor' "$optionsCommonMark"
+          grep -q 'RETENTION' "$optionsCommonMark"
+          grep -q 'parsedmarc.ini' "$optionsCommonMark"
+          # Negative self-test (the CI ruff-step pattern): the hardening
+          # greps must DISCRIMINATE, not match anything. Flip one key in a
+          # copy; the matcher must then miss.
+          sed 's/"dynamicUser":true/"dynamicUser":false/' "$renderedPath" > neg.json
+          if grep -q '"dynamicUser":true' neg.json; then
+            echo "FATAL: the dynamicUser matcher is vacuous" >&2
+            exit 1
+          fi
           touch "$out"
         ''
       ];
