@@ -165,9 +165,21 @@ in {
         printf '[authentication.fallback-admin]\nuser = "${cfg.admin.username}"\nsecret = "%s"\n' "$secret"
       } > "$probe_toml"
       chmod 600 "$probe_toml"
+      # The probe and the recovery boot run as the SERVICE USER (upstream
+      # doctrine: root-run boots litter the store with root-owned RocksDB
+      # files the unit cannot always rewrite). The toml carries the admin
+      # secret, so it stays 0600 - just owned by the service user.
+      chown ${lib.escapeShellArg cfg.user}:${lib.escapeShellArg cfg.group} "$probe_toml"
+      as_service_user="${lib.getExe' pkgs.util-linux "setpriv"} --reuid=${lib.escapeShellArg cfg.user} --regid=${lib.escapeShellArg cfg.group} --init-groups"
+      if [ "$dump_store" != "$store_dir" ]; then
+        # A root-unpacked backup copy is root-owned; the 0.15.5 probe needs
+        # to WRITE (RocksDB lock + WAL) as the service user.
+        echo "[*] normalizing dump-copy ownership for the 0.15.x probe"
+        chown -R ${lib.escapeShellArg cfg.user}:${lib.escapeShellArg cfg.group} "$dump_store"
+      fi
 
       echo "[*] preflight: opening the dump store with ${mig.package.version}"
-      ${lib.getExe mig.package} --config="$probe_toml" > "$work/preflight.log" 2>&1 &
+      $as_service_user ${lib.getExe mig.package} --config="$probe_toml" > "$work/preflight.log" 2>&1 &
       preflight_pid=$!
       preflight_verdict=""
       for _ in $(seq 1 40); do
@@ -238,7 +250,7 @@ in {
       STALWART_RECOVERY_MODE=1 \
       STALWART_RECOVERY_ADMIN="${cfg.admin.username}:$recovery_password" \
       STALWART_RECOVERY_MODE_PORT=${toString mig.recoveryPort} \
-        ${lib.getExe cfg.package} --config="$work/config.json" \
+        $as_service_user ${lib.getExe cfg.package} --config="$work/config.json" \
         > "$work/recovery.log" 2>&1 &
       recovery_pid=$!
       recovery_up=0
@@ -266,6 +278,10 @@ in {
       for _ in $(seq 1 20); do kill -0 "$recovery_pid" 2>/dev/null || break; sleep 0.5; done
       kill -9 "$recovery_pid" 2>/dev/null || true
       wait "$recovery_pid" 2>/dev/null || true
+
+      # Recovery wiped + rewrote subspaces; normalize any root-owned strays
+      # a root-run 0.16 boot attempt left in the live store.
+      chown -R ${lib.escapeShellArg cfg.user}:${lib.escapeShellArg cfg.group} "$store_dir"
 
       touch "$marker"
       chown ${lib.escapeShellArg cfg.user}:${lib.escapeShellArg cfg.group} "$marker"
