@@ -13,7 +13,9 @@
   inputs,
   self,
   ...
-}: {
+}: let
+  common = import ../tests/common.nix;
+in {
   # Throwaway demo host for `nix run .#vm` (see apps.vm below): boots the
   # full stack with a provisioned demo account + catch-all. NOT a consumer
   # template - real hosts wire the modules in SystemNix (AGENTS.md:
@@ -40,6 +42,10 @@
         system.stateVersion = "26.05";
         imports = [
           (modulesPath + "/virtualisation/qemu-vm.nix")
+          # DNS-less-VM provision patches (DnsResolver Cloudflare + pyzor
+          # off, with the 2026-10-18 demo boot-race rationale): the
+          # canonical copy lives in tests/common.nix.
+          common.dnslessVmPatches
         ];
         services = {
           mail-server = {
@@ -60,21 +66,7 @@
 
           # dmarc-monitor stays OFF: parsedmarc polls a real rua mailbox,
           # which a throwaway .invalid VM cannot have (ROADMAP D1).
-          stalwart.provision = {
-            singletons = {
-              # Tested posture from stalwart-e2e: pyzor's public host adds
-              # network dependence + config-error risk for zero demo value.
-              SpamPyzor.enable = false;
-              # 0.16 reload-validation reads the SYSTEM resolver config and
-              # fails the whole apply ("no nameservers found in config")
-              # when it beats resolvconf at boot - demo VM transcript
-              # 2026-10-18: op #7 (reload) failed, the apply aborted before
-              # its restart step, and stalwart kept the built-in listener
-              # set (no 587/465). Same pin the e2e uses
-              # (tests/stalwart-e2e.nix "DnsResolver").
-              DnsResolver."@type" = "Cloudflare";
-            };
-            objects = {
+          stalwart.provision.objects = {
               Account = {
                 reconcile = true;
                 match = ["name"];
@@ -105,7 +97,6 @@
                 };
               };
               Domain.objects.domain.catchAllAddress = "catchall@mail.demo.test";
-            };
           };
           getty.autologinUser = "root";
         };

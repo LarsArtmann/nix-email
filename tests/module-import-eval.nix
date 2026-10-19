@@ -18,31 +18,36 @@
   inherit (nixpkgs) lib;
   pkgs = nixpkgs.legacyPackages.${system};
 
-  eval = nixpkgs.lib.nixosSystem {
-    inherit system;
-    modules = [
-      ../modules/mail-server.nix
-      ../modules/dmarc-monitor.nix
-      {
-        # Explicit stateVersion: kills the "defaulting to 26.11" eval
-        # warning (fleet convention 26.05).
-        system.stateVersion = "26.05";
-        # Both wrappers at once: the co-existence proof (an option conflict
-        # or broken merge between the two modules fails HERE, on both
-        # arches, before any consumer hits it).
-        services = {
-          mail-server = {
-            enable = true;
-            hostname = "import-check.invalid";
-            # REQUIRED under 0.16: the fallback admin is the provisioning
-            # CLI's only credential path.
-            admin.secretFile = "/run/import-check-admin-secret";
-          };
-          dmarc-monitor.enable = true;
-        };
-      }
-    ];
+  # Shared boilerplate for the four evals below: base stateVersion +
+  # the minimal mail-server config every scenario starts from. Extra
+  # scenarios ride extra modules - the module system deep-merges them
+  # onto the base.
+  mailServerBase = {
+    # Explicit stateVersion: kills the "defaulting to 26.11" eval
+    # warning (fleet convention 26.05).
+    system.stateVersion = "26.05";
+    services.mail-server = {
+      enable = true;
+      hostname = "import-check.invalid";
+      # REQUIRED under 0.16: the fallback admin is the provisioning
+      # CLI's only credential path.
+      admin.secretFile = "/run/import-check-admin-secret";
+    };
   };
+
+  mkEval = extraModules:
+    nixpkgs.lib.nixosSystem {
+      inherit system;
+      modules = [../modules/mail-server.nix mailServerBase] ++ extraModules;
+    };
+
+  # Both wrappers at once: the co-existence proof (an option conflict
+  # or broken merge between the two modules fails HERE, on both
+  # arches, before any consumer hits it).
+  eval = mkEval [
+    ../modules/dmarc-monitor.nix
+    {services.dmarc-monitor.enable = true;}
+  ];
 
   cfg = eval.config;
   stalwart = cfg.services.stalwart;
@@ -62,80 +67,46 @@
   # MtaInboundThrottleKey enum, dnsbl as variant objects with QUOTED
   # expression constants (unquoted zone strings die in the expression
   # tokenizer).
-  evalHardened = nixpkgs.lib.nixosSystem {
-    inherit system;
-    modules = [
-      ../modules/mail-server.nix
-      {
-        system.stateVersion = "26.05";
-        services = {
-          mail-server = {
-            enable = true;
-            hostname = "import-check.invalid";
-            admin.secretFile = "/run/import-check-admin-secret";
-            rateLimits = {
-              enable = true;
-              rate = "100/1h";
-              keys = ["sender_domain" "remote_ip"];
-            };
-            spamFilter.dnsbl.servers.hardcore = {
-              scope = "ip";
-              zone = "zen.spamhaus.org";
-              tag = "spamhaus-hit";
-            };
-          };
+  evalHardened = mkEval [
+    {
+      services.mail-server = {
+        rateLimits = {
+          enable = true;
+          rate = "100/1h";
+          keys = ["sender_domain" "remote_ip"];
         };
-      }
-    ];
-  };
+        spamFilter.dnsbl.servers.hardcore = {
+          scope = "ip";
+          zone = "zen.spamhaus.org";
+          tag = "spamhaus-hit";
+        };
+      };
+    }
+  ];
   hardened = evalHardened.config.services.stalwart.provision;
 
   # Invalid inputs must trip the module's eval-time assertions. NixOS
   # assertions are enforced in toplevel (not built here), so the contract is
   # the ASSERTION LIST contents.
-  evalBadKey = nixpkgs.lib.nixosSystem {
-    inherit system;
-    modules = [
-      ../modules/mail-server.nix
-      {
-        system.stateVersion = "26.05";
-        services = {
-          mail-server = {
-            enable = true;
-            hostname = "import-check.invalid";
-            admin.secretFile = "/run/import-check-admin-secret";
-            rateLimits = {
-              enable = true;
-              # The plausible-but-wrong spelling (upstream enum: authenticatedAs).
-              keys = ["auth_as"];
-            };
-          };
-        };
-      }
-    ];
-  };
+  evalBadKey = mkEval [
+    {
+      services.mail-server.rateLimits = {
+        enable = true;
+        # The plausible-but-wrong spelling (upstream enum: authenticatedAs).
+        keys = ["auth_as"];
+      };
+    }
+  ];
   badKeyTrips = lib.any (a: lib.hasInfix "invalid throttle key" a.message) evalBadKey.config.assertions;
 
-  evalEmptyZone = nixpkgs.lib.nixosSystem {
-    inherit system;
-    modules = [
-      ../modules/mail-server.nix
-      {
-        system.stateVersion = "26.05";
-        services = {
-          mail-server = {
-            enable = true;
-            hostname = "import-check.invalid";
-            admin.secretFile = "/run/import-check-admin-secret";
-            spamFilter.dnsbl.servers.empty = {
-              scope = "ip";
-              zone = "";
-            };
-          };
-        };
-      }
-    ];
-  };
+  evalEmptyZone = mkEval [
+    {
+      services.mail-server.spamFilter.dnsbl.servers.empty = {
+        scope = "ip";
+        zone = "";
+      };
+    }
+  ];
   emptyZoneTrips = lib.any (a: lib.hasInfix "non-empty DNSBL zone" a.message) evalEmptyZone.config.assertions;
 
   # The option surface itself: a consumer evaluating `services.mail-server.*`

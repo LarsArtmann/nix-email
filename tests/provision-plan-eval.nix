@@ -21,28 +21,27 @@
   system,
   nixpkgs,
 }: let
+  dnslessVmPatches = (import ./common.nix).dnslessVmPatches;
+
   mkConfig = extra:
     (import (nixpkgs + "/nixos/lib/eval-config.nix")) {
       inherit system;
       modules = [
         ../modules/mail-server.nix
-        (
-          {config, ...}: {
-            system.stateVersion = "26.05";
-            services.mail-server =
-              {
-                enable = true;
-                hostname = "mail.check.test";
-                httpBind = "127.0.0.1:8082";
-                admin.secretFile = "/etc/check-admin-secret";
-              }
-              // extra;
-            services.stalwart.provision.singletons = {
-              DnsResolver."@type" = "Cloudflare";
-              SpamPyzor.enable = false;
-            };
-          }
-        )
+        {
+          system.stateVersion = "26.05";
+          services.mail-server =
+            {
+              enable = true;
+              hostname = "mail.check.test";
+              httpBind = "127.0.0.1:8082";
+              admin.secretFile = "/etc/check-admin-secret";
+            }
+            // extra;
+        }
+        # DNS-less-VM plan posture (DnsResolver Cloudflare + pyzor off):
+        # tests/common.nix owns the canonical copy and rationale.
+        dnslessVmPatches
       ];
     };
 
