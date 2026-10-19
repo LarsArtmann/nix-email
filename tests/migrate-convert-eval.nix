@@ -92,7 +92,7 @@ in
         and (.value | to_entries | any(
           .key == "restore-2"
           and .value.name == "lars"
-          and (.value.domainId | startswith("#"))))' export.json > /dev/null
+          and (.value.domainId | startswith("#")))))' export.json > /dev/null
       grep -q 'restore-' export.json
 
       echo "[*] convert with --patch-paths (the dump-copy -> live rewrite)"

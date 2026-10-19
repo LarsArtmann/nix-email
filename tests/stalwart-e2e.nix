@@ -964,9 +964,15 @@ in
           # same way as apiUrl (absolute https URL, DNS-less VM -> loopback),
           # listen in the background, deliver a fresh needle, and require a
           # StateChange event to arrive over the stream.
+          # The session's eventSourceUrl is a TEMPLATE (literal
+          # {types}/{closeafter}/{ping} placeholders - a raw GET is a 400,
+          # observed 2026-10-19). Expand it with the probe-proven params
+          # (demo VM 2026-10-18: types=Email, closeafter=no).
           machine.succeed(
               "jq -j '.eventSourceUrl | sub(\"^https?://[^/]+\"; \"\")' "
-              "/tmp/jmap-session.json > /tmp/es-path.txt"
+              "/tmp/jmap-session.json "
+              "| sed -e 's/{types}/Email/' -e 's/{closeafter}/no/' -e 's/&ping={ping}//' "
+              "> /tmp/es-path.txt"
           )
           machine.succeed("cat /tmp/es-path.txt >&2")
           machine.execute(
