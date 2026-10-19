@@ -351,13 +351,27 @@ covered:
   `config.services.stalwart.migrateFrom015.script` to
   `environment.systemPackages`, run as root): poison preflight ->
   `cp -a` backup -> 0.15.x dump probe on a dedicated loopback port ->
-  vendored `migrate_v016.py` dump+convert -> recovery-mode 0.16 on
-  `migrateFrom015.recoveryPort` (default 18080, NEVER the built-in 8080 -
-  real hosts own that port) -> `stalwart-cli apply` (accounts keep their
-  0.15 ids via the `restore-<id>` mechanism, so mail linkage survives) ->
-  marker. When the live store is already poisoned, `--backup-dir PATH`
-  dumps from an unpacked pre-0.16 copy instead and still recovers the
-  live store.
+  vendored `migrate_v016.py` dump+convert (dump-store paths rewritten to
+  the LIVE store - the dump serves the probe's EFFECTIVE settings, so an
+  unrewritten DataStore path made recovery migrate the `--backup-dir`
+  COPY while the live store stayed pre-0.16 and the first normal boot
+  panicked with the multi-step message; migrate-e2e runs 6-7,
+  2026-10-18/19) -> when `--backup-dir` is used, the clean copy is
+  RESTORED into the live store path first (recovery mode's one-shot wipe
+  only triggers on a CLEAN pre-0.16 store; poisoned settings skip the
+  detection, the built-in Role objects are never re-seeded, and the apply
+  dies on `x:Account/set` "Role not found" - run 9; the freshest
+  poisoned-live mail survives in the `.v015-premigrate` backup) ->
+  recovery-mode 0.16 as the SERVICE USER on `migrateFrom015.recoveryPort`
+  (default 18080, NEVER the built-in 8080 - real hosts own that port) ->
+  `stalwart-cli apply` (accounts keep their 0.15 ids via the
+  `restore-<id>` mechanism, so mail linkage survives) -> marker -> a
+  VERIFIED end state: the script boots `stalwart.service` itself,
+  requires stable-active with zero restarts, runs the provision apply,
+  and only then prints `[DONE]` (a failed verification removes the
+  marker so the guard refuses further boots). When the live store is
+  already poisoned, `--backup-dir PATH` dumps from an unpacked pre-0.16
+  copy instead and still recovers the live store.
 
 Listeners, rate limits, and report settings do NOT ride the migration
 (0.16 objects) - the provision plan recreates them at the next start.

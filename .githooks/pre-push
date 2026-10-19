@@ -32,3 +32,21 @@ elif command -v nix >/dev/null 2>&1; then
 else
   echo "pre-push: actionlint/shellcheck unavailable - skipping (CI enforces)" >&2
 fi
+
+# 4. Markdown lints (CI parity, fast + nix-free): pipes + list markers +
+#    check-set drift alarm. The daemon pushes bypass this hook entirely -
+#    CI is the hard gate; this front-runs it for human pushes.
+echo "pre-push: markdown lints (pipes, list markers, drift alarm)"
+bash scripts/check-md-table-pipes.sh
+bash scripts/check-md-list-markers.sh
+bash scripts/check-check-set-drift.sh
+
+# 5. Statix (CI parity, the 4x-red W20 class): the PINNED statix, same
+#    rev CI uses, so local findings match CI exactly.
+echo "pre-push: pinned statix"
+if command -v nix >/dev/null 2>&1; then
+  rev="$(nix flake metadata --json . | jq -r '.locks.nodes.nixpkgs.locked.rev')"
+  nix run "github:NixOS/nixpkgs/$rev#statix" -- check .
+else
+  echo "pre-push: nix unavailable - skipping statix (CI enforces)" >&2
+fi

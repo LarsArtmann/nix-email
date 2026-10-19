@@ -29,12 +29,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   switch-to-configuration ever runs (the 2026-10-17 single-node wedge).
   Six real runs debugged the harness (read-only share, virtfs chown,
   oneshot wait race, python quoting, unrealistic 0.15 listener set);
-  subtests 1-6 are green. ONE product bug remains open and is tracked,
-  not hidden: the post-migration normal boot still panics with the
-  upstream "multi-step process" refusal - the migration script's
-  recovery-mode apply does not complete the binary's store migration on
-  the live store in at least one flow (02-16 status report b/1; root
-  cause pending the instrumented artifact dumps).
+  subtests 1-6 are green. The then-open post-migration boot bug was
+  fixed the next day (see Fixed below; the runs 6-10 transcript chain).
+- Guard-tooling batch (2026-10-19, W11): prose-wrap list-marker lint
+  (`scripts/check-md-list-markers.sh`, empirically scoped against real
+  dprint behavior - the one list-adjacency shape dprint normalizes is
+  flagged, stable wrapped/sibling/nested shapes are not), check-set
+  drift alarm (`scripts/check-check-set-drift.sh`: numeric check-set
+  claims in AGENTS/README fail - counts rot within hours), a README
+  completeness step (every live check name must appear in README -
+  caught `provision-plan-eval` missing on first run), argless mode +
+  indented-fence coverage for the pipes lint, a `nix-health`
+  contention-vs-failure bisect in the devShell, and pre-push parity
+  for all of it incl. the PINNED statix (the 4x-red W20 class).
+  Every new CI step self-tests on planted fixtures first (the
+  never-firing-lint-is-a-false-green doctrine).
+- `dmarc-eval` unit-hardening pins (2026-10-19, W9): the pinned
+  nixpkgs parsedmarc module's sandbox shape is now DROP-detected at
+  eval (DynamicUser, SystemCallFilter, RestrictAddressFamilies -
+  additions pass, drops fail loudly naming the dropped key) with a
+  build-time negative self-test proving the matcher discriminates.
+  IFD cleanup: the strip script and options doc are grepped at BUILD
+  time instead of `builtins.readFile`/passAsFile forcing at eval.
 - Demo-VM disk relocation (2026-10-18): `apps.vm` pins `NIX_DISK_IMAGE`
   to `~/.cache/nix-email-demo/demo.qcow2` (HOME-unset fallback kept) -
   the demo disk is no longer CWD-relative and can never pollute the

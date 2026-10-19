@@ -15,6 +15,10 @@
         pkgs.actionlint
         pkgs.python3
         pkgs.shellcheck
+        # The contention-vs-failure bisect (06-12 f40): when any nix
+        # command dies with EMPTY output under concurrent sessions, run
+        # `nix-health` BEFORE debugging your diff.
+        (pkgs.writeShellScriptBin "nix-health" "exec bash ${../scripts/nix-health-check.sh}")
       ];
     };
 
