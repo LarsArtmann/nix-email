@@ -50,7 +50,7 @@
   throttled = mkConfig {rateLimits.enable = true;};
 
   provision = base.config.services.stalwart.provision;
-  objects = provision.objects;
+  inherit (provision) objects;
 
   hostname = base.config.services.mail-server.hostname;
 
@@ -147,10 +147,8 @@
   renderedAttrs = {
     inherit domainName hostname;
     inherit reconcileWithoutMatch noMatchOutsideAllowlist accountSetMatchWrong;
-    listenerPostureOk = listenerPostureOk;
-    settingsCoherent = settingsCoherent;
+    inherit listenerPostureOk settingsCoherent throttleOk;
     multilineExecs = builtins.length multilineExecs == 0;
-    throttleOk = throttleOk;
     wrapperAssertionsClean = builtins.length wrapperAssertionFires == 0;
   };
   rendered = builtins.toJSON renderedAttrs;
@@ -167,7 +165,7 @@ in
   assert domainName == hostname || throw "provision-plan-eval: the wrapper Domain name (${domainName}) must equal services.mail-server.hostname (${hostname}) - addresses synthesize as name@<Domain.name>, a split lands them outside the local namespace.";
   assert builtins.length reconcileWithoutMatch == 0 || throw "provision-plan-eval: reconcile sets without an explicit match property: ${toString reconcileWithoutMatch} - reconcile DELETES by key, a null match is a footgun.";
   assert builtins.length noMatchOutsideAllowlist == 0 || throw "provision-plan-eval: object sets without match outside the documented implicit-key allowlist (${toString implicitKeyAllowlist}): ${toString noMatchOutsideAllowlist}.";
-  assert !(accountSetMatchWrong) || throw "provision-plan-eval: an Account set exists but does not match on [\"name\"] (the e2e/demo idempotence posture).";
+  assert !accountSetMatchWrong || throw "provision-plan-eval: an Account set exists but does not match on [\"name\"] (the e2e/demo idempotence posture).";
   assert listenerPostureOk || throw "provision-plan-eval: the NetworkListener plan drifted from the fallback port set (smtp 25 / submission 587 / submissions 465 / imaps 993 / http httpBind) or lost match=[name]+reconcile.";
   assert settingsCoherent || throw "provision-plan-eval: SystemSettings.defaultHostname/defaultDomainId drifted from the wrapper hostname/Domain id.";
   assert (builtins.length multilineExecs == 0) || throw "provision-plan-eval: multi-line text found in Exec* of ${toString multilineExecs} - systemd rejects it ('Unbalanced quoting'); scripts must stay on store paths.";

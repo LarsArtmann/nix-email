@@ -157,6 +157,13 @@ in {
       # option types, so strip the section from the RENDERED ini after the
       # module's own ExecStartPre. Guarded: a real [elasticsearch] (ES
       # provisioned) must survive.
+      # UPSTREAM (merged 2026-10-13, nixpkgs PR #566282; NOT in our pin
+      # yet): master renamed the option to provision.opensearch (default
+      # TRUE, mkRemovedOptionModule throws on the old name) - the first
+      # pin past it breaks BOTH the mkDefault above and this guard, and
+      # the host-less section reappears as [opensearch] (bug persists,
+      # #563651 still open). Port procedure: README "Pin-advance runbook"
+      # step 2.
       ExecStartPre = lib.mkIf (!config.services.parsedmarc.provision.elasticsearch) (
         lib.mkAfter [
           (pkgs.writeShellScript "parsedmarc-strip-elasticsearch-section" ''

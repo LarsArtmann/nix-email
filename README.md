@@ -1189,15 +1189,26 @@ conditions in the module comments and the Pin-advance runbook):
 - [NixOS/nixpkgs#563651](https://github.com/NixOS/nixpkgs/issues/563651) -
   parsedmarc module materializes a host-less `[elasticsearch]` ini section
   with `provision.elasticsearch = false` (parsedmarc 11 exits 255). Wrapper
-  workaround: guarded `ExecStartPre` strip. Filed 2026-09-15, re-verified
-  unfixed on nixpkgs master same day.
+  workaround: guarded `ExecStartPre` strip. UPSTREAM REWORK MERGED
+  2026-10-13 (nixpkgs PR #566282): master dropped `provision.elasticsearch`
+  (`mkRemovedOptionModule` - the filed repro no longer evals) in favor of
+  `provision.opensearch` (default TRUE), but the bug SHAPE PERSISTS: with
+  `provision.opensearch = false` the module still materializes a host-less
+  `[opensearch]` section (unconditional `ssl`/`cert_path` defaults survive
+  the null filter) and parsedmarc still exits 255 ("hosts setting missing
+  from the opensearch config section", cli.py re-verified on parsedmarc
+  master 2026-10-19). Issue still OPEN, zero maintainer response; the
+  wrapper port procedure is mandatory at the first pin past the rework
+  (Pin-advance runbook step 2).
 - [NixOS/nixpkgs#563652](https://github.com/NixOS/nixpkgs/issues/563652) -
   imapclient `starttls()` assigns the read-only `imaplib.IMAP4.file` on
   python 3.14. Wrapper workaround: unit pinned to the py3.13 build. UPSTREAM
   FIX LANDED: [mjs/imapclient#663](https://github.com/mjs/imapclient/pull/663)
   MERGED 2026-09-18 and released in imapclient 4.1.0 (maintainer comment on
-  the nixpkgs issue, gh re-checked 2026-09-22); the pinned rev `6774f7bc`
-  still ships 4.0.1 on py3.13 AND py3.14 (`nix eval` 2026-09-22), so the
+  the nixpkgs issue; no further movement - the 2026-10-01 touch was only a
+  title rename); nixpkgs master ships 4.1.0 as of the 2026-10-19 re-check
+  (rode PR #566282), while the pinned rev `6774f7bc` still ships 4.0.1 on
+  py3.13 AND py3.14 (`nix eval`), so the
   py3.13 pin retires at the next bump carrying >= 4.1.0 (Pin-advance
   runbook). [mjs/imapclient#662](https://github.com/mjs/imapclient/issues/662)
   (the upstream crash report) is CLOSED as fixed.
@@ -1205,7 +1216,9 @@ conditions in the module comments and the Pin-advance runbook):
   parsedmarc module ships no systemd `Restart` policy: the poller exits 255
   on a transient boot race (observed in the TLS IMAPS VM variant) and stays
   failed. Fixture adds `Restart = on-failure` to stay deterministic; filed
-  2026-09-16 asking for `Restart = lib.mkDefault "on-failure"`.
+  2026-09-16 asking for `Restart = lib.mkDefault "on-failure"`. Re-checked
+  2026-10-19: still OPEN, zero comments, and the reworked master module
+  still contains no `Restart` (grep-verified).
 - [mjs/imapclient#662](https://github.com/mjs/imapclient/issues/662) -
   the upstream crash report for the py3.14 `starttls()` bug (same root
   cause as nixpkgs#563652). CLOSED as fixed via the #663 merge (see the
@@ -1215,6 +1228,7 @@ conditions in the module comments and the Pin-advance runbook):
   upgrades when the server advertises STARTTLS (same trap as
   parsedmarc#534). Filed 2026-10-05 after the verify-before-filing gates
   (master `imap.py` byte-identical at the quoted lines, no duplicate
-  issue). Wrapper impact today: none - the parsedmarc e2e runs TLS
+  issue). Re-checked 2026-10-19: OPEN, zero comments - no maintainer
+  response. Wrapper impact today: none - the parsedmarc e2e runs TLS
   IMAPS with DEFAULT verification; the ask is for future plaintext-hop
   consumers.

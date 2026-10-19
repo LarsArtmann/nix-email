@@ -11,6 +11,7 @@
 **Verdict: A- data/protocol layer, C+ interop fringe.**
 
 Strengths `[SRC]`:
+
 - vCard model: full RFC 6350 IANA property table + RFC 6474 (deathdate/birthplace), RFC 9556 (PRONOUNS/GRAMGENDER), SOCIALPROFILE, `Other` catch-all preserving unknown properties and params; vCard 3.0/4.0 output negotiation (`calcard/src/vcard/types.rs`).
 - JSContact (RFC 9553) conversion is serious: ~5.4k lines in `calcard/src/jscontact/{import,export}/` handling prop-ids, localizations, alt-ids, phonetic systems, JSCOMPS — the hard 20% most implementations skip.
 - Storage: parsed vCard archived via rkyv (zero-copy), versioned, changelog'd, quota-aware (`crates/groupware/src/contact/storage.rs`).
@@ -21,6 +22,7 @@ Strengths `[SRC]`:
 - JMAP surface live-confirmed `[LIVE]`: `urn:ietf:params:jmap:contacts` (+`:parse`), `mayCreateAddressBook: true`, `maxAddressBooksPerCard: null` (session-admin/user.json).
 
 Weaknesses `[SRC]`:
+
 - `addressbook-query` filters = in-memory scan of every card in the book; no index pushdown (`crates/dav/src/card/query.rs`). Fine at personal scale; degrades past a few thousand cards.
 - Storage is the parsed model, not raw bytes → GET re-serializes; model-faithful (via `Other`) but not byte-faithful for exotic cards.
 - `FilterOp::TimeRange` always returns `false` (unimplemented; rarely used for contacts).
@@ -61,7 +63,7 @@ CRM-relevant takeaway (Kith CRM's `Source` seam, "CardDAV later"): viable sync t
 
 ## d) TOTALLY FUCKED UP!
 
-1. **Wrong version basis for the whole source review (the big one):** I resolved stalwart's version via `nix eval nixpkgs#stalwart_0_16` — the *registry* nixpkgs (0.16.26) — instead of this repo's *flake.lock* (0.16.22). The in-session verdict cited "the pinned 0.16.26". Discovered during this self-review, corrected by evaluating `stalwart_0_16.version` at the locked rev (`6774f7bc…` → "0.16.22"). Lesson: resolve versions through the project's lock, never the registry.
+1. **Wrong version basis for the whole source review (the big one):** I resolved stalwart's version via `nix eval nixpkgs#stalwart_0_16` — the _registry_ nixpkgs (0.16.26) — instead of this repo's _flake.lock_ (0.16.22). The in-session verdict cited "the pinned 0.16.26". Discovered during this self-review, corrected by evaluating `stalwart_0_16.version` at the locked rev (`6774f7bc…` → "0.16.22"). Lesson: resolve versions through the project's lock, never the registry.
 2. **Banned command attempt:** first download tried `curl` in bash — rejected by the tool contract; wasted a round-trip. The `download` tool should have been the first and only choice.
 3. **Sloppy rg pattern:** `use .*vcard|vcard::` produced mangled output; I worked around it instead of fixing the pattern. Harmless, but pattern discipline slipped.
 4. **Premise drift in-flight:** mid-session I implied calcard had no tests (empty `tests/` dir) before confirming the inline `#[cfg(test)]` modules existed. Corrected within the session, but the intermediate claim should never have been made.
@@ -78,6 +80,7 @@ CRM-relevant takeaway (Kith CRM's `Source` seam, "CardDAV later"): viable sync t
 ## f) Things we should get done next (impact-sorted; honest count: 20)
 
 **nix-email (hardening the assessment into this repo's evidence standard):**
+
 1. Diff contacts-relevant crates (`calcard`, `crates/{groupware,dav,jmap-proto}`) between v0.16.22 and v0.16.26 — confirm the verdict holds for the locked rev; note deltas in this report's appendix if any.
 2. Boot demo VM (`nix run .#vm`), run a CardDAV transcript set: PUT vCard 4.0 + 3.0, addressbook-query with prop/param filters, multiget, sync-collection token round-trip → `docs/probes/<date>-carddav-demo-vm/`.
 3. Probe the #2884-class edge on the pin: SOCIALPROFILE-without-uri through JMAP `ContactCard/get` vs CardDAV GET.
@@ -111,4 +114,4 @@ CRM-relevant takeaway (Kith CRM's `Source` seam, "CardDAV later"): viable sync t
 
 ---
 
-*Point-in-time snapshot. Session modified no project files; the auto-commit daemon owns this file's landing.*
+_Point-in-time snapshot. Session modified no project files; the auto-commit daemon owns this file's landing._

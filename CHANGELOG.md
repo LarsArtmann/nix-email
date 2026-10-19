@@ -307,6 +307,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   past it) and added the one-VM-per-qcow2 demo write-lock note, and the
   upstream watch row was re-verified (filings all still OPEN,
   #566282 MERGED).
+- Upstream-watch re-verification (2026-10-19): the merged #566282 module
+  rework removed `provision.elasticsearch` on nixpkgs master but the
+  #563651 bug shape PERSISTS - with `provision.opensearch = false` the
+  module still materializes a host-less `[opensearch]` section and
+  parsedmarc still exits 255 ("hosts setting missing from the opensearch
+  config section", cli.py re-verified on parsedmarc master). nixpkgs
+  master now ships imapclient 4.1.0 (the #563652 py3.13-pin retirement is
+  armed; our pin still 4.0.1), the #563777 module still ships no
+  `Restart`, and mailsuite#65 remains unanswered (zero comments). README
+  ledger bullets, the dmarc-monitor workaround comment, and the TODO
+  watch row updated to the new truth.
 
 ### Fixed
 
