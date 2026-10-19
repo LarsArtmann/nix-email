@@ -181,6 +181,22 @@ SystemNix (`6774f7bc`, NixOS 26.11):
   port pairs, provisioned account role + catch-all, fallback admin
   credential, pyzor off) - the demo toplevel itself is already forced by
   the gate.
+- `provision-plan-eval`: pure-eval contract over the rendered provision
+  plan - the provisioned Domain name equals `services.mail-server.hostname`
+  (the auth-535 / MAIL-FROM-501 class), every `reconcile` set carries an
+  explicit `match` property, object sets outside the implicit-key
+  allowlist are match-pinned, the fallback port posture, a multi-line
+  `Exec*` lint, and the `MtaInboundThrottle` identity (description match
+  key, `authenticated_as` vocabulary). Arch-independent.
+- `stalwart-migrate-e2e`: TWO-node VM - a phase-A 0.15.5 node seeds a real
+  store (domain + principal through the management API), the store travels
+  to the consumer node, which proves the unit GUARD refusal (the binary
+  never runs on a 0.15 store), the poison simulation + script refusal, the
+  full `--backup-dir` migration (0.15.5 probe dump, convert with paths
+  rewritten to the LIVE store, clean-copy restore, recovery-mode wipe +
+  apply, marker), the VERIFIED end-state boot (stable unit + provision
+  apply), the 0.15 password authenticating on 0.16, and restart
+  persistence.
 
 ## Module: `services.mail-server`
 

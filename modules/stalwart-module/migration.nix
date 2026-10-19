@@ -28,7 +28,10 @@
 #             rewritten to the LIVE store: the dump serves the probe's
 #             effective settings, so an unrewritten DataStore path
 #             migrated the copy while the live store stayed pre-0.16 -
-#             the run-6 exit-101) -> recovery-mode 0.16 on a dedicated
+#             the run-6 exit-101) -> [poisoned flow: the clean dump copy
+#             is RESTORED into the live store path - recovery mode's
+#             one-shot wipe only triggers on clean pre-0.16 stores] ->
+#             recovery-mode 0.16 on a dedicated
 #             port -> stalwart-cli apply -> marker -> VERIFIED end
 #             state (stable normal boot + provision apply; no [DONE]
 #             before the store actually boots). Accounts keep their
@@ -252,6 +255,23 @@ in {
       # serverUnavailable (migrate-e2e run 8, 2026-10-19). Normalize BEFORE
       # the boot; upstream's Docker flow does the same chown on import.
       chown -R ${lib.escapeShellArg cfg.user}:${lib.escapeShellArg cfg.group} "$store_dir"
+      if [ "$dump_store" != "$store_dir" ]; then
+        # --backup-dir means the live store is POISONED, and recovery
+        # mode's one-shot wipe only triggers on a CLEAN pre-0.16 store:
+        # poisoned settings make the detection skip the wipe, so the
+        # built-in objects (Roles) are never re-seeded and the apply
+        # dies on x:Account/set "Role not found" (run 9, 2026-10-19).
+        # Restore the clean dump copy INTO the live path first (upstream
+        # doctrine - the poison refusal says exactly this). The freshest
+        # poisoned-live mail survives in the .v015-premigrate backup.
+        echo "[*] restoring the clean pre-0.16 dump copy into the live store path"
+        restore_tmp="$(mktemp -d "$work/restore.XXXXXX")"
+        tar -C "$(dirname "$dump_store")" -cf - "$(basename "$dump_store")" | tar -C "$restore_tmp" -xf -
+        rm -rf "$store_dir"
+        mv "$restore_tmp/$(basename "$dump_store")" "$store_dir"
+        rmdir "$restore_tmp" 2>/dev/null || true
+        chown -R ${lib.escapeShellArg cfg.user}:${lib.escapeShellArg cfg.group} "$store_dir"
+      fi
       recovery_password="$(head -c 32 /dev/urandom | base64 | tr -d '=+/' | cut -c1-24)"
       STALWART_RECOVERY_MODE=1 \
       STALWART_RECOVERY_ADMIN="${cfg.admin.username}:$recovery_password" \

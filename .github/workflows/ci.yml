@@ -134,6 +134,66 @@ jobs:
           git ls-files -z '*.md' > /tmp/md-files.list
           xargs -0 bash scripts/check-md-table-pipes.sh < /tmp/md-files.list
 
+      - name: Lint prose-wrap list markers (fail-closed, self-tested)
+        run: |
+          # LIST-MARKER LINT (the dprint rewrap incidents, mechanized and
+          # empirically scoped 2026-10-19): a list marker directly after a
+          # column-0 prose line is the one list-adjacency shape dprint
+          # normalizes (it inserts the blank line itself) - in a formatted
+          # tree that means unfresh formatting or a mistyped wrap. Wrapped
+          # items, siblings, and nested lists are dprint-stable shapes and
+          # are NOT flagged (verified against dprint behavior). Negative
+          # fixtures first: a never-firing lint is a false green.
+          set -eu
+          fixture="$(mktemp /tmp/marker-lint-XXXXXX.md)"
+          trap 'rm -f "$fixture"' EXIT
+          printf 'prose line that wraps\n- and the wrap lands on a marker\n' > "$fixture"
+          if bash scripts/check-md-list-markers.sh "$fixture" > /dev/null 2>&1; then
+            echo "FATAL: lint accepted a marker directly after prose"; exit 1
+          fi
+          printf 'prose\n\n- item\n  - nested\n- sibling after wrap\n  continues\n- next\n' > "$fixture"
+          if ! bash scripts/check-md-list-markers.sh "$fixture" > /dev/null 2>&1; then
+            echo "FATAL: lint flagged a deliberate list shape"; exit 1
+          fi
+          git ls-files -z '*.md' > /tmp/md-files2.list
+          xargs -0 bash scripts/check-md-list-markers.sh < /tmp/md-files2.list
+
+      - name: Check-set drift alarm (fail-closed, self-tested)
+        run: |
+          # DRIFT ALARM (the 6->7 count rot, mechanized): AGENTS.md and
+          # README.md must not carry NUMERIC check-set claims ("9-check
+          # set", "the 7 checks") - counts rot within hours. The canonical
+          # set lives in the ci.yml lockstep lists + scripts/check-inventory.sh;
+          # README "What is built and verified" names checks individually.
+          set -eu
+          fixture="$(mktemp /tmp/drift-lint-XXXXXX.md)"
+          trap 'rm -f "$fixture"' EXIT
+          printf 'the 9-check set is green\n' > "$fixture"
+          if bash scripts/check-check-set-drift.sh "$fixture" > /dev/null 2>&1; then
+            echo "FATAL: drift alarm accepted a numeric check-set claim"; exit 1
+          fi
+          printf 'the canonical check list lives in ci.yml\n' > "$fixture"
+          if ! bash scripts/check-check-set-drift.sh "$fixture" > /dev/null 2>&1; then
+            echo "FATAL: drift alarm flagged a clean line"; exit 1
+          fi
+          bash scripts/check-check-set-drift.sh AGENTS.md README.md
+
+      - name: Assert README names every flake check (anti-drift)
+        run: |
+          # Completeness side of the drift alarm: every LIVE check name
+          # must appear in README (its "What is built and verified" section
+          # owns the prose restatement; the ci.yml lockstep step owns the
+          # canonical machine list). A check that ships without README
+          # prose rots silently.
+          set -eu
+          names="$(nix eval .#checks.x86_64-linux --json --apply 'builtins.attrNames')"
+          for name in $(echo "$names" | jq -r '.[]'); do
+            if ! grep -q "$name" README.md; then
+              echo "FATAL: check '$name' is not named in README.md (the canonical prose restatement)"; exit 1
+            fi
+          done
+          echo "README names all $(echo "$names" | jq -r '. | length') checks"
+
       - name: Statix lint Nix files (fail-closed)
         run: |
           # STATIX: structural nix warnings (W20-class collapses ship as
