@@ -82,3 +82,24 @@ green) supersedes the upgrade-state facts and stays live.
 | 2026-10-16_21-08_stalwart-016-vm-tests-going-green…       | ARCHIVE        | 63 verdicts incl. the inline CORRECTION of the stale relay "green" (a/2); rest done-in-pass or routed                              |
 | 2026-10-17_01-22_statix-w20-fix-and-gate-triage…          | ARCHIVE        | 36 verdicts: statix fix landed, catch-all fixed in-tree, gate green; process items routed (TODO rows + AGENTS ritual)              |
 | 2026-10-17_00-03_stalwart-016-quota-signature-and-schema… | ARCHIVE        | 59 verdicts: quota = journal silence (03-34 a/1-2), gate green (a/5), all f-items done/routed; g/3 closed as MOOT                  |
+
+## Manifest — 2026-10-19 late docs-health pass (5 files + specs)
+
+All ANNOTATE→ARCHIVE: every b/c/f/g item carries an inline verdict (182
+tool-applied + 8 hand for literal-`~~`/bullet lines); tables in per-cell
+form with `check-rows:ledger` exemptions where routed rows are the point;
+a/d/e historical by policy. The daemon's mid-pass dprint run mangled
+whole-line table strikes twice — rebuilt per-cell from the preserved specs
+(next to this manifest: `2026-10-17-late-pass-annotate-specs/`). The
+06-12 report's f27 verdict (lost in a pre-pass annotate rebuild, routed
+here by the 2026-10-19 06-05 resumed-thread report) is restored in the
+stable form. Forward items route to TODO_LIST (10-check-set state),
+decision-batch (C38/C41 addenda, new C52/C53), and ROADMAP.
+
+| File (date prefix)                                   | Classification | Deciding reason                                                                                                                       |
+| ---------------------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-10-17_03-53_docs-health-016-sweep-334-verdicts… | ARCHIVE        | 16 verdicts: push/CI done (green runs 39016232923/39072344502), residue routed (backup/monitoring/lockstep/demo-smoke rows), g routed |
+| 2026-10-17_04-09_docs-health-self-review…            | ARCHIVE        | 63 verdicts: b/c closed by later passes (05-37, 06-05), f/1-50 routed to TODO rows (all verified present), g done (push) or routed    |
+| 2026-10-17_05-37_readme-agents-superb-pass…          | ARCHIVE        | 25 verdicts: accuracy work done-in-pass (05-37), structure calls routed (C52, C41 addendum), CI-watch + harvest done by this pass     |
+| 2026-10-17_06-05_agents-md-drift-fix-prune…          | ARCHIVE        | 25 verdicts: prune executed 06-05, duration claim fixed (CI-timed), tooling rows routed then executed by W11 (2026-10-19)             |
+| 2026-10-17_06-12_issue-4-bootstrap-fix-and-p3-close… | ARCHIVE        | 53 verdicts: f27 done (pbx gate on d7e1334), f28/f29/f32 done (AGENTS + grep), rest routed per P-numbers; g routed (C38/C52/C53)      |
