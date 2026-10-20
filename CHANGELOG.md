@@ -413,6 +413,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- CI ruff floor red since 2026-10-19 (first red run on master 2026-10-20
+  08:46 UTC): F541 `carddav_diag.py:165`, F841 unused `token0` + RUF059
+  unused `headers2` in `carddav_probe.py`, SIM115 x2 in the archived
+  `gen-repair-spec.py`. The owning CardDAV session landed 2026-10-20
+  08:40 without them, so the cross-session hold expired and the four
+  floor fixes landed; every push until now failed at the ruff step and
+  skipped the lockstep/shape steps downstream. TODO row removed.
+
 - `stalwart-migrate-from-015` post-migration exit-101 panic (2026-10-19,
   migrate-e2e runs 6-10, each root cause transcript-pinned): THREE
   stacked causes. (1) convert's `config.json` DataStore path carried
