@@ -413,6 +413,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- stalwart-bind-e2e red class (2026-10-20): the store-cached `runCommand`
+  test cert carried `-days 2` and expired 2026-10-19 (yesterday's green
+  gate finished ~13 minutes before expiry); stalwart then silently fell
+  back to its rcgen runtime self-signed and the imaps-cert probe failed
+  on the served-vs-pinned mismatch (`CN=rcgen self signed cert` vs
+  `CN=bind.test`, debug transcript). Now `-days 3650` with the
+  load-bearing rationale in-file: nix never rebuilds a cached
+  runCommand output, so short validity only ever detonates. vm-debug.sh
+  also survives a RED check now - its GC-root build RUNS the test and
+  used to abort under `set -e` before the debug script could run.
+
 - VM-test failure-forensics gaps (W18.3/W18.4 residue, 2026-10-20):
   seventeen redirect sites across the five VM tests wrote evidence to
   VM-local files whose only consumer was a `grep -q` - a failing

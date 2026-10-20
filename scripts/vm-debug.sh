@@ -41,7 +41,12 @@ esac
 
 ROOT="/tmp/nix-email-vm-debug-$CHECK"
 echo ">>> building GC root $ROOT (instant when the check is cached)"
-nix build -o "$ROOT" ".#checks.x86_64-linux.$CHECK" -L
+# The build RUNS the VM test - a RED check fails here and, under set -e,
+# would abort before the debug script ever runs (the exact case the
+# script exists for). Survive it: debug against the store closure
+# instead; the GC root only materializes on green.
+nix build -o "$ROOT" ".#checks.x86_64-linux.$CHECK" -L ||
+	echo ">>> check is RED - no GC root; continuing against the store closure" >&2
 
 # Driver discovery: a testers.runNixOSTest check output is an EMPTY dir -
 # the per-test driver (which preloads the machine configs) appears in the

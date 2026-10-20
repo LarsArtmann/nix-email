@@ -26,13 +26,18 @@
   adminSecret = common.testAdminSecret;
   # SAN-carrying self-signed pair (binary-proven 2026-10-17: the manual
   # Certificate upsert needs the SAN match key, and modern TLS validation
-  # rejects CN-only certs on reload).
+  # rejects CN-only certs on reload). Long validity is LOAD-BEARING: the
+  # runCommand output is store-cached (inputs never change -> never
+  # rebuilds), so a short -days is a time bomb - the -days 2 pair expired
+  # 2026-10-19, stalwart silently fell back to its rcgen runtime cert,
+  # and imaps-cert verification failed with a served-vs-pinned mismatch
+  # (bind-tls debug transcript 2026-10-20).
   testCert =
     pkgs.runCommand "stalwart-bind-e2e-cert" {
       nativeBuildInputs = [pkgs.openssl];
     } ''
       openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem \
-        -days 2 -nodes -subj "/CN=bind.test" \
+        -days 3650 -nodes -subj "/CN=bind.test" \
         -addext "subjectAltName=DNS:bind.test"
       mkdir $out; cp key.pem cert.pem $out/
     '';
