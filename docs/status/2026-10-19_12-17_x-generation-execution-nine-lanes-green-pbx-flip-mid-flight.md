@@ -9,13 +9,13 @@ processes), and a pbx-artmann session was touching that repo's AGENTS.md
 
 ## 0. TL;DR
 
-| Area | Verdict |
-| --- | --- |
-| nix-email lanes (X9, X6, X10, X12.1, X16, X14, X1.2-verify) | DONE, gate GREEN locally (buildflow EXIT:0 at 08:26) |
-| nix-email master | 10 commits AHEAD of origin - the daemon has NOT pushed since 05:52, so CI has NOT yet exercised the new lockstep step |
-| CI red 05:34/05:45/05:52 | TRIAGED, not mine: the new CI ruff step catching the CardDAV session's probe files (TODO row 68 hand-off honored, evidence appended) |
-| pbx-artmann X5 flip | LANDED MID-FLIGHT: flip + leg re-adds committed by their daemon (7b5f7dc), but the gate is RED on a NEW, transcript-pinned blocker (OIDC discovery fetch at reload-validation + VM egress); 14 VM runs total, NOT green at yield |
-| Misc | 6 TODO rows closed with CHANGELOG entries; AGENTS.md kept within the 220-line cap (219) after my own edits briefly pushed it to 224 |
+| Area                                                        | Verdict                                                                                                                                                                                                                          |
+| ----------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| nix-email lanes (X9, X6, X10, X12.1, X16, X14, X1.2-verify) | DONE, gate GREEN locally (buildflow EXIT:0 at 08:26)                                                                                                                                                                             |
+| nix-email master                                            | 10 commits AHEAD of origin - the daemon has NOT pushed since 05:52, so CI has NOT yet exercised the new lockstep step                                                                                                            |
+| CI red 05:34/05:45/05:52                                    | TRIAGED, not mine: the new CI ruff step catching the CardDAV session's probe files (TODO row 68 hand-off honored, evidence appended)                                                                                             |
+| pbx-artmann X5 flip                                         | LANDED MID-FLIGHT: flip + leg re-adds committed by their daemon (7b5f7dc), but the gate is RED on a NEW, transcript-pinned blocker (OIDC discovery fetch at reload-validation + VM egress); 14 VM runs total, NOT green at yield |
+| Misc                                                        | 6 TODO rows closed with CHANGELOG entries; AGENTS.md kept within the 220-line cap (219) after my own edits briefly pushed it to 224                                                                                              |
 
 ## 1. a) FULLY DONE
 
@@ -40,7 +40,7 @@ processes), and a pbx-artmann session was touching that repo's AGENTS.md
    README prose row) because the restatement class is dead. Verified:
    green eval both arches, negative test (drifted name throws EXIT:1,
    restore passes), drift alarm green, inventory hook green, actionlint
-   + shellcheck clean, `nix fmt -- . --check` green.
+   - shellcheck clean, `nix fmt -- . --check` green.
 3. **X6 - match-property audit CLOSED.** Traced all 34
    `services.mail-server` options to consumption (plan emission,
    settings, credentials, assertions, warnings): ZERO dead/no-op
@@ -108,15 +108,15 @@ processes), and a pbx-artmann session was touching that repo's AGENTS.md
    - Resolver forensics block added (resolv.conf / ip addr / route /
      getent / curl dumps) - the introspection style the file already
      uses.
-   What is NOT done: the check is NOT GREEN. Transcript-pinned blocker
-   chain: the apply itself now SUCCEEDS through all 30 objects (the
-   bootstrap fallback works: "management API answering at
-   http://127.0.0.1:8080 (configured: http://127.0.0.1:8082)"), then
-   the final `reload` action's 0.16 validation fetches the Directory's
-   OIDC discovery (https://auth.larsartmann.cloud/
-   .well-known/openid-configuration) and fails
-   ("validationFailed | Network error: Discovery fetch failed"). The
-   fetch needs egress; the VM picture (14 runs of forensics):
+     What is NOT done: the check is NOT GREEN. Transcript-pinned blocker
+     chain: the apply itself now SUCCEEDS through all 30 objects (the
+     bootstrap fallback works: "management API answering at
+     http://127.0.0.1:8080 (configured: http://127.0.0.1:8082)"), then
+     the final `reload` action's 0.16 validation fetches the Directory's
+     OIDC discovery (https://auth.larsartmann.cloud/
+     .well-known/openid-configuration) and fails
+     ("validationFailed | Network error: Discovery fetch failed"). The
+     fetch needs egress; the VM picture (14 runs of forensics):
    - slirp IS present on eth0 (DHCP offer 10.0.2.15 from 10.0.2.2,
      lease completed t=14.7 in run 12),
    - but there is NO default route until dhcpcd finishes, and the
@@ -132,15 +132,15 @@ processes), and a pbx-artmann session was touching that repo's AGENTS.md
      ACME webroot mkVMOverride was removed with it (nginx re-enabled,
      exactly-one-issuance assertion satisfied by the ACME-nginx
      integration again).
-   OPEN QUESTION at yield: does the discovery fetch succeed once the
-   route + resolver are REALLY up? Nobody has observed a post-route
-   probe yet - every DNS probe so far raced the lease. The one-edit
-   resume: add `machine.wait_until_succeeds("ip route show default |
+     OPEN QUESTION at yield: does the discovery fetch succeed once the
+     route + resolver are REALLY up? Nobody has observed a post-route
+     probe yet - every DNS probe so far raced the lease. The one-edit
+     resume: add `machine.wait_until_succeeds("ip route show default |
    grep -q .", timeout=90)` before the forensics, run once, read the
-   transcript.
-   CONSEQUENCE: pbx master (their daemon pushes) is RED right now -
-   red-by-my-in-progress-flip, not red-by-design anymore. Their repo's
-   working tree is clean (daemon committed everything).
+     transcript.
+     CONSEQUENCE: pbx master (their daemon pushes) is RED right now -
+     red-by-my-in-progress-flip, not red-by-design anymore. Their repo's
+     working tree is clean (daemon committed everything).
 2. **X12 - upstream filings (the non-watch half).** NOT started beyond
    the watch: the dnsmasq-forward note, the T13b dprint pipe-cell
    filing, the #552103 evidence-comments idea - all need
