@@ -691,6 +691,21 @@ The InboxClean contract (`docs/INBOXCLEAN.md`) describes the 0.15 probes
 and carries the 0.16 re-verification banner; transcripts in
 `docs/probes/2026-10-05-jmap-demo-vm/` are 0.15-historical.
 
+#### Contacts quickstart (CardDAV + JMAP contacts; probe-pinned 2026-10-19/20)
+
+The same HTTP listener serves the contacts surface. CardDAV discovery
+starts at `/.well-known/carddav`; addressbooks are MKCOL-able collections
+under `/dav/card/<address>/<book>/`; JMAP contacts speak
+`urn:ietf:params:jmap:contacts` at the session's `apiUrl`. The full
+chain (discovery, CRUD, conditional PUT, multiget, addressbook-query,
+sync-collection) is probe-verified on the deployed 0.16.22 pin —
+transcripts and the server-dialect notes that bit the first mirror
+(`If-Match` REQUIRED on overwrite, `no-uid-conflict`, async ingestion,
+sync-level 1) live in `docs/probes/2026-10-19-carddav-demo-vm/README.md`.
+No webmail frontend ships in the package (verified-facts ledger below) —
+the contacts story is the API surface; the Kith CRM out-mirror consumes
+exactly this.
+
 ## Platform support
 
 The VM tests gate `stalwart-e2e`/`stalwart-relay-e2e` to **x86_64-linux
