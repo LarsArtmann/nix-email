@@ -122,7 +122,7 @@ def driver(phase: str) -> bool:
     print(done.stdout, end="", flush=True)
     if done.stderr:
         print(done.stderr, file=sys.stderr, end="", flush=True)
-    phase_fails = re.findall(r"^VERDICT \S+: FAIL.*$", done.stdout, re.M)
+    phase_fails = re.findall(r"^VERDICT .*FAIL.*$", done.stdout, re.M)
     return done.returncode == 0 and not phase_fails
 
 

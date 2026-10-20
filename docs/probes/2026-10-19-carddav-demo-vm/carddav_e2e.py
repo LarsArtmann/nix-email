@@ -122,15 +122,31 @@ def seed() -> None:
     record("E2E-seed projections settled", "PASS" if wait_crm_contacts(2) else "FAIL (timeout)")
 
 
-def assert_mirror() -> None:
+def eventually(check, tries: int = 60, delay: float = 0.25):
+    """Stalwart ingests PUT cards ASYNCHRONOUSLY: address-data renders from
+    the parsed contact store, so an immediate readback can be partial
+    (observed 2026-10-20: +30ms after PUT the cards rendered UID-only) and
+    the normalized form (KIND upper-cased, TEL leading + stripped) lands
+    only once the import settles. Retry until the invariant holds."""
+    detail = None
+    for _ in range(tries):
+        ok, detail = check()
+        if ok:
+            return True, detail
+        time.sleep(delay)
+    return False, detail
+
+
+def book_hrefs() -> list[str]:
     body = (
         '<?xml version="1.0"?><D:propfind xmlns:D="DAV:"><D:prop>'
-        "<D:resourcetype/><D:getetag/></D:prop></D:propfind>"
+        "<D:resourcetype/></D:prop></D:propfind>"
     )
-    status, data = dav_req("PROPFIND", BOOK, body=body, depth="1")
-    hrefs = [e.text for e in ET.fromstring(data).iter("{DAV:}href") if (e.text or "").endswith(".vcf")]
-    record("E2E-1 book exists with 2 cards", f"{status}, {len(hrefs)} cards")
+    _, data = dav_req("PROPFIND", BOOK, body=body, depth="1")
+    return [e.text for e in ET.fromstring(data).iter("{DAV:}href") if (e.text or "").endswith(".vcf")]
 
+
+def multiget_cards(hrefs: list[str]) -> str:
     multiget = (
         '<?xml version="1.0"?>'
         '<C:addressbook-multiget xmlns:D="DAV:" xmlns:C="urn:ietf:params:xml:ns:carddav">'
@@ -138,49 +154,74 @@ def assert_mirror() -> None:
         + "".join(f"<D:href>{h}</D:href>" for h in hrefs)
         + "</C:addressbook-multiget>"
     )
-    status, data = dav_req("REPORT", BOOK, body=multiget, depth="1")
-    cards = data.decode(errors="replace")
-    checks = {
-        "VERSION:4.0": 2,
-        "KIND:individual": 2,
-        "FN:Ada Lovelace": 1,
-        "N:Lovelace;Ada;;;": 1,
-        "EMAIL:ada@example.com": 1,
-        "TEL:+49 170 0000001": 1,
-        "ORG:ACME E2E GmbH": 1,
-        "FN:Grace": 1,
-        "EMAIL:grace@example.com": 1,
-    }
-    failed = {needle: cards.count(needle) != want for needle, want in checks.items()}
-    record("E2E-2 vCard field shapes", "PASS" if not any(failed.values()) else f"FAIL {failed}")
+    _, data = dav_req("REPORT", BOOK, body=multiget, depth="1")
+    return data.decode(errors="replace")
+
+
+def assert_mirror() -> None:
+    hrefs = book_hrefs()
+    record("E2E-1 book exists with 2 cards", f"{len(hrefs)} cards")
+
+    def shapes_ok():
+        cards = multiget_cards(hrefs)
+        shapes = {
+            "VERSION:4.0": (2, len(re.findall(r"VERSION:4\.0", cards))),
+            "KIND individual": (2, len(re.findall(r"KIND:INDIVIDUAL", cards, re.I))),
+            "FN:Ada Lovelace": (1, cards.count("FN:Ada Lovelace")),
+            "N:Lovelace;Ada;;;": (1, cards.count("N:Lovelace;Ada;;;")),
+            "EMAIL:ada@example.com": (1, cards.count("EMAIL:ada@example.com")),
+            "TEL +49 170 0000001": (1, len(re.findall(r"TEL:\+?49 170 0000001", cards))),
+            "ORG:ACME E2E GmbH": (1, cards.count("ORG:ACME E2E GmbH")),
+            "FN:Grace": (1, cards.count("FN:Grace")),
+            "EMAIL:grace@example.com": (1, cards.count("EMAIL:grace@example.com")),
+        }
+        bad = {name: got for name, (want, got) in shapes.items() if got != want}
+        return not bad, (bad, cards)
+
+    ok, (bad, cards) = eventually(shapes_ok)
+    if not ok:
+        print(repr(cards[:4000]), flush=True)
+    record("E2E-2 vCard field shapes (settled)", "PASS" if ok else f"FAIL {bad}")
 
     uid_lines = re.findall(r"UID:([0-9A-HJKMNP-TV-Z]{26})", cards)
     record("E2E-3 UIDs are bare ULIDs", f"PASS ({len(uid_lines)}/2)" if len(uid_lines) == 2 else "FAIL")
 
 
 def device_edit_and_restore() -> None:
+    # The etag-bearing listing feeds a CONDITIONAL device PUT: Stalwart
+    # rejects an unconditional PUT onto an existing card with 412
+    # (observed 2026-10-20; the CRM runner itself always sends If-Match).
     body = (
         '<?xml version="1.0"?><D:propfind xmlns:D="DAV:"><D:prop>'
-        "<D:resourcetype/></D:prop></D:propfind>"
+        "<D:resourcetype/><D:getetag/></D:prop></D:propfind>"
     )
-    status, data = dav_req("PROPFIND", BOOK, body=body, depth="1")
-    hrefs = [e.text for e in ET.fromstring(data).iter("{DAV:}href") if (e.text or "").endswith(".vcf")]
-    victim = sorted(hrefs)[0]
+    _, data = dav_req("PROPFIND", BOOK, body=body, depth="1")
+    pairs = sorted(
+        (
+            resp.findtext("{DAV:}href") or "",
+            resp.findtext("{DAV:}propstat/{DAV:}prop/{DAV:}getetag") or "",
+        )
+        for resp in ET.fromstring(data).iter("{DAV:}response")
+        if (resp.findtext("{DAV:}href") or "").endswith(".vcf")
+    )
+    victim, etag = pairs[0]
 
-    dav_req(
+    status, _ = dav_req(
         "PUT",
         victim,
         body="BEGIN:VCARD\r\nVERSION:4.0\r\nUID:device-edit\r\nFN:Device Wins\r\nEND:VCARD\r\n",
-        extra={"Content-Type": "text/vcard; charset=utf-8"},
+        extra={"Content-Type": "text/vcard; charset=utf-8", "If-Match": etag},
     )
-    multiget = (
-        '<?xml version="1.0"?>'
-        '<C:addressbook-multiget xmlns:D="DAV:" xmlns:C="urn:ietf:params:xml:ns:carddav">'
-        "<D:prop><D:address-data/></D:prop>"
-        f"<D:href>{victim}</D:href></C:addressbook-multiget>"
-    )
-    status, data = dav_req("REPORT", BOOK, body=multiget, depth="1")
-    record("E2E-4 device edit staged", "Device Wins" in data.decode(errors="replace") and "PASS" or "FAIL")
+    record("E2E-4 device edit PUT (If-Match)", "PASS" if status in (200, 201, 204) else f"FAIL ({status})")
+
+    def staged():
+        cards = multiget_cards([victim])
+        return "Device Wins" in cards, cards
+
+    ok, cards = eventually(staged)
+    if not ok:
+        print(repr(cards[:4000]), flush=True)
+    record("E2E-4b device edit staged (settled)", "PASS" if ok else "FAIL")
 
 
 def main() -> int:
@@ -194,25 +235,14 @@ def main() -> int:
     elif mode == "conflict":
         device_edit_and_restore()
     elif mode == "verify-restore":
-        body = (
-            '<?xml version="1.0"?><D:propfind xmlns:D="DAV:"><D:prop>'
-            "<D:resourcetype/></D:prop></D:propfind>"
-        )
-        status, data = dav_req("PROPFIND", BOOK, body=body, depth="1")
-        hrefs = [e.text for e in ET.fromstring(data).iter("{DAV:}href") if (e.text or "").endswith(".vcf")]
-        multiget = (
-            '<?xml version="1.0"?>'
-            '<C:addressbook-multiget xmlns:D="DAV:" xmlns:C="urn:ietf:params:xml:ns:carddav">'
-            "<D:prop><D:address-data/></D:prop>"
-            + "".join(f"<D:href>{h}</D:href>" for h in hrefs)
-            + "</C:addressbook-multiget>"
-        )
-        status, data = dav_req("REPORT", BOOK, body=multiget, depth="1")
-        cards = data.decode(errors="replace")
-        record(
-            "E2E-5 CRM wins after device edit",
-            "PASS" if "Device Wins" not in cards and "FN:Ada Lovelace" in cards else "FAIL",
-        )
+        def restored():
+            cards = multiget_cards(book_hrefs())
+            return "Device Wins" not in cards and "FN:Ada Lovelace" in cards, cards
+
+        ok, cards = eventually(restored)
+        if not ok:
+            print(repr(cards[:4000]), flush=True)
+        record("E2E-5 CRM wins after device edit (settled)", "PASS" if ok else "FAIL")
 
     print("\n# SUMMARY", flush=True)
     for step, verdict in results:
