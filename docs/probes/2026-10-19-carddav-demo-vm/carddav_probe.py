@@ -243,7 +243,6 @@ def main() -> int:
     reports = sorted(
         {m.decode() for m in re.findall(rb"<D:report>\s*<(\w+:[\w-]+)", data)}
     )
-    token0 = prop(data, "sync-token")
     record(
         "T04.2d supported-report-set",
         f"PASS ({', '.join(reports)})"
@@ -256,7 +255,7 @@ def main() -> int:
     status, headers, _ = req(
         "PUT", card2, VCARD_3, extra={"Content-Type": "text/vcard; charset=utf-8"}
     )
-    status2, headers2, data2 = req("GET", card2)
+    status2, _, data2 = req("GET", card2)
     version2 = re.search(rb"VERSION:(\d\.\d)", data2)
     record(
         "T04.3 PUT v3.0 round-trip",

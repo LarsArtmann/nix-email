@@ -3,7 +3,8 @@ open(D + "repair-spec.tsv", "w").close()
 
 
 def gen(file_path, verdicts_path, pairs, out):
-    verdicts = open(verdicts_path).read().splitlines()
+    with open(verdicts_path) as vf:
+        verdicts = vf.read().splitlines()
     lines = []
     for idx, lineno in pairs:
         v = verdicts[idx - 1]
@@ -48,4 +49,5 @@ gen(
     [(i, 159 + i) for i in range(9, 23)],
     D + "repair-spec.tsv",
 )
-print("specs written:", sum(1 for _ in open(D + "repair-spec.tsv")))
+with open(D + "repair-spec.tsv") as sf:
+    print("specs written:", sum(1 for _ in sf))

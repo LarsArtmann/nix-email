@@ -162,7 +162,7 @@ def main() -> int:
     )
     record(
         "D2b PUT If-Match real etag",
-        f"PASS (2xx)" if status in (200, 201, 204) else f"REJECTED ({status})",
+        "PASS (2xx)" if status in (200, 201, 204) else f"REJECTED ({status})",
     )
     status, headers, data = req("GET", f"{book}card1.vcf")
     stored2 = data.decode(errors="replace")
