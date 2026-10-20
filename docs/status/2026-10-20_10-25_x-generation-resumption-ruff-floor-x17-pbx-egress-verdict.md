@@ -57,6 +57,23 @@ is the parent report; its 3 owner questions stand unless restated here).
   directory). Evidence + verdict written into the test header (their
   daemon commits).
 
+## b2) FULLY DONE (late-session surprise) - the bind-e2e cert time bomb
+
+- The final gate went red on stalwart-bind-e2e: 993 served
+  `CN=rcgen self signed cert` (stalwart's RUNTIME fallback) instead of
+  the pinned `CN=bind.test` cert. Root cause (fingerprint transcript,
+  vm-debug direct-driver run): the store-cached `runCommand` test cert
+  carried `-days 2` and expired 2026-10-19 04:39 GMT - yesterday's
+  green gate finished ~13 minutes BEFORE expiry; stalwart then
+  silently refused the expired cert material and fell back to rcgen.
+  Nix never rebuilds a cached runCommand output, so short validity on
+  a cached cert is a time bomb that only ever detonates. Fixed with
+  `-days 3650` + the load-bearing rationale in-file; bind-e2e re-run
+  GREEN. vm-debug.sh also gained the missing RED-check path: its
+  GC-root build RUNS the test and used to abort under `set -e` before
+  any debug script could run (the exact case the script exists for).
+  Daemon commit d3fb4e7.
+
 ## c) NOT STARTED (unchanged from the parent report)
 
 X1-C43 release chain (X2/X3/X4), X8, X15, X11.3, X13 (wait-for
