@@ -1,4 +1,4 @@
-# Probe transcripts — 2026-10-19 CardDAV demo-VM drill (T04 + T17.1)
+# Probe transcripts — 2026-10-19 CardDAV demo-VM drill (T04 + T05 + T06 + T17.1 + T14)
 
 Session: execution of the CRM data-mesh CardDAV plan, tasks T04.2–T04.11 +
 T17.1 (`crm/docs/planning/2026-10-19_04-09_data-mesh-carddav-pareto.md`).
@@ -34,6 +34,14 @@ deployed pin) via the FIFO-console pattern; host-side probes against
   2000-cap discovery (count PROPFIND returns exactly 2000 of 10k).
 - `social_edge_probe.py` / `social-edge.log` — T06 SOCIALPROFILE edge
   (verdict 7 below).
+- `carddav_e2e.py` / `carddav_e2e_run.py` / `carddav-e2e.log` — T14
+  full-pipeline E2E (verdict 8): the real `crm-server` binary seeds a
+  throwaway CRM over HTTP forms, the `-carddav-sync` one-shot mirrors it
+  into `Kith-E2E` three times (initial / idempotent / conflict), and the
+  driver asserts server-side card shapes, UID stability, zero-write
+  rerun, and CRM-wins after a staged device edit. The orchestrator owns
+  the WHOLE lifecycle in one process (the 10-19 inline-bash attempt hung
+  because no process owned the server).
 
 ## Key verdicts (all transcript-backed)
 
@@ -90,6 +98,26 @@ deployed pin) via the FIFO-console pattern; host-side probes against
    JMAP posts to `/jmap/` (trailing slash) with
    `urn:ietf:params:jmap:contacts`; JMAP card ids are server-assigned, uid
    preserved.
+8. **T14 E2E: the CRM mirror passes end-to-end on the pin (10-20)** —
+   initial mirror `created=2`, settled vCard shapes with bare-ULID UIDs,
+   idempotent rerun `unchanged=2` with ZERO server writes, realistic
+   device edit (same href, same UID, `If-Match`) detected via the
+   sync-collection delta (`server-side=1`) and overwritten
+   (`conflicts=1, errors=0`). Full transcript: `carddav-e2e.log`.
+9. **Overwrite dialect (T14 discoveries, load-bearing for the mirror)**:
+   a) PUT onto an EXISTING card must be conditional — no `If-Match` at
+   all → 412. b) PUT whose vCard UID differs from the stored card's UID →
+   412 `no-uid-conflict` naming the href, even with the CORRECT etag
+   (same-href variant of verdict 2's duplicate-UID rule; a UID-changing
+   device "edit" is impossible — devices delete + create instead). The
+   CRM runner therefore escalates a failed conflict re-PUT to
+   DELETE + recreate (eviction). c) Card ingestion is ASYNCHRONOUS: at
+   +30 ms after a PUT, multiget address-data rendered a partial
+   (UID-only) card; the normalized form (`KIND:INDIVIDUAL` upper-cased,
+   TEL leading `+` stripped) lands once the import settles (~100 ms to
+   seconds), while the etag stays stable — readback assertions must
+   settle-retry, and phones read from the book come back WITHOUT the
+   leading `+` (CRM keeps verbatim phones; the mirror is one-way out).
 
 ## Reproduce
 
@@ -97,6 +125,8 @@ deployed pin) via the FIFO-console pattern; host-side probes against
 # VM up (FIFO console), then from this directory:
 python3 carddav_probe.py | tee carddav-probe.log
 python3 carddav_diag.py | tee carddav-diag.log
+# T14 E2E (builds /tmp/crm-e2e-server from ../..-relative CRM checkout):
+python3 carddav_e2e_run.py 2>&1 | tee -a carddav-e2e.log
 ```
 
 Each `carddav_probe.py` run MKCOLs a fresh `kith-probe-<epoch>` book; the
