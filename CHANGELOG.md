@@ -413,6 +413,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- VM-test failure-forensics gaps (W18.3/W18.4 residue, 2026-10-20):
+  seventeen redirect sites across the five VM tests wrote evidence to
+  VM-local files whose only consumer was a `grep -q` - a failing
+  assertion lost the artifact. Every capture now dumps to the driver
+  transcript on/before its failure path (shell brace-group `cat >&2`
+  chains; assertion strength unchanged, no new pipes). The
+  dump-on-failure claim itself is fault-injection-proven (vm-debug.sh
+  debug run: a failing `stalwart-cli apply` - `unknown object:
+  NoSuchObjectType`, exit 1 - still delivered the log dump;
+  /tmp/x17-run.log). TODO row removed.
+
 - CI ruff floor red since 2026-10-19 (first red run on master 2026-10-20
   08:46 UTC): F541 `carddav_diag.py:165`, F841 unused `token0` + RUF059
   unused `headers2` in `carddav_probe.py`, SIM115 x2 in the archived
