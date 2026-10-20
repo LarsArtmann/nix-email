@@ -206,10 +206,15 @@ def device_edit_and_restore() -> None:
     )
     victim, etag = pairs[0]
 
+    # Realistic device edit: same href, same vCard UID, changed content.
+    # (A UID-CHANGING PUT is impossible on Stalwart — 412 no-uid-conflict,
+    # observed 2026-10-20 — so real devices always edit in place.)
+    uid = victim.rsplit("/", 1)[1][: -len(".vcf")]
+
     status, _ = dav_req(
         "PUT",
         victim,
-        body="BEGIN:VCARD\r\nVERSION:4.0\r\nUID:device-edit\r\nFN:Device Wins\r\nEND:VCARD\r\n",
+        body=f"BEGIN:VCARD\r\nVERSION:4.0\r\nUID:{uid}\r\nFN:Device Wins\r\nEND:VCARD\r\n",
         extra={"Content-Type": "text/vcard; charset=utf-8", "If-Match": etag},
     )
     record("E2E-4 device edit PUT (If-Match)", "PASS" if status in (200, 201, 204) else f"FAIL ({status})")
