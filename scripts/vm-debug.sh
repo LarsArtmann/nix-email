@@ -79,6 +79,12 @@ machine.sleep(3)
 # silently (status -1/28); the driver dumps logged artifacts on failure.
 machine.succeed("journalctl -u stalwart.service > /tmp/stalwart-journal.log 2>&1")
 print(machine.succeed("cat /tmp/stalwart-journal.log"))
+
+# Egress forensics (pbx run 16, 2026-10-20): driver VMs have NO outbound
+# - slirp DNS AND direct TCP fail instantly despite a DHCP default route.
+# Read the network state before any network-dependent probe.
+machine.succeed("cat /etc/resolv.conf >&2 || true")
+machine.succeed("ip -br addr >&2; ip route >&2 || true")
 PYEOF
 		echo ">>> wrote starter script $SCRIPT (edit it for your probe)"
 	fi

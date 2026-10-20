@@ -99,7 +99,12 @@ the GC root, extracts the per-test driver from the check derivation's
 buildCommand (the check output itself is an EMPTY dir; `runNixOSTest` puts
 no bin/ there), generates a starter script with the rules below baked in,
 and runs the driver (`--test-script ... -o ...`). Verified 2026-10-19
-through driver invocation (smoke script, no boot).
+through driver invocation (smoke script, no boot). Unit-script PATH trap
+(pbx run 15, 2026-10-20): a unit's `ExecStartPre` PATH is NOT the console
+PATH - bare tool names that work in `machine.succeed` (`ip`) fail inside
+unit scripts (`command not found`, looping into the start timeout and
+failing the unit itself); use absolute `${pkgs.X}/bin/tool` store paths in
+any unit script a test defines.
 
 (a) long `machine.execute` payloads die silently (status -1/28) - capture via
 `succeed("... > /tmp/f.log 2>&1")` and `cat` the file.
@@ -121,7 +126,11 @@ let provisioning settle before probing (port-open != server-ready; the
 ExecStartPost restart window eats connections); (e) logged artifacts dump on
 failure by default; (f) dnsmasq must FORWARD upstream (10.0.2.3) - 0.16
 reload validation resolves via the system resolver (the demo's 2026-10-18
-boot race was this class; the demo pins DnsResolver = Cloudflare); (g)
+boot race was this class; the demo pins DnsResolver = Cloudflare) - scope
+note: TEST-DRIVER VMs have NO outbound AT ALL (valid DHCP default route,
+yet slirp DNS AND direct TCP both fail instantly - pbx run 16 transcript,
+2026-10-20), so a live fetch can never go green in `nix flake check` VMs -
+hermetic shapes only there; (g)
 serialize heavy VM builds ACROSS repos (concurrent builds OOM-killed a run
 once).
 
