@@ -157,3 +157,11 @@ invalidates every wire claim here. Re-run the probe set (boot
 the eventsource parameter matrix) before shipping the bump — the
 pin-advance runbook (README) owns the procedure; this doc owns the
 wire-level expectations.
+
+The contacts surface has its OWN probe set (`docs/probes/2026-10-19-carddav-demo-vm/`,
+written for the CRM data-mesh plan): on any pin advance, re-run
+`carddav_probe.py` (17/18 PASS is the pin-0.16.22 baseline) and diff the
+README ledger's "Contacts surface" dialect notes (If-Match-on-overwrite,
+no-uid-conflict, async ingestion, sync-level-1, maxResults 2000) — a
+changed dialect breaks the Kith CRM out-mirror's assumptions (T04–T06 +
+T14 of the CRM plan; crm `docs/ops/CARDDAV-SYNC.md`).

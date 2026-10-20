@@ -794,6 +794,37 @@ json/yaml/markdown.
   `holdMtaReportsFor`. C42 evidence base complete: parsedmarc's remaining
   unique value = file sinks + arbitrary-mailbox polling (docs-verified, not
   yet runtime-verified on the pin).
+- **Contacts surface (CardDAV + JMAP contacts, probe-pinned on the
+  deployed pin 2026-10-19/20; transcripts
+  `docs/probes/2026-10-19-carddav-demo-vm/`)**: the HTTP listener serves
+  full CardDAV (discovery chain, MKCOL books, conditional PUT, multiget,
+  addressbook-query, sync-collection) and JMAP contacts
+  (`urn:ietf:params:jmap:contacts` at `/jmap/`, trailing slash required;
+  card ids server-assigned, UID preserved). Dialect notes that bit the
+  CRM mirror: PUT onto an EXISTING card requires `If-Match`
+  (unconditional -> 412); a PUT whose vCard UID differs from the stored
+  card's -> 412 `no-uid-conflict` even with the correct etag; card
+  ingestion is ASYNC (address-data renders partial, then normalized -
+  KIND upper-cased, TEL leading `+` stripped - once the import settles,
+  etag stable); sync-collection REQUIRES `<D:sync-level>1</D:sync-level>`
+  in the body (silent-empty otherwise; the HTTP Depth header is ignored
+  for that report); DAV result sets cap at `WebDav.maxResults` 2000.
+- **AddressBook knobs (source-verified 2026-10-19, defaults healthy -
+  document, do not expose)**: `AddressBook.maxVCardSize` 512 KiB (enforced
+  on JMAP set + DAV address-data), `vCardVersion` V4, `maxAddressBooks`
+  250, `maxContacts` unlimited. Exposure path if ever needed: registry
+  `AddressBook` object via the provision pattern.
+- **Spam x contacts: ZERO coupling** (checked 2026-10-19 for the CRM
+  out-mirror): no contact/addressbook reference anywhere in spam-filter
+  or SMTP delivery crates; the addressbook does not influence
+  classification (consistent with the 10-18 "may land in Junk Mail"
+  finding).
+- **No webmail/frontend assets ship in the package** (nixpkgs
+  `stalwart_0_16` 0.16.22 store path inspected 2026-10-20): only
+  `bin/stalwart` + `bin/migrate_v0_16`; zero webmail references in the
+  source tree. The webmail/admin UIs are separate runtime-fetched
+  frontend bundles (the admin is the downloadable Application bundle at
+  `/admin`) - the module's contacts story is API-surface only.
 
 ### Stalwart 0.15.5 era (historical facts; several are superseded above)
 
