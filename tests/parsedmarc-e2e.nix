@@ -651,7 +651,7 @@ in
           tls.succeed(
               "journalctl -u dovecot -b 0 -o cat > /tmp/journal-dovecot.log && { "
               "cat /tmp/journal-dovecot.log >&2; "
-              "grep -E 'imap-login: Logged in: user=<dmarc>.* TLS, session=' /tmp/journal-dovecot.log; "
+              "grep -E 'imap-login: Logged in: user=<dmarc>.* TLS, session=' /tmp/journal-dovecot.log; }"
           )
     '';
   }
