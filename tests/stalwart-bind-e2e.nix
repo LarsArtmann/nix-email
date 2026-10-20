@@ -201,8 +201,9 @@ in
 
       with subtest("journal: no configuration build errors"):
           machine.succeed(
-              "journalctl -u stalwart -b 0 -o cat > /tmp/journal-config.log"
-              "&& ! grep -q 'Configuration build error' /tmp/journal-config.log"
+              "journalctl -u stalwart -b 0 -o cat > /tmp/journal-config.log && { "
+              "cat /tmp/journal-config.log >&2; "
+              "if grep -q 'Configuration build error' /tmp/journal-config.log; then exit 1; fi; }"
           )
     '';
   }

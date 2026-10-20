@@ -242,7 +242,7 @@ in
       # (write error) on a MATCHING payload once (2026-09-15). Under pipefail
       # the negated form is worse: `! producer | grep -q` phantom-greens.
       smtp.wait_until_succeeds(
-          "dig +short relay @127.0.0.1 > /tmp/dig-relay.txt && grep -q . /tmp/dig-relay.txt",
+          "dig +short relay @127.0.0.1 > /tmp/dig-relay.txt && { cat /tmp/dig-relay.txt >&2; grep -q . /tmp/dig-relay.txt; }",
           timeout=120,
       )
 
@@ -251,7 +251,7 @@ in
       # so the STARTTLS submissions below cannot flake on cert timing.
       smtp.wait_until_succeeds(
           "echo | openssl s_client -connect 127.0.0.1:993 2>/dev/null > /tmp/tls-greeting.txt "
-          + "&& grep -q 'OK' /tmp/tls-greeting.txt",
+          + "&& { cat /tmp/tls-greeting.txt >&2; grep -q 'OK' /tmp/tls-greeting.txt; }",
           timeout=180,
       )
 
@@ -306,8 +306,9 @@ in
 
       with subtest("no crashes"):
           smtp.succeed(
-              "journalctl -u stalwart -b 0 > /tmp/journal-full.log "
-              + "&& ! grep -qiE 'panic|fatal error' /tmp/journal-full.log"
+              "journalctl -u stalwart -b 0 > /tmp/journal-full.log && { "
+              "cat /tmp/journal-full.log >&2; "
+              "if grep -qiE 'panic|fatal error' /tmp/journal-full.log; then exit 1; fi; }"
           )
     '';
   }

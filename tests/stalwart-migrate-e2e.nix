@@ -187,7 +187,7 @@ in
               "for i in $(seq 1 180); do "
               "journalctl -u stalwart --no-pager -o cat 2>/dev/null > /tmp/guard-poll.log || true; "
               "grep -q 'refusing to start - a pre-0.16 store' /tmp/guard-poll.log && exit 0; "
-              "sleep 1; done; exit 1"
+              "sleep 1; done; cat /tmp/guard-poll.log >&2; exit 1"
           )
           mig016.succeed("journalctl -u stalwart --no-pager -o cat > /tmp/guard.log")
           mig016.succeed("cat /tmp/guard.log >&2")
@@ -263,8 +263,9 @@ in
           mig016.wait_for_open_port(8082, timeout=120)
           mig016.fail("systemctl is-failed stalwart.service")
           mig016.succeed(
-              "journalctl -u stalwart --no-pager -o cat --since \"$(cat /tmp/restart-ts)\" > /tmp/restart.log; "
-              "! grep -q 'refusing to start' /tmp/restart.log"
+              "journalctl -u stalwart --no-pager -o cat --since \"$(cat /tmp/restart-ts)\" > /tmp/restart.log && { "
+              "cat /tmp/restart.log >&2; "
+              "if grep -q 'refusing to start' /tmp/restart.log; then exit 1; fi; }"
           )
     '';
   }

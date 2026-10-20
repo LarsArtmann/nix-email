@@ -480,7 +480,7 @@ in
           # DNS-less VM (observed >80s once) - poll instead of single-shotting.
           machine.wait_until_succeeds(
               "echo | openssl s_client -connect 127.0.0.1:993 2>/dev/null > /tmp/tls-greeting.txt "
-              + "&& grep -q 'OK' /tmp/tls-greeting.txt",
+              + "&& { cat /tmp/tls-greeting.txt >&2; grep -q 'OK' /tmp/tls-greeting.txt; }",
               timeout=180,
           )
 
@@ -517,7 +517,7 @@ in
               "-d '{\"using\":[\"urn:ietf:params:jmap:core\",\"urn:ietf:params:jmap:mail\"],"
               "\"methodCalls\":[[\"Mailbox/query\",{\"accountId\":\"\",\"filter\":null},\"a\"]}' "
               "http://127.0.0.1:8080/jmap/ > /tmp/jmap-anon-code.txt"
-              "&& grep -q 401 /tmp/jmap-anon-code.txt"
+              "&& { cat /tmp/jmap-anon-code.txt >&2; grep -q 401 /tmp/jmap-anon-code.txt; }"
           )
 
       with subtest("submission: authenticated SMTP on 587 delivers to INBOX"):
@@ -584,8 +584,9 @@ in
           # asserted clean after transcript inspection (VM run of this
           # file).
           machine.succeed(
-              "journalctl -u stalwart -b 0 -o cat > /tmp/journal-config.log"
-              "&& ! grep -q 'Configuration build error' /tmp/journal-config.log"
+              "journalctl -u stalwart -b 0 -o cat > /tmp/journal-config.log && { "
+              "cat /tmp/journal-config.log >&2; "
+              "if grep -q 'Configuration build error' /tmp/journal-config.log; then exit 1; fi; }"
           )
 
       with subtest("alias: second emails entry delivers to the same account"):
@@ -685,8 +686,9 @@ in
           # long-term fate (retry-forever vs deferred) is not
           # journal-observable on 0.16 (README ledger carries the delta).
           machine.succeed(
-              "journalctl -u stalwart.service -b 0 -o cat > /tmp/journal-quota.log"
-              "&& ! grep -qiE 'rescheduled|over quota' /tmp/journal-quota.log"
+              "journalctl -u stalwart.service -b 0 -o cat > /tmp/journal-quota.log && { "
+              "cat /tmp/journal-quota.log >&2; "
+              "if grep -qiE 'rescheduled|over quota' /tmp/journal-quota.log; then exit 1; fi; }"
           )
 
       with subtest("spam: GTUBE message gets X-Spam-Status (no auto-Junk filing)"):
@@ -757,7 +759,7 @@ in
           machine.succeed(
               "curl -sS -o /dev/null -w '%{http_code}' "
               "http://127.0.0.1:8080/jmap > /tmp/jmap-old-code.txt"
-              "&& grep -q 404 /tmp/jmap-old-code.txt"
+              "&& { cat /tmp/jmap-old-code.txt >&2; grep -q 404 /tmp/jmap-old-code.txt; }"
           )
           machine.succeed(
               "curl -fsSL -u user2@example.test:${testPass} "
@@ -881,6 +883,9 @@ in
               "systemctl show -p ActiveEnterTimestamp --value stalwart-provision.service "
               "> /tmp/prov-ts-after.txt"
           )
+          machine.succeed(
+              "cat /tmp/prov-ts-before.txt /tmp/prov-ts-after.txt >&2"
+          )
           machine.succeed("diff /tmp/prov-ts-before.txt /tmp/prov-ts-after.txt")
 
       with subtest("no crashes"):
@@ -904,6 +909,7 @@ in
           )
           banners = flood.succeed("grep -c '^220' /tmp/flood.log || true").strip()
           hangups = flood.succeed("grep -c HANGUP /tmp/flood.log || true").strip()
+          flood.succeed("cat /tmp/flood.log >&2")
           assert banners == "3", "expected exactly 3 banners (rate 3/1m), got " + banners
           assert hangups == "7", "expected 7 pre-banner hangups, got " + hangups
           # The 1m window must NOT refill after 2 s: a fresh connection is
@@ -915,6 +921,7 @@ in
               "if IFS= read -r -t 10 line <&3; then echo \"$line\" >> /tmp/flood2.log; "
               "else echo HANGUP >> /tmp/flood2.log; fi; exec 3<&- 3>&-"
           )
+          flood.succeed("cat /tmp/flood2.log >&2")
           flood.succeed("grep -q HANGUP /tmp/flood2.log")
     '';
   }

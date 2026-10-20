@@ -596,6 +596,7 @@ in
           machine.succeed(
               "journalctl -u parsedmarc -b 0 -o cat > /tmp/journal-parsedmarc.log"
           )
+          machine.succeed("cat /tmp/journal-parsedmarc.log >&2")
           machine.succeed(
               "! grep -qi 'File output Error' /tmp/journal-parsedmarc.log"
           )
@@ -638,6 +639,7 @@ in
           tls.succeed(
               "journalctl -u parsedmarc -b 0 -o cat > /tmp/journal-tls.log"
           )
+          tls.succeed("cat /tmp/journal-tls.log >&2")
           tls.succeed(
               "! grep -qiE 'CERTIFICATE_VERIFY_FAILED|SSL:.+(WRONG|FAILED)' /tmp/journal-tls.log"
           )
@@ -647,8 +649,9 @@ in
           # user=<dmarc>, method=PLAIN, ..., TLS, session=...`; the plain
           # machine's non-TLS logins log "secured" without TLS).
           tls.succeed(
-              "journalctl -u dovecot -b 0 -o cat > /tmp/journal-dovecot.log"
-              "&& grep -E 'imap-login: Logged in: user=<dmarc>.* TLS, session=' /tmp/journal-dovecot.log"
+              "journalctl -u dovecot -b 0 -o cat > /tmp/journal-dovecot.log && { "
+              "cat /tmp/journal-dovecot.log >&2; "
+              "grep -E 'imap-login: Logged in: user=<dmarc>.* TLS, session=' /tmp/journal-dovecot.log; "
           )
     '';
   }
