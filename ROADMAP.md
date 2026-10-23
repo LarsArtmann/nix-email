@@ -180,9 +180,13 @@ ideas, all D1-gated:
   README); a typed `credentials.<user>.secretFile` wrapper option
   (post-C44); queue-depth observability as a first-class metric + dashboard
   row (the journal is silent on 0.16); parsedmarc end-to-end against a REAL
-  0.16 deployment (SystemNix wiring: report destinations, IMAP polling);
-  wrapper option-surface review post-0.16 (which 0.15-era options are
-  dead/no-op under the object model)
+  0.16 deployment (SystemNix wiring: report destinations, IMAP polling)
+  - (the wrapper option-surface review idea CLOSED 2026-10-19: X6 traced
+  all 34 options to consumption, zero dead/no-op options)
+- DOMAIN_LANGUAGE.md authoring: a DDD glossary for the mail/DMARC/
+  provisioning vocabulary (plan, reconcile set, match property, singleton,
+  object, datastore descriptor) - the README ledger holds the facts, this
+  would hold the LANGUAGE; write when the terms stabilize post-v0.5.0
 - Arch-diagram content-freshness audit (routed 2026-09-22 from the
   16_19-16 report): `docs/architecture-understanding/*.d2` renders are
   label-verified but the CONTENT vs module reality (relay, DKIM
