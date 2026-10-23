@@ -152,58 +152,56 @@ in
     # whole plan to the webphone (schema refresh 404, red switch). A short
     # unit timeout keeps the refusal leg cheap; the journal warning fires at
     # ~10s, well inside it.
-    nodes.guarded =
-      {
-        lib,
-        pkgs,
-        ...
-      }:
-      {
-        imports = [
-          ../modules/mail-server.nix
-          common.dnslessVmPatches
-          common.testAdminSecretModule
-        ];
+    nodes.guarded = {
+      lib,
+      pkgs,
+      ...
+    }: {
+      imports = [
+        ../modules/mail-server.nix
+        common.dnslessVmPatches
+        common.testAdminSecretModule
+      ];
 
-        system.stateVersion = "26.05";
+      system.stateVersion = "26.05";
 
-        services = {
-          mail-server = {
-            enable = true;
-            hostname = "guard.test";
-            httpBind = "127.0.0.1:8082";
-            admin.secretFile = "/etc/test-admin-secret";
-            certificate.mode = "manual";
-            certificate.manual = {
-              certFile = "${testCert}/cert.pem";
-              keyFile = "${testCert}/key.pem";
-            };
-          };
-          stalwart.provision.singletons = {
-            DnsResolver."@type" = "Cloudflare";
-            SpamPyzor.enable = false;
+      services = {
+        mail-server = {
+          enable = true;
+          hostname = "guard.test";
+          httpBind = "127.0.0.1:8082";
+          admin.secretFile = "/etc/test-admin-secret";
+          certificate.mode = "manual";
+          certificate.manual = {
+            certFile = "${testCert}/cert.pem";
+            keyFile = "${testCert}/key.pem";
           };
         };
-
-        # Foreign occupant FIRST, exactly like the webphone on the pbx host
-        # (empirically: python's 0.0.0.0:8080 also blocks stalwart's
-        # dual-stack built-in bind, and stalwart stays up on its remaining
-        # listeners). It serves 200 on `/` (so a blind probe would accept
-        # it) and 404 on /jmap/session (so the identity check refuses it).
-        systemd.services.fake-builtin-http = {
-          wantedBy = ["multi-user.target"];
-          before = ["stalwart.service" "stalwart-provision.service"];
-          serviceConfig = {
-            ExecStart = "${pkgs.python3}/bin/python3 -m http.server 8080 --bind 0.0.0.0";
-            Restart = "always";
-          };
+        stalwart.provision.singletons = {
+          DnsResolver."@type" = "Cloudflare";
+          SpamPyzor.enable = false;
         };
-
-        systemd.services.stalwart-provision.serviceConfig.TimeoutStartSec =
-          lib.mkForce "20s";
-
-        virtualisation.memorySize = 1024;
       };
+
+      # Foreign occupant FIRST, exactly like the webphone on the pbx host
+      # (empirically: python's 0.0.0.0:8080 also blocks stalwart's
+      # dual-stack built-in bind, and stalwart stays up on its remaining
+      # listeners). It serves 200 on `/` (so a blind probe would accept
+      # it) and 404 on /jmap/session (so the identity check refuses it).
+      systemd.services.fake-builtin-http = {
+        wantedBy = ["multi-user.target"];
+        before = ["stalwart.service" "stalwart-provision.service"];
+        serviceConfig = {
+          ExecStart = "${pkgs.python3}/bin/python3 -m http.server 8080 --bind 0.0.0.0";
+          Restart = "always";
+        };
+      };
+
+      systemd.services.stalwart-provision.serviceConfig.TimeoutStartSec =
+        lib.mkForce "20s";
+
+      virtualisation.memorySize = 1024;
+    };
 
     testScript = ''
       start_all()

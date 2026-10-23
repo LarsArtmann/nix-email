@@ -452,6 +452,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- Provision bootstrap applied the plan to a FOREIGN service (2026-10-23,
+  pbx-artmann burn): the unit's fallback accepted any endpoint that
+  answered `curl --fail` on `127.0.0.1:8080`. On a host where that
+  built-in port is taken (there the webphone), the fallback won the
+  probe's first tick - before the just-restarted stalwart had bound
+  `cfg.url` - so the whole plan was applied to the webphone (schema
+  refresh 404, `stalwart-provision.service` failed, switch exit 4).
+  Both endpoints are now accepted only when their unauthenticated
+  `/jmap/session` identifies Stalwart (`urn:ietf:params:jmap:core`); the
+  loop keeps waiting otherwise, and names the foreign responder in the
+  journal once. `stalwart-bind-e2e` gained a second node (`guarded`)
+  that replays the shape and pins the refusal (no plan sent anywhere).
+
 - stalwart-bind-e2e red class (2026-10-20): the store-cached `runCommand`
   test cert carried `-days 2` and expired 2026-10-19 (yesterday's green
   gate finished ~13 minutes before expiry); stalwart then silently fell

@@ -760,9 +760,17 @@ json/yaml/markdown.
   8080). A non-8080 `httpBind` therefore bootstraps through the built-in
   endpoint: the provision unit probes `cfg.url`, falls back to
   `127.0.0.1:8080`, applies against whichever answered, restarts stalwart,
-  then verifies `cfg.url` - a wedge or a never-activated listener set
-  fails the unit at its 3-min bound instead of hanging forever (the
-  pbx-artmann 43-min burn, nix-email#4; `stalwart-bind-e2e` pins it).
+  then verifies `cfg.url`. An endpoint is accepted ONLY when its
+  unauthenticated `/jmap/session` carries
+  `urn:ietf:params:jmap:core` - a bare HTTP answer on the built-in port is
+  not identity (post-fix, 2026-10-23: the built-in port is Stalwart's only
+  on a host that leaves it free; on pbx-artmann the webphone owned :8080
+  and a blind `curl --fail` fallback handed it the WHOLE plan - schema
+  refresh 404, red switch; the unit now keeps waiting and names the
+  foreign responder in the journal). A wedge, a foreign responder, or a
+  never-activated listener set fails the unit at its 3-min bound instead
+  of hanging forever (the pbx-artmann 43-min burn, nix-email#4;
+  `stalwart-bind-e2e` pins both the bootstrap and the refusal).
 - **Reload does NOT re-bind listeners on 0.16.22** (upstream #352, open
   since 2024): the vendored unit's `ExecStartPost` stalwart restart is the
   workaround; plan-changing deploys bounce the mail ports for seconds
