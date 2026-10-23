@@ -68,7 +68,10 @@ def shell_fragments(tree: ast.AST) -> list[tuple[int, str]]:
         if not isinstance(node, ast.Call) or not node.args:
             continue
         func = node.func
-        name = func.attr if isinstance(func, ast.Attribute) else getattr(func, "id", None)
+        if isinstance(func, ast.Attribute):
+            name = func.attr
+        else:
+            name = getattr(func, "id", None)
         if name not in SHELL_METHODS:
             continue
         arg = node.args[0]

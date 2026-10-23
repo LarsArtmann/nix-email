@@ -246,10 +246,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   The Y plan's Appendix C is the coverage proof for the routed bar.
 - BuildFlow per-step ceiling baked into `.buildflow.yml`
   (`default_step_timeout: 25m`, 2026-10-23): the VM E2E builds no longer
-  need `--step-timeout nix-build=25m` from memory. This binary (ed9ce48)
-  rejects a per-tool `step_timeouts:` map as an unknown key (verified with
-  `buildflow config lint`), so the documented global key is the durable
-  form; docs still pass `--max-time 30m`.
+  need `--step-timeout nix-build=25m` from memory. The 2026-10-23 binary
+  (3509b30) rejects a per-tool `step_timeouts:` map as an unknown key
+  (verified with `buildflow config lint`), so the documented global key
+  is the durable form; docs still pass `--max-time 30m`.
 - Probe-script lint doctrine (2026-10-23, closes D4.2): `docs/probes/`
   scripts are ruff-clean under the CI floor with NO per-file-ignores - a
   fired rule is fixed in the script; the executable bit is the shebang's
