@@ -305,50 +305,51 @@ flowchart TD
 
 ## 6. Coverage appendix - every open row maps to exactly one task
 
-| Open item (source)                                    | Task                                                                              |
-| ----------------------------------------------------- | --------------------------------------------------------------------------------- |
-| Cut v0.5.0 (TODO 0.16 release path)                   | A1-A5                                                                             |
-| SystemNix consumer pin advance                        | C1-C4                                                                             |
-| C42 dmarc-monitor retire-or-keep (owner)              | O2 (verdict); execution rides G7 if keep (ARF probe) or a retire commit if retire |
-| C44 account-secrets doctrine                          | O2 + C5                                                                           |
-| C45 package decision                                  | O2 + C2.2                                                                         |
-| dmarc-monitor live validation (D1)                    | C7 (prep), D1-lane execution                                                      |
-| MemoryMax policy (C39)                                | O2 + C6                                                                           |
-| SystemNix CI-debt residue                             | G3                                                                                |
-| pbx-artmann flip (owner blessing)                     | O2 + B1-B3                                                                        |
-| CI python-lint remainder (bandit/vulture scope)       | D3                                                                                |
-| Relay bounce-path e2e subtest                         | E1                                                                                |
-| E2E runtime trim investigation                        | E2                                                                                |
-| Flood-subtest refill flake watch + posture            | E3                                                                                |
-| EventSource ping probe (JMAP anti-rot remainder)      | E4                                                                                |
-| Upstream filings remainder (dnsmasq, T13b)            | F3, F4                                                                            |
-| Upstream watch (5 filings + retire checklists)        | F5 (+C2.1, G6)                                                                    |
-| BuildFlow upstream follow-ups                         | G1-G2                                                                             |
-| TLS-node coverage (Netease + LinkedIn)                | E6                                                                                |
-| Watch nixpkgs stalwart rename past 0.16               | G6                                                                                |
-| Pin-advance contacts probe set                        | G5                                                                                |
-| NEW bash -n lint                                      | D1                                                                                |
-| NEW probe-lint residue + doctrine                     | D4                                                                                |
-| NEW buildflow step-timeout                            | D2                                                                                |
-| NEW migrate-e2e no-backup-dir flow                    | E5                                                                                |
-| NEW webmail dist check                                | F8                                                                                |
-| Migration tooling compare (vandelay vs imapsync, D1)  | C7.2                                                                              |
-| Rotate three SystemNix placeholder secrets (D1)       | C7.1                                                                              |
-| Resend SASL verify + smoke (needs key)                | C7.4                                                                              |
-| Branch-protection policy (C18)                        | O2.3 + settings micro on verdict                                                  |
-| Renovate install-or-drop (C19)                        | O2.3 + app-install/drop micro                                                     |
-| GitHub Discussions (C22)                              | O2.3 + settings micro                                                             |
-| qcow2 history purge or accept verdict                 | G4                                                                                |
-| Ratify/override [rec] adoptions + C39-C46 sitting     | O1-O3                                                                             |
-| RESIDUE: W/X/P/V planning plans annotate/archive      | F1                                                                                |
-| RESIDUE: AGENTS corridor-scope line                   | D6                                                                                |
-| RESIDUE: buildflow full gate on final tree            | D5                                                                                |
-| RESIDUE: kept-live reports closeout                   | B3                                                                                |
-| RESIDUE: README line-by-line                          | F6                                                                                |
-| RESIDUE: TELEMETRY full re-verify                     | F7                                                                                |
-| RESIDUE: demo banner ritual / SAN comment / cert note | E3.2, E7                                                                          |
-| ROADMAP standing ideas (10 items)                     | G7                                                                                |
-| CI ruff caching, vm-debug --script-only/--check ideas | G7                                                                                |
+| Open item (source)                                                        | Task                                                                              |
+| ------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| Cut v0.5.0 (TODO 0.16 release path)                                       | A1-A5                                                                             |
+| SystemNix consumer pin advance                                            | C1-C4                                                                             |
+| C42 dmarc-monitor retire-or-keep (owner)                                  | O2 (verdict); execution rides G7 if keep (ARF probe) or a retire commit if retire |
+| C44 account-secrets doctrine                                              | O2 + C5                                                                           |
+| C45 package decision                                                      | O2 + C2.2                                                                         |
+| 0.16 admin-bundle spelling (`webui` vs `webadmin`, F8 residue 2026-10-23) | C2.1 (upstream #552103 / retirement checklist) or a vendored patch                |
+| dmarc-monitor live validation (D1)                                        | C7 (prep), D1-lane execution                                                      |
+| MemoryMax policy (C39)                                                    | O2 + C6                                                                           |
+| SystemNix CI-debt residue                                                 | G3                                                                                |
+| pbx-artmann flip (owner blessing)                                         | O2 + B1-B3                                                                        |
+| CI python-lint remainder (bandit/vulture scope)                           | D3                                                                                |
+| Relay bounce-path e2e subtest                                             | E1                                                                                |
+| E2E runtime trim investigation                                            | E2                                                                                |
+| Flood-subtest refill flake watch + posture                                | E3                                                                                |
+| EventSource ping probe (JMAP anti-rot remainder)                          | E4                                                                                |
+| Upstream filings remainder (dnsmasq, T13b)                                | F3, F4                                                                            |
+| Upstream watch (5 filings + retire checklists)                            | F5 (+C2.1, G6)                                                                    |
+| BuildFlow upstream follow-ups                                             | G1-G2                                                                             |
+| TLS-node coverage (Netease + LinkedIn)                                    | E6                                                                                |
+| Watch nixpkgs stalwart rename past 0.16                                   | G6                                                                                |
+| Pin-advance contacts probe set                                            | G5                                                                                |
+| NEW bash -n lint                                                          | D1                                                                                |
+| NEW probe-lint residue + doctrine                                         | D4                                                                                |
+| NEW buildflow step-timeout                                                | D2                                                                                |
+| NEW migrate-e2e no-backup-dir flow                                        | E5                                                                                |
+| NEW webmail dist check                                                    | F8                                                                                |
+| Migration tooling compare (vandelay vs imapsync, D1)                      | C7.2                                                                              |
+| Rotate three SystemNix placeholder secrets (D1)                           | C7.1                                                                              |
+| Resend SASL verify + smoke (needs key)                                    | C7.4                                                                              |
+| Branch-protection policy (C18)                                            | O2.3 + settings micro on verdict                                                  |
+| Renovate install-or-drop (C19)                                            | O2.3 + app-install/drop micro                                                     |
+| GitHub Discussions (C22)                                                  | O2.3 + settings micro                                                             |
+| qcow2 history purge or accept verdict                                     | G4                                                                                |
+| Ratify/override [rec] adoptions + C39-C46 sitting                         | O1-O3                                                                             |
+| RESIDUE: W/X/P/V planning plans annotate/archive                          | F1                                                                                |
+| RESIDUE: AGENTS corridor-scope line                                       | D6                                                                                |
+| RESIDUE: buildflow full gate on final tree                                | D5                                                                                |
+| RESIDUE: kept-live reports closeout                                       | B3                                                                                |
+| RESIDUE: README line-by-line                                              | F6                                                                                |
+| RESIDUE: TELEMETRY full re-verify                                         | F7                                                                                |
+| RESIDUE: demo banner ritual / SAN comment / cert note                     | E3.2, E7                                                                          |
+| ROADMAP standing ideas (10 items)                                         | G7                                                                                |
+| CI ruff caching, vm-debug --script-only/--check ideas                     | G7                                                                                |
 
 ## 7. Kill-switches (how this plan avoids Verschlimmbessering)
 

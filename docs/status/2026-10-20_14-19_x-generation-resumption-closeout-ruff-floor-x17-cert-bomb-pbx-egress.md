@@ -86,11 +86,11 @@ Idle since 10:48. All claims transcript-pinned below.
      the test header + their TODO_LIST. Awaits owner blessing (it
      changes what the test proves about the OIDC directory) + one VM
      run to land the flip.
-~~2. **CI exercise of the new lockstep/shape steps** - still pending:~~ done — pushed; run 39864876276 (2026-10-22) green end-to-end (ruff -> lockstep -> shape -> flake-check)
-   master is 13 commits ahead of origin (daemon has not pushed since
-   06:46Z; that run predates every fix above). The next push runs
-   ruff -> lockstep -> shape -> nix flake check in order for the first
-   time; expected green end-to-end. Assistants never push.
+     ~~2. **CI exercise of the new lockstep/shape steps** - still pending:~~ done — pushed; run 39864876276 (2026-10-22) green end-to-end (ruff -> lockstep -> shape -> flake-check)
+     master is 13 commits ahead of origin (daemon has not pushed since
+     06:46Z; that run predates every fix above). The next push runs
+     ruff -> lockstep -> shape -> nix flake check in order for the first
+     time; expected green end-to-end. Assistants never push.
 
 ## c) NOT STARTED (unchanged from the parent report)
 
@@ -148,115 +148,115 @@ today), X18, X19, X20.
 
 1. OWNER: bless the pbx hermetic override (spec in b.1) - one VM run **→ TODO pbx row (OPEN, owner)**
    lands the stalwart-host-wiring flip.
-~~2. Push master (owner/daemon): first CI exercise of~~ done — pushed; run 39864876276 (2026-10-22) green end-to-end
+   ~~2. Push master (owner/daemon): first CI exercise of~~ done — pushed; run 39864876276 (2026-10-22) green end-to-end
    ruff -> lockstep -> shape -> nix flake check; watch the step names.
-3. Mechanize bash -n over testScript shell fragments (new lint or **→ TODO_LIST row (new 2026-10-23)**
+2. Mechanize bash -n over testScript shell fragments (new lint or **→ TODO_LIST row (new 2026-10-23)**
    BuildFlow provider; see e.2).
-~~4. Sweep sibling repos for store-cached short-validity certs~~ **NOT-DO — cross-repo sweep belongs to each repo; this repo's hazard fixed (d3fb4e7).**
+   ~~4. Sweep sibling repos for store-cached short-validity certs~~ **NOT-DO — cross-repo sweep belongs to each repo; this repo's hazard fixed (d3fb4e7).**
    (`grep -rn "days [0-7]" --include='*.nix'` on cert generators).
-5. X8.1/X8.2 relay bounce-path subtest (refusing smarthost, Mailpit **→ TODO_LIST row**
+3. X8.1/X8.2 relay bounce-path subtest (refusing smarthost, Mailpit **→ TODO_LIST row**
    counters - never journal greps).
-6. X8.3/X8.4 runtime-trim + test-profile TTL doctrine. **→ TODO_LIST row**
-7. X8.5 flood-flake capture-first protocol into the stalwart-e2e **→ TODO_LIST flood row**
+4. X8.3/X8.4 runtime-trim + test-profile TTL doctrine. **→ TODO_LIST row**
+5. X8.5 flood-flake capture-first protocol into the stalwart-e2e **→ TODO_LIST flood row**
    header (the flood logs now dump; the header doctrine is the rest).
-8. X15 TLS-node fixture breadth (Netease + LinkedIn on the IMAPS **→ TODO_LIST row**
+6. X15 TLS-node fixture breadth (Netease + LinkedIn on the IMAPS **→ TODO_LIST row**
    node).
-9. X11.3 EventSource ping probe on the demo VM (CardDAV session has **→ TODO_LIST row**
+7. X11.3 EventSource ping probe on the demo VM (CardDAV session has **→ TODO_LIST row**
    landed; the lane is free).
-10. X12.2 reproduce the dnsmasq forward-vs-blackhole claim FIRST **→ TODO_LIST upstream-filings row**
-    (verify-before-filing), now with the driver-vs-demo scope split.
-11. X12.3/X12.4 T13b dprint pipe-cell filing + venue (github-voice). **→ TODO_LIST upstream-filings row**
-12. X12.5 #552103 evidence-comments (ExecStartPost-restart + **→ first comment filed 2026-10-19 (6258512488); more when the PR moves (watch row)**
+8. X12.2 reproduce the dnsmasq forward-vs-blackhole claim FIRST **→ TODO_LIST upstream-filings row**
+   (verify-before-filing), now with the driver-vs-demo scope split.
+9. X12.3/X12.4 T13b dprint pipe-cell filing + venue (github-voice). **→ TODO_LIST upstream-filings row**
+10. X12.5 #552103 evidence-comments (ExecStartPost-restart + **→ first comment filed 2026-10-19 (6258512488); more when the PR moves (watch row)**
     bootstrap-fallback transcripts) when it next moves.
-13. X13.1-X13.8 BuildFlow batch after their concurrent session lands + **→ TODO_LIST BuildFlow row**
+11. X13.1-X13.8 BuildFlow batch after their concurrent session lands + **→ TODO_LIST BuildFlow row**
     binary rebuild (ef32fa0 vs 9e3ccb0 - doctor warns every run).
-~~14. Row 71 residue: fold the count-line attribution into the BuildFlow~~ done — carried in the TODO BuildFlow row
+    ~~14. Row 71 residue: fold the count-line attribution into the BuildFlow~~ done — carried in the TODO BuildFlow row
     session.
-15. Row 53: bandit/vulture CI-scope doctrine (owner blessing pending). **→ TODO_LIST CI python-lint row**
-16. X7.1/X7.2: draft the bandit/vulture scope doctrine so the owner **→ TODO_LIST CI python-lint row**
+12. Row 53: bandit/vulture CI-scope doctrine (owner blessing pending). **→ TODO_LIST CI python-lint row**
+13. X7.1/X7.2: draft the bandit/vulture scope doctrine so the owner **→ TODO_LIST CI python-lint row**
     blessing is a 5-minute read.
-17. X2.1 (pre-C43): draft the CHANGELOG link-resolution pass (links **→ TODO_LIST v0.5.0 row**
+14. X2.1 (pre-C43): draft the CHANGELOG link-resolution pass (links **→ TODO_LIST v0.5.0 row**
     only, no verdict).
-~~18. X2.2/X2.3 (pre-C43): draft the C45 0.16.22 -> 0.16.26 delta table~~ done — WRITTEN (README ledger delta table, V15)
+    ~~18. X2.2/X2.3 (pre-C43): draft the C45 0.16.22 -> 0.16.26 delta table~~ done — WRITTEN (README ledger delta table, V15)
     research; the C45 verdict stays owner-gated.
-19. X19.1-X19.3: the three D1-unlock prep docs (owner-gated D1). **→ TODO_LIST D1-gated rows**
-20. X18 SystemNix CI debt lanes (their repo). **→ TODO_LIST SystemNix row**
-21. X20 owner sitting #2 packaging (C18/C19/C22 into decision-batch). **→ decision-batch (open)**
-22. Warning-level ruff batch in probe scripts (EXE001 chmod +x, SIM115 **→ TODO_LIST probe-lint row (new 2026-10-23; EXE001 half fixed by chmod this pass)**
+15. X19.1-X19.3: the three D1-unlock prep docs (owner-gated D1). **→ TODO_LIST D1-gated rows**
+16. X18 SystemNix CI debt lanes (their repo). **→ TODO_LIST SystemNix row**
+17. X20 owner sitting #2 packaging (C18/C19/C22 into decision-batch). **→ decision-batch (open)**
+18. Warning-level ruff batch in probe scripts (EXE001 chmod +x, SIM115 **→ TODO_LIST probe-lint row (new 2026-10-23; EXE001 half fixed by chmod this pass)**
     context managers in carddav_bench, FURB167 re.I aliases) - see e.6.
-~~23. Fingerprint-first doctrine into CONTRIBUTING's VM debug section~~ done — added 2026-10-23 (CONTRIBUTING VM debug loops rule (e))
+    ~~23. Fingerprint-first doctrine into CONTRIBUTING's VM debug section~~ done — added 2026-10-23 (CONTRIBUTING VM debug loops rule (e))
     (one sentence - the probe shape is already in vm-debug history).
-24. Consider `--keep-machine-state` guidance in vm-debug.sh for **→ idea parked (vm-debug.sh)**
+19. Consider `--keep-machine-state` guidance in vm-debug.sh for **→ idea parked (vm-debug.sh)**
     repeated TLS-style debugging (avoids full boots between probes).
-25. Re-run `buildflow -d` after the next BuildFlow binary reinstall - **→ TODO_LIST BuildFlow row**
+20. Re-run `buildflow -d` after the next BuildFlow binary reinstall - **→ TODO_LIST BuildFlow row**
     the skip-unaware "interrogate not installed" preflight WARN may
     vanish (X14 residue).
-~~26. X6 residue: re-run the option-surface audit after any wrapper~~ done — ROADMAP line updated 2026-10-23 (X6 closed: zero dead options; re-run trigger = next wrapper-option change)
+    ~~26. X6 residue: re-run the option-surface audit after any wrapper~~ done — ROADMAP line updated 2026-10-23 (X6 closed: zero dead options; re-run trigger = next wrapper-option change)
     option change (standing doctrine; consider an eval lint pairing
     options with consumption sites).
-~~27. Contacts wire-claims stay source-level until a demo-VM transcript~~ done — AGENTS rule landed (transcript rule extends to CardDAV/JMAP-contacts)
+    ~~27. Contacts wire-claims stay source-level until a demo-VM transcript~~ done — AGENTS rule landed (transcript rule extends to CardDAV/JMAP-contacts)
     set exists under docs/probes/ (10k+ cards benchmark = filing gate;
     2026-10-19 assessment owns the verdict).
-28. X10 residue: buildflow's lychee step private-repo policy once the **→ TODO_LIST BuildFlow row (added 2026-10-23)**
+21. X10 residue: buildflow's lychee step private-repo policy once the **→ TODO_LIST BuildFlow row (added 2026-10-23)**
     gate's lychee step actually exercises INBOXCLEAN.md.
-29. Demo VM: re-verify the login banner ports/credentials against the **→ standing ritual; demo-eval pins the ports/roles/admin contract mechanically**
+22. Demo VM: re-verify the login banner ports/credentials against the **→ standing ritual; demo-eval pins the ports/roles/admin contract mechanically**
     README quickstart on the next demo boot (single-source ritual).
-30. docs/TELEMETRY.md is 0.15.5-era: verify keys against the pin on **→ standing caveat (AGENTS docs map; W7 spot-check banner 2026-10-19)**
+23. docs/TELEMETRY.md is 0.15.5-era: verify keys against the pin on **→ standing caveat (AGENTS docs map; W7 spot-check banner 2026-10-19)**
     the next telemetry-adjacent session.
-~~31. Consider a gate-log step-name assertion in CI triage docs: "a red~~ **NOT-DO — the AGENTS prose rule suffices.**
+    ~~31. Consider a gate-log step-name assertion in CI triage docs: "a red~~ **NOT-DO — the AGENTS prose rule suffices.**
     run is never 'the known one' without reading the failing STEP
     name" is prose; the failure-mode table could carry the two known
     stacked causes.
-32. Parsedmarc-e2e: the fixture-cert `-days 3650` is in-VM generated **→ small doc note next to the bind-e2e cert comment**
+24. Parsedmarc-e2e: the fixture-cert `-days 3650` is in-VM generated **→ small doc note next to the bind-e2e cert comment**
     (safe) - document that distinction once next to the bind-e2e
     comment so nobody "harmonizes" it backwards.
-33. vm-debug.sh: optional `--check` arg listing *-e2e checks with **→ idea parked (vm-debug.sh)**
+25. vm-debug.sh: optional `--check` arg listing *-e2e checks with **→ idea parked (vm-debug.sh)**
     cached-red status (saves the red-build surprise).
-34. Bind-e2e: the probe uses `create_default_context(cafile=...)` - **→ small comment nicety (tests/stalwart-bind-e2e.nix)**
+26. Bind-e2e: the probe uses `create_default_context(cafile=...)` - **→ small comment nicety (tests/stalwart-bind-e2e.nix)**
     an SNI/hostname variant assertion (served SAN == bind.test) is
     already implied; a one-line comment linking probe to cert SAN
     would future-proof it.
-35. Stalwart-e2e flood subtest: the assert messages carry counts, and **→ TODO_LIST flood row (output hygiene)**
+27. Stalwart-e2e flood subtest: the assert messages carry counts, and **→ TODO_LIST flood row (output hygiene)**
     the logs now dump - consider asserting per-connection detail only
     on failure (output hygiene, low).
-36. CI: consider caching the locked-rev ruff binary (each lint step **→ idea parked (CI optimization)**
+28. CI: consider caching the locked-rev ruff binary (each lint step **→ idea parked (CI optimization)**
     pays `nix run` resolution; ~13 s today, growing with py files).
-~~37. README: the check prose row and tests/check-expected.json are the~~ done — verified 2026-10-23: no third copy outside docs/status snapshots; drift alarm + README anti-drift enforce the two sites
+    ~~37. README: the check prose row and tests/check-expected.json are the~~ done — verified 2026-10-23: no third copy outside docs/status snapshots; drift alarm + README anti-drift enforce the two sites
     two sanctioned check-list sites - verify no THIRD copy crept into
     docs/ during the docs-heavy morning (drift alarm forbids it; a
     30-second grep).
-38. Confirm the aarch64 lockstep shape after the next nixpkgs **→ README pin-advance runbook owns it**
+29. Confirm the aarch64 lockstep shape after the next nixpkgs **→ README pin-advance runbook owns it**
     pin-advance (README pin-advance runbook owns it).
-~~39. Upstream watch: nixpkgs #563651/#563652/#563777 + mailsuite#65 -~~ done — TODO_LIST watch row
+    ~~39. Upstream watch: nixpkgs #563651/#563652/#563777 + mailsuite#65 -~~ done — TODO_LIST watch row
     re-check on the next upstream-watch cadence.
-40. When the hermetic override lands (a/b.1), fold the run-17 **→ TODO pbx row**
+30. When the hermetic override lands (a/b.1), fold the run-17 **→ TODO pbx row**
     transcript into the pbx test header (runs 11-17 tell one story).
-~~41. Docs-health sweep: docs/probes/<date> transcripts referenced in~~ **NOT-DO — the /tmp logs are lost to reboot; superseded by the impossibility verdict (test header + CONTRIBUTING carry the doctrine).**
+    ~~41. Docs-health sweep: docs/probes/<date> transcripts referenced in~~ **NOT-DO — the /tmp logs are lost to reboot; superseded by the impossibility verdict (test header + CONTRIBUTING carry the doctrine).**
     today's reports (/tmp/*.log) are volatile - consider copying the
     two decisive pbx run logs into docs/probes/2026-10-20-pbx-egress/
     before a reboot loses them.
-42. CHANGELOG: the [Unreleased] Fixed section is growing release- **→ TODO_LIST v0.5.0 row (release-procedure assessment step)**
+31. CHANGELOG: the [Unreleased] Fixed section is growing release- **→ TODO_LIST v0.5.0 row (release-procedure assessment step)**
     worthy payload (ruff floor, cert bomb, forensics) - consider the
     release-procedure assessment step on the next release session.
-~~43. AGENTS.md line cap (219/220): the next lesson must EDIT an~~ done — standing constraint honored this pass (no appends)
+    ~~43. AGENTS.md line cap (219/220): the next lesson must EDIT an~~ done — standing constraint honored this pass (no appends)
     existing bullet, not append (the doctor enforces 220).
-~~44. Annotated status reports: none written today (no strike rows) -~~ **NOT-DO — ritual note; this pass ran check-rows over every annotated file.**
+    ~~44. Annotated status reports: none written today (no strike rows) -~~ **NOT-DO — ritual note; this pass ran check-rows over every annotated file.**
     keep `annotate.go check-rows` in the ritual for future ones.
-45. The `M features/README/INBOXCLEAN` unformatted-commit pattern **→ BuildFlow owns the hook (their repo)**
+32. The `M features/README/INBOXCLEAN` unformatted-commit pattern **→ BuildFlow owns the hook (their repo)**
     (foreign sessions) - a pre-commit dprint hook would mechanize what
     I repaired by hand (BuildFlow owns the hook).
-46. Reconcile the 84-warning buildflow ruff findings list vs the CI **→ TODO_LIST CI python-lint row (canonical gap list)**
+33. Reconcile the 84-warning buildflow ruff findings list vs the CI **→ TODO_LIST CI python-lint row (canonical gap list)**
     floor select once (row 53 overlaps; keep one canonical gap list).
-~~47. Demo VM disk at ~/.cache/nix-email-demo/ - the pbx e2e work never~~ **NOT-DO — no-action note.**
+    ~~47. Demo VM disk at ~/.cache/nix-email-demo/ - the pbx e2e work never~~ **NOT-DO — no-action note.**
     touches it; no action, just noting the separation held.
-~~48. Next CardDAV-adjacent session: confirm their session's final~~ done — superseded: the debt was fixed by X11 (2026-10-20); the hand-off-protocol note stays with their repo
+    ~~48. Next CardDAV-adjacent session: confirm their session's final~~ done — superseded: the debt was fixed by X11 (2026-10-20); the hand-off-protocol note stays with their repo
     commit closed the probe debt (it did not fix the ruff findings -
     my fix did; their TODO hand-off protocol could note that error-
     class lint findings should never ride a hand-off row past landing).
-~~49. When CI first exercises the lockstep step, verify the step's~~ **NOT-DO — correct refusal; the local negative test covers drift.**
+    ~~49. When CI first exercises the lockstep step, verify the step's~~ **NOT-DO — correct refusal; the local negative test covers drift.**
     failure MODE once by... no - never weaken or fault-inject CI for
     proof; the local negative test already covers drift.
-~~50. Idle-time hygiene: the 3.5 h idle gap between the final gate and~~ **NOT-DO — process note, consumed.**
+    ~~50. Idle-time hygiene: the 3.5 h idle gap between the final gate and~~ **NOT-DO — process note, consumed.**
     this closeout - a session that ends green should closeout
     immediately (the closeout prompt arrived late; the report was
     already amended in place at 10:48, which softened the cost).
@@ -270,13 +270,13 @@ today), X18, X19, X20.
    one blessed run), or do you want the test to stay red until a
    different shape exists? It changes what the test proves about the
    OIDC directory.
-~~2. **Push policy**: nix-email master is 13 commits ahead (ruff-floor~~ done — pushed; run 39864876276 (2026-10-22) green end-to-end
+   ~~2. **Push policy**: nix-email master is 13 commits ahead (ruff-floor~~ done — pushed; run 39864876276 (2026-10-22) green end-to-end
    fix, cert fix, X17 batch - all gate-green locally). The daemon has
    not pushed since 06:46Z. Should you push now so CI finally
    exercises the lockstep step, or is the daemon cadence deliberate?
    (I never push; asking only because CI verification of my work is
    blocked on it.)
-3. **Cross-repo red-master tolerance**: the wait-for discipline **→ owner call (cross-repo policy)**
+2. **Cross-repo red-master tolerance**: the wait-for discipline **→ owner call (cross-repo policy)**
    prevented all collisions but left nix-email red ~26 h and pbx red
    ~22 h on error-class findings owned by landed sessions. Adopt a
    rule "error-class lint/typo fixes may cross a session's files once

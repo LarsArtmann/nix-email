@@ -37,25 +37,25 @@ is the parent report; its 3 owner questions stand unless restated here).
 ## b) PARTIAL - pbx X5 (their repo; runs 15/16 decisive)
 
 ~~- **Run 15**: the unit-level route-wait ExecStartPre was a NO-OP that~~ **NOT-DO — subsumed by the same session's 14-19 closeout (b.1 carries the final state).**
-  itself failed the provision unit - bare `ip` is not on the unit PATH
-  (`command not found` looped 60s, exit 1 at t=85.5). Fixed with
-  absolute store paths.
+itself failed the provision unit - bare `ip` is not on the unit PATH
+(`command not found` looped 60s, exit 1 at t=85.5). Fixed with
+absolute store paths.
 ~~- **Run 16** (with the fix + new discriminators): apply passes ALL 30~~ **NOT-DO — subsumed by the same session's 14-19 closeout (b.1 carries the final state).**
-  objects, fails ONLY at the final `reload` action's OIDC discovery
-  fetch - and the forensics prove the fetch can NEVER work in a driver
-  VM: with a valid DHCP default route, slirp DNS (10.0.2.3, resolv.conf
-  correctly populated by resolvconf) AND direct TCP (curl 7 to
-  1.1.1.1:443 in 1 ms) both fail instantly. /tmp/pbx-x5-run16.log.
+objects, fails ONLY at the final `reload` action's OIDC discovery
+fetch - and the forensics prove the fetch can NEVER work in a driver
+VM: with a valid DHCP default route, slirp DNS (10.0.2.3, resolv.conf
+correctly populated by resolvconf) AND direct TCP (curl 7 to
+1.1.1.1:443 in 1 ms) both fail instantly. /tmp/pbx-x5-run16.log.
 ~~- **Consequence**: owner question 1 (live GET vs hermetic) is settled~~ **NOT-DO — subsumed by the same session's 14-19 closeout (b.1 carries the final state).**
-  by impossibility, not policy - a live fetch cannot go green in
-  `nix flake check` VMs. The hermetic mechanism is spec'd (whole-key
-  `mkVMOverride` on `provision.objects.Directory.objects.pocketid` to a
-  non-remote `@type` + the Authentication ref; the wrapper renderer and
-  option types read: singletons render `update` ops, objects-sets with
-  `reconcile=false` + empty map are harmless no-ops). Implementation
-  waits on the owner (it changes what the test proves about the OIDC
-  directory). Evidence + verdict written into the test header (their
-  daemon commits).
+by impossibility, not policy - a live fetch cannot go green in
+`nix flake check` VMs. The hermetic mechanism is spec'd (whole-key
+`mkVMOverride` on `provision.objects.Directory.objects.pocketid` to a
+non-remote `@type` + the Authentication ref; the wrapper renderer and
+option types read: singletons render `update` ops, objects-sets with
+`reconcile=false` + empty map are harmless no-ops). Implementation
+waits on the owner (it changes what the test proves about the OIDC
+directory). Evidence + verdict written into the test header (their
+daemon commits).
 
 ## b2) FULLY DONE (late-session surprise) - the bind-e2e cert time bomb
 
@@ -98,17 +98,17 @@ X18, X19, X20, X12 filings.
 
 1. Owner: bless the hermetic pbx override (spec in (b)) - one more **→ 14-19 f/1 = TODO pbx row (owner, open)**
    pbx VM run lands the flip.
-~~2. Next nix-email daemon push: first CI exercise of ruff->lockstep->~~ done — pushed; run 39864876276 (2026-10-22) green end-to-end
+   ~~2. Next nix-email daemon push: first CI exercise of ruff->lockstep->~~ done — pushed; run 39864876276 (2026-10-22) green end-to-end
    shape->flake-check in order; expect GREEN end-to-end (no push from
    assistants - daemon/owner action).
-3. X8/X15 heavy VM lanes (relay bounce-path, TLS-node breadth) - each **→ TODO_LIST rows**
+2. X8/X15 heavy VM lanes (relay bounce-path, TLS-node breadth) - each **→ TODO_LIST rows**
    is its own session-sized run.
-4. X12.2: reproduce the dnsmasq forward-vs-blackhole claim BEFORE **→ TODO_LIST upstream-filings row**
+3. X12.2: reproduce the dnsmasq forward-vs-blackhole claim BEFORE **→ TODO_LIST upstream-filings row**
    filing (verify-before-filing); note the new scope split (driver VM
    vs demo VM egress differ).
-5. X13 after the BuildFlow session lands + binary rebuild (their HEAD **→ TODO_LIST BuildFlow row**
+4. X13 after the BuildFlow session lands + binary rebuild (their HEAD **→ TODO_LIST BuildFlow row**
    9e3ccb0 is already ahead of the installed binary ef32fa0).
-6. X7.1/X7.2 bandit/vulture doctrine draft (owner blessing = 5-min **→ TODO_LIST CI python-lint row**
+5. X7.1/X7.2 bandit/vulture doctrine draft (owner blessing = 5-min **→ TODO_LIST CI python-lint row**
    read).
 
 ## g) Owner questions (unchanged set, evidence upgraded)
