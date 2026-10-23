@@ -32,7 +32,7 @@ settled the ARF unknown. The recommendation text is unchanged in effect, but
 its rationale ("failure-report parsing is docs-verified, not runtime-verified")
 is now the only remaining gap - re-read `decision-batch.md` C42 before answering.
 
-## Batch 2 - pbx-artmann hermetic blessing (unblocks B1-B3, ~24 corridor arrows)
+## Batch 2 - pbx-artmann hermetic blessing (unblocks B1-B3 and the last two kept-live reports)
 
 | ID  | The call                                                                                                                                                                                                                         | Recommendation                                                                                  | Cost of delay                                                     |
 | --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
@@ -60,16 +60,17 @@ plus CONTRIBUTING "VM debug loops" (f).
 
 ## Batch 5 - policy batch (2-minute answers)
 
-| ID  | The call                                                                          | Recommendation                                                                                                    | Cost of delay                                    |
-| --- | --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
-| C18 | Branch protection: keep the push bypass for the auto-commit daemon, or go strict? | **Keep the bypass on master**, require the check on any future protected branch                                   | The 4x-red statix streak is the observed cost    |
-| C19 | Renovate: install the GitHub app or drop `renovate.json`?                         | **Drop the config** (Dependabot covers Actions)                                                                   | Dead config stays drift                          |
-| C22 | GitHub Discussions, or issues-only?                                               | **Keep issues-only**                                                                                              | Another inbox for a single maintainer            |
-| C24 | Alert channel (alerts must NOT ride the mail stack they watch)                    | **Discord via the existing DiscordSync layer**, ntfy as fallback                                                  | Blocks the monitoring taxonomy + dead-man switch |
-| C29 | Round-trip canary vantage (send to receive SLO probe)                             | **evo-x2** (independent network + DNS path)                                                                       | Blocks the canary implementation                 |
-| C34 | Webmail: wrapper goal or non-goal?                                                | **Non-goal** - already executed as Bulwark on the consumer host (2026-10-19)                                      | Ratification only                                |
-| Q4  | README ops-detail level (public runbook detail has recon value)                   | **Keep as-is** until D1 lands, then re-decide                                                                     | None                                             |
-| Q6  | Spam/Junk ownership                                                               | **Tag-only now** - the auto-move half is MOOT (upstream hard-codes INBOX-spam to JUNK; no wrapper setting exists) | Ratification only                                |
+| ID  | The call                                                                                                              | Recommendation                                                                                                    | Cost of delay                                                                                   |
+| --- | --------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| C18 | Branch protection: keep the push bypass for the auto-commit daemon, or go strict?                                     | **Keep the bypass on master**, require the check on any future protected branch                                   | The 4x-red statix streak is the observed cost                                                   |
+| C19 | Renovate: install the GitHub app or drop `renovate.json`?                                                             | **Drop the config** (Dependabot covers Actions)                                                                   | Dead config stays drift                                                                         |
+| C22 | GitHub Discussions, or issues-only?                                                                                   | **Keep issues-only**                                                                                              | Another inbox for a single maintainer                                                           |
+| C24 | Alert channel (alerts must NOT ride the mail stack they watch)                                                        | **Discord via the existing DiscordSync layer**, ntfy as fallback                                                  | Blocks the monitoring taxonomy + dead-man switch                                                |
+| C29 | Round-trip canary vantage (send to receive SLO probe)                                                                 | **evo-x2** (independent network + DNS path)                                                                       | Blocks the canary implementation                                                                |
+| C34 | Webmail: wrapper goal or non-goal?                                                                                    | **Non-goal** - already executed as Bulwark on the consumer host (2026-10-19)                                      | Ratification only                                                                               |
+| Q4  | README ops-detail level (public runbook detail has recon value)                                                       | **Keep as-is** until D1 lands, then re-decide                                                                     | None                                                                                            |
+| CI  | CI python-lint scope: keep the ruff error floor, or move bandit/vulture (and BuildFlow's deeper ruleset) into CI too? | **Keep the error floor in CI** (`--select E4,E7,E9,F`); bandit/vulture stay BuildFlow detect-only                 | Move them into CI (204 bandit + 436 ruff-format findings today - a gate nobody can go green on) |
+| Q6  | Spam/Junk ownership                                                                                                   | **Tag-only now** - the auto-move half is MOOT (upstream hard-codes INBOX-spam to JUNK; no wrapper setting exists) | Ratification only                                                                               |
 
 ## Batch 6 - ratify the agent-executed adoptions (reversible, 2026-10-05)
 
@@ -100,15 +101,16 @@ No CVEs in the window; the pin's 0.16.22 is past the one that mattered.
 
 ## Appendix C - what each verdict unlocks (Y-plan mapping)
 
-| Verdict      | Unlocks                                                            |
-| ------------ | ------------------------------------------------------------------ |
-| C43 = cut    | A1-A5 (CHANGELOG pass, gate proof, dry-run, tag, banner)           |
-| C45          | C2.2 (overlay execution or stand-verdict)                          |
-| C44          | C5 (implementation + THREAT_MODEL)                                 |
-| C39          | C6 (MemoryMax landing)                                             |
-| PBX blessing | B1-B3 (their gate + the corridor closeout)                         |
-| D1/D2        | C7 (rotation runbook, vandelay-vs-imapsync, dmarc live poll)       |
-| Resend key   | C7.4 (the one live smoke)                                          |
-| C18/C19/C22  | settings micros (branch protection, app install/drop, Discussions) |
-| C24/C29      | G7 monitoring encoding (taxonomy, canary)                          |
-| C34/Q4/Q6    | ratifications; ROADMAP non-goals pass (G7)                         |
+| Verdict       | Unlocks                                                            |
+| ------------- | ------------------------------------------------------------------ |
+| C43 = cut     | A1-A5 (CHANGELOG pass, gate proof, dry-run, tag, banner)           |
+| C45           | C2.2 (overlay execution or stand-verdict)                          |
+| C44           | C5 (implementation + THREAT_MODEL)                                 |
+| C39           | C6 (MemoryMax landing)                                             |
+| PBX blessing  | B1-B3 (their gate + the corridor closeout)                         |
+| D1/D2         | C7 (rotation runbook, vandelay-vs-imapsync, dmarc live poll)       |
+| Resend key    | C7.4 (the one live smoke)                                          |
+| CI lint scope | D3 (ci.yml/.buildflow.yml scope landing + negative test)           |
+| C18/C19/C22   | settings micros (branch protection, app install/drop, Discussions) |
+| C24/C29       | G7 monitoring encoding (taxonomy, canary)                          |
+| C34/Q4/Q6     | ratifications; ROADMAP non-goals pass (G7)                         |
