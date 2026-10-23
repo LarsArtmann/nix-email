@@ -58,6 +58,21 @@
 # 20. Restart persistence: INBOX survives, admin stays locked, AND the
 #      provision oneshot does NOT re-run (active-enter timestamp pinned)
 #
+# RUNTIME BUDGET DOCTRINE (decided 2026-10-23, closes W6.4): two windows
+# dominate the wall clock and neither is a product default we may trim:
+#   - the unknown-recipient probe (~35 s): the DNS-less VM waits out real
+#     resolver timeouts. That wait IS the evidence (a resolver that
+#     answered instantly would prove nothing about the real path), so it
+#     stays.
+#   - the reports subtest (~75 s): swaks upload + the analyzer's window.
+#     Shrinking it means asserting before ingestion can finish, i.e.
+#     trading determinism for speed.
+# The ONLY test-profile knob allowed to differ is directoryCacheTtlNegative
+# (= 5 here, upstream default 3600): a low negative-cache TTL makes a stall
+# LOUD sooner and is a canary, not a relaxation. Doctrine: a test-profile
+# setting may shorten a WAIT, never relax a product assertion; never weaken
+# a module default to make a test faster - fix the test.
+#
 # NOT covered (needs DNS + external relay creds): outbound smarthost relay
 # (see stalwart-relay-e2e). Those stay live-host go-live checks - see
 # README verified-facts ledger for the keys.

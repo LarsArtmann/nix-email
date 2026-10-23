@@ -19,6 +19,9 @@
 #      poisons the LIVE store; the script REFUSES (restore-first)
 #   6. --backup-dir migration: dump from the clean share copy,
 #      recovery-mode apply, marker, DONE banner
+#   6b. --backup-dir-FREE migration: a CLEAN live store dumps in place
+#      (the happy path) and the script makes its own .v015-premigrate
+#      copy; the store is then reset to re-run the poisoned-path legs
 #   7. Post-migration: stalwart + provision units re-run, the plan's
 #      8082 listener binds, the 0.15 password authenticates on 0.16
 #   8. Restart persistence: the guard passes on the migrated store
@@ -195,6 +198,31 @@ in
           # THE point of the guard: the binary never ran, so the store was
           # never poisoned by the UNIT (exit-101 panic class unreachable).
           mig016.fail("grep -q 'Migration aborted' /tmp/guard.log")
+
+      with subtest("no-backup-dir migration: a CLEAN live store migrates in place"):
+          # The other leg always passes --backup-dir (the poisoned-store
+          # shape). This covers the happy path: a pre-0.16 store that no
+          # 0.16 binary ever touched is dumped from the LIVE directory, and
+          # the script takes its own .v015-premigrate copy before touching
+          # anything.
+          mig016.succeed(
+              "stalwart-migrate-from-015 2>&1 | tee /tmp/migrate-clean.log"
+          )
+          mig016.succeed("cat /tmp/migrate-clean.log >&2")
+          mig016.succeed("grep -q '\\[DONE\\] migration complete' /tmp/migrate-clean.log")
+          mig016.succeed("test -f /var/lib/stalwart/v016-store-migrated")
+          # The pre-migration copy is the rollback artifact: it must exist
+          # and contain the RocksDB dir, because a later 0.16 poisoning of
+          # the live store is exactly what it protects against.
+          mig016.succeed("test -d /var/lib/stalwart.v015-premigrate/db")
+          mig016.succeed("ls -la /var/lib/stalwart/db /var/lib/stalwart.v015-premigrate/db >&2")
+          # Reset to a pristine pre-0.16 store for the poisoned-path legs
+          # below. The re-extract also drops the migration marker, which the
+          # guard and the script both key on.
+          mig016.succeed(
+              "rm -rf /var/lib/stalwart /var/lib/stalwart.v015-premigrate && "
+              "tar -C /var/lib -xf /tmp/shared/pre016-store.tar"
+          )
 
       with subtest("poison simulation: one direct 0.16 boot, then the script refuses"):
           # Settle the restart cycling first so the store is at rest.

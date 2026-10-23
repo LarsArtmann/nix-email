@@ -51,7 +51,11 @@
     '';
   # Implicit-TLS probes (stdlib, not `openssl s_client`: its stdin/pipe
   # shapes are flaky around server-first greetings - two probe
-  # iterations, 2026-10-17).
+  # iterations, 2026-10-17). The `cafile=` argument trusts testCert and
+  # `server_hostname="bind.test"` forces the hostname half of validation,
+  # so the probe succeeds only when the SERVED SAN matches the
+  # `DNS:bind.test` value the Certificate upsert matches on - that link is
+  # what makes the probe a SAN assertion, not just a handshake.
   tlsProbe = pkgs.writeText "stalwart-bind-e2e-tls-probe.py" ''
     import socket
     import ssl

@@ -226,6 +226,15 @@
   # default verification context does HOSTNAME checks against the
   # configured host (localhost), not just chain validation - a bare
   # CN-only cert fails with a hostname mismatch.
+  #
+  # DISTINCTION vs bind-e2e's testCert (2026-10-23): both use `-days 3650`
+  # but the failure modes differ. Here the cert is CLIENT-TRUST only (the
+  # probe passes it as a cafile); an expired one fails LOUDLY at
+  # verification, so a long validity is convenience, not load-bearing. In
+  # bind-e2e the same number IS load-bearing: stalwart silently falls back
+  # to its rcgen runtime cert when the pinned one expires (the 2026-10-19
+  # -days 2 incident), so shortening THAT one reintroduces a time bomb.
+  # Do not "harmonize" the two.
   imapTestCert =
     pkgs.runCommand "dmarc-imap-test-cert" {
       nativeBuildInputs = [pkgs.openssl];
