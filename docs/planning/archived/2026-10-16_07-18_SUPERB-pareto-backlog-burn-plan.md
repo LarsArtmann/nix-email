@@ -493,26 +493,26 @@ same directory) owns the routing, its Appendix C proves every open TODO maps
 to exactly one Y task, and executed work lives in CHANGELOG. Dispositions
 below are grouped by evidence class, not invented per-cell verdicts.
 
-| Task | Disposition | Home / evidence |
-| ---- | ----------- | --------------- |
-| N1, N2 | ROUTED - owner sittings | Y O1-O3; `docs/planning/decision-batch.md` C18/C19/C22/C24/C29/C34/C39-C46/Q4 |
-| N3 | ROUTED - cut v0.5.0 (gated C43) | Y A1-A5; TODO_LIST "0.16 release path" |
-| N4, N5 | ROUTED - pin advance + #566282 port | Y C1-C4.4; README pin-advance runbook |
-| N6 | ROUTED - post-bump eval checks | Y C4.1 |
-| N7, N8 | DONE - JMAP push assertion GREEN 2026-10-19; Junk-filing verified 2026-10-18 | `tests/stalwart-e2e.nix`; `docs/probes/2026-10-18-demo-smoke-backup/` |
-| N9 | ROUTED - C39 verdict then documentation | Y C6 |
-| N10, N11 | DONE - pipes lint argless+indented-fence mode; host-parse dry-run script | `scripts/check-md-table-pipes.sh`, `scripts/host-parse-fixture.py` |
-| N12 | ROUTED - TLS-node breadth | Y E6 |
-| N13 | ROUTED - debug-driver recipe | Y G7 |
-| N14 | DONE - demo-eval closure check registered | `tests/demo-eval.nix` |
-| N15, N16 | ROUTED - low-priority eval/fixture ideas | Y G7 |
-| N17 | ROUTED - BuildFlow upstream batch | Y G1-G2 |
-| N18 | DONE - `.buildflow.yml` skip set with rationale | `.buildflow.yml` |
-| N19 | ROUTED - dprint T13b filing | Y F4 |
-| N20 | ROUTED - SystemNix CI debt | Y G3 |
-| N21 | DONE - docs corridor closed 2026-10-23 (13 annotated, 11 archived) | `docs/status/archived/README.md` |
-| N22 | ROUTED - Resend smoke (needs key) | Y C7.4; decision-batch "Resend account actions" |
-| N23 | ROUTED - qcow2 verdict | Y G4 |
-| N24 | ROUTED - policy application micros | Y O3 |
-| N25, N26 | ROUTED - monitoring + D1 slice (post-D1) | Y C7 / G7; `docs/MONITORING.md` |
-| N27 | ROUTED - standing upstream watch | Y F5 |
+| Task     | Disposition                                                                  | Home / evidence                                                               |
+| -------- | ---------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| N1, N2   | ROUTED - owner sittings                                                      | Y O1-O3; `docs/planning/decision-batch.md` C18/C19/C22/C24/C29/C34/C39-C46/Q4 |
+| N3       | ROUTED - cut v0.5.0 (gated C43)                                              | Y A1-A5; TODO_LIST "0.16 release path"                                        |
+| N4, N5   | ROUTED - pin advance + #566282 port                                          | Y C1-C4.4; README pin-advance runbook                                         |
+| N6       | ROUTED - post-bump eval checks                                               | Y C4.1                                                                        |
+| N7, N8   | DONE - JMAP push assertion GREEN 2026-10-19; Junk-filing verified 2026-10-18 | `tests/stalwart-e2e.nix`; `docs/probes/2026-10-18-demo-smoke-backup/`         |
+| N9       | ROUTED - C39 verdict then documentation                                      | Y C6                                                                          |
+| N10, N11 | DONE - pipes lint argless+indented-fence mode; host-parse dry-run script     | `scripts/check-md-table-pipes.sh`, `scripts/host-parse-fixture.py`            |
+| N12      | ROUTED - TLS-node breadth                                                    | Y E6                                                                          |
+| N13      | ROUTED - debug-driver recipe                                                 | Y G7                                                                          |
+| N14      | DONE - demo-eval closure check registered                                    | `tests/demo-eval.nix`                                                         |
+| N15, N16 | ROUTED - low-priority eval/fixture ideas                                     | Y G7                                                                          |
+| N17      | ROUTED - BuildFlow upstream batch                                            | Y G1-G2                                                                       |
+| N18      | DONE - `.buildflow.yml` skip set with rationale                              | `.buildflow.yml`                                                              |
+| N19      | ROUTED - dprint T13b filing                                                  | Y F4                                                                          |
+| N20      | ROUTED - SystemNix CI debt                                                   | Y G3                                                                          |
+| N21      | DONE - docs corridor closed 2026-10-23 (13 annotated, 11 archived)           | `docs/status/archived/README.md`                                              |
+| N22      | ROUTED - Resend smoke (needs key)                                            | Y C7.4; decision-batch "Resend account actions"                               |
+| N23      | ROUTED - qcow2 verdict                                                       | Y G4                                                                          |
+| N24      | ROUTED - policy application micros                                           | Y O3                                                                          |
+| N25, N26 | ROUTED - monitoring + D1 slice (post-D1)                                     | Y C7 / G7; `docs/MONITORING.md`                                               |
+| N27      | ROUTED - standing upstream watch                                             | Y F5                                                                          |

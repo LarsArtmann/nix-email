@@ -166,9 +166,22 @@ in {
       # the one that answered, and the post-restart wait verifies cfg.url
       # itself - "provisioned listeners never activate" (the apply-succeeded
       # reload-validation class) now fails the unit instead of passing
-      # silently. If a future stalwart changes the built-in port, the
-      # fallback misses and behavior degrades to today's bounded visible
-      # failure - never a silent one.
+      # silently.
+      #
+      # A bare `curl --fail` is NOT an identity test (2026-10-23 pbx burn):
+      # the built-in port is Stalwart's only on a host that leaves it free.
+      # There the webphone owns 127.0.0.1:8080 and answered the fallback on
+      # the probe's FIRST tick - before a just-restarted stalwart had bound
+      # cfg.url - so the whole plan was applied to the webphone (schema
+      # refresh 404, red switch, exit 4). An endpoint is accepted only when
+      # its unauthenticated JMAP session identifies Stalwart (/jmap/session
+      # carries urn:ietf:params:jmap:core on BOTH the built-in and the
+      # provisioned listener set). The loop keeps waiting while neither is
+      # Stalwart, so a busy built-in port can never receive the plan; the
+      # unit's TimeoutStartSec bounds the wait, and a foreign responder is
+      # named in the journal once so the failure is diagnosable instead of
+      # a silent timeout.
+      #
       # Scripts live on store PATHS (writeShellScript), not inline in the
       # unit: systemd unit files are line-based and an embedded newline in
       # ExecStart dies with "Unbalanced quoting ... unit will not be
@@ -176,13 +189,29 @@ in {
       applyScript = pkgs.writeShellScript "stalwart-provision-apply" ''
         cfg_url=${lib.escapeShellArg cfg.url}
         built_in_url='http://127.0.0.1:8080'
+        is_stalwart() {
+          body=$(${pkgs.curl}/bin/curl --fail --silent --max-time 2 "$1/jmap/session" 2>/dev/null) || return 1
+          case "$body" in
+            *'"urn:ietf:params:jmap:core"'*) return 0 ;;
+          esac
+          return 1
+        }
         chosen=""
+        ticks=0
+        warned=""
         until [ -n "$chosen" ]; do
-          if ${pkgs.curl}/bin/curl --fail "$cfg_url" &> /dev/null; then
+          if is_stalwart "$cfg_url"; then
             chosen="$cfg_url"
-          elif ${pkgs.curl}/bin/curl --fail "$built_in_url" &> /dev/null; then
+          elif is_stalwart "$built_in_url"; then
             chosen="$built_in_url"
           else
+            ticks=$((ticks + 1))
+            if [ "$warned" = "" ] && [ $((ticks % 40)) -eq 0 ]; then
+              if ${pkgs.curl}/bin/curl --fail --silent --max-time 2 "$built_in_url" &> /dev/null; then
+                warned=1
+                echo "stalwart-provision: a non-Stalwart HTTP service answers on $built_in_url - refusing to apply the plan through it, still waiting for $cfg_url" >&2
+              fi
+            fi
             sleep 0.25
           fi
         done

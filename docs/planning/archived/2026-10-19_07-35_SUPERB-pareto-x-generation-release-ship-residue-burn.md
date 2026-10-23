@@ -4,9 +4,15 @@
      2026-10-18/19 status reports (02-16, 02-35, 03-59, 04-43, 05-18,
      05-56, 06-05, 07-18). Every open TODO_LIST row maps to exactly one
      X-task (appendix A proves coverage). Supersedes the task routing of
-     the P/V/W plans (their executed tasks live in CHANGELOG). -->
+     the P/V/W plans (their executed tasks live in CHANGELOG).
+     ARCHIVED 2026-10-23: superseded by the Y-generation plan; per-task
+     dispositions in Appendix R at the bottom of this file. -->
 
 # X-generation: release ship + residue burn (Pareto plan)
+
+> **STATUS: ARCHIVED 2026-10-23 - SUPERSEDED by the Y-generation plan
+> (`2026-10-23_11-49_SUPERB-pareto-y-generation-release-train-owner-gates-full-backlog.md`,
+> same directory). Appendix R carries the disposition for every X task.**
 
 ## 0. State of the world (verified 2026-10-19 07:35 CEST)
 
@@ -302,3 +308,34 @@ by any session (respecting the their-repo and wait-for notes).
 | Migration tooling compare (D1)                   | X19    |
 | Secrets rotation (D1)                            | X19    |
 | Resend smoke + C18 + C19 + C22 + qcow2 + sitting | X20    |
+
+---
+
+## Appendix R — Resolution (2026-10-23 archive pass)
+
+ARCHIVED - superseded by the Y-generation plan (its Appendix C proves every
+open TODO row maps to exactly one Y task). Every row below was re-read
+against the tree; DONE means the artifact exists and was verified today.
+
+| Task | Disposition                                                                                                   | Home / evidence                                                    |
+| ---- | ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| X1   | ROUTED - owner sitting #1                                                                                     | Y O1-O3                                                            |
+| X2   | SPLIT - 0.16.22→0.16.26 delta table DONE in README; CHANGELOG date/link pass remains                          | README "Stalwart 0.16.22 -> 0.16.26 delta"; Y A1                   |
+| X3   | ROUTED - cut v0.5.0                                                                                           | Y A1-A5 (gated C43)                                                |
+| X4   | ROUTED - SystemNix pin advance                                                                                | Y C1-C4                                                            |
+| X5   | ROUTED - pbx flip + corridor tail                                                                             | Y B1-B3 (owner blessing)                                           |
+| X6   | ROUTED - wrapper option-surface review                                                                        | Y G7                                                               |
+| X7   | ROUTED - CI python-lint doctrine                                                                              | Y D3                                                               |
+| X8   | ROUTED - e2e stability batch                                                                                  | Y E1-E4                                                            |
+| X9   | DONE - local lockstep check + CI inventory twin + glow count attribution (buildflow-emitted)                  | `tests/`, `scripts/check-inventory.sh`, `.github/workflows/ci.yml` |
+| X10  | ROUTED - docs truth sweep                                                                                     | Y F6, F7, G7                                                       |
+| X11  | DONE - probe/script ruff debt cleared (carddav probe, bench, e2e runner); gen-repair-spec.py no longer exists | `ruff check docs/probes scripts` clean                             |
+| X12  | SPLIT - #552103 comment FILED 2026-10-19; dnsmasq + T13b routed                                               | Y F3, F4; `docs/drafts/552103-evidence-comment.md`                 |
+| X13  | ROUTED - BuildFlow upstream batch                                                                             | Y G1-G2                                                            |
+| X14  | DONE - local-noise skip set + rationales                                                                      | `.buildflow.yml`                                                   |
+| X15  | ROUTED - TLS-node coverage                                                                                    | Y E6                                                               |
+| X16  | DONE - VM debug-driver mechanized                                                                             | `scripts/vm-debug.sh`                                              |
+| X17  | ROUTED - apply-log fault-injection proof                                                                      | Y G7                                                               |
+| X18  | ROUTED - SystemNix CI debt                                                                                    | Y G3                                                               |
+| X19  | ROUTED - D1-unlock prep slice                                                                                 | Y C7                                                               |
+| X20  | ROUTED - owner sitting #2 + policy application                                                                | Y O2-O3                                                            |

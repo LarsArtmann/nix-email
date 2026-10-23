@@ -20,3 +20,20 @@ archive banner added, check-rows green, dprint-formatted BEFORE the
 | 2026-10-05_08-01_SUPERB-pareto-backlog-burn-plan           | ARCHIVE        | SUPERSEDED banner (2026-10-05) updated: T13 completed upstream (15ea141d2), archive note added; 15/23 tasks executed per the 10-29 report |
 
 Decision-batch references to these plans point at their archived paths.
+
+## Manifest — 2026-10-23 planning-plans corridor (5 files)
+
+The P/V/W/X chain plus the 10-16 ancestor. Every task is closed or canonically
+routed: each file carries an `## Appendix R — Resolution` table whose rows
+point at a DONE artifact (with its path) or at a Y-generation task / living
+doc. The Y plan's Appendix C proves full TODO coverage, which is what makes
+the routed-bar policy satisfiable for four generations at once. dprint ran
+BEFORE the `git mv`.
+
+| File (date prefix)                                                       | Classification | Deciding reason                                                                                                               |
+| ------------------------------------------------------------------------ | -------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| 2026-10-16_07-18_SUPERB-pareto-backlog-burn-plan                         | ARCHIVE        | N-generation ancestor; Appendix R maps N1-N27 (5 DONE with artifacts, rest routed to Y/decision-batch)                        |
+| 2026-10-17_04-18_SUPERB-pareto-backlog-burn-plan-p-gen                   | ARCHIVE        | P-generation; 1:1 chain mapping already in its banner, Appendix R records the terminal hand-off to Y                          |
+| 2026-10-18_22-20_SUPERB-pareto-v-generation-backlog-burn                 | ARCHIVE        | Per-task dispositions already written by W15.1 (2026-10-19); Appendix R records the archive verdict                           |
+| 2026-10-19_02-34_SUPERB-pareto-w-generation-migration-fix-release-unlock | ARCHIVE        | Appendix R reads all 19 rows: 5 DONE (migration e2e, gate, dmarc-eval pins, guard tooling, docs corridor), rest split/routed  |
+| 2026-10-19_07-35_SUPERB-pareto-x-generation-release-ship-residue-burn    | ARCHIVE        | Appendix R reads all 20 rows: 5 DONE (delta table, local guards, ruff debt, skip set, vm-debug.sh), rest routed to the Y plan |

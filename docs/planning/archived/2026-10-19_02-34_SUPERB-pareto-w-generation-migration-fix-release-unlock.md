@@ -1,10 +1,11 @@
 # SUPERB Pareto Backlog-Burn Plan — nix-email, 2026-10-19 (W-generation)
 
-> **STATUS: ACTIVE PLAN (2026-10-19 02:34 CEST).** Point-in-time snapshot
+> **STATUS: ARCHIVED 2026-10-23 - SUPERSEDED by the X then Y generation.**
+> Point-in-time snapshot
 > over the TODO_LIST state (living doc; truth-up executed this session:
 > 7 completed rows deleted, 5 rows advanced to IN_PROGRESS with evidence).
-> Living truth stays in `TODO_LIST.md`; this plan feeds docs-health
-> HARVEST/ANNOTATE later. Customer = Lars (owner), SystemNix (the one
+> Living truth stays in `TODO_LIST.md`; per-task dispositions are in
+> Appendix R below. Customer = Lars (owner), SystemNix (the one
 > consumer), future agent sessions.
 >
 > Format note: `.md` with mermaid per the user's explicit instruction (the
@@ -438,3 +439,34 @@ Watch/backlog lanes (R28-R31) sit outside the graph by design.
   ANNOTATE, never rewrite).
 - This plan's own commit + push carries the TODO truth-up, the CHANGELOG
   additions, and the 02-16 status report.
+
+---
+
+## Appendix R — Resolution (2026-10-23 archive pass)
+
+ARCHIVED. Superseded through X → Y; the Y plan's Appendix C proves every open
+TODO row maps to exactly one Y task, and every executed item below has a
+transcript or gate log behind it. This was the first pass to READ all 19 rows
+rather than trust the banner.
+
+| Task | Disposition                                                                                                                 | Home / evidence                                                     |
+| ---- | --------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| W1   | DONE - migration path repaired; `stalwart-migrate-e2e` GREEN 9/9                                                            | registered check; Y §0                                              |
+| W2   | DONE - full gate GREEN (11-check set); CI green end-to-end (run 39864876276, 2026-10-22)                                    | CI + Y §0                                                           |
+| W3   | ROUTED - owner sitting #1                                                                                                   | Y O1-O3                                                             |
+| W4   | ROUTED - cut v0.5.0, gated on C43                                                                                           | Y A1-A5                                                             |
+| W5   | ROUTED - SystemNix pin advance                                                                                              | Y C1-C4                                                             |
+| W6   | SPLIT - dkim-survival, restart-persistence, JMAP push all GREEN; bounce-path/runtime-trim/flood/ping remain                 | Y E1-E4                                                             |
+| W7   | ROUTED - monitoring/TELEMETRY residue                                                                                       | Y F7 (TELEMETRY), G7 (monitoring)                                   |
+| W8   | ROUTED - owner sitting #2                                                                                                   | Y O2                                                                |
+| W9   | DONE - dmarc-eval pins DynamicUser/SystemCallFilter/RestrictAddressFamilies with loud negative assertions                   | `tests/dmarc-eval.nix:76-112`                                       |
+| W10  | SPLIT - host-parse script + debug driver shipped; TLS-node breadth routed                                                   | Y E6, G7                                                            |
+| W11  | DONE - pipes argless+indented fences, list-marker lint, drift alarm, inventory CI twin, lockstep check                      | `scripts/`, `.github/workflows/ci.yml`                              |
+| W12  | SPLIT - #552103 evidence comment FILED 2026-10-19; dnsmasq note and T13b routed                                             | Y F3, F4; `docs/drafts/552103-evidence-comment.md`                  |
+| W13  | ROUTED - BuildFlow upstream batch                                                                                           | Y G1-G2                                                             |
+| W14  | ROUTED - provision-vs-resolv.conf verdict (no transcript yet)                                                               | Y G7                                                                |
+| W15  | DONE - docs-health corridor closed 2026-10-23 (13 annotated, 575 verdicts, 11 archived)                                     | `docs/status/archived/README.md`                                    |
+| W16  | ROUTED - SystemNix CI debt                                                                                                  | Y G3                                                                |
+| W17  | ROUTED - D1 enablement slice                                                                                                | Y C7                                                                |
+| W18  | SPLIT - pinned statix in pre-push + refactor-identity script DONE; apply-log fault injection and external-link sweep routed | `.githooks/pre-push`, `scripts/check-refactor-identity.sh`, Y F6/F7 |
+| W19  | ROUTED - standing upstream watch                                                                                            | Y F5                                                                |

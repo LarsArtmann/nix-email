@@ -1,10 +1,10 @@
 # Decision Batch — every open call, one page
 
-| Field         | Value                                                                                                                                       |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| Date          | 2026-09-22 (execution session)                                                                                                              |
-| Purpose       | Unblock the 19 decision-gated todos (Pareto plan M2; plan file `archived/2026-09-22_19-23_pareto-master-plan-super-email-monitoring.md` §1) |
-| How to answer | Reply with the decision IDs (`D1: retire`, `C24: discord`, ...). Defaults marked **[rec]** execute on your go.                              |
+| Field         | Value                                                                                                                                                                                                                                   |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Date          | 2026-09-22 (execution session)                                                                                                                                                                                                          |
+| Purpose       | Unblock the 19 decision-gated todos (Pareto plan M2; plan file `archived/2026-09-22_19-23_pareto-master-plan-super-email-monitoring.md` §1)                                                                                             |
+| How to answer | Reply with the decision IDs (`D1: retire`, `C24: discord`, ...). Defaults marked **[rec]** execute on your go.                                                                                                                          |
 | Sitting sheet | 2026-10-23: the one-page verdict sheet for the Y-generation sitting is `2026-10-23_11-56_owner-sitting-ratification-verdict-sheet.md` (same directory). It re-reads every open entry below against the current tree; answer from there. |
 
 **Fresh-read verdict 2026-10-23 (Y-plan O1):** every `[rec]` below was
