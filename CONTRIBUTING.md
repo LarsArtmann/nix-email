@@ -88,11 +88,9 @@ more reliable than the driver for ad-hoc runs. Probe LAYERED: guest service
 -> guest loopback -> HOST port; "connects but never answers" behind a port
 forward is a FIREWALL signature (ledger (k)).
 
-VM-test debug loop: realize the driver from the e2e closure's references
-(binary at `<output>/bin/nixos-test-driver`; `--test-script /tmp/debug.py`;
-`-o` needs an EXISTING dir). Driver python runs on the HOST - VM-port work
-must be packaged scripts or `machine.succeed`, never host socket code. Keep
-a GC root (`nix build -o /tmp/root .#checks...stalwart-e2e`). Rules:
+VM-test debug loop rules (the driver dance itself is MECHANIZED below):
+driver python runs on the HOST - VM-port work must be packaged scripts or
+`machine.succeed`, never host socket code.
 
 The dance is MECHANIZED: `scripts/vm-debug.sh [check] [test-script]` builds
 the GC root, extracts the per-test driver from the check derivation's
@@ -106,6 +104,8 @@ unit scripts (`command not found`, looping into the start timeout and
 failing the unit itself); use absolute `${pkgs.X}/bin/tool` store paths in
 any unit script a test defines.
 
+Rules:
+
 (a) long `machine.execute` payloads die silently (status -1/28) - capture via
 `succeed("... > /tmp/f.log 2>&1")` and `cat` the file.
 
@@ -116,7 +116,10 @@ manual RE-run's try-restart races the probe (535 on VALID creds). Wait for
 (c) journal greps must quote concrete phrases (bare `over` matches every
 "Consumed ... over Ns" line).
 
-(d) BrokenPipeError driver death = rerun.
+(d) BrokenPipeError driver death = rerun. (e) FINGERPRINT BEFORE THEORY on
+served-vs-pinned mismatches: dump the actual served cert/state with one
+vm-debug probe before any hypothesis work - the bind-e2e cert time bomb
+burned ~7 runs before a 1-minute fingerprint named the rcgen fallback.
 
 0.16-upgrade loop: (a) PROBE BEFORE RERUN - boot the FIFO console before
 rerunning a failed VM test; (b) NEVER trust a sibling report's "green" - read
