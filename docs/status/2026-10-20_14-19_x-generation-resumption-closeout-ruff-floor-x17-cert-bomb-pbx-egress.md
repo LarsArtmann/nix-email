@@ -94,7 +94,7 @@ Idle since 10:48. All claims transcript-pinned below.
 
 ## c) NOT STARTED (unchanged from the parent report)
 
-X1-C43 release chain (X2/X3/X4), X8.1-X8.5, X15, X11.3, X12 filings,
+X1-C43 release chain (X2/X3/X4), X8.1-X8.5, X15, X11.3, X12 filings, **→ TODO_LIST v0.5.0 + SystemNix pin rows + decision-batch (owner-gated)**
 X13 (wait-for BuildFlow session; the installed binary ef32fa0 is
 already stale vs their HEAD 9e3ccb0 - doctor warned on every run
 today), X18, X19, X20.

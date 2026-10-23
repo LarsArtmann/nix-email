@@ -216,6 +216,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- Docs-health full-corridor pass (2026-10-23): the whole 2026-10-17 ->
+  2026-10-20 status-report corridor (13 reports) verified against code and
+  annotated inline (575 verdicts via annotate.go repair + the identical
+  grammar for the plain-bullet lines; check-rows green per file before AND
+  after the dprint pass) - the 11 fully-resolved reports are ARCHIVED
+  (manifest in `docs/status/archived/README.md`, specs preserved
+  alongside); the 12-17 X-generation parent and the 10-20 closeout stay
+  live owning the owner-gated pbx work. Living docs truth-up: TODO_LIST
+  sweep banner re-dated + 5 new Low rows (bash -n lint, probe-lint
+  doctrine, buildflow step-timeout, migrate-e2e no-backup-dir flow,
+  webmail dist) + the pbx/watch/C45 rows refreshed to the runs-15/16
+  verdict; FEATURES refreshed 5 stale rows (demo VM 0.16 smoke done ->
+  FULLY_FUNCTIONAL, stalwart-e2e 19/19, 11-check gate + origin run
+  39864876276, CI ruff step, devShell pins); ROADMAP closed the
+  option-surface idea (X6) and added the DOMAIN_LANGUAGE.md idea;
+  THREAT_MODEL gained the OIDC reload-validation egress bullet;
+  MONITORING row 15 gained the `validationFailed` signature;
+  CONTRIBUTING lost the dead `<output>/bin/nixos-test-driver` half-recipe
+  and gained the fingerprint-before-theory rule; the five CardDAV probe
+  scripts got their exec bit back (EXE001 class). This entry and the two
+  2026-10-19 backfill entries above (devShell pins, common.nix dedup) are
+  part of the same pass.
 - VM-test debug loop restructured into CONTRIBUTING + devShell tool pins
   (2026-10-19): the VM debug loops and 0.16-upgrade loop rules moved from
   AGENTS.md (451 -> 220 lines across the two diet passes, at the BuildFlow

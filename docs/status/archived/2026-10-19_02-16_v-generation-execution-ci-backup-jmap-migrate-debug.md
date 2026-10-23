@@ -152,82 +152,84 @@
 ## b) PARTIALLY DONE
 
 ~~1. **V8 migrate-e2e two-node redesign — WRITTEN, REGISTERED, 6/7 of the~~ done — fixed + green 9/9 next day (W1, runs 6-10; three stacked root causes)
-   way, ONE REAL PRODUCT BUG OPEN.** Design: mig015 (0.15.5 raw module)
-   seeds domain+principal via the REST API; the store travels as a TAR
-   through the framework's writable `/tmp/shared` virtfs dir; mig016
-   (consumer shape, httpBind 8082) swaps its store, trips the guard,
-   simulates poison, runs `--backup-dir` migration, re-applies
-   provision, asserts the 0.15 password authenticates on 0.16 + restart
-   persistence. Registered in all THREE guard sites. Debug arc (each
-   run ~5-7 min, diagnosis from transcripts):
-   - run 1: custom virtfs share was read-only → framework's `/tmp/shared`;
-   - run 2: `cp -a` over virtfs fails chown → tar relay both ways;
-   - run 3: `wait_for_unit` races a completed oneshot ("inactive") →
-     house pattern (stalwart.service + port + `Result=success`);
-   - run 4: nested-double-quote python syntax error → single-quoted
-     strings;
-   - run 5: post-migration provision TIMEOUT — the test's 0.15 node had
-     ONLY the 18098 api listener, so the converted store bound no 8080
-     and provision's probe (cfg.url, then built-in 8080) could never
-     reach the server → 0.15 node made REALISTIC (webadmin listener on
-     8080 added; README caveat written for exotic-bind hosts);
-   - run 6: **subtests 1-6 ALL PASS (phase A, handoff, baseline,
-     guard-refusal, poison-refusal, --backup-dir migration, marker) —
-     then the post-migration NORMAL boot PANICS exit-101 "Migration
-     aborted: Upgrading to version 0.16 is a multi-step process"**.
-     The script's recovery-mode apply ran clean (`Done: 0 destroyed, 4
+way, ONE REAL PRODUCT BUG OPEN.** Design: mig015 (0.15.5 raw module)
+seeds domain+principal via the REST API; the store travels as a TAR
+through the framework's writable `/tmp/shared` virtfs dir; mig016
+(consumer shape, httpBind 8082) swaps its store, trips the guard,
+simulates poison, runs `--backup-dir` migration, re-applies
+provision, asserts the 0.15 password authenticates on 0.16 + restart
+persistence. Registered in all THREE guard sites. Debug arc (each
+run ~5-7 min, diagnosis from transcripts):
+
+- run 1: custom virtfs share was read-only → framework's `/tmp/shared`;
+- run 2: `cp -a` over virtfs fails chown → tar relay both ways;
+- run 3: `wait_for_unit` races a completed oneshot ("inactive") →
+  house pattern (stalwart.service + port + `Result=success`);
+- run 4: nested-double-quote python syntax error → single-quoted
+  strings;
+- run 5: post-migration provision TIMEOUT — the test's 0.15 node had
+  ONLY the 18098 api listener, so the converted store bound no 8080
+  and provision's probe (cfg.url, then built-in 8080) could never
+  reach the server → 0.15 node made REALISTIC (webadmin listener on
+  8080 added; README caveat written for exotic-bind hosts);
+- run 6: **subtests 1-6 ALL PASS (phase A, handoff, baseline,
+  guard-refusal, poison-refusal, --backup-dir migration, marker) —
+  then the post-migration NORMAL boot PANICS exit-101 "Migration
+  aborted: Upgrading to version 0.16 is a multi-step process"**.
+  The script's recovery-mode apply ran clean (`Done: 0 destroyed, 4
      updated, 2 created (0 failed)`) but did NOT complete the binary's
-     store migration on the LIVE store. Upstream `UPGRADING/v0_16.md`
-     fetched in full: recovery mode itself is supposed to detect old
-     data, wipe incompatible subspaces, and come up on 8080. Prime
-     suspect: convert's `config.json` datastore path (which store did
-     recovery actually wipe?) or the poisoned-settings interaction.
-     Run 7 (instrumented: dump `migration-v016/config.json` +
-     `recovery.log` + dir listings) was killed by an interrupted tool
-     call — it never executed (0-byte log).
+  store migration on the LIVE store. Upstream `UPGRADING/v0_16.md`
+  fetched in full: recovery mode itself is supposed to detect old
+  data, wipe incompatible subspaces, and come up on 8080. Prime
+  suspect: convert's `config.json` datastore path (which store did
+  recovery actually wipe?) or the poisoned-settings interaction.
+  Run 7 (instrumented: dump `migration-v016/config.json` +
+  `recovery.log` + dir listings) was killed by an interrupted tool
+  call — it never executed (0-byte log).
+
 2. **V16 flood/bounce/polish — not started**; the stalwart-e2e file now **→ TODO_LIST rows (bounce-path, runtime trim, ping probe; flood watch)**
    carries the untested dkim-survival subtest.
-~~3. **V12 MONITORING — blocked on a fresh metrics dump**: the demo has~~ done — W7 landed 2026-10-19 (37-series inventory + NO-GAUGE verdict)
+   ~~3. **V12 MONITORING — blocked on a fresh metrics dump**: the demo has~~ done — W7 landed 2026-10-19 (37-series inventory + NO-GAUGE verdict)
    metrics off by design; the series names must come from the (final
    gate) stalwart-e2e log's `/metrics/prometheus` dump (the subtest
    prints it for exactly this purpose). The queue-depth row is
    0.15.5-era ("no gauge") and needs the 0.16 answer.
-~~4. **V10 remainder**: gate-log "running N flake checks" 4-vs-7~~ done — count line attributed buildflow-emitted (2026-10-19); lockstep landed (X9)
+   ~~4. **V10 remainder**: gate-log "running N flake checks" 4-vs-7~~ done — count line attributed buildflow-emitted (2026-10-19); lockstep landed (X9)
    reconciliation not done; lockstep guard exists (check-inventory hook,
    extended via the new registrations).
-5. **V23 BuildFlow noise**: binary rebuild still deliberately blocked **→ TODO_LIST BuildFlow row (rebuild + count gaps)**
+3. **V23 BuildFlow noise**: binary rebuild still deliberately blocked **→ TODO_LIST BuildFlow row (rebuild + count gaps)**
    (concurrent session owns that checkout); count-gap reproduction was
    session-1 work; no issues filed in their repo yet this session.
-~~6. **TODO_LIST harvest**: partially done inline (rows closed/deleted as~~ done (docs-health pass 2026-10-23)
+   ~~6. **TODO_LIST harvest**: partially done inline (rows closed/deleted as~~ done (docs-health pass 2026-10-23)
    work completed: backup story, EXE001, CI python-lint, 19-23 moot,
    content-diff; new rows added: module-level DNS race). A final
    end-of-session harvest pass is still owed.
 
 ## c) NOT STARTED
 
-- **V4** release prep (CHANGELOG date/link pass, gates-green proof on
+- **V4** release prep (CHANGELOG date/link pass, gates-green proof on **→ TODO_LIST v0.5.0 row (C43-gated)**
   the release tree, scratch-tag dry-run; the REAL tag stays C43-gated).
-- **V5** SystemNix pin advance (needs v0.5.0).
-- **V17** dmarc-eval hardening + IFD cleanup.
-- **V20** guard-tooling batch (pipes argless mode, prose-wrap lint,
+- **V5** SystemNix pin advance (needs v0.5.0). **→ TODO_LIST (blocked on v0.5.0)**
+  ~~- **V17** dmarc-eval hardening + IFD cleanup.~~ done — W9 (drop-detectors + negative self-test + IFD cleanup, 2026-10-19)
+  ~~- **V20** guard-tooling batch (pipes argless mode, prose-wrap lint,~~ done — W11 (list-marker lint, drift alarm, README completeness, nix-health, pre-push parity)
   check-set drift alarm, demo ports single-source, check-inventory CI
   twin, nix bisect helper).
-- **V22** upstream evidence filings (#552103 comment, dnsmasq note,
+  ~~- **V22** upstream evidence filings (#552103 comment, dnsmasq note,~~ done — #552103 comment filed (W12.2, 6258512488); dnsmasq + T13b routed to the TODO filings row
   dprint T13b).
-- **V24** SystemNix CI debt (their repo).
-- **V25 remainder**: convert-smoke fixture for migrate_v016.py (0.15
+- **V24** SystemNix CI debt (their repo). **→ TODO_LIST SystemNix CI-debt row**
+- **V25 remainder**: convert-smoke fixture for migrate_v016.py (0.15 **→ convert-smoke/debug-driver/apps.vm/fixture-dedup done (W10, X16); TLS-node open (TODO row)**
   dump fixture → convert → plan diff), TLS-node coverage, debug-driver
   script pin, apps.vm store-closure eval guard, fixture-dedup decision.
-- **V27** D1 enablement slice (owner-gated: secrets rotation, live
+- **V27** D1 enablement slice (owner-gated: secrets rotation, live **→ TODO_LIST D1-gated rows**
   dmarc poll, alert-channel encoding, canary skeleton).
-- **V1/V2 owner sittings** (all of C39-C46 + ratifications + D1/D2 +
+- **V1/V2 owner sittings** (all of C39-C46 + ratifications + D1/D2 + **→ decision-batch sittings (open)**
   Resend key + CI bandit/vulture scope doctrine) — untouched, still the
   top gates on the plan.
-- **The FULL GATE has not run since the check-set grew to 9** (demo-eval
+  ~~- **The FULL GATE has not run since the check-set grew to 9** (demo-eval~~ done — first full gate green 2026-10-19 (W2); set now 11 checks, origin green 2026-10-22
   ran green earlier; provision-plan-eval green; the edited stalwart-e2e
   and the new migrate-e2e are UNPROVEN as checks).
-- Final `nix flake check` + fmt + commit + push + CI watch.
-- 10-17 P-plan "superseded-by-V" annotation (docs-health sweep item).
+  ~~- Final `nix flake check` + fmt + commit + push + CI watch.~~ done — origin green chain through run 39864876276 (2026-10-22)
+  ~~- 10-17 P-plan "superseded-by-V" annotation (docs-health sweep item).~~ done — W15 annotated both plans with per-task dispositions
 
 ## d) TOTALLY FUCKED UP (honesty section)
 
@@ -285,74 +287,76 @@
 ## f) NEXT (ranked, up to 50)
 
 ~~1. Re-run the instrumented migrate-e2e (run 7) DETACHED; read~~ done — W1 runs 6-10: fixed and green 9/9 (2026-10-19)
-   `migration-v016/config.json` + `recovery.log`.
+`migration-v016/config.json` + `recovery.log`.
 ~~2. Root-cause the run-6 panic (which store did recovery wipe?); fix~~ done — three stacked causes transcript-pinned + fixed (W1)
-   `stalwart-migrate-from-015` (likely: config.json store path or the
-   poisoned-store wipe interaction); re-run to green.
+`stalwart-migrate-from-015` (likely: config.json store path or the
+poisoned-store wipe interaction); re-run to green.
 ~~3. Full gate `nix flake check` (9 checks) — first run with~~ done — W2 first full gate green (2026-10-19)
-   provision-plan-eval + migrate-e2e + the edited stalwart-e2e.
+provision-plan-eval + migrate-e2e + the edited stalwart-e2e.
 ~~4. Triage any red by step name; fix; re-gate.~~ done — W2 statix red root-caused + fixed with CI's exact pin
 ~~5. Push; watch CI green (`gh run watch`, --log-failed triage).~~ done — green chain through run 39864876276 (2026-10-22)
 ~~6. Harvest the gate log's `/metrics/prometheus` dump → 0.16 series~~ done — W7 37-series inventory (MONITORING 5.5)
-   names (V12.1).
+names (V12.1).
 ~~7. Write the MONITORING queue-depth rule from those series (or record~~ done — W7 NO-GAUGE verdict + counter-divergence proxy
-   the 0.16 no-gauge verdict if still absent) + provision-failure alert
-   - 60 s verify-budget note (V12).
-~~8. TELEMETRY.md key spot-check vs 0.16.22 binary (V12.5).~~ done — W7 0.16.22 spot-check banner
-~~9. Dry-run `nix run .#host-parse-fixture <fixture> --check~~ done — W10 end-to-end dry-run (-- separator nuance recorded)
+the 0.16 no-gauge verdict if still absent) + provision-failure alert
+
+- 60 s verify-budget note (V12).
+  ~~8. TELEMETRY.md key spot-check vs 0.16.22 binary (V12.5).~~ done — W7 0.16.22 spot-check banner
+  ~~9. Dry-run `nix run .#host-parse-fixture <fixture> --check~~ done — W10 end-to-end dry-run (-- separator nuance recorded)
    parsedmarc-e2e` (V25.3 verification).
-~~10. `nix run .#vm` smoke after the disk-wrapper change (boot + one probe~~ done — W10.5 re-smoke 2026-10-19 (HTTP 200)
-    - confirm ~/.cache disk).
+  ~~10. `nix run .#vm` smoke after the disk-wrapper change (boot + one probe~~ done — W10.5 re-smoke 2026-10-19 (HTTP 200)
+  - confirm ~/.cache disk).
+
 11. V4.1 CHANGELOG `[Unreleased]` date/link pass. **→ TODO_LIST v0.5.0 row (Unreleased date/link pass)**
 12. V4.3 scratch-tag dry-run of the CONTRIBUTING release procedure. **→ TODO_LIST v0.5.0 row (C43-gated)**
 13. V16.1 flood subtest transcript check (pre-wait or relaxed bound). **→ TODO_LIST flood watch row**
 14. V16.2 relay bounce-path via Mailpit/queue state (never the journal). **→ TODO_LIST row**
 15. V16.3 e2e runtime trim investigation (35 s TTL + 75 s reports). **→ TODO_LIST row**
-~~16. V16.4 restart-persistence: provision must NOT re-run after~~ done — W6: provision NOT re-run pinned across restart
+    ~~16. V16.4 restart-persistence: provision must NOT re-run after~~ done — W6: provision NOT re-run pinned across restart
     `systemctl restart`.
-~~17. V17.1 dmarc-eval unit-hardening eval pin (lines ~568/584/589).~~ done — W9 drop-detectors
-~~18. V17.2 negative test: flip one key, eval must fail loudly.~~ done — W9 build-time negative self-test
-~~19. V17.3 IFD cleanup: build-time grep instead of `builtins.readFile`.~~ done — W9 build-time greps
-~~20. V20.1 check-md-table-pipes.sh argless mode + indented fences.~~ done — W11
-~~21. V20.2 prose-wrap list-marker lint (awk word-boundary rule).~~ done — W11 (empirically scoped against dprint)
-~~22. V20.3 check-set drift alarm lint (names/counts restated = fail).~~ done — W11
-~~23. V20.4 demo ports/credentials single-source audit.~~ done — README quickstart + banner own them (07-18 AGENTS restructure points there)
-~~24. V20.5 check-inventory CI twin evaluation + decision.~~ done — decided: pre-push mirror + CI README-completeness + lockstep (W11/X9)
-~~25. V20.6 nix health-check bisect helper into the devShell.~~ done — nix-health in the devShell (W11)
-~~26. V20.7 CI wiring + one deliberate-failure proof each.~~ done — W11 self-tests on planted fixtures
-~~27. V22.1 verify-before-filing gates over each upstream claim.~~ done — passed for #552103 (W12.2)
-~~28. V22.2 nixpkgs #552103 evidence comment (ExecStartPost-restart +~~ done — filed 2026-10-19 (comment 6258512488)
+    ~~17. V17.1 dmarc-eval unit-hardening eval pin (lines ~568/584/589).~~ done — W9 drop-detectors
+    ~~18. V17.2 negative test: flip one key, eval must fail loudly.~~ done — W9 build-time negative self-test
+    ~~19. V17.3 IFD cleanup: build-time grep instead of `builtins.readFile`.~~ done — W9 build-time greps
+    ~~20. V20.1 check-md-table-pipes.sh argless mode + indented fences.~~ done — W11
+    ~~21. V20.2 prose-wrap list-marker lint (awk word-boundary rule).~~ done — W11 (empirically scoped against dprint)
+    ~~22. V20.3 check-set drift alarm lint (names/counts restated = fail).~~ done — W11
+    ~~23. V20.4 demo ports/credentials single-source audit.~~ done — README quickstart + banner own them (07-18 AGENTS restructure points there)
+    ~~24. V20.5 check-inventory CI twin evaluation + decision.~~ done — decided: pre-push mirror + CI README-completeness + lockstep (W11/X9)
+    ~~25. V20.6 nix health-check bisect helper into the devShell.~~ done — nix-health in the devShell (W11)
+    ~~26. V20.7 CI wiring + one deliberate-failure proof each.~~ done — W11 self-tests on planted fixtures
+    ~~27. V22.1 verify-before-filing gates over each upstream claim.~~ done — passed for #552103 (W12.2)
+    ~~28. V22.2 nixpkgs #552103 evidence comment (ExecStartPost-restart +~~ done — filed 2026-10-19 (comment 6258512488)
     bootstrap-fallback transcripts — bind-e2e logs).
-29. V22.3 dnsmasq-forward upstream note (VM-test resolver rule). **→ TODO_LIST upstream-filings row**
-30. V22.4 dprint T13b filing (eaten-cells incident). **→ TODO_LIST upstream-filings row**
-~~31. V22.5 link filings into the upstream-watch TODO row.~~ done — watch row carries the filed comment + pending files (2026-10-23 update)
-32. V23.1 rebuild BuildFlow binary once the concurrent session lands; **→ TODO_LIST BuildFlow row**
+16. V22.3 dnsmasq-forward upstream note (VM-test resolver rule). **→ TODO_LIST upstream-filings row**
+17. V22.4 dprint T13b filing (eaten-cells incident). **→ TODO_LIST upstream-filings row**
+    ~~31. V22.5 link filings into the upstream-watch TODO row.~~ done — watch row carries the filed comment + pending files (2026-10-23 update)
+18. V23.1 rebuild BuildFlow binary once the concurrent session lands; **→ TODO_LIST BuildFlow row**
     `git log ef32fa0..HEAD` delta review.
-33. V23.2 reconcile nix-checker 12-vs-2 and bandit 54-vs-4 count gaps. **→ TODO_LIST BuildFlow row**
-34. V23.3 file the ruff findings-identity bug (`missing_file=55`). **→ TODO_LIST BuildFlow row**
-35. V23.4 detect-only-under-sibling-failure proposal to BuildFlow. **→ TODO_LIST BuildFlow row**
-~~36. V25.1 convert-smoke: 0.15 dump fixture → `migrate_v016.py convert`~~ done — migrate-convert-eval check (W10)
+19. V23.2 reconcile nix-checker 12-vs-2 and bandit 54-vs-4 count gaps. **→ TODO_LIST BuildFlow row**
+20. V23.3 file the ruff findings-identity bug (`missing_file=55`). **→ TODO_LIST BuildFlow row**
+21. V23.4 detect-only-under-sibling-failure proposal to BuildFlow. **→ TODO_LIST BuildFlow row**
+    ~~36. V25.1 convert-smoke: 0.15 dump fixture → `migrate_v016.py convert`~~ done — migrate-convert-eval check (W10)
     → plan diff (cheap, host-side).
-37. V25.2 TLS-node coverage for Netease + LinkedIn fixtures. **→ TODO_LIST row**
-~~38. V25.4 debug-driver recipe as a script (GC root + test-script dance).~~ done — scripts/vm-debug.sh (X16)
-~~39. V25.5 apps.vm store-closure eval guard.~~ done — resolved-as-redundant (W10)
-~~40. V25.6 fixture-dedup decision (shared tests/fixtures.nix).~~ done — decided AGAINST (W10)
-41. V24 SystemNix CI-debt assessment (their repo; Actions credential, **→ TODO_LIST SystemNix row**
+22. V25.2 TLS-node coverage for Netease + LinkedIn fixtures. **→ TODO_LIST row**
+    ~~38. V25.4 debug-driver recipe as a script (GC root + test-script dance).~~ done — scripts/vm-debug.sh (X16)
+    ~~39. V25.5 apps.vm store-closure eval guard.~~ done — resolved-as-redundant (W10)
+    ~~40. V25.6 fixture-dedup decision (shared tests/fixtures.nix).~~ done — decided AGAINST (W10)
+23. V24 SystemNix CI-debt assessment (their repo; Actions credential, **→ TODO_LIST SystemNix row**
     digest allowlist, pin flips, scheduled-vs-push divergence).
-~~42. V13 finish: trim AGENTS to <=220 OR record the C41 blessing ask.~~ done — 220/220 (07-18 pass); C41 moot
-~~43. TODO_LIST final harvest + this report's routing.~~ done (docs-health pass 2026-10-23)
-~~44. Annotate the 10-17 P-plan superseded-by-V (docs-health sweep).~~ done — W15 annotated both plans
-45. V1 owner sitting #1 (C43/C45/C44/C42/C39/C41/C46 + ratifications). **→ decision-batch (open)**
-46. V2 owner sitting #2 (policy batch, CI bandit/vulture scope, demo **→ decision-batch (open)**
+    ~~42. V13 finish: trim AGENTS to <=220 OR record the C41 blessing ask.~~ done — 220/220 (07-18 pass); C41 moot
+    ~~43. TODO_LIST final harvest + this report's routing.~~ done (docs-health pass 2026-10-23)
+    ~~44. Annotate the 10-17 P-plan superseded-by-V (docs-health sweep).~~ done — W15 annotated both plans
+24. V1 owner sitting #1 (C43/C45/C44/C42/C39/C41/C46 + ratifications). **→ decision-batch (open)**
+25. V2 owner sitting #2 (policy batch, CI bandit/vulture scope, demo **→ decision-batch (open)**
     g1/g2 + qcow2 verdict — note the qcow2 question is now MOOT via the
     disk fix, D1/D2 timeline, Resend key).
-47. V4 real: cut v0.5.0 (post-V1) → V5 SystemNix pin advance. **→ TODO_LIST v0.5.0 row**
-48. V27 D1 slice (post-D1): secrets rotation, live dmarc poll, **→ TODO_LIST D1-gated rows**
+26. V4 real: cut v0.5.0 (post-V1) → V5 SystemNix pin advance. **→ TODO_LIST v0.5.0 row**
+27. V27 D1 slice (post-D1): secrets rotation, live dmarc poll, **→ TODO_LIST D1-gated rows**
     vandelay-vs-imapsync compare, alert-channel encoding, canary
     skeleton.
-~~49. Session-end: drop /tmp/migrate-e2e-root GC root; trash /tmp probe~~ done (docs-health pass 2026-10-23)
+    ~~49. Session-end: drop /tmp/migrate-e2e-root GC root; trash /tmp probe~~ done (docs-health pass 2026-10-23)
     scripts (archived copies live in docs/probes/).
-~~50. Record the snapshot-vs-wrapper matchOn divergence as a ledger line~~ done — README ledger line (VM-proven 2026-10-18; X6 confirmed 2026-10-19)
+    ~~50. Record the snapshot-vs-wrapper matchOn divergence as a ledger line~~ done — README ledger line (VM-proven 2026-10-18; X6 confirmed 2026-10-19)
     during the next CONTRIBUTING ledger pass.
 
 ## g) QUESTIONS (cannot be figured out from the repo)
@@ -362,11 +366,11 @@
    cut; the plan gates the tag on V1 which is an owner sitting. (The
    migrate-e2e panic in b/1 is arguably also a hold signal until the
    migration path is actually bootable.)
-~~2. **b/1 direction**: fix-forward the `stalwart-migrate-from-015` bug~~ done — answered by W1: fixed-forward, green 9/9 same day
+   ~~2. **b/1 direction**: fix-forward the `stalwart-migrate-from-015` bug~~ done — answered by W1: fixed-forward, green 9/9 same day
    tonight (root-cause via the run-7 artifacts, patch the script, run to
    green) — or park the registered check red-in-principle with the
    diagnosis written up and prioritize the remaining V-tasks instead?
-~~3. **V13/C41**: is the 229-line AGENTS.md acceptable (bless a repo-local~~ done — 220/220 reached (07-18 pass); C41 moot
+   ~~3. **V13/C41**: is the 229-line AGENTS.md acceptable (bless a repo-local~~ done — 220/220 reached (07-18 pass); C41 moot
    cap of ~230), or do you want the hard 220 trim enforced before this
    row closes?
 

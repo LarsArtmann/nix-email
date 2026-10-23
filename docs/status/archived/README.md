@@ -103,3 +103,39 @@ decision-batch (C38/C41 addenda, new C52/C53), and ROADMAP.
 | 2026-10-17_05-37_readme-agents-superb-pass…          | ARCHIVE        | 25 verdicts: accuracy work done-in-pass (05-37), structure calls routed (C52, C41 addendum), CI-watch + harvest done by this pass     |
 | 2026-10-17_06-05_agents-md-drift-fix-prune…          | ARCHIVE        | 25 verdicts: prune executed 06-05, duration claim fixed (CI-timed), tooling rows routed then executed by W11 (2026-10-19)             |
 | 2026-10-17_06-12_issue-4-bootstrap-fix-and-p3-close… | ARCHIVE        | 53 verdicts: f27 done (pbx gate on d7e1334), f28/f29/f32 done (AGENTS + grep), rest routed per P-numbers; g routed (C38/C52/C53)      |
+
+## Manifest — 2026-10-23 docs-health full-corridor pass (11 files)
+
+All ANNOTATE→ARCHIVE: 575 tool-applied verdicts (annotate.go repair) across
+the WHOLE 2026-10-17 → 2026-10-20 corridor (13 reports, 575 specs, zero
+skips; the 31 plain-bullet lines the tool's action-line grammar skips were
+applied with the identical `~~line~~ verdict` / `**→ verdict**` grammar).
+Specs preserved next to this manifest: `2026-10-23-pass-annotate-specs.tsv`.
+Sections a/d/e historical by policy; check-rows green per file before AND
+after the dprint pass; the `grep -L '~~'` completeness gate is silent over
+all 11 moved files. Two reports STAY LIVE by decision (they own open,
+owner-gated work): `docs/status/2026-10-19_12-17_x-generation…` (pbx flip)
+and `docs/status/2026-10-20_14-19_x-generation…closeout` (pbx blessing +
+cross-repo policy questions). Forward items route to TODO_LIST (5 new Low
+rows: bash -n lint, probe-lint doctrine, buildflow step-timeout,
+migrate-e2e no-backup-dir flow, webmail dist), the watch row (#563651
+follow-up pending file), ROADMAP (DOMAIN_LANGUAGE line added; the
+option-surface idea closed per X6), THREAT_MODEL (OIDC reload-validation
+egress bullet), MONITORING (row 15 validationFailed signature), FEATURES
+(5 refreshed rows), and CHANGELOG (devShell pins + common.nix dedup
+entries). Harvest ledger dispositions live in the specs TSV; the two kept
+live reports carry their own per-item arrows.
+
+| File (date prefix)                                 | Classification | Deciding reason                                                                                                                                                                                                                                    |
+| -------------------------------------------------- | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-10-17_03-34_stalwart-016-gate-green-quota…    | ARCHIVE        | the upgrade-session record is fully closed: 71 verdicts — b/c done by V/W/X generations (backup V6, delta table V15, INBOXCLEAN V18, lockstep X9), f-list done-or-routed (C43/C44/C45 owner gates → decision-batch), harvest = the 2026-10-17 pass |
+| 2026-10-18_09-49_buildflow-gate-recovery…          | ARCHIVE        | 53 verdicts: CI ruff floor shipped (bc24227), convert-smoke shipped (migrate-convert-eval), AGENTS 220/220, devShell pins landed; bandit/binary residues routed to the BuildFlow TODO row                                                          |
+| 2026-10-19_02-16_v-generation-execution…           | ARCHIVE        | 59 verdicts: migrate-e2e panic fixed (W1, 9/9), MONITORING landed (W7), guard tooling landed (W11), V17/V20/V22 done; V24/V25-TLS/V27/D1 routed to TODO rows                                                                                       |
+| 2026-10-19_02-35_stalwart-contacts-assessment…     | ARCHIVE        | 39 verdicts: probes landed (docs/probes/2026-10-19-carddav-demo-vm), crates-diff + knobs + benchmark addenda closed every [SRC] residue; AGENTS.md owns the pointer (ratified as the durable record); webmail-dist row harvested                   |
+| 2026-10-19_03-59_upstream-watch-recheck…           | ARCHIVE        | 50 verdicts: persistence proof lives in the README ledger + watch row; #563651 follow-up comment = the one pending file (owner go-ahead, watch row); port strategy rides runbook step 2                                                            |
+| 2026-10-19_04-43_w-generation-migration-fixed…     | ARCHIVE        | 5 verdicts: execution summary subsumed by the 05-18 companion; count-line noise root-caused (buildflow-emitted); c-list owner questions → decision-batch                                                                                           |
+| 2026-10-19_05-18_w-generation-status…self-review   | ARCHIVE        | 58 verdicts: W6/W12/W13 residues routed to TODO rows; four-sites superseded by X9 single-sourcing same day; premigrate assert shipped (test line 237); sd_notify note lives in the README delta table                                              |
+| 2026-10-19_05-56_nix-test-dedup-common-nix…        | ARCHIVE        | 27 verdicts: statix/deadnix/inventory green in every gate since; dprint pinned in devShell (07-18); CHANGELOG entry added this pass; flood posture + conditional extractions stay owner/conditional                                                |
+| 2026-10-19_06-05_resumed-thread-pbx-flip-row…      | ARCHIVE        | 3 verdicts: f27 verdict cell restored 2026-10-19 (stable per-cell form); working-tree foreign edits landed via daemon sweep; owner sittings → decision-batch                                                                                       |
+| 2026-10-19_07-18_buildflow-gate-repair…agents-trim | ARCHIVE        | 63 verdicts: the 4 foreign ruff findings fixed by X11 (2026-10-20); step-timeout + probe-lint doctrine harvested as TODO rows; CHANGELOG entries added this pass; f-table 20-50 were TODO-row pointers (verified current)                          |
+| 2026-10-20_10-25_x-generation-resumption…verdict   | ARCHIVE        | 9 verdicts: superseded in place by the same session's 14-19 closeout (bullets struck NOT-DO/subsumed; open items carry arrows to the closeout + TODO rows)                                                                                         |

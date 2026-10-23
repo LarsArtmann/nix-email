@@ -94,6 +94,7 @@ CHANGELOG, and the module header carry the full dialect.
 
 ## d) Known state
 
-- The gate count line ("running 7" vs 10) is documented noise; attrNames is truth.
+~~- The gate count line ("running 7" vs 10) is documented noise; attrNames is truth.~~ done — root-caused 2026-10-19: the line is buildflow-emitted (nix prints no aggregate count; BuildFlow-side residue in the TODO row)
+
 - Concurrent session active (upstream-watch docs); no file conflicts hit.
 - BuildFlow binary rebuild still blocked (their session owns the checkout).

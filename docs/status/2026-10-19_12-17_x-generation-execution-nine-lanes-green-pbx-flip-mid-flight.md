@@ -152,21 +152,21 @@ processes), and a pbx-artmann session was touching that repo's AGENTS.md
 
 ## 3. c) NOT STARTED
 
-- X1 (owner sitting) - the gate on everything release-shaped. X2/X3/X4
+- X1 (owner sitting) - the gate on everything release-shaped. X2/X3/X4 **→ decision-batch sittings (open); X2/X3/X4 = TODO_LIST v0.5.0 + SystemNix pin rows (C43/C45-gated)**
   (CHANGELOG release pass, v0.5.0 tag, SystemNix pin advance) - blocked
   on C43/C45 answers.
-- X7 (CI python-lint doctrine) - owner V2.3 blessing pending.
-- X8 (e2e stability batch), X15 (TLS-node coverage), X17 (apply-log
+- X7 (CI python-lint doctrine) - owner V2.3 blessing pending. **→ TODO_LIST CI python-lint row (owner blessing)**
+- X8 (e2e stability batch), X15 (TLS-node coverage), X17 (apply-log **→ X17 DONE (X17.1/17.2, 2026-10-20); X8/X15 remain (TODO rows); X11.3 ping (TODO row)**
   dump proof), X11.3/X11.4 (EventSource ping probe) - all heavy-VM or
   demo-VM work; deliberately skipped: the CardDAV session owned the
   demo VM all session and heavy builds serialize across repos (the OOM
   lesson). X17 becomes ~15 min now that scripts/vm-debug.sh exists.
-- X11.1/X11.2 (ruff debt) - wait-for-CardDAV stood all session (their
+  ~~- X11.1/X11.2 (ruff debt) - wait-for-CardDAV stood all session (their~~ done — fixed 2026-10-20 (40cfed4); CI green 2026-10-22
   commits at 08:02, 29 crush processes); still NOT edited cross-session.
-- X13 (BuildFlow upstream batch) - their binary is stale (ef32fa0 vs
+- X13 (BuildFlow upstream batch) - their binary is stale (ef32fa0 vs **→ TODO_LIST BuildFlow row**
   HEAD cf606f8, the binary-freshness WARN) and a concurrent session is
   committing to /home/lars/projects/BuildFlow - wait-for stands.
-- X18 (SystemNix CI debt), X19 (D1-unlock prep), X20 (owner sitting #2)
+- X18 (SystemNix CI debt), X19 (D1-unlock prep), X20 (owner sitting #2) **→ TODO rows + decision-batch (open)**
   - not started; X19 is D1-gated, X20 is owner time.
 
 ## 4. d) TOTALLY FUCKED UP (own it)
@@ -240,108 +240,108 @@ processes), and a pbx-artmann session was touching that repo's AGENTS.md
 ## 6. f) NEXT (ranked; up to 50, bounded)
 
 ~~1. pbx: add the route wait to the test forensics, run once, read the~~ done — run 15 executed it (route-wait landed; blocker moved to the OIDC egress impossibility)
-   transcript (the single highest-information run).
+transcript (the single highest-information run).
 ~~2. pbx: if DNS answers post-route -> expect green; if the fetch still~~ done — run 16 answered: impossible in driver VMs (no outbound at all)
-   fails, capture curl-vs-stalwart differential and decide.
+fails, capture curl-vs-stalwart differential and decide.
 3. pbx: if slirp DNS (10.0.2.3) is genuinely dead, decide doctrine: **→ TODO pbx row (hermetic override, owner blessing)**
-   live-IdP GET vs hermetic stub vs plan-level OidcDirectory skip in VM
-   (needs the owner answer - question 1 below).
+live-IdP GET vs hermetic stub vs plan-level OidcDirectory skip in VM
+(needs the owner answer - question 1 below).
 4. pbx: on green, run their FULL gate; watch for the legs (993/995 TLS **→ TODO pbx row (after the blessing)**
-   greeting, 8082 401, admin auth) - never run, never asserted.
+greeting, 8082 401, admin auth) - never run, never asserted.
 ~~5. pbx: update the test header (the "Zero external traffic" clause~~ done — their test header carries the verdict + hermetic spec (their daemon commits)
-   needs the OIDC-GET exemption wording if live-fetch is the doctrine).
+needs the OIDC-GET exemption wording if live-fetch is the doctrine).
 6. pbx: cross-link nix-email issue #4 (the flip closes its consumer **→ TODO pbx row (row updated 2026-10-23; CHANGELOG entry waits for green, per f/49)**
-   half); TODO row 52 in this repo -> executed, CHANGELOG here.
+half); TODO row 52 in this repo -> executed, CHANGELOG here.
 ~~7. nix-email: the daemon is 10 commits ahead of origin - the next push~~ done — pushed; run 39864876276 (2026-10-22) exercised the chain green end-to-end
-   exercises the NEW ci.yml lockstep/shape steps + the lockstep check
-   in CI for the first time; watch that run's STEP names.
+exercises the NEW ci.yml lockstep/shape steps + the lockstep check
+in CI for the first time; watch that run's STEP names.
 ~~8. nix-email: expect the CI ruff step to stay red on the CardDAV debt~~ done — fixed 2026-10-20 (X11); floor green since
-   until the owning session lands - do NOT weaken the step.
+until the owning session lands - do NOT weaken the step.
 ~~9. X11.1/X11.2 the moment the CardDAV session lands (4 tiny fixes).~~ done — fixed 2026-10-20 (40cfed4)
 ~~10. X17 via scripts/vm-debug.sh (fault-inject a failing apply, prove~~ done — 2026-10-20 (60e7916 + c430db4/28e5dd7)
-    the dump) - now cheap.
+the dump) - now cheap.
 11. X11.3 ping probe on the demo VM once the CardDAV session releases it. **→ TODO_LIST row**
 ~~12. X9.4 residue: the count-line attribution landed in TODO row 71 -~~ done — carried in the TODO BuildFlow row (attribution resolved 2026-10-19)
-    fold into the next BuildFlow session.
+fold into the next BuildFlow session.
 13. X12.2: reproduce the dnsmasq forward-vs-blackhole claim FIRST **→ TODO_LIST upstream-filings row**
-    (verify-before-filing), and re-test relay-e2e's forward with the
-    route-wait pattern before filing anything upstream.
+(verify-before-filing), and re-test relay-e2e's forward with the
+route-wait pattern before filing anything upstream.
 14. X12.3/X12.4: the T13b dprint pipe-cell filing + venue pick **→ TODO_LIST upstream-filings row**
-    (github-voice pass).
+(github-voice pass).
 ~~15. X12.5: #552103 evidence-comments (ExecStartPost-restart +~~ done — filed 2026-10-19 (comment 6258512488); more when the PR moves (watch row)
-    bootstrap-fallback transcripts) when it next moves.
+bootstrap-fallback transcripts) when it next moves.
 ~~16. X16 polish: CONTRIBUTING's stale driver half-recipe deletion.~~ done — deleted 2026-10-23 (docs-health pass)
 ~~17. X16 polish: teach vm-debug.sh to generate route-wait-aware starter~~ done — network-state dump in the starter (5edbae6, 2026-10-20)
-    scripts (this session's lesson, baked into the tool).
+scripts (this session's lesson, baked into the tool).
 18. X8.1/X8.2 relay bounce-path subtest (refusing smarthost, Mailpit **→ TODO_LIST row**
-    counters - never journal greps).
+counters - never journal greps).
 19. X8.3/X8.4 runtime-trim + test-profile TTL doctrine. **→ TODO_LIST row**
 20. X8.5 flood-flake capture-first protocol into the test header. **→ TODO_LIST flood row**
 21. X15 TLS-node fixture breadth (Netease + LinkedIn on the IMAPS **→ TODO_LIST row**
-    node).
+node).
 22. X10 residue: buildflow's lychee step private-repo policy once the **→ TODO_LIST BuildFlow row (added 2026-10-23; conditional on lychee exercising INBOXCLEAN.md)**
-    gate's lychee step actually exercises INBOXCLEAN.md.
+gate's lychee step actually exercises INBOXCLEAN.md.
 23. X13.1-X13.8 BuildFlow batch (count gaps, ruff identity parsing, **→ TODO_LIST BuildFlow row**
-    masking docs, threshold config) after the concurrent BuildFlow
-    session lands + binary rebuild.
+masking docs, threshold config) after the concurrent BuildFlow
+session lands + binary rebuild.
 24. X14 residue: re-run `buildflow -d` after the next BuildFlow binary **→ TODO_LIST BuildFlow row**
-    reinstall - the skip-unaware "interrogate not installed" preflight
-    WARN may vanish with a fresh binary.
+reinstall - the skip-unaware "interrogate not installed" preflight
+WARN may vanish with a fresh binary.
 ~~25. X6 residue: none (closed) - but the plan's option-surface audit~~ done — X6 closed 2026-10-19; ROADMAP line updated 2026-10-23
-    should be re-run after any wrapper option change; consider an eval
-    lint that pairs each option with a consumption site.
+should be re-run after any wrapper option change; consider an eval
+lint that pairs each option with a consumption site.
 26. X2 prep (pre-C43): the CHANGELOG link-resolution pass can be **→ TODO_LIST v0.5.0 row (Unreleased date/link pass)**
-    DRAFTED without the owner (X2.1) - links only.
+DRAFTED without the owner (X2.1) - links only.
 ~~27. X2 prep: the C45 0.16.22 -> 0.16.26 delta table research can be~~ done — WRITTEN (README ledger delta table, V15 2026-10-19)
-    DRAFTED (X2.2/X2.3) - the C45 verdict stays owner-gated.
+DRAFTED (X2.2/X2.3) - the C45 verdict stays owner-gated.
 28. X2.4/X2.5: scratch-tag dry-run of the release procedure - NOT **→ TODO_LIST v0.5.0 row (owner call)**
-    before C43 (a dry-run tag still touches the repo; owner call).
+before C43 (a dry-run tag still touches the repo; owner call).
 29. X7.1/X7.2: draft the bandit/vulture scope doctrine + deeper-ruleset **→ TODO_LIST CI python-lint row**
-    recommendation so the owner blessing is a 5-minute read.
+recommendation so the owner blessing is a 5-minute read.
 30. X18.2 digest-based canary allowlist research (their repo). **→ TODO_LIST SystemNix row**
 31. X18.4 scheduled-vs-push CI divergence explanation (their repo). **→ TODO_LIST SystemNix row**
 32. X19.1-X19.3: the three D1-unlock prep docs (secrets rotation, **→ TODO_LIST D1-gated rows**
-    vandelay-vs-imapsync compare plan, dmarc-live-poll checklist).
+vandelay-vs-imapsync compare plan, dmarc-live-poll checklist).
 33. X20.1: package owner sitting #2 into decision-batch (C18/C19/C22/ **→ decision-batch (open)**
-    C24/C29/C34/Q4/demo g1-g2/qcow2/D1-D2/Resend).
+C24/C29/C34/Q4/demo g1-g2/qcow2/D1-D2/Resend).
 ~~34. X1 prep: the owner sitting needs ONE fresh read of decision-batch -~~ **NOT-DO — sitting-prep nicety; decision-batch owns freshness.**
-    consider a "decisions expired" timestamp sweep before scheduling it.
+consider a "decisions expired" timestamp sweep before scheduling it.
 ~~35. Annotate/archive pass over the 2026-10-19 reports (02-16, 02-35,~~ done (docs-health pass 2026-10-23)
-    03-59, 04-43, 05-18, 05-56, 06-05, 07-18) once their items close;
-    03-34 stays live (queue owner).
+03-59, 04-43, 05-18, 05-56, 06-05, 07-18) once their items close;
+03-34 stays live (queue owner).
 36. This session's own report becomes an annotate candidate after the **→ stays live until the pbx saga closes (annotated this pass, archive deferred)**
-    X5 saga closes (item 4 above).
+X5 saga closes (item 4 above).
 ~~37. docs/probes/: the 14-run pbx forensics live only in build logs -~~ **NOT-DO — the /tmp logs are lost; the runs are superseded by the 10-20 impossibility verdict (test header + CONTRIBUTING carry the doctrine).**
-    if the egress saga yields doctrine, archive the decisive
-    transcripts under docs/probes/ like the quota-silence probe did.
+if the egress saga yields doctrine, archive the decisive
+transcripts under docs/probes/ like the quota-silence probe did.
 38. nix-email: consider an eval-time guard that pairs declared wrapper **→ idea parked (revisit on the next wrapper-option change)**
-    options with consumption (X6's audit mechanized - catches future
-    dead options at eval speed).
+options with consumption (X6's audit mechanized - catches future
+dead options at eval speed).
 39. nix-email: the relay-e2e dnsmasq comment fix (or forward fix) per **→ TODO_LIST upstream-filings row (transcript first)**
-    finding 3 above - small, transcript first.
+finding 3 above - small, transcript first.
 ~~40. nix-email: route-wait pattern documentation for late-DNS hosts~~ done — CONTRIBUTING VM debug loops (f) carries the driver-VM scope; the DnsResolver doctrine is in the README (W14)
-    alongside the DnsResolver doctrine (README ledger line).
+alongside the DnsResolver doctrine (README ledger line).
 41. BuildFlow skill note: writers.writePython3Bin flake8 trap (E-class **→ cross-repo docs ask (BuildFlow/crush-config references)**
-    with store-path interpolation) - one line in the right references.
+with store-path interpolation) - one line in the right references.
 42. SystemNix: contract-test fix preview for the v0.5.0 wrapper API **→ TODO_LIST SystemNix pin row**
-    (X4.3 prep - read-only, their repo, while waiting on C43).
+(X4.3 prep - read-only, their repo, while waiting on C43).
 ~~43. Roadmap: the reload-validation dependency belongs in THREAT_MODEL's~~ done — added 2026-10-23 (THREAT_MODEL 0.16 exposure delta)
-    "0.16 exposure delta" (an outbound fetch at reload time).
+"0.16 exposure delta" (an outbound fetch at reload time).
 ~~44. MONITORING: the provision-failure alert row (05-18 item 46) should~~ done — validationFailed signature added to row 15 (2026-10-23)
-    mention the new fetch-failure signature (validationFailed class).
+mention the new fetch-failure signature (validationFailed class).
 ~~45. INBOXCLEAN/ledger: no change needed - the OIDC discovery fetch is~~ **NOT-DO — scope note, correct.**
-    provision-time, not the JMAP contract - noted to prevent scope creep.
+provision-time, not the JMAP contract - noted to prevent scope creep.
 ~~46. TODO_LIST: row 68's owner (CardDAV session) - ping via the row if~~ done — superseded: their session landed 2026-10-20; the findings fixed by X11 same day
-    their session ends without the fixes.
+their session ends without the fixes.
 47. scripts/vm-debug.sh: consider a `--script-only` mode that writes **→ idea parked (vm-debug.sh)**
-    the starter script without running (useful for pre-editing).
+the starter script without running (useful for pre-editing).
 48. pbx: their AGENTS.md session was active - check their TODO/hand-off **→ their TODO/hand-off rows own it (their repo)**
-    rows before touching pbx again.
+rows before touching pbx again.
 49. CHANGELOG here: the pbx flip gets its nix-email-side entry only **→ TODO pbx row (entry waits for green)**
-    when it lands green (do not pre-log).
+when it lands green (do not pre-log).
 ~~50. WAIT-state discipline: this session ends with two foreign/live~~ **NOT-DO — point-in-time note; the ritual is in AGENTS.**
-    sessions (CardDAV, pbx AGENTS) - the next session must re-run the
-    baseline ritual before any edit.
+sessions (CardDAV, pbx AGENTS) - the next session must re-run the
+baseline ritual before any edit.
 
 ## 7. Questions for the owner (cannot self-answer)
 

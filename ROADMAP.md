@@ -182,7 +182,7 @@ ideas, all D1-gated:
   row (the journal is silent on 0.16); parsedmarc end-to-end against a REAL
   0.16 deployment (SystemNix wiring: report destinations, IMAP polling)
   - (the wrapper option-surface review idea CLOSED 2026-10-19: X6 traced
-  all 34 options to consumption, zero dead/no-op options)
+    all 34 options to consumption, zero dead/no-op options)
 - DOMAIN_LANGUAGE.md authoring: a DDD glossary for the mail/DMARC/
   provisioning vocabulary (plan, reconcile set, match property, singleton,
   object, datastore descriptor) - the README ledger holds the facts, this

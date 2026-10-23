@@ -95,16 +95,16 @@ this session (no research per scope).
 ## c) NOT STARTED (noticed this session, zero work done)
 
 1. Follow-up comment / retitle on nixpkgs#563651 (the persistence finding). **→ TODO_LIST watch row (owner go-ahead + filing gates first)**
-~~2. Mechanical eval-safety proof for the touched module file: I reasoned~~ done — dmarc-eval green in every gate since (incl. CI 2026-10-22)
+   ~~2. Mechanical eval-safety proof for the touched module file: I reasoned~~ done — dmarc-eval green in every gate since (incl. CI 2026-10-22)
    "comment-only cannot affect eval" instead of running the ~10s
    `dmarc-eval` check. Doctrine prefers mechanical proof.
-~~3. `annotate.go check-rows`: not located this session (not in~~ done — AGENTS records the invocation (formatter rule)
+   ~~3. `annotate.go check-rows`: not located this session (not in~~ done — AGENTS records the invocation (formatter rule)
    `scripts/`, not on PATH). The dprint pass DID touch the other session's
    02-35 report (cosmetic-only: blank lines after list intros, `*x*` to
    `_x_`; verified benign by diff read, no struck rows involved).
-4. The actual pin advance carrying #566282 (bump-gated; owned by the **→ README runbook step 2 (bump-gated; TODO_LIST SystemNix row)**
+2. The actual pin advance carrying #566282 (bump-gated; owned by the **→ README runbook step 2 (bump-gated; TODO_LIST SystemNix row)**
    runbook, not this session).
-~~5. HARVEST of this report's section (f) into TODO_LIST - deliberately~~ done (docs-health pass 2026-10-23)
+   ~~5. HARVEST of this report's section (f) into TODO_LIST - deliberately~~ done (docs-health pass 2026-10-23)
    deferred because you instructed WAIT FOR INSTRUCTIONS.
 
 ## d) TOTALLY FUCKED UP
@@ -137,33 +137,33 @@ this session (no research per scope).
 ## e) WHAT WE SHOULD IMPROVE
 
 ~~1. **Count table columns BEFORE composing edits** - or edit only the inner~~ **NOT-DO — process note, consumed.**
-   text of the target cell, never splice cell boundaries. (Direct fix for
-   d1.)
+text of the target cell, never splice cell boundaries. (Direct fix for
+d1.)
 ~~2. **Mechanical proof over argument, even for trivial diffs**: after ANY~~ **NOT-DO — process note, consumed.**
-   `.nix` touch, build the cheapest affected check. (d4.)
+`.nix` touch, build the cheapest affected check. (d4.)
 ~~3. **List layout before fetching by assumption**: `gh api .../contents` or~~ **NOT-DO — process note, consumed.**
-   code search first, raw-file fetch second. (d3.)
+code search first, raw-file fetch second. (d3.)
 ~~4. **The upstream watch must refresh ALL surfaces in one pass.** The~~ done — watch row + ledger + module comment updated together (2026-10-19 and 2026-10-23 passes)
-   10-16 session updated the runbook + TODO row but left the README ledger
-   bullets stale for three days - a runbook/ledger split-brain. New rule
-   candidate for AGENTS working rules: a watch re-check updates ledger,
-   row, and module comment together or not at all.
+10-16 session updated the runbook + TODO row but left the README ledger
+bullets stale for three days - a runbook/ledger split-brain. New rule
+candidate for AGENTS working rules: a watch re-check updates ledger,
+row, and module comment together or not at all.
 ~~5. **The rework fact now lives in FOUR places** (README ledger, runbook,~~ done — all four surfaces carry it; the runbook owns the retire-together port
-   TODO row, module comment). AGENTS designates the ledger as owner and
-   the module comments + runbook as retirement sites, so this is
-   sanctioned - but when the pin advances, all four need the retirement
-   edit in the same change. Consider a `grep -rn '566282'` pre-flight
-   before the bump (mirrors the existing check-inventory pre-flight).
+TODO row, module comment). AGENTS designates the ledger as owner and
+the module comments + runbook as retirement sites, so this is
+sanctioned - but when the pin advances, all four need the retirement
+edit in the same change. Consider a `grep -rn '566282'` pre-flight
+before the bump (mirrors the existing check-inventory pre-flight).
 ~~6. **Locate `annotate.go check-rows` now**, not during a future formatter~~ done — AGENTS records the invocation
-   fire; record the command in AGENTS.md if it is devShell-only.
+fire; record the command in AGENTS.md if it is devShell-only.
 7. **Upstream silence handling**: two filings (563651: 34 days, mailsuite#65: **→ TODO_LIST watch row (nudge policy rides the row)**
-   14 days) have zero maintainer response. Define a bump policy (e.g. after
-   N days, post the nudge with new evidence) instead of deciding it fresh
-   each time.
+14 days) have zero maintainer response. Define a bump policy (e.g. after
+N days, post the nudge with new evidence) instead of deciding it fresh
+each time.
 ~~8. **No ghost systems created** (no code added) and **no split brains~~ **NOT-DO — confirmation note.**
-   introduced** - this session actually closed one (runbook knew, ledger
-   did not). No useful code removed. Scope stayed inside the user's bounds
-   (no unrelated research).
+introduced** - this session actually closed one (runbook knew, ledger
+did not). No useful code removed. Scope stayed inside the user's bounds
+(no unrelated research).
 
 ## f) Things we should get done next (up to 50; brainstorm, not commitments)
 
@@ -187,27 +187,27 @@ noticed in passing. Impact-sorted within groups.
    radius), or (b) forward-compatible dual-strip (strip `[elasticsearch]`
    AND `[opensearch]`, option-shape-aware condition) landing before the
    bump (smaller bump, small YAGNI cost). Owner call.
-~~4. `[S]` Add a dmarc-eval assertion pinning the strip's CONTRACT: rendered~~ done — parsedmarc-e2e asserts the rendered ini [elasticsearch]-free; dmarc-eval pins the strip-script content
+   ~~4. `[S]` Add a dmarc-eval assertion pinning the strip's CONTRACT: rendered~~ done — parsedmarc-e2e asserts the rendered ini [elasticsearch]-free; dmarc-eval pins the strip-script content
    ini contains NEITHER `[elasticsearch]` NOR `[opensearch]` when
    provisioning is off (today only the VM e2e sees the rendered ini).
    (~30-45m)
-~~5. `[S]` Build `dmarc-eval` once to mechanically confirm the comment-only~~ done — green in every gate since
+   ~~5. `[S]` Build `dmarc-eval` once to mechanically confirm the comment-only~~ done — green in every gate since
    module edit is eval-clean (~10s; closes c2/d4).
-~~6. `[S]` Locate `annotate.go check-rows` (devShell?) and record the~~ done — AGENTS records the invocation
+   ~~6. `[S]` Locate `annotate.go check-rows` (devShell?) and record the~~ done — AGENTS records the invocation
    invocation in AGENTS.md. (~10m)
-~~7. `[S]` AGENTS.md working-rules candidate: "a watch re-check refreshes~~ done — folded into the TODO watch row text (2026-10-23; AGENTS is at its 220-line cap)
+   ~~7. `[S]` AGENTS.md working-rules candidate: "a watch re-check refreshes~~ done — folded into the TODO watch row text (2026-10-23; AGENTS is at its 220-line cap)
    ledger + TODO row + module comment in the same pass" (2-line edit,
    prevents the next runbook/ledger split-brain).
-8. `[S]` AGENTS.md pre-flight candidate for the bump: `grep -rn '566282' **→ README runbook step 2 owns the retire-together port**
+4. `[S]` AGENTS.md pre-flight candidate for the bump: `grep -rn '566282' **→ README runbook step 2 owns the retire-together port**
    .` before a pin advance - four surfaces must retire together.
-9. `[S]` Re-verify the mailsuite#65 quoted lines against mailsuite master **→ TODO_LIST watch row (added 2026-10-23)**
+5. `[S]` Re-verify the mailsuite#65 quoted lines against mailsuite master **→ TODO_LIST watch row (added 2026-10-23)**
    before any bump that advances parsedmarc/mailsuite (the auto-STARTTLS
    trap gates future plaintext-hop consumers). (~10m)
-10. `[S]` mailsuite#65 nudge policy: if still silent by ~2026-11-05, post **→ TODO_LIST watch row**
-    a one-paragraph bump with any new evidence (your call, your voice).
-11. `[S]` Next scheduled watch re-check: fold into every pin advance + **→ TODO_LIST watch row (cadence + evidence-cell dating)**
-    a monthly cadence, and log each re-check date in the watch row's
-    evidence cell (the row now carries the 2026-10-19 set).
+6. `[S]` mailsuite#65 nudge policy: if still silent by ~2026-11-05, post **→ TODO_LIST watch row**
+   a one-paragraph bump with any new evidence (your call, your voice).
+7. `[S]` Next scheduled watch re-check: fold into every pin advance + **→ TODO_LIST watch row (cadence + evidence-cell dating)**
+   a monthly cadence, and log each re-check date in the watch row's
+   evidence cell (the row now carries the 2026-10-19 set).
 
 ### The mandatory bump work (existing plan, sharpened by this session)
 
@@ -230,47 +230,47 @@ noticed in passing. Impact-sorted within groups.
 ### Existing TODO rows noticed this session (not re-verified today)
 
 ~~17. `[T]` migrate-e2e run 7: instrumented artifact dumps~~ done — fixed + green 9/9 (W1, 2026-10-19)
-    (`migration-v016/config.json`, `recovery.log`), root-cause the
-    post-migration exit-101 "multi-step process" panic, fix
-    `stalwart-migrate-from-015`, run to green. (IN_PROGRESS, High, the one
-    open product bug.)
+(`migration-v016/config.json`, `recovery.log`), root-cause the
+post-migration exit-101 "multi-step process" panic, fix
+`stalwart-migrate-from-015`, run to green. (IN_PROGRESS, High, the one
+open product bug.)
 18. `[T]` C42: dmarc-monitor retire-or-keep - one stalw.art docs fetch **→ decision-batch C42 (evidence complete)**
-    (0.16 inbound failure parsing) settles the last unknown. (~15m)
+(0.16 inbound failure parsing) settles the last unknown. (~15m)
 19. `[T]` C44: real-host account-secrets doctrine (sops-rendered apply vs **→ decision-batch C44**
-    admin-created vs credential-file secret type). (~1h)
+admin-created vs credential-file secret type). (~1h)
 20. `[T]` C45: 0.16.22 vs 0.16.26 overlay decision + the delta table next **→ decision-batch C45 (delta table written)**
-    to it. (~1h)
+to it. (~1h)
 21. `[T]` C39: MemoryMax ownership decision, then document. (~30m) **→ decision-batch C39**
 ~~22. `[T]` Provision vs resolv.conf boot race: real-host verdict before any~~ done — DECIDED as doctrine (W14: DnsResolver singleton, not ordering)
-    unit reorder (demo already pins the Cloudflare resolver).
+unit reorder (demo already pins the Cloudflare resolver).
 ~~23. `[T]` Match-property audit REMAINING: wrapper option-surface review~~ done — X6 closed 2026-10-19 (zero dead options; ledger line existed)
-    (which 0.15-era wrapper options are dead under 0.16) + the
-    snapshot-vs-wrapper matchOn divergence ledger line.
+(which 0.15-era wrapper options are dead under 0.16) + the
+snapshot-vs-wrapper matchOn divergence ledger line.
 24. `[T]` dmarc-monitor live validation against a real IMAP mailbox **→ TODO_LIST (D1-gated row)**
-    (D1-gated; first poll, JSON/CSV output lands). (~1h)
+(D1-gated; first poll, JSON/CSV output lands). (~1h)
 ~~25. `[T]` dmarc-eval: unit-hardening shape assertions (DynamicUser,~~ done — W9 drop-detectors + negative self-test
-    SystemCallFilter, RestrictAddressFamilies) so a pin advance that drops
-    them fails loudly at eval speed. (~45m)
+SystemCallFilter, RestrictAddressFamilies) so a pin advance that drops
+them fails loudly at eval speed. (~45m)
 26. `[T]` CI python-lint gate residue: bandit/vulture scope doctrine + **→ TODO_LIST CI python-lint row (owner blessing)**
-    whether buildflow's deeper ruff ruleset (PERF/FURB/BLE) joins the CI
-    floor (owner blessing).
+whether buildflow's deeper ruff ruleset (PERF/FURB/BLE) joins the CI
+floor (owner blessing).
 ~~27. `[T]` PR #552103 watch: when it merges into the pinned rev, retire~~ done — TODO_LIST watch row carries the retirement checklist
-    `modules/stalwart-module/` (restore `meta.doc` + `partOf`, drop the
-    ExecStartPost patch; header checklist).
+`modules/stalwart-module/` (restore `meta.doc` + `partOf`, drop the
+ExecStartPost patch; header checklist).
 ~~28. `[T]` Consider posting our ExecStartPost-restart + bootstrap-fallback~~ done — filed 2026-10-19 (comment 6258512488, W12.2)
-    transcripts as PR #552103 evidence comments (verify-before-filing
-    first).
+transcripts as PR #552103 evidence comments (verify-before-filing
+first).
 
 ### Noticed in passing
 
 ~~29. `[N]` The 02-35 session's contacts-assessment follow-ups (0.16.22 vs~~ done — that thread closed 2026-10-19 (probes + FEATURES rows + AGENTS pointer)
-    0.16.26 crates diff; CardDAV demo transcript probe; the SOCIALPROFILE
-    edge) - owned by that session's thread; harvest only if orphaned.
+0.16.26 crates diff; CardDAV demo transcript probe; the SOCIALPROFILE
+edge) - owned by that session's thread; harvest only if orphaned.
 ~~30. `[N]` Honesty note: I read TODO_LIST only to line 60 - the "Low Impact~~ **NOT-DO — point-in-time note; later passes inventoried the full file.**
-    (hygiene)" rows BELOW the watch row were NOT inventoried this session.
+(hygiene)" rows BELOW the watch row were NOT inventoried this session.
 ~~31. `[N]` HARVEST this report's f-list into TODO_LIST/ROADMAP once you~~ done (docs-health pass 2026-10-23)
-    answer g1-g3 (skill-mandated close-out; deliberately deferred per your
-    WAIT instruction).
+answer g1-g3 (skill-mandated close-out; deliberately deferred per your
+WAIT instruction).
 
 (31 items: the honest, grounded set. Padding to 50 with unverified filler
 would violate the no-new-research scope and the ledger's no-fabrication

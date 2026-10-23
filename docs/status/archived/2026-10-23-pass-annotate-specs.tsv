@@ -1,0 +1,575 @@
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	78	v	written into the README ledger (V15, 2026-10-19)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	83	v	rows rewritten onto durable evidence (2026-10-17/19 passes)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	90	v	FEATURES/CHANGELOG swept to the 0.16 truth (V19 + CHANGELOG, 2026-10-18)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	98	v	banner corrected 2026-10-18 (V19)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	103	v	re-verified 2026-10-18 (V18; INBOXCLEAN 0.16 banner)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	110	v	docs/probes/2026-10-18-demo-smoke-backup/ (V11/V18)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	115	v	VM-proven 2026-10-18 (V6; README go-live backup step + probes)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	128	r	decision-batch C43 (open owner gate; TODO_LIST 0.16 release path)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	130	r	TODO_LIST 0.16 release path (blocked on the v0.5.0 tag)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	131	r	decision-batch C44
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	134	r	decision-batch C45 (delta table written 2026-10-19)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	135	r	decision-batch C42 (evidence complete 2026-10-18/19)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	137	v	provision-plan-eval shipped 2026-10-18; X6 audit closed 2026-10-19
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	140	v	V11 2026-10-18 + W10.5 re-smoke 2026-10-19 (probes dir)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	142	r	TODO_LIST (D1-gated row)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	143	v	origin green end-to-end (run 39864876276, 2026-10-22)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	147	v	MONITORING 0.16 truth landed (W7: 37-series inventory + NO-GAUGE verdict)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	150	p	-
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	239	r	decision-batch C43 (open)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	241	r	decision-batch C45 (open)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	243	r	decision-batch C44 (open)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	246	v	VM-proven 2026-10-18 (V6; README runbook + FEATURES)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	250	v	README ledger (V15, 2026-10-19)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	252	v	green chain through run 39864876276 (2026-10-22)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	254	v	corrected 2026-10-18 (V19)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	256	v	rows refreshed (e2e 19/19, backup 0.16 posture; docs-health 2026-10-23)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	259	v	journal-silence + relay fix present in [Unreleased]
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	261	v	V11 2026-10-18 + W10.5 (probes)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	264	v	V18 2026-10-18 (0.16 banner)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	267	v	provision-plan-eval (V9) + X6 closure 2026-10-19
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	270	r	decision-batch C42
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	273	r	ROADMAP open questions (D1)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	275	r	ROADMAP open questions (D2; Junk-filing residue Q6)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	277	v	W7 37-series inventory + counter-divergence proxy (2026-10-19)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	280	v	rows rewritten onto durable evidence (2026-10-17/19 passes)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	282	p	-
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	284	v	2026-10-17 pass archived the corridor (manifest in archived/README)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	287	v	both annotated + archived (2026-10-17 pass)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	290	r	decision-batch C43/C45 (still open, owner)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	293	v	V13 diet + V19 sweep (2026-10-18/19)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	295	v	W7 0.16.22 spot-check banner (2026-10-19)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	298	v	V14 exposure-delta section (2026-10-18)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	300	v	check-set-lockstep + tests/check-expected.json (X9, 2026-10-19)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	303	v	filed 2026-10-19 (comment 6258512488, W12.2)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	306	v	flake app + end-to-end dry-run (W10, 2026-10-19)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	309	r	TODO_LIST flood watch row (open)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	312	r	ROADMAP 0.16-born ideas
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	314	r	ROADMAP 0.16-born ideas
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	316	r	ROADMAP repo-excellence (BuildFlow ships a working scanner)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	319	v	mypy rationale replaced 2026-10-19 (X14); pytest skip stands
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	321	v	NIX_DISK_IMAGE pinned to ~/.cache (V26, 2026-10-18)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	323	r	TODO_LIST (open)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	327	v	V18 probes + W6 e2e push subtest (closeafter ACCEPTED)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	330	r	TODO_LIST (open)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	333	v	session-start baseline ritual in AGENTS
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	335	r	TODO_LIST BuildFlow row
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	337	v	swept by the 2026-10-17/19 passes
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	340	v	W10.5 re-smoke + demo-eval contract (2026-10-19)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	344	v	provision-plan-eval (V9, 2026-10-18)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	348	r	TODO_LIST v0.5.0 row (C43-blocked)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	352	r	ROADMAP (post-C44)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	355	r	ROADMAP 0.16-born ideas
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	359	v	JMAP push subtest asserts StateChange (W6)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	363	r	TODO_LIST v0.5.0 row
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	366	v	W15 probe-manifest audit clean (2026-10-19)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	369	v	X6 closed 2026-10-19 (zero dead options; ROADMAP line updated)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	373	v	provision-not-rerun pinned across restart (W6)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	377	v	every report carries the .md format note (settled in practice)
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	384	r	decision-batch C43
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	392	r	decision-batch C45
+/home/lars/projects/nix-email/docs/status/2026-10-17_03-34_stalwart-016-gate-green-quota-silence-pinned.md	398	r	decision-batch C44
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	36	r	TODO_LIST BuildFlow row (54-vs-4 gap open there)
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	37	v	migrate-convert-eval check shipped (W10, 2026-10-19)
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	38	v	triage stood; dovecot rename rides the upstream parsedmarc module
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	39	r	TODO_LIST BuildFlow row (rebuild + delta review)
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	40	v	documented accepted noise (AGENTS known-lint-noise)
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	46	v	220/220 reached (07-18 pass); C41 moot
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	47	v	pinned in the devShell (2026-10-19, devshells.nix)
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	48	v	shipped bc24227 (V3, 2026-10-18; CI green with the step)
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	49	v	migrate-convert-eval check (W10, 2026-10-19)
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	50	r	TODO_LIST BuildFlow row
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	113	v	bc24227 fail-closed floor (V3, 2026-10-18)
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	114	v	migrate-convert-eval (W10, 2026-10-19)
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	115	v	220/220 (07-18 pass, 2026-10-19)
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	116	r	TODO_LIST BuildFlow row
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	117	r	TODO_LIST BuildFlow row
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	118	r	TODO_LIST BuildFlow row
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	119	v	pinned 2026-10-19 (devshells.nix)
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	120	v	creator-mode gap proven (V3.6, 2026-10-19)
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	121	r	TODO_LIST BuildFlow row
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	122	r	TODO_LIST BuildFlow row
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	123	v	lives in the TODO_LIST upstream-watch row (current)
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	124	v	W7 landed 2026-10-19 (37-series + NO-GAUGE verdict + spot-check)
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	125	v	V19 sweep 2026-10-18 (one stale hit, fixed)
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	126	v	V18 probes + W6 e2e push subtest (ping residue in TODO row)
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	127	v	X14 landed 2026-10-19 (CHANGELOG entry)
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	128	r	TODO_LIST upstream-filings row
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	129	v	W11 (argless + indented fences, 2026-10-19)
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	130	v	apps.host-parse-fixture + dry-run (W10, 2026-10-19)
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	131	r	TODO_LIST row (open)
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	132	v	scripts/vm-debug.sh (X16, 2026-10-19)
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	133	v	resolved-as-redundant (W10, 2026-10-19)
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	134	v	W9 build-time greps (2026-10-19)
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	135	v	decided AGAINST for fetchurl pins (W10, 2026-10-19)
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	136	v	V26 2026-10-18 + W10.5 demo-disk trashing
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	137	v	check-set-lockstep (X9, 2026-10-19)
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	138	r	TODO_LIST flood watch row
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	139	r	TODO_LIST row
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	140	r	trim open (TODO row); restart-persistence shipped (W6)
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	141	v	attributed buildflow-emitted 2026-10-19 (nix prints no aggregate count); BuildFlow-side residue in the TODO row
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	142	v	X17.1 fault-injection proof (2026-10-20, 60e7916)
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	143	v	W11 pre-push parity incl. pinned statix
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	144	v	untracked + gitignored (V21, 2026-10-19)
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	145	v	scripts/check-refactor-identity.sh (W18.2, 2026-10-19)
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	146	v	shipped (V9, 2026-10-18; Exec lint + port pin included)
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	147	v	W9 drop-detectors + negative self-test (2026-10-19)
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	148	r	ROADMAP open questions
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	149	r	ROADMAP Q6 residue (ratification in decision-batch)
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	150	r	decision-batch C45 (delta table written)
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	151	v	V11 2026-10-18 + W10.5 2026-10-19 (0.16 smoke)
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	152	v	mypy rationale replaced 2026-10-19 (X14); pytest skip stands
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	156	r	de-facto answered: ships + is tested with the vendored module (migrate-convert-eval); retirement rides #552103 (module header checklist)
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	162	v	shipped bc24227 (V3); scope doctrine residue = TODO row
+/home/lars/projects/nix-email/docs/status/2026-10-18_09-49_buildflow-gate-recovery-ruff-debt.md	167	v	220/220 reached (07-18 pass); C41 moot
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	154	v	fixed + green 9/9 next day (W1, runs 6-10; three stacked root causes)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	188	r	TODO_LIST rows (bounce-path, runtime trim, ping probe; flood watch)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	190	v	W7 landed 2026-10-19 (37-series inventory + NO-GAUGE verdict)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	195	v	count line attributed buildflow-emitted (2026-10-19); lockstep landed (X9)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	198	r	TODO_LIST BuildFlow row (rebuild + count gaps)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	201	p	-
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	208	r	TODO_LIST v0.5.0 row (C43-gated)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	210	r	TODO_LIST (blocked on v0.5.0)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	211	v	W9 (drop-detectors + negative self-test + IFD cleanup, 2026-10-19)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	212	v	W11 (list-marker lint, drift alarm, README completeness, nix-health, pre-push parity)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	215	v	#552103 comment filed (W12.2, 6258512488); dnsmasq + T13b routed to the TODO filings row
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	217	r	TODO_LIST SystemNix CI-debt row
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	218	r	convert-smoke/debug-driver/apps.vm/fixture-dedup done (W10, X16); TLS-node open (TODO row)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	221	r	TODO_LIST D1-gated rows
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	223	r	decision-batch sittings (open)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	226	v	first full gate green 2026-10-19 (W2); set now 11 checks, origin green 2026-10-22
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	229	v	origin green chain through run 39864876276 (2026-10-22)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	230	v	W15 annotated both plans with per-task dispositions
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	287	v	W1 runs 6-10: fixed and green 9/9 (2026-10-19)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	289	v	three stacked causes transcript-pinned + fixed (W1)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	292	v	W2 first full gate green (2026-10-19)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	294	v	W2 statix red root-caused + fixed with CI's exact pin
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	295	v	green chain through run 39864876276 (2026-10-22)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	296	v	W7 37-series inventory (MONITORING 5.5)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	298	v	W7 NO-GAUGE verdict + counter-divergence proxy
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	301	v	W7 0.16.22 spot-check banner
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	302	v	W10 end-to-end dry-run (-- separator nuance recorded)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	304	v	W10.5 re-smoke 2026-10-19 (HTTP 200)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	306	r	TODO_LIST v0.5.0 row (Unreleased date/link pass)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	307	r	TODO_LIST v0.5.0 row (C43-gated)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	308	r	TODO_LIST flood watch row
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	309	r	TODO_LIST row
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	310	r	TODO_LIST row
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	311	v	W6: provision NOT re-run pinned across restart
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	313	v	W9 drop-detectors
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	314	v	W9 build-time negative self-test
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	315	v	W9 build-time greps
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	316	v	W11
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	317	v	W11 (empirically scoped against dprint)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	318	v	W11
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	319	v	README quickstart + banner own them (07-18 AGENTS restructure points there)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	320	v	decided: pre-push mirror + CI README-completeness + lockstep (W11/X9)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	321	v	nix-health in the devShell (W11)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	322	v	W11 self-tests on planted fixtures
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	323	v	passed for #552103 (W12.2)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	324	v	filed 2026-10-19 (comment 6258512488)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	326	r	TODO_LIST upstream-filings row
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	327	r	TODO_LIST upstream-filings row
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	328	v	watch row carries the filed comment + pending files (2026-10-23 update)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	329	r	TODO_LIST BuildFlow row
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	331	r	TODO_LIST BuildFlow row
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	332	r	TODO_LIST BuildFlow row
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	333	r	TODO_LIST BuildFlow row
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	334	v	migrate-convert-eval check (W10)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	336	r	TODO_LIST row
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	337	v	scripts/vm-debug.sh (X16)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	338	v	resolved-as-redundant (W10)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	339	v	decided AGAINST (W10)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	340	r	TODO_LIST SystemNix row
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	342	v	220/220 (07-18 pass); C41 moot
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	343	p	-
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	344	v	W15 annotated both plans
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	345	r	decision-batch (open)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	346	r	decision-batch (open)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	349	r	TODO_LIST v0.5.0 row
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	350	r	TODO_LIST D1-gated rows
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	353	p	-
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	355	v	README ledger line (VM-proven 2026-10-18; X6 confirmed 2026-10-19)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	360	r	decision-batch C43
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	365	v	answered by W1: fixed-forward, green 9/9 same day
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-16_v-generation-execution-ci-backup-jmap-migrate-debug.md	369	v	220/220 reached (07-18 pass); C41 moot
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-35_stalwart-contacts-assessment.md	49	v	addendum f)1: contacts crates byte-identical 0.16.22 vs 0.16.26 (verdict holds for the pin)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-35_stalwart-contacts-assessment.md	50	v	filing-gate rule landed in AGENTS (no filing without a measured victim; benchmark = the gate)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-35_stalwart-contacts-assessment.md	51	n	ratified as-is - the verdict stands on read code + live probes; test-depth stays unassessed by design
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-35_stalwart-contacts-assessment.md	52	v	addendum: knobs source-verified, defaults healthy, document-don't-expose verdict
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-35_stalwart-contacts-assessment.md	56	v	CardDAV probe set landed (docs/probes/2026-10-19-carddav-demo-vm/, addendum 07:45)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-35_stalwart-contacts-assessment.md	57	r	TODO_LIST webmail-dist row (new 2026-10-23)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-35_stalwart-contacts-assessment.md	58	r	ROADMAP theme 5 (device-interop rides CardDAV enablement, D1-gated)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-35_stalwart-contacts-assessment.md	59	v	SOCIALPROFILE-without-uri PASS on the pin (addendum 07:55; non-issue)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-35_stalwart-contacts-assessment.md	60	v	addendum 08:05: ZERO coupling (source-verified)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-35_stalwart-contacts-assessment.md	61	r	crm repo (data-mesh CardDAV plan T19 lives there)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-35_stalwart-contacts-assessment.md	62	p	-
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-35_stalwart-contacts-assessment.md	74	v	AGENTS rule: the INBOXCLEAN transcript rule extends to CardDAV/JMAP-contacts
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-35_stalwart-contacts-assessment.md	75	v	AGENTS source-assessment discipline bullet (resolve through flake.lock)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-35_stalwart-contacts-assessment.md	76	n	tool-contract enforced; nothing repo-side to do
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-35_stalwart-contacts-assessment.md	77	v	the [SRC]/[LIVE]/[WEB] labeling is modeled by this report; habit kept
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-35_stalwart-contacts-assessment.md	78	n	style note; nothing to do
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-35_stalwart-contacts-assessment.md	84	v	addendum 08:05: byte-identical (delta table in-file)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-35_stalwart-contacts-assessment.md	85	v	docs/probes/2026-10-19-carddav-demo-vm/ (07:45 addendum)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-35_stalwart-contacts-assessment.md	86	v	PASS, non-issue (07:55 addendum)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-35_stalwart-contacts-assessment.md	87	v	probed live (07:45 addendum: 412 no-uid-conflict, stale-If-Match 412)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-35_stalwart-contacts-assessment.md	88	r	TODO_LIST webmail-dist row (new 2026-10-23)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-35_stalwart-contacts-assessment.md	89	v	addendum: defaults healthy, document-don't-expose
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-35_stalwart-contacts-assessment.md	90	v	FEATURES contacts rows (CardDAV / JMAP contacts / search) present (verified 2026-10-23)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-35_stalwart-contacts-assessment.md	91	r	ROADMAP theme 5 (exposure rides enablement, D1-gated)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-35_stalwart-contacts-assessment.md	94	r	crm repo (T19 plan)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-35_stalwart-contacts-assessment.md	95	v	answered: one-way mirror (owner decision 2026-10-19, ROADMAP theme 5)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-35_stalwart-contacts-assessment.md	96	r	crm repo (T19 plan)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-35_stalwart-contacts-assessment.md	97	r	crm repo (T19 plan)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-35_stalwart-contacts-assessment.md	98	r	crm repo (T19 plan)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-35_stalwart-contacts-assessment.md	99	r	crm repo (T19 plan)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-35_stalwart-contacts-assessment.md	100	r	crm repo (T19 plan)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-35_stalwart-contacts-assessment.md	101	v	probed live (07:45 addendum: 307 chain, principals, home-set)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-35_stalwart-contacts-assessment.md	104	v	ratified: AGENTS.md points at this report as the verdict home (2026-10-19 rule)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-35_stalwart-contacts-assessment.md	105	v	AGENTS source-assessment discipline bullet
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-35_stalwart-contacts-assessment.md	106	v	TODO_LIST pin-advance contacts probe row
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-35_stalwart-contacts-assessment.md	107	p	-
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-35_stalwart-contacts-assessment.md	111	v	answered: the Kith CRM out-mirror is live (owner decision 2026-10-19; FEATURES contacts rows)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-35_stalwart-contacts-assessment.md	112	v	ratified as the durable record (AGENTS pointer, 2026-10-19)
+/home/lars/projects/nix-email/docs/status/2026-10-19_02-35_stalwart-contacts-assessment.md	113	v	answered: one-way (ROADMAP theme 5: nothing writes into Kith from Stalwart)
+/home/lars/projects/nix-email/docs/status/2026-10-19_03-59_upstream-watch-recheck-and-566282-persistence.md	81	r	TODO_LIST watch row (pending #563651 follow-up comment, owner go-ahead)
+/home/lars/projects/nix-email/docs/status/2026-10-19_03-59_upstream-watch-recheck-and-566282-persistence.md	86	r	port decision rides the pin advance (README runbook step 2); gates eval-prove the comment-only edit every run
+/home/lars/projects/nix-email/docs/status/2026-10-19_03-59_upstream-watch-recheck-and-566282-persistence.md	90	r	TODO_LIST watch row (pre-bump re-verify added 2026-10-23)
+/home/lars/projects/nix-email/docs/status/2026-10-19_03-59_upstream-watch-recheck-and-566282-persistence.md	97	r	TODO_LIST watch row (owner go-ahead + filing gates first)
+/home/lars/projects/nix-email/docs/status/2026-10-19_03-59_upstream-watch-recheck-and-566282-persistence.md	98	v	dmarc-eval green in every gate since (incl. CI 2026-10-22)
+/home/lars/projects/nix-email/docs/status/2026-10-19_03-59_upstream-watch-recheck-and-566282-persistence.md	101	v	AGENTS records the invocation (formatter rule)
+/home/lars/projects/nix-email/docs/status/2026-10-19_03-59_upstream-watch-recheck-and-566282-persistence.md	105	r	README runbook step 2 (bump-gated; TODO_LIST SystemNix row)
+/home/lars/projects/nix-email/docs/status/2026-10-19_03-59_upstream-watch-recheck-and-566282-persistence.md	107	p	-
+/home/lars/projects/nix-email/docs/status/2026-10-19_03-59_upstream-watch-recheck-and-566282-persistence.md	139	n	process note, consumed
+/home/lars/projects/nix-email/docs/status/2026-10-19_03-59_upstream-watch-recheck-and-566282-persistence.md	142	n	process note, consumed
+/home/lars/projects/nix-email/docs/status/2026-10-19_03-59_upstream-watch-recheck-and-566282-persistence.md	144	n	process note, consumed
+/home/lars/projects/nix-email/docs/status/2026-10-19_03-59_upstream-watch-recheck-and-566282-persistence.md	146	v	watch row + ledger + module comment updated together (2026-10-19 and 2026-10-23 passes)
+/home/lars/projects/nix-email/docs/status/2026-10-19_03-59_upstream-watch-recheck-and-566282-persistence.md	151	v	all four surfaces carry it; the runbook owns the retire-together port
+/home/lars/projects/nix-email/docs/status/2026-10-19_03-59_upstream-watch-recheck-and-566282-persistence.md	157	v	AGENTS records the invocation
+/home/lars/projects/nix-email/docs/status/2026-10-19_03-59_upstream-watch-recheck-and-566282-persistence.md	159	r	TODO_LIST watch row (nudge policy rides the row)
+/home/lars/projects/nix-email/docs/status/2026-10-19_03-59_upstream-watch-recheck-and-566282-persistence.md	163	n	confirmation note
+/home/lars/projects/nix-email/docs/status/2026-10-19_03-59_upstream-watch-recheck-and-566282-persistence.md	176	r	TODO_LIST watch row (owner go-ahead + verify-before-filing + github-voice)
+/home/lars/projects/nix-email/docs/status/2026-10-19_03-59_upstream-watch-recheck-and-566282-persistence.md	182	r	TODO_LIST watch row (rides the follow-up comment)
+/home/lars/projects/nix-email/docs/status/2026-10-19_03-59_upstream-watch-recheck-and-566282-persistence.md	185	r	owner call at bump planning (README runbook step 2 owns the port)
+/home/lars/projects/nix-email/docs/status/2026-10-19_03-59_upstream-watch-recheck-and-566282-persistence.md	190	v	parsedmarc-e2e asserts the rendered ini [elasticsearch]-free; dmarc-eval pins the strip-script content
+/home/lars/projects/nix-email/docs/status/2026-10-19_03-59_upstream-watch-recheck-and-566282-persistence.md	194	v	green in every gate since
+/home/lars/projects/nix-email/docs/status/2026-10-19_03-59_upstream-watch-recheck-and-566282-persistence.md	196	v	AGENTS records the invocation
+/home/lars/projects/nix-email/docs/status/2026-10-19_03-59_upstream-watch-recheck-and-566282-persistence.md	198	v	folded into the TODO watch row text (2026-10-23; AGENTS is at its 220-line cap)
+/home/lars/projects/nix-email/docs/status/2026-10-19_03-59_upstream-watch-recheck-and-566282-persistence.md	201	r	README runbook step 2 owns the retire-together port
+/home/lars/projects/nix-email/docs/status/2026-10-19_03-59_upstream-watch-recheck-and-566282-persistence.md	203	r	TODO_LIST watch row (added 2026-10-23)
+/home/lars/projects/nix-email/docs/status/2026-10-19_03-59_upstream-watch-recheck-and-566282-persistence.md	206	r	TODO_LIST watch row
+/home/lars/projects/nix-email/docs/status/2026-10-19_03-59_upstream-watch-recheck-and-566282-persistence.md	208	r	TODO_LIST watch row (cadence + evidence-cell dating)
+/home/lars/projects/nix-email/docs/status/2026-10-19_03-59_upstream-watch-recheck-and-566282-persistence.md	214	r	TODO_LIST SystemNix pin row + README runbook step 2
+/home/lars/projects/nix-email/docs/status/2026-10-19_03-59_upstream-watch-recheck-and-566282-persistence.md	219	r	rides the bump; triaged upstream-not-actionable (2026-10-19 07-18 session)
+/home/lars/projects/nix-email/docs/status/2026-10-19_03-59_upstream-watch-recheck-and-566282-persistence.md	221	r	README runbook step 2 bullet 3
+/home/lars/projects/nix-email/docs/status/2026-10-19_03-59_upstream-watch-recheck-and-566282-persistence.md	224	r	TODO_LIST v0.5.0 row
+/home/lars/projects/nix-email/docs/status/2026-10-19_03-59_upstream-watch-recheck-and-566282-persistence.md	227	r	TODO_LIST SystemNix pin row
+/home/lars/projects/nix-email/docs/status/2026-10-19_03-59_upstream-watch-recheck-and-566282-persistence.md	232	v	fixed + green 9/9 (W1, 2026-10-19)
+/home/lars/projects/nix-email/docs/status/2026-10-19_03-59_upstream-watch-recheck-and-566282-persistence.md	237	r	decision-batch C42 (evidence complete)
+/home/lars/projects/nix-email/docs/status/2026-10-19_03-59_upstream-watch-recheck-and-566282-persistence.md	239	r	decision-batch C44
+/home/lars/projects/nix-email/docs/status/2026-10-19_03-59_upstream-watch-recheck-and-566282-persistence.md	241	r	decision-batch C45 (delta table written)
+/home/lars/projects/nix-email/docs/status/2026-10-19_03-59_upstream-watch-recheck-and-566282-persistence.md	243	r	decision-batch C39
+/home/lars/projects/nix-email/docs/status/2026-10-19_03-59_upstream-watch-recheck-and-566282-persistence.md	244	v	DECIDED as doctrine (W14: DnsResolver singleton, not ordering)
+/home/lars/projects/nix-email/docs/status/2026-10-19_03-59_upstream-watch-recheck-and-566282-persistence.md	246	v	X6 closed 2026-10-19 (zero dead options; ledger line existed)
+/home/lars/projects/nix-email/docs/status/2026-10-19_03-59_upstream-watch-recheck-and-566282-persistence.md	249	r	TODO_LIST (D1-gated row)
+/home/lars/projects/nix-email/docs/status/2026-10-19_03-59_upstream-watch-recheck-and-566282-persistence.md	251	v	W9 drop-detectors + negative self-test
+/home/lars/projects/nix-email/docs/status/2026-10-19_03-59_upstream-watch-recheck-and-566282-persistence.md	254	r	TODO_LIST CI python-lint row (owner blessing)
+/home/lars/projects/nix-email/docs/status/2026-10-19_03-59_upstream-watch-recheck-and-566282-persistence.md	257	v	TODO_LIST watch row carries the retirement checklist
+/home/lars/projects/nix-email/docs/status/2026-10-19_03-59_upstream-watch-recheck-and-566282-persistence.md	260	v	filed 2026-10-19 (comment 6258512488, W12.2)
+/home/lars/projects/nix-email/docs/status/2026-10-19_03-59_upstream-watch-recheck-and-566282-persistence.md	266	v	that thread closed 2026-10-19 (probes + FEATURES rows + AGENTS pointer)
+/home/lars/projects/nix-email/docs/status/2026-10-19_03-59_upstream-watch-recheck-and-566282-persistence.md	269	n	point-in-time note; later passes inventoried the full file
+/home/lars/projects/nix-email/docs/status/2026-10-19_03-59_upstream-watch-recheck-and-566282-persistence.md	271	p	-
+/home/lars/projects/nix-email/docs/status/2026-10-19_03-59_upstream-watch-recheck-and-566282-persistence.md	282	r	TODO_LIST watch row (pending owner go-ahead)
+/home/lars/projects/nix-email/docs/status/2026-10-19_03-59_upstream-watch-recheck-and-566282-persistence.md	287	r	owner call at bump planning (runbook step 2)
+/home/lars/projects/nix-email/docs/status/2026-10-19_03-59_upstream-watch-recheck-and-566282-persistence.md	292	r	owner call (TODO_LIST v0.5.0 + SystemNix pin rows)
+/home/lars/projects/nix-email/docs/status/2026-10-19_04-43_w-generation-migration-fixed-first-full-gate-green.md	97	v	root-caused 2026-10-19: the line is buildflow-emitted (nix prints no aggregate count; BuildFlow-side residue in the TODO row)
+/home/lars/projects/nix-email/docs/status/2026-10-19_04-43_w-generation-migration-fixed-first-full-gate-green.md	88	r	decision-batch C43
+/home/lars/projects/nix-email/docs/status/2026-10-19_04-43_w-generation-migration-fixed-first-full-gate-green.md	89	r	decision-batch C45 (delta table written)
+/home/lars/projects/nix-email/docs/status/2026-10-19_04-43_w-generation-migration-fixed-first-full-gate-green.md	90	r	decision-batch C44
+/home/lars/projects/nix-email/docs/status/2026-10-19_04-43_w-generation-migration-fixed-first-full-gate-green.md	91	r	decision-batch sittings (open)
+/home/lars/projects/nix-email/docs/status/2026-10-19_04-43_w-generation-migration-fixed-first-full-gate-green.md	92	r	decision-batch + TODO blocked-on-user rows
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	82	r	TODO_LIST rows (bounce-path W6.3, runtime trim W6.4, ping probe W6.7)
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	85	r	#552103 filed (6258512488); dnsmasq + T13b in the TODO filings row
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	87	r	TODO_LIST row
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	89	r	TODO_LIST BuildFlow row
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	91	p	-
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	97	r	decision-batch sittings (open)
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	100	r	TODO_LIST v0.5.0 row (C43)
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	101	r	TODO_LIST SystemNix row (W16) + D1-gated rows (W17)
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	103	v	X17.1 proof + X17.2 audit (2026-10-20); W18.5 link sweep done by X10 (2026-10-19)
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	105	r	ROADMAP aarch64 posture (occasional local --all-systems eval)
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	207	r	decision-batch C43
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	208	r	decision-batch C44
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	209	r	decision-batch C45
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	210	r	TODO_LIST v0.5.0 row
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	212	r	TODO_LIST SystemNix pin row
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	214	r	decision-batch (C41 moot since 07-18)
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	216	r	decision-batch + TODO blocked-on-user rows
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	218	v	superseded same day: X9 single-sourced the set (AGENTS now says TWO sites + tests/check-expected.json)
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	220	v	migration row is FULLY_FUNCTIONAL 9/9 (verified 2026-10-23)
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	222	v	reconciled: common.nix shipped same day; dedup-AGAINST scoped to fetchurl fixtures; both CHANGELOG entries present (2026-10-23)
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	224	v	attributed buildflow-emitted (2026-10-19; BuildFlow-side residue in the TODO row)
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	226	r	TODO_LIST row
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	228	r	TODO_LIST row
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	229	r	TODO_LIST row
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	230	r	TODO_LIST upstream-filings row
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	232	r	TODO_LIST upstream-filings row
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	234	v	X17.1 (2026-10-20, 60e7916)
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	235	v	X17.2 (2026-10-20, c430db4 + 28e5dd7)
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	237	v	X10 (2026-10-19, zero dead links)
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	238	r	TODO_LIST BuildFlow row
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	240	r	TODO_LIST BuildFlow row
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	242	r	TODO_LIST BuildFlow row
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	244	r	TODO_LIST BuildFlow row
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	246	r	TODO_LIST SystemNix row
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	248	r	TODO_LIST D1-gated rows
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	250	r	TODO_LIST row
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	251	r	ROADMAP aarch64 posture (occasional local --all-systems eval)
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	254	r	ROADMAP 0.16-born ideas
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	255	r	ROADMAP (post-C44)
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	256	r	ROADMAP 0.16-born ideas
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	259	r	ROADMAP 0.16-born ideas
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	261	r	ROADMAP theme 6
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	262	r	TODO_LIST blocked-on-user rows
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	263	r	ROADMAP (documented-manual posture)
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	264	n	rejected without new evidence (AGENTS conventions; alejandra CI contract)
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	266	r	ROADMAP repo-excellence
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	267	v	ROADMAP line added (2026-10-23 docs-health pass)
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	268	r	ROADMAP non-goals (confirmation rides the next roadmap pass)
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	269	v	TODO_LIST watch row carries the retirement checklist
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	271	v	TODO_LIST watch row + README runbook step 2
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	273	v	README delta table carries it (module comment updates only if 0.16.26 is ever overlaid, C45)
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	275	v	TODO_LIST watch row (re-checked 2026-10-19)
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	277	n	the file is vendored; the divergence is documented in the README ledger - no upstream ask
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	280	v	asserted (tests/stalwart-migrate-e2e.nix:237)
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	282	r	TODO_LIST row (new 2026-10-23)
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	284	v	row 15 SPEC stands; consumer encoding is SystemNix-side; validationFailed signature added 2026-10-23
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	286	v	FEATURES devShell row + the devshells.nix comment carry it (AGENTS at its 220-line cap)
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	288	p	-
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	290	p	-
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	292	v	AGENTS session-start ritual owns it
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	298	r	decision-batch C43
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	302	r	decision-batch C44
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-18_w-generation-status-and-brutal-self-review.md	307	r	decision-batch C45
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-56_nix-test-dedup-common-nix.md	68	v	residue executed same day + next sessions (statix/deadnix green in gates; CI observed green; CHANGELOG entry added 2026-10-23)
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-56_nix-test-dedup-common-nix.md	73	v	dprint pinned in the devShell (07-18 pass, 2026-10-19)
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-56_nix-test-dedup-common-nix.md	81	v	green in every gate since (pinned statix; CI 2026-10-22 green)
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-56_nix-test-dedup-common-nix.md	85	v	green in every gate since (07-18 verified its auto-fixes)
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-56_nix-test-dedup-common-nix.md	86	v	pre-push + CI run them (green chain through 2026-10-22)
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-56_nix-test-dedup-common-nix.md	89	v	added 2026-10-23 (docs-health pass)
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-56_nix-test-dedup-common-nix.md	91	v	AGENTS records the common.nix convention (import, never restate); the accepted-clone enumeration stays in this report
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-56_nix-test-dedup-common-nix.md	95	v	green chain 2026-10-19 through 2026-10-22 (run 39864876276)
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-56_nix-test-dedup-common-nix.md	98	p	-
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-56_nix-test-dedup-common-nix.md	149	v	green in every gate since
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-56_nix-test-dedup-common-nix.md	151	v	green in every gate since
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-56_nix-test-dedup-common-nix.md	153	v	pre-push + CI (green chain)
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-56_nix-test-dedup-common-nix.md	155	v	devShell pin (07-18 pass)
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-56_nix-test-dedup-common-nix.md	158	v	green (runs 39190484173/39191414206 through 39864876276)
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-56_nix-test-dedup-common-nix.md	160	v	added 2026-10-23
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-56_nix-test-dedup-common-nix.md	162	v	convention recorded; enumeration stays in this report
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-56_nix-test-dedup-common-nix.md	164	p	-
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-56_nix-test-dedup-common-nix.md	166	r	TODO_LIST flood watch row
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-56_nix-test-dedup-common-nix.md	169	r	TODO_LIST flood row (owner taste call, open)
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-56_nix-test-dedup-common-nix.md	172	n	conditional; accept stands at two consumers
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-56_nix-test-dedup-common-nix.md	175	n	conditional; accept stands at four checks
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-56_nix-test-dedup-common-nix.md	178	v	shipped 2026-10-19 (devshells.nix pins dprint)
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-56_nix-test-dedup-common-nix.md	180	v	AGENTS carries the cache-hit/--rebuild rule; the never-built/failed-output variants stay in this report
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-56_nix-test-dedup-common-nix.md	183	p	-
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-56_nix-test-dedup-common-nix.md	188	v	answered: pinned in the devShell (2026-10-19)
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-56_nix-test-dedup-common-nix.md	193	v	answered by practice: internal infra refactors DO get entries (guard-tooling batch; the dedup entry added 2026-10-23)
+/home/lars/projects/nix-email/docs/status/2026-10-19_05-56_nix-test-dedup-common-nix.md	197	r	TODO_LIST flood row (owner call, open)
+/home/lars/projects/nix-email/docs/status/2026-10-19_06-05_resumed-thread-pbx-flip-row-and-f27-verdict-handoff.md	32	v	restored 2026-10-19 in the stable per-cell form (late docs-health pass)
+/home/lars/projects/nix-email/docs/status/2026-10-19_06-05_resumed-thread-pbx-flip-row-and-f27-verdict-handoff.md	45	v	landed via the daemon sweep (V-plan annotated superseded, W15)
+/home/lars/projects/nix-email/docs/status/2026-10-19_06-05_resumed-thread-pbx-flip-row-and-f27-verdict-handoff.md	43	r	decision-batch sittings (open)
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	34	v	ruff-check-fix cleared 2026-10-20 (X11.1/11.2, 40cfed4); CI green 2026-10-22
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	43	v	standing constraint (219-220/220; the next lesson must edit, not append)
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	50	r	TODO_LIST BuildFlow row
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	58	v	landed 2026-10-20 08:40 (probes + README index); its ruff debt fixed by X11 same day
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	66	p	-
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	70	r	TODO_LIST row (new 2026-10-23; owner eyes on the shared gate config)
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	74	v	added 2026-10-23 (devShell pins + AGENTS/CONTRIBUTING restructure entry)
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	77	v	green chain (10-19 runs through 39864876276, 2026-10-22)
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	79	r	TODO_LIST probe-lint row (new 2026-10-23)
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	82	r	TODO_LIST BuildFlow row (added 2026-10-23)
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	162	v	fixed 2026-10-20 (X11, 40cfed4)
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	163	v	fixed 2026-10-20 (X11, 40cfed4)
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	164	v	fixed 2026-10-20 (X11, 40cfed4)
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	165	v	full gates green (2026-10-19/20 sessions; CI green 2026-10-22)
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	166	r	TODO_LIST row (new 2026-10-23)
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	167	r	TODO_LIST BuildFlow row
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	168	p	-
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	169	v	added 2026-10-23
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	170	v	green through run 39864876276 (2026-10-22)
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	171	r	TODO_LIST probe-lint row (new 2026-10-23)
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	172	v	standing constraint: 220 cap, edit-don't-append (14-19 f/43 note)
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	173	n	warm-run validated; cold-cache validation folded into the step-timeout TODO row
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	174	v	check-md-list-markers.sh shipped (W11, empirically scoped)
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	175	v	landed 2026-10-20 (transcripts + README index; FEATURES contacts rows)
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	176	v	README-completeness step caught real drifts on day one (W11); superseded by X9 single-sourcing
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	177	v	zero refs repo-wide (07-18 grep)
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	178	r	rides the bump; triaged upstream-not-actionable (07-18)
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	179	r	TODO_LIST BuildFlow row (added 2026-10-23)
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	180	v	FEATURES gate/CI rows refreshed 2026-10-23 (run 39864876276)
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	181	r	TODO_LIST row
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	182	r	TODO_LIST row
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	183	r	TODO_LIST row
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	184	r	TODO_LIST row
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	185	v	X17.1 (2026-10-20)
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	186	v	X10 (2026-10-19)
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	187	r	TODO_LIST upstream-filings row
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	188	v	TODO_LIST watch row
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	189	r	TODO_LIST BuildFlow row
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	190	v	X14 landed 2026-10-19
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	191	r	TODO_LIST row
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	192	v	scripts/vm-debug.sh (X16)
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	193	v	W9
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	194	v	check-set-lockstep (X9)
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	195	r	TODO_LIST row
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	196	v	attributed buildflow-emitted (2026-10-19)
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	197	v	TODO_LIST stalwart-rename row
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	198	v	README-completeness CI step + lockstep (W11/X9)
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	199	r	TODO_LIST v0.5.0 row (C43-blocked)
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	200	r	TODO_LIST SystemNix pin row
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	201	r	decision-batch C42
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	202	r	decision-batch C44
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	203	r	decision-batch C45 (delta table written)
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	204	r	TODO_LIST (D1-gated row)
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	205	r	decision-batch C39
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	206	v	X6 closed 2026-10-19 (zero dead options; ledger line existed)
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	207	r	TODO_LIST CI python-lint row
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	208	v	flip landed on their master (runs 15/16 verdict); f27 cell restored 2026-10-19; remainder = TODO pbx row (owner blessing)
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	209	n	the edit-tool guard enforces it; ritual line exists in AGENTS
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	210	v	W6: provision NOT re-run pinned across restart
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	211	r	TODO_LIST row
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	218	v	superseded: the owning session landed 2026-10-20 08:40; the fixes landed same day (X11)
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	222	r	TODO_LIST step-timeout row (new 2026-10-23; owner call)
+/home/lars/projects/nix-email/docs/status/2026-10-19_07-18_buildflow-gate-repair-e2e-green-agents-trim.md	225	r	TODO_LIST probe-lint row (new 2026-10-23; owner call)
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	96	r	STILL OPEN: hermetic override owner-gated (TODO pbx row); runs 15/16 proved live fetch impossible (10-20 resumption reports)
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	144	r	TODO_LIST upstream-filings row (dnsmasq transcript first, T13b)
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	155	r	decision-batch sittings (open); X2/X3/X4 = TODO_LIST v0.5.0 + SystemNix pin rows (C43/C45-gated)
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	158	r	TODO_LIST CI python-lint row (owner blessing)
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	159	r	X17 DONE (X17.1/17.2, 2026-10-20); X8/X15 remain (TODO rows); X11.3 ping (TODO row)
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	164	v	fixed 2026-10-20 (40cfed4); CI green 2026-10-22
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	166	r	TODO_LIST BuildFlow row
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	169	r	TODO rows + decision-batch (open)
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	242	v	run 15 executed it (route-wait landed; blocker moved to the OIDC egress impossibility)
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	244	v	run 16 answered: impossible in driver VMs (no outbound at all)
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	246	r	TODO pbx row (hermetic override, owner blessing)
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	249	r	TODO pbx row (after the blessing)
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	251	v	their test header carries the verdict + hermetic spec (their daemon commits)
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	253	r	TODO pbx row (row updated 2026-10-23; CHANGELOG entry waits for green, per f/49)
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	255	v	pushed; run 39864876276 (2026-10-22) exercised the chain green end-to-end
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	258	v	fixed 2026-10-20 (X11); floor green since
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	260	v	fixed 2026-10-20 (40cfed4)
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	261	v	done 2026-10-20 (60e7916 + c430db4/28e5dd7)
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	263	r	TODO_LIST row
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	264	v	carried in the TODO BuildFlow row (attribution resolved 2026-10-19)
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	266	r	TODO_LIST upstream-filings row
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	269	r	TODO_LIST upstream-filings row
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	271	v	filed 2026-10-19 (comment 6258512488); more when the PR moves (watch row)
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	273	v	deleted 2026-10-23 (docs-health pass)
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	274	v	network-state dump in the starter (5edbae6, 2026-10-20)
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	276	r	TODO_LIST row
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	278	r	TODO_LIST row
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	279	r	TODO_LIST flood row
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	280	r	TODO_LIST row
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	282	r	TODO_LIST BuildFlow row (added 2026-10-23; conditional on lychee exercising INBOXCLEAN.md)
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	284	r	TODO_LIST BuildFlow row
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	287	r	TODO_LIST BuildFlow row
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	290	v	X6 closed 2026-10-19; ROADMAP line updated 2026-10-23
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	293	r	TODO_LIST v0.5.0 row (Unreleased date/link pass)
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	295	v	WRITTEN (README ledger delta table, V15 2026-10-19)
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	297	r	TODO_LIST v0.5.0 row (owner call)
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	299	r	TODO_LIST CI python-lint row
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	301	r	TODO_LIST SystemNix row
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	302	r	TODO_LIST SystemNix row
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	303	r	TODO_LIST D1-gated rows
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	305	r	decision-batch (open)
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	307	n	sitting-prep nicety; decision-batch owns freshness
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	309	p	-
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	312	r	stays live until the pbx saga closes (annotated this pass, archive deferred)
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	314	n	the /tmp logs are lost; the runs are superseded by the 10-20 impossibility verdict (test header + CONTRIBUTING carry the doctrine)
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	317	r	idea parked (revisit on the next wrapper-option change)
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	320	r	TODO_LIST upstream-filings row (transcript first)
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	322	v	CONTRIBUTING VM debug loops (f) carries the driver-VM scope; the DnsResolver doctrine is in the README (W14)
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	324	r	cross-repo docs ask (BuildFlow/crush-config references)
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	326	r	TODO_LIST SystemNix pin row
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	328	v	added 2026-10-23 (THREAT_MODEL 0.16 exposure delta)
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	330	v	validationFailed signature added to row 15 (2026-10-23)
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	332	n	scope note, correct
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	334	v	superseded: their session landed 2026-10-20; the findings fixed by X11 same day
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	336	r	idea parked (vm-debug.sh)
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	338	r	their TODO/hand-off rows own it (their repo)
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	340	r	TODO pbx row (entry waits for green)
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	342	n	point-in-time note; the ritual is in AGENTS
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	348	r	answered by evidence: live fetch impossible in driver VMs; hermetic blessing pending (TODO pbx row)
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	355	r	owner call (working instance is consumer-side; TODO pbx row evidence)
+/home/lars/projects/nix-email/docs/status/2026-10-19_12-17_x-generation-execution-nine-lanes-green-pbx-flip-mid-flight.md	360	r	owner call (cross-repo policy)
+/home/lars/projects/nix-email/docs/status/2026-10-20_10-25_x-generation-resumption-ruff-floor-x17-pbx-egress-verdict.md	39	n	subsumed by the same session's 14-19 closeout (b.1 carries the final state)
+/home/lars/projects/nix-email/docs/status/2026-10-20_10-25_x-generation-resumption-ruff-floor-x17-pbx-egress-verdict.md	43	n	subsumed by the same session's 14-19 closeout (b.1 carries the final state)
+/home/lars/projects/nix-email/docs/status/2026-10-20_10-25_x-generation-resumption-ruff-floor-x17-pbx-egress-verdict.md	49	n	subsumed by the same session's 14-19 closeout (b.1 carries the final state)
+/home/lars/projects/nix-email/docs/status/2026-10-20_10-25_x-generation-resumption-ruff-floor-x17-pbx-egress-verdict.md	79	r	carried by the 14-19 closeout + TODO_LIST rows
+/home/lars/projects/nix-email/docs/status/2026-10-20_10-25_x-generation-resumption-ruff-floor-x17-pbx-egress-verdict.md	99	r	14-19 f/1 = TODO pbx row (owner, open)
+/home/lars/projects/nix-email/docs/status/2026-10-20_10-25_x-generation-resumption-ruff-floor-x17-pbx-egress-verdict.md	101	v	pushed; run 39864876276 (2026-10-22) green end-to-end
+/home/lars/projects/nix-email/docs/status/2026-10-20_10-25_x-generation-resumption-ruff-floor-x17-pbx-egress-verdict.md	104	r	TODO_LIST rows
+/home/lars/projects/nix-email/docs/status/2026-10-20_10-25_x-generation-resumption-ruff-floor-x17-pbx-egress-verdict.md	106	r	TODO_LIST upstream-filings row
+/home/lars/projects/nix-email/docs/status/2026-10-20_10-25_x-generation-resumption-ruff-floor-x17-pbx-egress-verdict.md	109	r	TODO_LIST BuildFlow row
+/home/lars/projects/nix-email/docs/status/2026-10-20_10-25_x-generation-resumption-ruff-floor-x17-pbx-egress-verdict.md	111	r	TODO_LIST CI python-lint row
+/home/lars/projects/nix-email/docs/status/2026-10-20_10-25_x-generation-resumption-ruff-floor-x17-pbx-egress-verdict.md	116	r	TODO pbx row (hermetic blessing pending)
+/home/lars/projects/nix-email/docs/status/2026-10-20_10-25_x-generation-resumption-ruff-floor-x17-pbx-egress-verdict.md	118	r	owner call (TODO pbx row evidence)
+/home/lars/projects/nix-email/docs/status/2026-10-20_10-25_x-generation-resumption-ruff-floor-x17-pbx-egress-verdict.md	121	r	owner call (cross-repo policy)
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	89	v	pushed; run 39864876276 (2026-10-22) green end-to-end (ruff -> lockstep -> shape -> flake-check)
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	97	r	TODO_LIST v0.5.0 + SystemNix pin rows + decision-batch (owner-gated)
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	149	r	TODO pbx row (OPEN, owner)
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	151	v	pushed; run 39864876276 (2026-10-22) green end-to-end
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	153	r	TODO_LIST row (new 2026-10-23)
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	155	n	cross-repo sweep belongs to each repo; this repo's hazard fixed (d3fb4e7)
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	157	r	TODO_LIST row
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	159	r	TODO_LIST row
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	160	r	TODO_LIST flood row
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	162	r	TODO_LIST row
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	164	r	TODO_LIST row
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	166	r	TODO_LIST upstream-filings row
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	168	r	TODO_LIST upstream-filings row
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	169	r	first comment filed 2026-10-19 (6258512488); more when the PR moves (watch row)
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	171	r	TODO_LIST BuildFlow row
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	173	v	carried in the TODO BuildFlow row
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	175	r	TODO_LIST CI python-lint row
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	176	r	TODO_LIST CI python-lint row
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	178	r	TODO_LIST v0.5.0 row
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	180	v	WRITTEN (README ledger delta table, V15)
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	182	r	TODO_LIST D1-gated rows
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	183	r	TODO_LIST SystemNix row
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	184	r	decision-batch (open)
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	185	r	TODO_LIST probe-lint row (new 2026-10-23; EXE001 half fixed by chmod this pass)
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	187	v	added 2026-10-23 (CONTRIBUTING VM debug loops rule (e))
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	189	r	idea parked (vm-debug.sh)
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	191	r	TODO_LIST BuildFlow row
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	194	v	ROADMAP line updated 2026-10-23 (X6 closed: zero dead options; re-run trigger = next wrapper-option change)
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	197	v	AGENTS rule landed (transcript rule extends to CardDAV/JMAP-contacts)
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	200	r	TODO_LIST BuildFlow row (added 2026-10-23)
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	202	r	standing ritual; demo-eval pins the ports/roles/admin contract mechanically
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	204	r	standing caveat (AGENTS docs map; W7 spot-check banner 2026-10-19)
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	206	n	the AGENTS prose rule suffices
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	210	r	small doc note next to the bind-e2e cert comment
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	213	r	idea parked (vm-debug.sh)
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	215	r	small comment nicety (tests/stalwart-bind-e2e.nix)
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	219	r	TODO_LIST flood row (output hygiene)
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	222	r	idea parked (CI optimization)
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	224	v	verified 2026-10-23: no third copy outside docs/status snapshots; drift alarm + README anti-drift enforce the two sites
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	228	r	README pin-advance runbook owns it
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	230	v	TODO_LIST watch row
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	232	r	TODO pbx row
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	234	n	the /tmp logs are lost to reboot; superseded by the impossibility verdict (test header + CONTRIBUTING carry the doctrine)
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	238	r	TODO_LIST v0.5.0 row (release-procedure assessment step)
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	241	v	standing constraint honored this pass (no appends)
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	243	n	ritual note; this pass ran check-rows over every annotated file
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	245	r	BuildFlow owns the hook (their repo)
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	248	r	TODO_LIST CI python-lint row (canonical gap list)
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	250	n	no-action note
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	252	v	superseded: the debt was fixed by X11 (2026-10-20); the hand-off-protocol note stays with their repo
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	256	n	correct refusal; the local negative test covers drift
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	259	n	process note, consumed
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	266	r	TODO pbx row (OPEN, owner)
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	273	v	pushed; run 39864876276 (2026-10-22) green end-to-end
+/home/lars/projects/nix-email/docs/status/2026-10-20_14-19_x-generation-resumption-closeout-ruff-floor-x17-cert-bomb-pbx-egress.md	279	r	owner call (cross-repo policy)

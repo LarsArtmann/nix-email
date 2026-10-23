@@ -36,17 +36,17 @@ is the parent report; its 3 owner questions stand unless restated here).
 
 ## b) PARTIAL - pbx X5 (their repo; runs 15/16 decisive)
 
-- **Run 15**: the unit-level route-wait ExecStartPre was a NO-OP that
+~~- **Run 15**: the unit-level route-wait ExecStartPre was a NO-OP that~~ **NOT-DO — subsumed by the same session's 14-19 closeout (b.1 carries the final state).**
   itself failed the provision unit - bare `ip` is not on the unit PATH
   (`command not found` looped 60s, exit 1 at t=85.5). Fixed with
   absolute store paths.
-- **Run 16** (with the fix + new discriminators): apply passes ALL 30
+~~- **Run 16** (with the fix + new discriminators): apply passes ALL 30~~ **NOT-DO — subsumed by the same session's 14-19 closeout (b.1 carries the final state).**
   objects, fails ONLY at the final `reload` action's OIDC discovery
   fetch - and the forensics prove the fetch can NEVER work in a driver
   VM: with a valid DHCP default route, slirp DNS (10.0.2.3, resolv.conf
   correctly populated by resolvconf) AND direct TCP (curl 7 to
   1.1.1.1:443 in 1 ms) both fail instantly. /tmp/pbx-x5-run16.log.
-- **Consequence**: owner question 1 (live GET vs hermetic) is settled
+~~- **Consequence**: owner question 1 (live GET vs hermetic) is settled~~ **NOT-DO — subsumed by the same session's 14-19 closeout (b.1 carries the final state).**
   by impossibility, not policy - a live fetch cannot go green in
   `nix flake check` VMs. The hermetic mechanism is spec'd (whole-key
   `mkVMOverride` on `provision.objects.Directory.objects.pocketid` to a
@@ -76,7 +76,7 @@ is the parent report; its 3 owner questions stand unless restated here).
 
 ## c) NOT STARTED (unchanged from the parent report)
 
-X1-C43 release chain (X2/X3/X4), X8, X15, X11.3, X13 (wait-for
+X1-C43 release chain (X2/X3/X4), X8, X15, X11.3, X13 (wait-for **→ carried by the 14-19 closeout + TODO_LIST rows**
 BuildFlow session - binary is already stale vs their HEAD 9e3ccb0),
 X18, X19, X20, X12 filings.
 

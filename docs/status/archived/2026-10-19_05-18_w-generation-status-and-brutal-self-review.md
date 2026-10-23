@@ -88,21 +88,21 @@
    never started; the rest of W10 landed.
 4. **W13 BuildFlow noise**: not touched this session (binary rebuild **→ TODO_LIST BuildFlow row**
    blocked by the concurrent session; diagnoses not started either).
-~~5. **W15.6 harvest**: TODO rows updated inline during the session, but~~ done (docs-health pass 2026-10-23)
+   ~~5. **W15.6 harvest**: TODO rows updated inline during the session, but~~ done (docs-health pass 2026-10-23)
    no dedicated final docs-health HARVEST pass over THIS report's f-list
    (deliberate: the user decides what survives).
 
 ## c) NOT STARTED
 
-- **W3 / W8 owner sittings** (everything they gate: C43-C46, C39, C41,
+- **W3 / W8 owner sittings** (everything they gate: C43-C46, C39, C41, **→ decision-batch sittings (open)**
   C18/C19/C22/C24/C29/C34, Q4, bandit/vulture scope, demo g1/g2, qcow2
   verdict, D1/D2, Resend key).
 - **W4 cut v0.5.0** → **W5 SystemNix pin advance** (gated on W3/C43).
-- **W16 SystemNix CI debt** (their repo), **W17 D1 slice** (D1+W8
+- **W16 SystemNix CI debt** (their repo), **W17 D1 slice** (D1+W8 **→ TODO_LIST SystemNix row (W16) + D1-gated rows (W17)**
   gated).
-- **W18.3/W18.4** apply-log dump-on-failure fault-injection proof +
+  ~~- **W18.3/W18.4** apply-log dump-on-failure fault-injection proof +~~ done — X17.1 proof + X17.2 audit (2026-10-20); W18.5 link sweep done by X10 (2026-10-19)
   VM-test redirect audit; **W18.5** external-link sweep.
-- The `migrate-convert-eval` CI twin check on the aarch64 side is
+- The `migrate-convert-eval` CI twin check on the aarch64 side is **→ ROADMAP aarch64 posture (occasional local --all-systems eval)**
   registered but has never run in a full aarch64 eval gate
   (`nix flake check` runs x86_64 only locally; CI's shape guard evals it).
 
@@ -215,81 +215,81 @@
    (flap), ratify the `[rec]` adoptions.
 7. W8: policy batch (C18/C19/C22/C24/C29/C34, Q4, bandit/vulture CI **→ decision-batch + TODO blocked-on-user rows**
    scope, demo g1/g2, qcow2 history verdict, D1/D2 timeline, Resend key).
-~~8. Update AGENTS.md: check registration is FOUR sites + README bullet~~ done — superseded same day: X9 single-sourced the set (AGENTS now says TWO sites + tests/check-expected.json)
+   ~~8. Update AGENTS.md: check registration is FOUR sites + README bullet~~ done — superseded same day: X9 single-sourced the set (AGENTS now says TWO sites + tests/check-expected.json)
    (this report d/3).
-~~9. Check + update the FEATURES.md migration row for the now-working~~ done — migration row is FULLY_FUNCTIONAL 9/9 (verified 2026-10-23)
+   ~~9. Check + update the FEATURES.md migration row for the now-working~~ done — migration row is FULLY_FUNCTIONAL 9/9 (verified 2026-10-23)
    migration path (this report d/8).
-~~10. Reconcile tests/common.nix vs the dedup-against CHANGELOG verdict~~ done — reconciled: common.nix shipped same day; dedup-AGAINST scoped to fetchurl fixtures; both CHANGELOG entries present (2026-10-23)
-    (handshake row, then align both texts).
-~~11. Root-cause the gate count line ("running 7" vs 10) in nix's check~~ done — attributed buildflow-emitted (2026-10-19; BuildFlow-side residue in the TODO row)
-    runner; replace "known noise" with the actual semantics.
-12. W6.3: relay bounce-path e2e subtest (Mailpit/queue state, never **→ TODO_LIST row**
-    journal greps).
-13. W6.4: e2e runtime-trim investigation + test-profile TTL doctrine. **→ TODO_LIST row**
-14. W6.7: EventSource `ping` parameter probe on the demo VM. **→ TODO_LIST row**
-15. W12.3: dnsmasq-forward upstream note (decide venue: nixos-test **→ TODO_LIST upstream-filings row**
+   ~~10. Reconcile tests/common.nix vs the dedup-against CHANGELOG verdict~~ done — reconciled: common.nix shipped same day; dedup-AGAINST scoped to fetchurl fixtures; both CHANGELOG entries present (2026-10-23)
+   (handshake row, then align both texts).
+   ~~11. Root-cause the gate count line ("running 7" vs 10) in nix's check~~ done — attributed buildflow-emitted (2026-10-19; BuildFlow-side residue in the TODO row)
+   runner; replace "known noise" with the actual semantics.
+8. W6.3: relay bounce-path e2e subtest (Mailpit/queue state, never **→ TODO_LIST row**
+   journal greps).
+9. W6.4: e2e runtime-trim investigation + test-profile TTL doctrine. **→ TODO_LIST row**
+10. W6.7: EventSource `ping` parameter probe on the demo VM. **→ TODO_LIST row**
+11. W12.3: dnsmasq-forward upstream note (decide venue: nixos-test **→ TODO_LIST upstream-filings row**
     docs? stalwart discussions?).
-16. W12.4: dprint T13b filing (run the verify-before-filing gates on **→ TODO_LIST upstream-filings row**
+12. W12.4: dprint T13b filing (run the verify-before-filing gates on **→ TODO_LIST upstream-filings row**
     the eaten-cells repro first).
-~~17. W18.3: apply-log dump-on-failure fault-injection proof.~~ done — X17.1 (2026-10-20, 60e7916)
-~~18. W18.4: audit all VM-test steps that redirect to VM-local files for~~ done — X17.2 (2026-10-20, c430db4 + 28e5dd7)
+    ~~17. W18.3: apply-log dump-on-failure fault-injection proof.~~ done — X17.1 (2026-10-20, 60e7916)
+    ~~18. W18.4: audit all VM-test steps that redirect to VM-local files for~~ done — X17.2 (2026-10-20, c430db4 + 28e5dd7)
     the dump rule.
-~~19. W18.5: external-link re-verification sweep over living docs.~~ done — X10 (2026-10-19, zero dead links)
-20. W13.1-2: reproduce + reconcile BuildFlow nix-checker 12-vs-2 and **→ TODO_LIST BuildFlow row**
+    ~~19. W18.5: external-link re-verification sweep over living docs.~~ done — X10 (2026-10-19, zero dead links)
+13. W13.1-2: reproduce + reconcile BuildFlow nix-checker 12-vs-2 and **→ TODO_LIST BuildFlow row**
     bandit 54-vs-4 count gaps (read-only diagnosis).
-21. W13.3: file the ruff findings-identity bug (missing_file=55, **→ TODO_LIST BuildFlow row**
+14. W13.3: file the ruff findings-identity bug (missing_file=55, **→ TODO_LIST BuildFlow row**
     json parsing).
-22. W13.4-5: detect-only-under-sibling-failure proposal + vulture **→ TODO_LIST BuildFlow row**
+15. W13.4-5: detect-only-under-sibling-failure proposal + vulture **→ TODO_LIST BuildFlow row**
     confidence policy docs (their repo).
-23. W13.6: BuildFlow binary rebuild + ef32fa0..HEAD delta review ONCE **→ TODO_LIST BuildFlow row**
+16. W13.6: BuildFlow binary rebuild + ef32fa0..HEAD delta review ONCE **→ TODO_LIST BuildFlow row**
     the concurrent session lands.
-24. W16: SystemNix CI debt (credential, canary allowlist, 2 pin flips, **→ TODO_LIST SystemNix row**
+17. W16: SystemNix CI debt (credential, canary allowlist, 2 pin flips, **→ TODO_LIST SystemNix row**
     scheduled-vs-push divergence).
-25. W17: D1 enablement slice (rotate placeholder secrets, live dmarc **→ TODO_LIST D1-gated rows**
+18. W17: D1 enablement slice (rotate placeholder secrets, live dmarc **→ TODO_LIST D1-gated rows**
     poll, vandelay-vs-imapsync, canary skeleton).
-26. TLS-node coverage for Netease + LinkedIn parsedmarc fixtures. **→ TODO_LIST row**
-27. A one-time aarch64 eval gate run (`nix flake check --all-systems` **→ ROADMAP aarch64 posture (occasional local --all-systems eval)**
+19. TLS-node coverage for Netease + LinkedIn parsedmarc fixtures. **→ TODO_LIST row**
+20. A one-time aarch64 eval gate run (`nix flake check --all-systems` **→ ROADMAP aarch64 posture (occasional local --all-systems eval)**
     or the shape eval) to actually EXECUTE the aarch64 check set
     including migrate-convert-eval.
-28. Declarative catch-all wrapper option (post-C44 backlog). **→ ROADMAP 0.16-born ideas**
-29. Typed secrets option (post-C44). **→ ROADMAP (post-C44)**
-30. Queue-depth observability surface (consumer poll spec from **→ ROADMAP 0.16-born ideas**
+21. Declarative catch-all wrapper option (post-C44 backlog). **→ ROADMAP 0.16-born ideas**
+22. Typed secrets option (post-C44). **→ ROADMAP (post-C44)**
+23. Queue-depth observability surface (consumer poll spec from **→ ROADMAP 0.16-born ideas**
     MONITORING row 2 — needs the counter-divergence rule encoded on
     the SystemNix side).
-31. parsedmarc on REAL 0.16 mail (live mailbox poll — D1 slice **→ ROADMAP 0.16-born ideas**
+24. parsedmarc on REAL 0.16 mail (live mailbox poll — D1 slice **→ ROADMAP 0.16-born ideas**
     adjacent).
-32. OIDC wiring (ROADMAP). **→ ROADMAP theme 6**
-33. Branch-protection + Renovate execution (post-C18/C19). **→ TODO_LIST blocked-on-user rows**
-34. aarch64 posture decision (ROADMAP). **→ ROADMAP (documented-manual posture)**
-~~35. treefmt standardization (rejected once; revisit only with new~~ **NOT-DO — rejected without new evidence (AGENTS conventions; alejandra CI contract).**
+25. OIDC wiring (ROADMAP). **→ ROADMAP theme 6**
+26. Branch-protection + Renovate execution (post-C18/C19). **→ TODO_LIST blocked-on-user rows**
+27. aarch64 posture decision (ROADMAP). **→ ROADMAP (documented-manual posture)**
+    ~~35. treefmt standardization (rejected once; revisit only with new~~ **NOT-DO — rejected without new evidence (AGENTS conventions; alejandra CI contract).**
     evidence).
-36. vulnix replacement (osv-scanner) — vulnix crashes fleet-wide. **→ ROADMAP repo-excellence**
-~~37. DOMAIN_LANGUAGE.md authoring (ROADMAP).~~ done — ROADMAP line added (2026-10-23 docs-health pass)
-38. Non-goals confirmation pass (ROADMAP). **→ ROADMAP non-goals (confirmation rides the next roadmap pass)**
-~~39. Watch: nixpkgs #552103 merge → vendored-module retirement~~ done — TODO_LIST watch row carries the retirement checklist
+28. vulnix replacement (osv-scanner) — vulnix crashes fleet-wide. **→ ROADMAP repo-excellence**
+    ~~37. DOMAIN_LANGUAGE.md authoring (ROADMAP).~~ done — ROADMAP line added (2026-10-23 docs-health pass)
+29. Non-goals confirmation pass (ROADMAP). **→ ROADMAP non-goals (confirmation rides the next roadmap pass)**
+    ~~39. Watch: nixpkgs #552103 merge → vendored-module retirement~~ done — TODO_LIST watch row carries the retirement checklist
     checklist (restore meta.doc/partOf, drop the ExecStartPost patch).
-~~40. Watch: #566282 pin-advance fallout (provision.opensearch port~~ done — TODO_LIST watch row + README runbook step 2
+    ~~40. Watch: #566282 pin-advance fallout (provision.opensearch port~~ done — TODO_LIST watch row + README runbook step 2
     procedure — README runbook step 2).
-~~41. Watch: 0.16.26 `sd_notify` note onto the vendored module comment~~ done — README delta table carries it (module comment updates only if 0.16.26 is ever overlaid, C45)
+    ~~41. Watch: 0.16.26 `sd_notify` note onto the vendored module comment~~ done — README delta table carries it (module comment updates only if 0.16.26 is ever overlaid, C45)
     (C45-adjacent).
-~~42. Watch: #563651/#563652/#563777 + mailsuite#65 (all open/silent~~ done — TODO_LIST watch row (re-checked 2026-10-19)
+    ~~42. Watch: #563651/#563652/#563777 + mailsuite#65 (all open/silent~~ done — TODO_LIST watch row (re-checked 2026-10-19)
     as of today's re-check).
-~~43. Snapshot-vs-wrapper matchOn: consider an upstream doc PR to~~ **NOT-DO — the file is vendored; the divergence is documented in the README ledger - no upstream ask.**
+    ~~43. Snapshot-vs-wrapper matchOn: consider an upstream doc PR to~~ **NOT-DO — the file is vendored; the divergence is documented in the README ledger - no upstream ask.**
     migrate_v016.py explaining the deliberate divergence (the ledger
     line now exists on our side).
-~~44. migrate-e2e: assert the `.v015-premigrate` backup EXISTS after the~~ done — asserted (tests/stalwart-migrate-e2e.nix:237)
+    ~~44. migrate-e2e: assert the `.v015-premigrate` backup EXISTS after the~~ done — asserted (tests/stalwart-migrate-e2e.nix:237)
     script (currently only the marker is asserted).
-45. migrate-e2e: cover the NO-backup-dir flow (clean live store) — **→ TODO_LIST row (new 2026-10-23)**
+30. migrate-e2e: cover the NO-backup-dir flow (clean live store) — **→ TODO_LIST row (new 2026-10-23)**
     today only the poisoned/--backup-dir path runs.
-~~46. MONITORING: encode the row-15 provision-failure alert as a~~ done — row 15 SPEC stands; consumer encoding is SystemNix-side; validationFailed signature added 2026-10-23
+    ~~46. MONITORING: encode the row-15 provision-failure alert as a~~ done — row 15 SPEC stands; consumer encoding is SystemNix-side; validationFailed signature added 2026-10-23
     concrete Gatus/systemd spec on the consumer side (their repo).
-~~47. Consider a `nix-health` mention in AGENTS commands (devShell~~ done — FEATURES devShell row + the devshells.nix comment carry it (AGENTS at its 220-line cap)
+    ~~47. Consider a `nix-health` mention in AGENTS commands (devShell~~ done — FEATURES devShell row + the devshells.nix comment carry it (AGENTS at its 220-line cap)
     ships it; the doc doesn't say so yet).
-~~48. Docs-health HARVEST of this report's f-list (once the user rules~~ done (docs-health pass 2026-10-23)
+    ~~48. Docs-health HARVEST of this report's f-list (once the user rules~~ done (docs-health pass 2026-10-23)
     on what survives).
-~~49. Delete/refresh the `fir-determinism-*` /tmp probe logs (foreign,~~ done (docs-health pass 2026-10-23)
+    ~~49. Delete/refresh the `fir-determinism-*` /tmp probe logs (foreign,~~ done (docs-health pass 2026-10-23)
     months old — someone's residue; confirm ownership first).
-~~50. Session-start baseline ritual note: three crush sessions were~~ done — AGENTS session-start ritual owns it
+    ~~50. Session-start baseline ritual note: three crush sessions were~~ done — AGENTS session-start ritual owns it
     active at peak; the ritual held, but a `docs/status` same-day
     scan BEFORE first edit caught the contacts session only by luck.
 

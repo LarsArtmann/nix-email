@@ -32,8 +32,8 @@ The 0.16 object model moved the threat surface in BOTH directions:
   discovery document when the plan carries an OidcDirectory
   (`validationFailed | Network error: Discovery fetch failed` otherwise)
   - every OidcDirectory consumer needs live egress at apply/reload time,
-  and VM-test plans must render hermetic non-remote directory shapes
-  (driver VMs have NO outbound at all; CONTRIBUTING "VM debug loops").
+    and VM-test plans must render hermetic non-remote directory shapes
+    (driver VMs have NO outbound at all; CONTRIBUTING "VM debug loops").
 - Store-guard boundary: the wrapper's `ExecStartPre` guard makes the
   poison-class (0.16 binary writing into a 0.15 store, destroying the
   dump path) a loud refusal instead of a crash loop - integrity, not

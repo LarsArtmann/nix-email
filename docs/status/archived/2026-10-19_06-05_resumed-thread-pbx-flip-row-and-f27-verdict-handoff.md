@@ -29,20 +29,20 @@
 
 ## b) HAND-OFF (found broken, not repaired - file under concurrent edit)
 
-- **06-12 report f27 verdict cell lost**: a later annotate rebuild of
-  `docs/status/2026-10-17_06-12_*.md` dropped my verdict (the row is now a
-  bare strike). The c/47 annotation still preserves the substance. The file
-  was being modified by another session DURING this thread (mtime <10 min),
-  so the restore is routed into the new TODO row instead of racing the
-  file. Verdict to restore: "done 2026-10-17 - their lock d7e1334
-  (0.16.26): stalwart.service ACTIVE + provision FINISHED at boot, fix
-  validated; remaining red = the file's own deliberate deadlock-pin".
+~~- **06-12 report f27 verdict cell lost**: a later annotate rebuild of~~ done — restored 2026-10-19 in the stable per-cell form (late docs-health pass)
+`docs/status/2026-10-17_06-12_*.md` dropped my verdict (the row is now a
+bare strike). The c/47 annotation still preserves the substance. The file
+was being modified by another session DURING this thread (mtime <10 min),
+so the restore is routed into the new TODO row instead of racing the
+file. Verdict to restore: "done 2026-10-17 - their lock d7e1334
+(0.16.26): stalwart.service ACTIVE + provision FINISHED at boot, fix
+validated; remaining red = the file's own deliberate deadlock-pin".
 
 ## c) Open (unchanged, owner-gated)
 
-- P1/P2 owner sittings (C39-C46 answers, ratifications, D1/D2, Resend key)
+- P1/P2 owner sittings (C39-C46 answers, ratifications, D1/D2, Resend key) **→ decision-batch sittings (open)**
   - unchanged; C42 evidence is complete and tilts retire-once-0.16-pins.
-- The concurrently modified `V-plan` + `decision-batch.md` working-tree
-  edits belong to the live sessions - left untouched (daemon will sweep).
+    ~~- The concurrently modified `V-plan` + `decision-batch.md` working-tree~~ done — landed via the daemon sweep (V-plan annotated superseded, W15)
+    edits belong to the live sessions - left untouched (daemon will sweep).
 
 WAITING FOR INSTRUCTIONS.

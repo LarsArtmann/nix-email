@@ -197,7 +197,7 @@ transcript-pinned dialect).
   CardDAV/JMAP-contacts. Upstream issues: no filing without a measured
   victim (filing gate = demo-VM benchmark at 10k+ cards); verdict, source
   facts + citations live in
-  docs/status/2026-10-19_02-35_stalwart-contacts-assessment.md.
+  docs/status/archived/2026-10-19_02-35_stalwart-contacts-assessment.md.
 
 ## Documentation map
 
