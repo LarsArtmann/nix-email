@@ -5,6 +5,15 @@
 | Date          | 2026-09-22 (execution session)                                                                                                              |
 | Purpose       | Unblock the 19 decision-gated todos (Pareto plan M2; plan file `archived/2026-09-22_19-23_pareto-master-plan-super-email-monitoring.md` §1) |
 | How to answer | Reply with the decision IDs (`D1: retire`, `C24: discord`, ...). Defaults marked **[rec]** execute on your go.                              |
+| Sitting sheet | 2026-10-23: the one-page verdict sheet for the Y-generation sitting is `2026-10-23_11-56_owner-sitting-ratification-verdict-sheet.md` (same directory). It re-reads every open entry below against the current tree; answer from there. |
+
+**Fresh-read verdict 2026-10-23 (Y-plan O1):** every `[rec]` below was
+re-checked against the tree and the gate state. Three are EXPIRED as written
+and carry an inline correction: C42 (its "docs-verified only" rationale is
+now the sole gap, evidence re-verified 2026-10-18), C40 (superseded by scope,
+already marked), and C41 (the addendum moved the debate to the <20 KB
+relocation question - the [rec] itself stands). Everything else is current.
+Unanswered entries stay BLOCKED; the executor never defaults them.
 
 ## The big two (gate ~15 todos incl. the entire production build-out)
 
@@ -207,6 +216,9 @@ deleting distinct paid-for lessons.
 
 - **[rec] Accept the current size as the floor** (no enforced budget, no
   gate); re-visit only if the flag threshold (30 KB) approaches.
+- **STATUS 2026-10-23 (Y-plan O1 fresh read): [rec] STANDS.** The <20 KB
+  relocation idea in the addendum below is a SEPARATE structure decision and
+  is still open; answering this entry does not answer that one.
 - Unblocks: retires the recurring F22.3 line from every docs pass.
 - ADDENDUM 2026-10-17: the 06-05 diet pass pruned 31,498 -> 28,040 B (11%,
   rules kept); the 0.16 migration doctrine re-grew it to 29,220 B (still
@@ -279,6 +291,9 @@ is the fleet pin, but the call stays owner-gated.
   exists (D1) and the 0.16 native report surface has been inspected hands-on
   (our e2e exercised AGGREGATE ingest on 0.16.22 only; failure-report parse
   is docs-verified, not runtime-verified).
+- **STATUS 2026-10-23 (Y-plan O1 fresh read): [rec] STANDS.** The rationale
+  above is the ONLY remaining gap (one ARF probe); everything else in this
+  entry was re-verified 2026-10-18.
 - Evidence RE-VERIFIED 2026-10-18 (fresh fetch, /docs/mta/reports/ +
   /docs/mta/reports/analysis/ + /docs/ref/object/report-settings): the
   overview lists "authentication-failure reports (DKIM, SPF, and DMARC

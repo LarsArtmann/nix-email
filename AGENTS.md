@@ -181,7 +181,8 @@ transcript-pinned dialect).
   can disagree with the defined set - trust the attrNames eval. Before
   creating a repo-root file, `ls` the WHOLE repo incl. `docs/` first.
 - Session-start baseline ritual: `git status --short`, `pgrep -af crush`,
-  scan `ls docs/status` for same-day reports BEFORE the first edit; never
+  scan EVERY corridor dir (`docs/status`, `docs/planning`, `docs/reviews`)
+  for same-day reports BEFORE the first edit; never
   edit a file another session is mid-iterating on - hand off via
   TODO_LIST rows. Register reads with `view` (bash does NOT arm the
   modified-since-read guard). Annotated status reports are

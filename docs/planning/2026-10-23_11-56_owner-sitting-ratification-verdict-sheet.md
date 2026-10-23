@@ -1,0 +1,114 @@
+<!-- Owner-sitting package (Y-plan task O1). Every entry here is an OPEN owner
+     call harvested fresh from docs/planning/decision-batch.md on 2026-10-23
+     (C38-C53 + the older policy/ratification batch). Recommendations were
+     re-read against the current tree, not copied blind: entries whose [rec]
+     is now stale are marked STALE with the correction inline. Nothing here
+     is executed by the agent sitting - the executor records verdicts
+     verbatim (Y-plan O3) and never defaults an unanswered row. -->
+
+# Owner sitting - ratification + verdict sheet (2026-10-23)
+
+> **Time budget:** ~60 min. Answer with IDs only (`C43: cut`, `C19: drop`).
+> **Unanswered = still BLOCKED** (no silent defaults, Y-plan kill-switch).
+> Verdicts get written into `docs/planning/decision-batch.md` and the
+> TODO_LIST re-rowed in the same session (O3).
+
+## Batch 1 - release train (blocks v0.5.0 and the whole fleet)
+
+| ID  | The call                                                                                            | Recommendation                    | Alternatives                                | Cost of delay                                                       |
+| --- | --------------------------------------------------------------------------------------------------- | --------------------------------- | ------------------------------------------- | ------------------------------------------------------------------- |
+| C43 | Ship v0.5.0 WITH the vendored 0.16 module, or wait for nixpkgs PR #552103 to merge?                 | **Cut with the vendored module**  | Wait for the PR (fleet stays 0.15.5)        | Every consumer stuck on v0.4.0 = the 0.15 world while the tree is green |
+| C45 | Stalwart package: stay on the pin's 0.16.22, or overlay 0.16.26?                                     | **Stay on 0.16.22**               | Overlay 0.16.26 (needs x86-64-v2 + VM cpu change) | None today: both known .22 bugs are neutralized in-tree        |
+| C44 | Account-secrets pattern for real hosts (0.16 plan passwords land in the world-readable store)        | **(b) admin-created for interactive + (a) sops-rendered for automation; build (c) only on demand** | (a) only, (b) only, (c) credential-file type | No blessed pattern exists at the v0.5.0 pin advance   |
+| C46 | Deploy-time restart flap on the vendored unit (every plan change bounces the mail ports seconds)     | **Accept for v0.5.0**             | Plan-hash gate (stateful)                   | Cosmetic                                                            |
+| C39 | MemoryMax ownership: wrapper `mkDefault` or consumer layer?                                          | **Consumer layer, wrapper ships none; record in THREAT_MODEL + module headers** | wrapper mkDefault              | Every nix-review re-flags it; unbounded stalwart on the VPS          |
+| C41 | AGENTS.md size floor (~29 KB, under the 30 KB flag)                                                   | **Accept as the floor** (no budget, no gate) | Force a diet to <20 KB by relocating VM-debug mechanics | Recurring F22.3 line in every docs pass                    |
+| C42 | `services.dmarc-monitor`: retire or keep on 0.16?                                                    | **Keep through 0.16 stabilization**; re-decide after the live webadmin exists | Retire now (0.16 parses aggregates AND ARF) | Wrapper may be partly redundant; README carries the caveat |
+| C52 | README-as-ledger permanent, or move the ledger to `docs/LEDGER.md`?                                   | **Accept README-as-ledger**       | Move (rewrites many pointers)               | Coupling deepens with every session                                  |
+| C53 | Bootstrap degradation doctrine (bind-e2e falls back to `127.0.0.1:8080`)                              | **Accept degrade-visible**        | Add the eval-time port-set pin              | None (failure is loud and bounded)                                   |
+
+**STALE flag:** C42's [rec] was written before the 2026-10-18 re-verification
+settled the ARF unknown. The recommendation text is unchanged in effect, but
+its rationale ("failure-report parsing is docs-verified, not runtime-verified")
+is now the only remaining gap - re-read `decision-batch.md` C42 before answering.
+
+## Batch 2 - pbx-artmann hermetic blessing (unblocks B1-B3, ~24 corridor arrows)
+
+| ID     | The call                                                                                         | Recommendation | Cost of delay                                    |
+| ------ | ------------------------------------------------------------------------------------------------ | -------------- | ------------------------------------------------ |
+| PBX    | Land the hermetic Directory override in their `stalwart-host-wiring` test (whole-key `mkVMOverride` of the `pocketid` object to a non-remote `@type` + Authentication ref), or keep the test red until a different shape exists? | **Land it** - their gate is red on a proven-impossible live OIDC fetch, not on a product defect | pbx master stays red; the last two kept-live reports cannot close |
+
+**Evidence pack (runs 15/16):** driver VMs have NO outbound at all (valid DHCP
+route + populated `resolv.conf`, yet slirp DNS AND direct TCP fail instantly).
+Full transcript: `docs/status/2026-10-19_12-17_*` and
+`docs/status/2026-10-20_14-19_*` (g/1); the spec lives in their test header
+plus CONTRIBUTING "VM debug loops" (f).
+
+## Batch 3 - the two D-lane questions (gate all live enablement)
+
+| ID  | The call                                                                                  | Recommendation                                             | Cost of delay                                        |
+| --- | ----------------------------------------------------------------------------------------- | ---------------------------------------------------------- | ---------------------------------------------------- |
+| D1  | Retire Google Workspace for the Stalwart VPS, or keep Workspace and run monitoring only?    | **Retire** (the whole build-out assumes it)                | The "super system" stays a test fleet                |
+| D2  | VPS placement + budget: Hetzner project/location, size ceiling, backup target              | **CX22 alongside the domains project; backup to evo-x2 btrfs, StorageBox second copy later** | Blocks M22-M26 even after D1 |
+| C14 | Rotate the 3 placeholder secrets in SystemNix `nix-email.yaml` (execution, not a choice)    | Executes as part of M22/M26 when D1 lands                  | Rotation-due drift before live enablement            |
+
+## Batch 4 - Resend (needs an account/API key, not a doctrine call)
+
+| ID  | The call                                                                         | What is needed                                        |
+| --- | -------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| R1  | One real SASL smoke: username `resend`, API-key-as-password, `smtp.resend.com:587` | An API key (and the FROM domain). Shape is doc-verified; only the live smoke is missing |
+
+## Batch 5 - policy batch (2-minute answers)
+
+| ID  | The call                                                                    | Recommendation                              | Cost of delay                                    |
+| --- | --------------------------------------------------------------------------- | ------------------------------------------- | ------------------------------------------------ |
+| C18 | Branch protection: keep the push bypass for the auto-commit daemon, or go strict? | **Keep the bypass on master**, require the check on any future protected branch | The 4x-red statix streak is the observed cost |
+| C19 | Renovate: install the GitHub app or drop `renovate.json`?                    | **Drop the config** (Dependabot covers Actions) | Dead config stays drift                       |
+| C22 | GitHub Discussions, or issues-only?                                          | **Keep issues-only**                        | Another inbox for a single maintainer            |
+| C24 | Alert channel (alerts must NOT ride the mail stack they watch)               | **Discord via the existing DiscordSync layer**, ntfy as fallback | Blocks the monitoring taxonomy + dead-man switch |
+| C29 | Round-trip canary vantage (send to receive SLO probe)                        | **evo-x2** (independent network + DNS path) | Blocks the canary implementation                 |
+| C34 | Webmail: wrapper goal or non-goal?                                           | **Non-goal** - already executed as Bulwark on the consumer host (2026-10-19) | Ratification only |
+| Q4  | README ops-detail level (public runbook detail has recon value)              | **Keep as-is** until D1 lands, then re-decide | None                                            |
+| Q6  | Spam/Junk ownership                                                          | **Tag-only now** - the auto-move half is MOOT (upstream hard-codes INBOX-spam to JUNK; no wrapper setting exists) | Ratification only |
+
+## Batch 6 - ratify the agent-executed adoptions (reversible, 2026-10-05)
+
+| ID        | Adoption                                                     | Status                                     |
+| --------- | ------------------------------------------------------------ | ------------------------------------------ |
+| C35       | JMAP spike start-now (executed; probes + e2e subtest)          | Ratification only                          |
+| C17/C17a  | SystemNix push + input hard-pinned `?ref=v0.4.0`               | Ratification only; the pin advances to v0.5.0 after A4 |
+| C20       | mailsuite#65 filed                                             | Ratification only                          |
+| C38       | Daemon flush: ride the cycle                                   | Ratification only; the sub-question (hold pushes over a concurrent session's in-flight files) stays OPEN |
+| Q6        | Spam-to-Junk "upstream ask" retired on source facts            | Ratification only                          |
+
+## Appendix A - C45 delta table (decision input, already written)
+
+`README.md` "Stalwart 0.16.22 -> 0.16.26 delta" (line ~259). Summary:
+0.16.23 fixes the `bit_and` DNSBL class (our always-reconcile already
+neutralizes it), 0.16.24-25 fix spam-rule/JMAP-VAPID/queue-quota bugs,
+0.16.26 BREAKS x86_64 startup below x86-64-v2 and needs a VM cpu-type change.
+No CVEs in the window; the pin's 0.16.22 is past the one that mattered.
+
+## Appendix B - C44 options in one line each
+
+- **(a) sops-rendered runtime `stalwart-cli apply`** - secrets never enter the
+  Nix store; adds a runtime apply step + sops coupling on the consumer host.
+- **(b) admin-created interactive accounts** - zero wrapper surface, zero
+  declared account state; interactive onboarding only.
+- **(c) wrapper credential-file secret type** - declarative + secret-safe;
+  new option surface, built only on real consumer demand.
+
+## Appendix C - what each verdict unlocks (Y-plan mapping)
+
+| Verdict      | Unlocks                                        |
+| ------------ | ---------------------------------------------- |
+| C43 = cut    | A1-A5 (CHANGELOG pass, gate proof, dry-run, tag, banner) |
+| C45          | C2.2 (overlay execution or stand-verdict)      |
+| C44          | C5 (implementation + THREAT_MODEL)             |
+| C39          | C6 (MemoryMax landing)                         |
+| PBX blessing | B1-B3 (their gate + the corridor closeout)     |
+| D1/D2        | C7 (rotation runbook, vandelay-vs-imapsync, dmarc live poll) |
+| Resend key   | C7.4 (the one live smoke)                      |
+| C18/C19/C22  | settings micros (branch protection, app install/drop, Discussions) |
+| C24/C29      | G7 monitoring encoding (taxonomy, canary)       |
+| C34/Q4/Q6    | ratifications; ROADMAP non-goals pass (G7)      |
