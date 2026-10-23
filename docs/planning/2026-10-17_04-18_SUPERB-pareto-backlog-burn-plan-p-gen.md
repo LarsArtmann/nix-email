@@ -1,8 +1,10 @@
 # SUPERB Pareto Backlog-Burn Plan — nix-email, 2026-10-17 (P-generation)
 
-> **STATUS: SUPERSEDED (2026-10-18) - first by the V-generation plan
-> (10-18 22:20, which executed the overlapping task set ~60%), then by
-> the W-generation plan (10-19 02:34, which owns every remainder).**
+> **STATUS: ARCHIVED 2026-10-23 (was SUPERSEDED 2026-10-18) - first by the
+> V-generation plan (10-18 22:20, which executed the overlapping task set
+> ~60%), then by the W-generation plan (10-19 02:34), then by X and Y
+> (10-23, which owns every remainder).** Appendix R records the archive
+> verdict; living truth is `TODO_LIST.md` such as it stands.
 > Point-in-time snapshot over the
 > TODO_LIST state rebuilt by the 03:53 docs-health pass and corrected by the
 > 04:09 self-review (same day, both verified against code + the 03-34
@@ -513,3 +515,15 @@ tool call.
 
 _(26 Level-A tasks, ~100 Level-B micro-tasks; every open TODO row,
 decision, and actionable ROADMAP idea mapped - R01-R51 superset in §2.)_
+
+---
+
+## Appendix R — Resolution (2026-10-23 archive pass)
+
+ARCHIVED. The 1:1 mapping already stated in the banner (P3→V3-class,
+P4/P5→W4/W5, P6→V6, P7→V11, P8→V12/W7, P9/P10→V9/V10, P11→V13,
+P12→V14, ...) terminated in the X plan and then the Y plan; Y Appendix C
+proves every open TODO maps to exactly one Y task. Executed work lives in
+CHANGELOG. No per-cell strike pass was attempted: the chain mapping plus the
+Y coverage proof is the auditable disposition, and re-striking 26 rows across
+four superseded generations would invent evidence the chain already carries.

@@ -1,8 +1,9 @@
 # SUPERB Pareto Backlog-Burn Plan — nix-email, 2026-10-18 (V-generation)
 
-> **STATUS: EXECUTED ~60% (2026-10-18 22:20 → 10-19 02:16) then SUPERSEDED
-> by the W-generation plan** (2026-10-19 02:34,
-> `2026-10-19_02-34_SUPERB-pareto-w-generation-migration-fix-release-unlock.md`).
+> **STATUS: ARCHIVED 2026-10-23 (executed ~60% 2026-10-18 22:20 → 10-19
+> 02:16, then SUPERSEDED through W → X → Y).** The per-task dispositions
+> below were written by the 2026-10-19 W15.1 pass and stay as the annotation
+> record; Appendix R states the archive verdict and the routing hand-off.
 > Point-in-time snapshot over the TODO_LIST state (living doc, last full
 > verification sweep 2026-10-17; three rows added by the 2026-10-18 09:49
 > gate-recovery session). Living truth stays in `TODO_LIST.md`. Per-task
@@ -568,3 +569,13 @@ lanes (R38/R40/R41) sit outside the graph by design.
 - This plan's own commit + push (user-requested) carries the 4 unpushed
   daemon commits and the untracked 09:49 status report - which is V3.1
   executed early. Only the CI watch remains of V3 after this session.
+
+---
+
+## Appendix R — Resolution (2026-10-23 archive pass)
+
+ARCHIVED. The banner above already carries the per-task dispositions
+(written by W15.1), so no re-strike pass was attempted. The residue chain is
+V → W (every remainder) → X → Y; the Y plan's Appendix C proves every open
+TODO row maps to exactly one Y task, and executed work lives in CHANGELOG.
+The 10-17 P-plan was annotated in the same pass (its Appendix R).
