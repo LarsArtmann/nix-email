@@ -83,7 +83,10 @@ def card(n: int) -> str:
 
 
 def main() -> int:
-    print(f"# CardDAV 10k benchmark {time.strftime('%Y-%m-%dT%H:%M:%S%z')} book={BOOK}", flush=True)
+    print(
+        f"# CardDAV 10k benchmark {time.strftime('%Y-%m-%dT%H:%M:%S%z')} book={BOOK}",
+        flush=True,
+    )
     load = Path("/proc/loadavg").read_text().strip()
     print(f"# host loadavg at start: {load}", flush=True)
 
@@ -123,8 +126,11 @@ def main() -> int:
             el = time.perf_counter() - t0
             print(f"seeded {i + 1}/{N} ({el:.0f}s elapsed)", flush=True)
     seed_s = time.perf_counter() - t0
-    print(f"SEED done: {created} created, {updated} updated in {seed_s:.1f}s "
-          f"({N / seed_s:.1f} PUT/s incl. pacing)", flush=True)
+    print(
+        f"SEED done: {created} created, {updated} updated in {seed_s:.1f}s "
+        f"({N / seed_s:.1f} PUT/s incl. pacing)",
+        flush=True,
+    )
 
     # Let the rate bucket refill before the measurement phase.
     time.sleep(10)
@@ -135,14 +141,22 @@ def main() -> int:
         "<D:resourcetype/><D:getetag/></D:prop></D:propfind>"
     )
     t0 = time.perf_counter()
-    status, _, data = req_throttled("PROPFIND", BOOK_URL, propfind_body, depth="1", timeout=600)
+    status, _, data = req_throttled(
+        "PROPFIND", BOOK_URL, propfind_body, depth="1", timeout=600
+    )
     propfind_s = time.perf_counter() - t0
     n_cards = data.count(b".vcf")
-    print(f"COUNT via PROPFIND: status {status}, {n_cards} card hrefs, {propfind_s:.2f}s, "
-          f"{len(data) / 1024:.0f} KiB body", flush=True)
+    print(
+        f"COUNT via PROPFIND: status {status}, {n_cards} card hrefs, {propfind_s:.2f}s, "
+        f"{len(data) / 1024:.0f} KiB body",
+        flush=True,
+    )
 
-    hrefs = [e.text for e in ET.fromstring(data).iter("{DAV:}href")
-             if (e.text or "").endswith(".vcf")]
+    hrefs = [
+        e.text
+        for e in ET.fromstring(data).iter("{DAV:}href")
+        if (e.text or "").endswith(".vcf")
+    ]
 
     # B1: filtered addressbook-query (~1% hit rate: contains "7133" in EMAIL).
     query = (
@@ -157,24 +171,34 @@ def main() -> int:
     hits = -1
     while len(runs) < 3:
         t0 = time.perf_counter()
-        status, _, data = req_throttled("REPORT", BOOK_URL, query, depth="1", timeout=600)
+        status, _, data = req_throttled(
+            "REPORT", BOOK_URL, query, depth="1", timeout=600
+        )
         if status == 429:
             continue
         runs.append(time.perf_counter() - t0)
         hits = data.count(b".vcf")
-    print(f"B1 filtered query: median {statistics.median(runs):.3f}s "
-          f"(runs {'/'.join(f'{r:.3f}' for r in runs)}), {hits} hits", flush=True)
+    print(
+        f"B1 filtered query: median {statistics.median(runs):.3f}s "
+        f"(runs {'/'.join(f'{r:.3f}' for r in runs)}), {hits} hits",
+        flush=True,
+    )
 
     # B2: plain PROPFIND Depth:1 timing (count pass above was warm-up run 0).
     runs = []
     while len(runs) < 3:
         t0 = time.perf_counter()
-        status, _, data = req_throttled("PROPFIND", BOOK_URL, propfind_body, depth="1", timeout=600)
+        status, _, data = req_throttled(
+            "PROPFIND", BOOK_URL, propfind_body, depth="1", timeout=600
+        )
         if status == 429:
             continue
         runs.append(time.perf_counter() - t0)
-    print(f"B2 PROPFIND Depth:1: median {statistics.median(runs):.3f}s "
-          f"(runs {'/'.join(f'{r:.3f}' for r in runs)}), {data.count(b'.vcf')} hrefs", flush=True)
+    print(
+        f"B2 PROPFIND Depth:1: median {statistics.median(runs):.3f}s "
+        f"(runs {'/'.join(f'{r:.3f}' for r in runs)}), {data.count(b'.vcf')} hrefs",
+        flush=True,
+    )
 
     # B3: multiget of 100 hrefs with address-data.
     h100 = "".join(f"<D:href>{h}</D:href>" for h in hrefs[:100])
@@ -187,13 +211,18 @@ def main() -> int:
     runs = []
     while len(runs) < 3:
         t0 = time.perf_counter()
-        status, _, data = req_throttled("REPORT", BOOK_URL, multiget, depth="1", timeout=600)
+        status, _, data = req_throttled(
+            "REPORT", BOOK_URL, multiget, depth="1", timeout=600
+        )
         if status == 429:
             continue
         runs.append(time.perf_counter() - t0)
-    print(f"B3 multiget 100: median {statistics.median(runs):.3f}s "
-          f"(runs {'/'.join(f'{r:.3f}' for r in runs)}), "
-          f"{data.count(b'BEGIN:VCARD')} cards, {len(data) / 1024:.0f} KiB", flush=True)
+    print(
+        f"B3 multiget 100: median {statistics.median(runs):.3f}s "
+        f"(runs {'/'.join(f'{r:.3f}' for r in runs)}), "
+        f"{data.count(b'BEGIN:VCARD')} cards, {len(data) / 1024:.0f} KiB",
+        flush=True,
+    )
 
     # B4: single GET reference.
     runs = []
@@ -203,13 +232,19 @@ def main() -> int:
         if status == 429:
             continue
         runs.append(time.perf_counter() - t0)
-    print(f"B4 single GET: median {statistics.median(runs) * 1000:.1f}ms "
-          f"(runs {'/'.join(f'{r * 1000:.1f}' for r in runs)}ms)", flush=True)
+    print(
+        f"B4 single GET: median {statistics.median(runs) * 1000:.1f}ms "
+        f"(runs {'/'.join(f'{r * 1000:.1f}' for r in runs)}ms)",
+        flush=True,
+    )
 
     load = Path("/proc/loadavg").read_text().strip()
     print(f"# host loadavg at end: {load}", flush=True)
-    print("# NOTE: demo VM shares the host with other workloads; treat as "
-          "order-of-magnitude evidence, not lab numbers.", flush=True)
+    print(
+        "# NOTE: demo VM shares the host with other workloads; treat as "
+        "order-of-magnitude evidence, not lab numbers.",
+        flush=True,
+    )
     return 0
 
 

@@ -42,7 +42,9 @@ failures: list[str] = []
 
 
 def verdict(step: str, ok: bool, detail: str = "") -> None:
-    line = f"VERDICT {step}: {'PASS' if ok else 'FAIL'}{(' ' + detail) if detail else ''}"
+    line = (
+        f"VERDICT {step}: {'PASS' if ok else 'FAIL'}{(' ' + detail) if detail else ''}"
+    )
     print(line, flush=True)
     if not ok:
         failures.append(step)
@@ -66,7 +68,11 @@ def build() -> bool:
     env = dict(os.environ, GOTOOLCHAIN="go1.27.2", GOEXPERIMENT="jsonv2")
     done = subprocess.run(
         ["go", "build", "-o", BIN, "./cmd/crm-server"],
-        cwd=CRM_REPO, env=env, capture_output=True, text=True, timeout=600,
+        cwd=CRM_REPO,
+        env=env,
+        capture_output=True,
+        text=True,
+        timeout=600,
         check=False,
     )
     if done.returncode != 0:
@@ -88,14 +94,17 @@ def fresh_book() -> None:
     resp = conn.getresponse()
     resp.read()
     conn.close()
-    verdict("E2E-0 fresh book", resp.status in (200, 204, 404), f"DELETE -> {resp.status}")
+    verdict(
+        "E2E-0 fresh book", resp.status in (200, 204, 404), f"DELETE -> {resp.status}"
+    )
 
 
 def boot_server() -> subprocess.Popen | None:
     log = open(SERVER_LOG, "w")  # noqa: SIM115 - child stdout lives as long as the server
     proc = subprocess.Popen(
         [BIN, "-addr", f"{CRM_ADDR}:{CRM_PORT}", "-db", DB],
-        stdout=log, stderr=subprocess.STDOUT,
+        stdout=log,
+        stderr=subprocess.STDOUT,
     )
     if not wait_port(CRM_ADDR, CRM_PORT, 30):
         proc.terminate()
@@ -119,7 +128,9 @@ def driver(phase: str) -> bool:
     print(f"\n# driver phase: {phase}", flush=True)
     done = subprocess.run(
         [sys.executable, DRIVER, phase],
-        timeout=180, capture_output=True, text=True,
+        timeout=180,
+        capture_output=True,
+        text=True,
         check=False,
     )
     print(done.stdout, end="", flush=True)
@@ -139,15 +150,25 @@ def sync(label: str) -> dict[str, int] | None:
     print(f"\n# one-shot sync: {label}", flush=True)
     env = dict(os.environ, CRM_CARDDAV_PASSWORD=PASS)
     args = [
-        BIN, "-carddav-sync",
-        "-db", DB,
-        "-carddav-url", f"http://{DAV_ADDR}:{DAV_PORT}",
-        "-carddav-user", USER,
-        "-carddav-book", "Kith-E2E",
-        "-carddav-state", STATE,
+        BIN,
+        "-carddav-sync",
+        "-db",
+        DB,
+        "-carddav-url",
+        f"http://{DAV_ADDR}:{DAV_PORT}",
+        "-carddav-user",
+        USER,
+        "-carddav-book",
+        "Kith-E2E",
+        "-carddav-state",
+        STATE,
     ]
     done = subprocess.run(
-        args, env=env, capture_output=True, text=True, timeout=300,
+        args,
+        env=env,
+        capture_output=True,
+        text=True,
+        timeout=300,
         check=False,
     )
     out = done.stdout + done.stderr
@@ -156,10 +177,20 @@ def sync(label: str) -> dict[str, int] | None:
     if done.returncode != 0 or not match:
         verdict(f"E2E-sync {label}", False, f"exit={done.returncode}")
         return None
-    counts = dict(zip(
-        ("created", "updated", "unchanged", "deleted", "conflicts", "server_side", "errors"),
-        (int(g) for g in match.groups()),
-    ))
+    counts = dict(
+        zip(
+            (
+                "created",
+                "updated",
+                "unchanged",
+                "deleted",
+                "conflicts",
+                "server_side",
+                "errors",
+            ),
+            (int(g) for g in match.groups()),
+        )
+    )
     print(f"# report {label}: {counts}", flush=True)
     return counts
 
@@ -189,26 +220,41 @@ def main() -> int:
 
     first = sync("initial")
     if first:
-        verdict("E2E-sync initial mirror", first["created"] == 2 and first["errors"] == 0, str(first))
+        verdict(
+            "E2E-sync initial mirror",
+            first["created"] == 2 and first["errors"] == 0,
+            str(first),
+        )
 
     verdict("E2E assert mirror phase", driver("assert"))
 
     second = sync("idempotent")
     if second:
-        ok = second["unchanged"] == 2 and second["created"] == 0 and second["updated"] == 0 \
-            and second["deleted"] == 0 and second["conflicts"] == 0 and second["errors"] == 0
+        ok = (
+            second["unchanged"] == 2
+            and second["created"] == 0
+            and second["updated"] == 0
+            and second["deleted"] == 0
+            and second["conflicts"] == 0
+            and second["errors"] == 0
+        )
         verdict("E2E-sync idempotent rerun (zero writes)", ok, str(second))
 
     verdict("E2E conflict stage phase", driver("conflict"))
 
     third = sync("conflict")
     if third:
-        ok = third["conflicts"] == 1 and third["unchanged"] == 1 and third["errors"] == 0
+        ok = (
+            third["conflicts"] == 1 and third["unchanged"] == 1 and third["errors"] == 0
+        )
         verdict("E2E-sync CRM wins (conflict overwritten)", ok, str(third))
 
     verdict("E2E verify restore phase", driver("verify-restore"))
 
-    print(f"\n# E2E FINAL: {'PASS' if not failures else 'FAIL — ' + ', '.join(failures)}", flush=True)
+    print(
+        f"\n# E2E FINAL: {'PASS' if not failures else 'FAIL — ' + ', '.join(failures)}",
+        flush=True,
+    )
     return 0 if not failures else 1
 
 

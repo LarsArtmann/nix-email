@@ -52,7 +52,9 @@ def req(
         headers[k] = v
     print(f"\n>> {method} {path}" + (f"  Depth: {depth}" if depth else ""), flush=True)
     if body:
-        print(body if len(body) <= 900 else body[:900] + "\n... (truncated)", flush=True)
+        print(
+            body if len(body) <= 900 else body[:900] + "\n... (truncated)", flush=True
+        )
     conn.request(method, path, body=body, headers=headers)
     resp = conn.getresponse()
     data = resp.read()
@@ -64,10 +66,14 @@ def req(
         if k in ("location", "etag", "content-type", "dav", "allow")
     }
     if interesting:
-        print("   " + " | ".join(f"{k}: {v}" for k, v in interesting.items()), flush=True)
+        print(
+            "   " + " | ".join(f"{k}: {v}" for k, v in interesting.items()), flush=True
+        )
     if data:
         text = data.decode(errors="replace")
-        print(text if len(text) <= 1600 else text[:1600] + "\n... (truncated)", flush=True)
+        print(
+            text if len(text) <= 1600 else text[:1600] + "\n... (truncated)", flush=True
+        )
     conn.close()
     return resp.status, lower, data
 
@@ -87,7 +93,9 @@ def card_hrefs(xml_bytes: bytes) -> list[str]:
     except ET.ParseError:
         return []
     return [
-        e.text or "" for e in root.iter(f"{{{DAV}}}href") if (e.text or "").endswith(".vcf")
+        e.text or ""
+        for e in root.iter(f"{{{DAV}}}href")
+        if (e.text or "").endswith(".vcf")
     ]
 
 
@@ -121,10 +129,11 @@ def main() -> int:
         "<D:resourcetype/><D:displayname/></D:prop></D:propfind>",
         depth="1",
     )
-    all_hrefs = [
-        e.text or ""
-        for e in ET.fromstring(data).iter(f"{{{DAV}}}href")
-    ] if status == 207 else []
+    all_hrefs = (
+        [e.text or "" for e in ET.fromstring(data).iter(f"{{{DAV}}}href")]
+        if status == 207
+        else []
+    )
     books = [h for h in all_hrefs if "kith-probe-" in h]
     if not books:
         record("setup locate probe book", f"FAIL (none found, status {status})")
@@ -142,7 +151,9 @@ def main() -> int:
     version = body.split("VERSION:")[1][:3] if "VERSION:" in body else "absent"
     record(
         "D1 GET garbage card3 stored form",
-        f"STORED ({len(data)} bytes, VERSION={version})" if status == 200 else f"GONE ({status})",
+        f"STORED ({len(data)} bytes, VERSION={version})"
+        if status == 200
+        else f"GONE ({status})",
     )
 
     # D2: If-Match with the REAL etag (case-insensitive header lookup).
@@ -150,7 +161,8 @@ def main() -> int:
     etag = headers.get("etag", "")
     stored = data.decode(errors="replace")
     uid = next(
-        (line[4:] for line in stored.splitlines() if line.startswith("UID:")), "diag-uid"
+        (line[4:] for line in stored.splitlines() if line.startswith("UID:")),
+        "diag-uid",
     )
     record("D2a GET card1 etag", f"PASS ({etag})" if etag else "FAIL (no etag header)")
     updated = stored.replace("FN:Kith Probe One", "FN:Kith Diag Updated")

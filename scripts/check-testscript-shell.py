@@ -107,7 +107,9 @@ def check_text(nix_text: str, label: str) -> tuple[list[str], int]:
             tree = ast.parse(source)
         except SyntaxError as exc:
             line = start + (exc.lineno or 1)
-            failures.append(f"{label}:{line}: testScript is not valid Python: {exc.msg}")
+            failures.append(
+                f"{label}:{line}: testScript is not valid Python: {exc.msg}"
+            )
             continue
         for lineno, fragment in shell_fragments(tree):
             checked += 1
@@ -175,7 +177,9 @@ def main(argv: list[str]) -> int:
     if checked == 0:
         print("no shell fragments found - extractor is broken", file=sys.stderr)
         return 1
-    print(f"testScript shell syntax OK ({checked} fragment(s) in {len(paths)} nix file(s))")
+    print(
+        f"testScript shell syntax OK ({checked} fragment(s) in {len(paths)} nix file(s))"
+    )
     return 0
 
 

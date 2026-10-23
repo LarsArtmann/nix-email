@@ -119,7 +119,10 @@ def seed() -> None:
     )
     record("E2E-seed create Grace", f"{status} -> {loc}")
 
-    record("E2E-seed projections settled", "PASS" if wait_crm_contacts(2) else "FAIL (timeout)")
+    record(
+        "E2E-seed projections settled",
+        "PASS" if wait_crm_contacts(2) else "FAIL (timeout)",
+    )
 
 
 def eventually(check, tries: int = 60, delay: float = 0.25):
@@ -143,7 +146,11 @@ def book_hrefs() -> list[str]:
         "<D:resourcetype/></D:prop></D:propfind>"
     )
     _, data = dav_req("PROPFIND", BOOK, body=body, depth="1")
-    return [e.text for e in ET.fromstring(data).iter("{DAV:}href") if (e.text or "").endswith(".vcf")]
+    return [
+        e.text
+        for e in ET.fromstring(data).iter("{DAV:}href")
+        if (e.text or "").endswith(".vcf")
+    ]
 
 
 def multiget_cards(hrefs: list[str]) -> str:
@@ -166,11 +173,17 @@ def assert_mirror() -> None:
         cards = multiget_cards(hrefs)
         shapes = {
             "VERSION:4.0": (2, len(re.findall(r"VERSION:4\.0", cards))),
-            "KIND individual": (2, len(re.findall(r"KIND:INDIVIDUAL", cards, re.IGNORECASE))),
+            "KIND individual": (
+                2,
+                len(re.findall(r"KIND:INDIVIDUAL", cards, re.IGNORECASE)),
+            ),
             "FN:Ada Lovelace": (1, cards.count("FN:Ada Lovelace")),
             "N:Lovelace;Ada;;;": (1, cards.count("N:Lovelace;Ada;;;")),
             "EMAIL:ada@example.com": (1, cards.count("EMAIL:ada@example.com")),
-            "TEL +49 170 0000001": (1, len(re.findall(r"TEL:\+?49 170 0000001", cards))),
+            "TEL +49 170 0000001": (
+                1,
+                len(re.findall(r"TEL:\+?49 170 0000001", cards)),
+            ),
             "ORG:ACME E2E GmbH": (1, cards.count("ORG:ACME E2E GmbH")),
             "FN:Grace": (1, cards.count("FN:Grace")),
             "EMAIL:grace@example.com": (1, cards.count("EMAIL:grace@example.com")),
@@ -184,7 +197,10 @@ def assert_mirror() -> None:
     record("E2E-2 vCard field shapes (settled)", "PASS" if ok else f"FAIL {bad}")
 
     uid_lines = re.findall(r"UID:([0-9A-HJKMNP-TV-Z]{26})", cards)
-    record("E2E-3 UIDs are bare ULIDs", f"PASS ({len(uid_lines)}/2)" if len(uid_lines) == 2 else "FAIL")
+    record(
+        "E2E-3 UIDs are bare ULIDs",
+        f"PASS ({len(uid_lines)}/2)" if len(uid_lines) == 2 else "FAIL",
+    )
 
 
 def device_edit_and_restore() -> None:
@@ -217,7 +233,10 @@ def device_edit_and_restore() -> None:
         body=f"BEGIN:VCARD\r\nVERSION:4.0\r\nUID:{uid}\r\nFN:Device Wins\r\nEND:VCARD\r\n",
         extra={"Content-Type": "text/vcard; charset=utf-8", "If-Match": etag},
     )
-    record("E2E-4 device edit PUT (If-Match)", "PASS" if status in (200, 201, 204) else f"FAIL ({status})")
+    record(
+        "E2E-4 device edit PUT (If-Match)",
+        "PASS" if status in (200, 201, 204) else f"FAIL ({status})",
+    )
 
     def staged():
         cards = multiget_cards([victim])
@@ -231,7 +250,10 @@ def device_edit_and_restore() -> None:
 
 def main() -> int:
     mode = sys.argv[1] if len(sys.argv) > 1 else "seed"
-    print(f"# carddav E2E driver ({mode}) {time.strftime('%Y-%m-%dT%H:%M:%S%z')}", flush=True)
+    print(
+        f"# carddav E2E driver ({mode}) {time.strftime('%Y-%m-%dT%H:%M:%S%z')}",
+        flush=True,
+    )
 
     if mode == "seed":
         seed()
@@ -240,6 +262,7 @@ def main() -> int:
     elif mode == "conflict":
         device_edit_and_restore()
     elif mode == "verify-restore":
+
         def restored():
             cards = multiget_cards(book_hrefs())
             return "Device Wins" not in cards and "FN:Ada Lovelace" in cards, cards
