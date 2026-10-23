@@ -838,6 +838,21 @@ json/yaml/markdown.
   source tree. The webmail/admin UIs are separate runtime-fetched
   frontend bundles (the admin is the downloadable Application bundle at
   `/admin`) - the module's contacts story is API-surface only.
+- **The 0.16 admin bundle is a SEPARATE package output, and its spelling
+  changed** (re-verified 2026-10-23 against the pin): `stalwart_0_16`
+  exposes `passthru.webui` = `webui-1.0.10` containing `webui.zip` (the
+  admin Application bundle). The 0.15 alias `pkgs.stalwart` (0.15.5)
+  exposes `passthru.webadmin` instead, containing `webadmin.zip`. The
+  vendored module's `webadmin.resource` default still spells
+  `cfg.package.webadmin` + `/webadmin.zip`, which is a LATENT eval bug on
+  0.16: it is dormant here only because the wrapper provisions listeners
+  through `services.stalwart.provision`, so `settings.server.listener`
+  stays empty and `hasHttpListener` is false. A 0.16 consumer that sets
+  `settings.server.listener.<name>.protocol = "http"` would hit
+  "attribute 'webadmin' missing"; the fix is a version-aware default
+  (`cfg.package.webui` + `/webui.zip` on 0.16) and belongs upstream in
+  PR #552103, not in this vendored copy. User webmail remains a non-goal
+  (C34): Bulwark on the consumer host is the JMAP-native client.
 
 ### Stalwart 0.15.5 era (historical facts; several are superseded above)
 
