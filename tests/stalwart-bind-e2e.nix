@@ -137,6 +137,66 @@ in
       virtualisation.memorySize = 1024;
     };
 
+    # The 2026-10-23 pbx shape: something OTHER than Stalwart owns the
+    # built-in bootstrap port (there the webphone on 127.0.0.1:8080). The
+    # provision unit must refuse to apply the plan through a responder that
+    # is not Stalwart's JMAP server - the blind `curl --fail` probe sent the
+    # whole plan to the webphone (schema refresh 404, red switch). A short
+    # unit timeout keeps the refusal leg cheap; the journal warning fires at
+    # ~10s, well inside it.
+    nodes.guarded =
+      {
+        lib,
+        pkgs,
+        ...
+      }:
+      {
+        imports = [
+          ../modules/mail-server.nix
+          common.dnslessVmPatches
+          common.testAdminSecretModule
+        ];
+
+        system.stateVersion = "26.05";
+
+        services = {
+          mail-server = {
+            enable = true;
+            hostname = "guard.test";
+            httpBind = "127.0.0.1:8082";
+            admin.secretFile = "/etc/test-admin-secret";
+            certificate.mode = "manual";
+            certificate.manual = {
+              certFile = "${testCert}/cert.pem";
+              keyFile = "${testCert}/key.pem";
+            };
+          };
+          stalwart.provision.singletons = {
+            DnsResolver."@type" = "Cloudflare";
+            SpamPyzor.enable = false;
+          };
+        };
+
+        # Foreign occupant FIRST, exactly like the webphone on the pbx host
+        # (empirically: python's 0.0.0.0:8080 also blocks stalwart's
+        # dual-stack built-in bind, and stalwart stays up on its remaining
+        # listeners). It serves 200 on `/` (so a blind probe would accept
+        # it) and 404 on /jmap/session (so the identity check refuses it).
+        systemd.services.fake-builtin-http = {
+          wantedBy = ["multi-user.target"];
+          before = ["stalwart.service" "stalwart-provision.service"];
+          serviceConfig = {
+            ExecStart = "${pkgs.python3}/bin/python3 -m http.server 8080 --bind 0.0.0.0";
+            Restart = "always";
+          };
+        };
+
+        systemd.services.stalwart-provision.serviceConfig.TimeoutStartSec =
+          lib.mkForce "20s";
+
+        virtualisation.memorySize = 1024;
+      };
+
     testScript = ''
       start_all()
 
@@ -209,6 +269,33 @@ in
               "journalctl -u stalwart -b 0 -o cat > /tmp/journal-config.log && { "
               "cat /tmp/journal-config.log >&2; "
               "if grep -q 'Configuration build error' /tmp/journal-config.log; then exit 1; fi; }"
+          )
+
+      with subtest("guard: a foreign built-in-port responder never gets the plan"):
+          # The 2026-10-23 pbx burn, replayed: the built-in port is owned by
+          # another HTTP service and the configured endpoint cannot bind on a
+          # virgin store. The old blind probe applied the whole plan through
+          # that stranger; the identity check must keep waiting instead and
+          # the unit must fail (bounded by TimeoutStartSec, shortened here).
+          guarded.wait_for_unit("fake-builtin-http.service")
+          guarded.wait_for_unit("stalwart.service", timeout=180)
+          guarded.wait_until_succeeds(
+              "systemctl is-failed stalwart-provision.service", timeout=120
+          )
+          guarded.succeed(
+              "journalctl -u stalwart-provision -b 0 -o cat > /tmp/guard.log"
+          )
+          guarded.succeed("cat /tmp/guard.log >&2")
+          # The refusal is NAMED, with the foreign responder's URL ...
+          guarded.succeed(
+              "grep -q 'a non-Stalwart HTTP service answers on http://127.0.0.1:8080' /tmp/guard.log"
+          )
+          # ... and the plan was never sent anywhere (no endpoint line).
+          guarded.fail(
+              "grep -q 'answering at http://127.0.0.1:8080' /tmp/guard.log"
+          )
+          guarded.fail(
+              "grep -q 'answering at http://127.0.0.1:8082' /tmp/guard.log"
           )
     '';
   }
