@@ -216,6 +216,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- VM-test debug loop restructured into CONTRIBUTING + devShell tool pins
+  (2026-10-19): the VM debug loops and 0.16-upgrade loop rules moved from
+  AGENTS.md (451 -> 220 lines across the two diet passes, at the BuildFlow
+  cap) into a new CONTRIBUTING "VM debug loops" section, and
+  `devShells.default` now pins dprint + lychee + ruff - buildflow resolves
+  its tool runners inside the shell, so without the pins each run fell back
+  to `nix run nixpkgs#<tool>` and lint/format results drifted with
+  registry-latest versions.
+- `tests/common.nix` shared-block dedup (2026-10-19): one canonical copy
+  each for the DNS-less-VM provision patches (DnsResolver Cloudflare +
+  SpamPyzor off), the `/etc/test-admin-secret` fallback-admin module, and
+  the upstream DMARC aggregate fixture; `module-import-eval` gained
+  `mailServerBase` + `mkEval` (bit-identical derivation, refactor-identity
+  proof), and stalwart-e2e deduplicated its User objects, IMAP probes, and
+  swaks submissions into helpers (~412 insertions / ~511 deletions across
+  12 files; refactor-identity proofs bit-identical on six checks, full VM
+  runs green).
 - buildflow local-noise batch (2026-10-19): `interrogate` skipped
   with rationale (procedural probe scripts, minimal devShell is
   deliberate); the stale mypy rationale ("only Python is the
