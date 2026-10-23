@@ -50,3 +50,13 @@ if command -v nix >/dev/null 2>&1; then
 else
   echo "pre-push: nix unavailable - skipping statix (CI enforces)" >&2
 fi
+
+# 6. VM-testScript shell syntax (CI parity, the 28e5dd7 class): bash -n over
+#    every constant shell fragment embedded in tests/*.nix testScripts.
+echo "pre-push: testScript shell syntax"
+if command -v python3 >/dev/null 2>&1; then
+  python3 scripts/check-testscript-shell.py --self-test
+  python3 scripts/check-testscript-shell.py
+else
+  echo "pre-push: python3 unavailable - skipping testScript shell lint (CI enforces)" >&2
+fi

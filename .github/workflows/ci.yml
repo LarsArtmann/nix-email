@@ -221,6 +221,21 @@ jobs:
           # (caught by the 2026-09-16 local negative test).
           awk 'match($0, /\|[[:space:]]*!?[[:space:]]*(grep|tail|head)([^[:alnum:]]|$)/) && $0 !~ /^[[:space:]]*#/ {printf "offender: %s:%d: %s\n", FILENAME, FNR, $0; bad=1} END {exit bad}' tests/*.nix
 
+      - name: Lint VM-testScript shell fragments (fail-closed, self-tested)
+        run: |
+          # TESTSCRIPT SHELL LINT (the 28e5dd7 unclosed-brace lesson,
+          # mechanized): testScript shell commands are Python string
+          # constants inside a Nix indented string, so nix eval, alejandra
+          # and the awk pipe lint all pass them. An unbalanced brace group
+          # only surfaces when bash runs it in the VM. The script extracts
+          # every testScript, folds implicit string concatenation with
+          # Python's ast, and runs `bash -n` on each constant argument.
+          # Self-test first (never-firing-lint doctrine): the 28e5dd7 broken
+          # shape MUST fail and the closed shape MUST pass before the real
+          # tree is checked, and zero extracted fragments is itself a fail.
+          python3 scripts/check-testscript-shell.py --self-test
+          python3 scripts/check-testscript-shell.py
+
       - name: Assert CI expected-checks match the flake (lockstep, fail-closed)
         run: |
           # LOCKSTEP GUARD: the flake's declared check set (builtins.attrNames

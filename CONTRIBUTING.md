@@ -77,6 +77,19 @@ runs pipefail, so grep -q's early exit can EPIPE the producer (observed as
 curl exit 23 on a matching payload, 2026-09-15) - and `! producer | grep -q`
 can phantom-green. Dump the producer to a file, then grep the file.
 
+Shell fragments inside a `testScript` are string literals, so none of the
+above catches a bash syntax error. `scripts/check-testscript-shell.py`
+closes that hole: it extracts every `testScript = ''...'';` block, folds
+implicit string concatenation with Python's `ast`, and runs `bash -n` over
+each constant argument to `succeed`/`fail`/`execute`/`wait_until_succeeds`/
+`wait_until_fails`. CI and the pre-push hook both run it (with `--self-test`,
+which asserts the 28e5dd7 unclosed-brace shape fails and the closed shape
+passes). Run it before rerunning an expensive VM test:
+
+```sh
+python3 scripts/check-testscript-shell.py
+```
+
 ## VM debug loops
 
 Distilled from the FIFO-console and 0.16-upgrade sessions (2026-10).
@@ -178,6 +191,26 @@ times on 2026-09-23 for inventory drift). Bypassing with
 the hook fires, run `nix fmt -- .` and re-push. Fresh clones must re-set
 `git config core.hooksPath .githooks` - hooksPath is repo-LOCAL config and
 the hook directory dangles silently without it (CI is the real gate).
+
+## Probe scripts (docs/probes)
+
+Probe/bench/forensic scripts are first-class Python and stay **ruff-clean
+under the CI floor select** (`E4,E7,E9,F`), the same floor the rest of the
+repo answers to. Doctrine (decided 2026-10-23, closes the recurring
+SIM115/FURB167/PLW1510 debate):
+
+- **No per-file-ignores for `docs/probes/`.** A rule that fires is fixed in
+  the script, not suppressed for the whole directory - a growing ignore block
+  would silently stop linting future probes.
+- **Executable bit instead of a dropped shebang**: probe scripts keep
+  `#!/usr/bin/env python3` and are `chmod +x` (EXE001 class).
+- **One justified `# noqa: <RULE> - <why>` is allowed** where the finding is
+  structurally correct (e.g. SIM115 on a long-lived file handle handed to a
+  child process). Name the rule, state the reason, keep it single-line.
+- Anything else (`SIM115` read-once opens, `FURB167` regex aliases,
+  `PLW1510` subprocess `check=`) is a fix: use `Path.read_text()`,
+  `re.IGNORECASE`/`re.MULTILINE`, and explicit `check=False` where the
+  return code is inspected instead of raised.
 
 ## Architecture diagrams
 
