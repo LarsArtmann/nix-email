@@ -10,6 +10,10 @@
 # by construction (the pbx 43-min wedge, bounded to a visible 3-min failure
 # 2026-10-17).
 #
+# Both endpoints are accepted only when their unauthenticated JMAP session
+# identifies Stalwart (2026-10-23 pbx burn: the webphone owned the built-in
+# 8080 and received the plan from a blind `curl --fail` probe).
+#
 # Subtests:
 #   1. Bootstrap: 8082 opens, the provision journal names the built-in 8080
 #      as the endpoint the apply ran against, and the unit is not failed
@@ -21,6 +25,10 @@
 #      back without the provision unit re-running (the STORED listener binds
 #      - every-boot posture for consumers)
 #   5. Journal hygiene: no configuration build errors
+#   6. Guard (second node `guarded`): a FOREIGN HTTP service owns the built-in
+#      8080 and the configured bind cannot come up on a virgin store -> the
+#      unit refuses to apply through the stranger, names it in the journal,
+#      and fails at its (shortened) start timeout with no plan sent anywhere
 {pkgs, ...}: let
   common = import ./common.nix;
   adminSecret = common.testAdminSecret;

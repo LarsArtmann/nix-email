@@ -163,7 +163,12 @@ and nothing else:
   unit falls back to the built-in `127.0.0.1:8080`, applies against it,
   restarts stalwart, and the plan's listener set replaces the built-ins
   (8080 gone; 8082 + 25 bound; admin JMAP session served on the dedicated
-  port; plain-restart persistence). GREEN 2026-10-17 (nix-email#4).
+  port; plain-restart persistence). Both endpoints must identify as
+  Stalwart by their unauthenticated JMAP session, and a SECOND node
+  (`guarded`) pins the refusal: a foreign HTTP service on the built-in
+  8080 (the 2026-10-23 pbx shape - the webphone) never receives the plan,
+  the unit names it in the journal and fails at its start timeout. GREEN
+  2026-10-23 (nix-email#4 + the identity fix).
 - `stalwart-relay-e2e`: TWO-node VM - Stalwart with `relay` (SASL
   credentials) -> Mailpit smarthost node enforcing AUTH. Non-local
   submission lands in Mailpit through the generated 0.16 MtaRoute relay
