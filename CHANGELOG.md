@@ -9,6 +9,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- `scripts/check-testscript-shell.py` (2026-10-23, closes D1): `bash -n`
+  over every constant shell fragment embedded in `tests/*.nix`
+  testScripts. It extracts each `testScript = ''...'';` block, parses it
+  with Python's `ast` (which folds implicit string concatenation into one
+  constant), and lints the constant arguments to
+  `succeed`/`fail`/`execute`/`wait_until_succeeds`/`wait_until_fails`.
+  Closes the 28e5dd7 unclosed-brace class that nix eval, alejandra, and
+  the awk pipe lint cannot see. CI and the pre-push hook both run it, and
+  `--self-test` proves the broken 28e5dd7 shape FAILS while the closed
+  shape passes (a zero-fragment run is itself a failure).
+- `stalwart-migrate-e2e` gained the backup-dir-FREE migration leg
+  (2026-10-23, closes E5): a CLEAN live 0.15 store is dumped in place
+  (the happy path), the script's own `.v015-premigrate` copy is asserted
+  before the store is reset, and the poisoned `--backup-dir` legs then
+  run unchanged on a pristine re-extracted store.
+- Owner-sitting verdict sheet (2026-10-23, Y-plan O1):
+  `docs/planning/2026-10-23_11-56_owner-sitting-ratification-verdict-sheet.md`
+  packages every open owner call (C38-C53, D1/D2, the pbx blessing, the
+  Resend key, the policy batch, the ratified adoptions) as one answerable
+  page with recommendations, alternatives, cost of delay, and the Y-task
+  each verdict unblocks. `decision-batch.md` gained a fresh-read verdict
+  banner marking the expired recommendations (C40 superseded by scope;
+  C42/C41 corrected in place).
 - `check-set-lockstep` check + `tests/check-expected.json` canonical
   check list (2026-10-19): the declared check set must equal the JSON
   list on BOTH arches or `nix flake check` throws with both sets
@@ -216,6 +239,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- Planning-plans corridor closed (2026-10-23, Y-plan F1): the P/V/W/X chain
+  plus the 10-16 N-generation ancestor ARCHIVED with an `## Appendix R —
+  Resolution` table per file (DONE with its artifact path, or ROUTED to a
+  Y task / living doc); manifest in `docs/planning/archived/README.md`.
+  The Y plan's Appendix C is the coverage proof for the routed bar.
+- BuildFlow per-step ceiling baked into `.buildflow.yml`
+  (`default_step_timeout: 25m`, 2026-10-23): the VM E2E builds no longer
+  need `--step-timeout nix-build=25m` from memory. This binary (ed9ce48)
+  rejects a per-tool `step_timeouts:` map as an unknown key (verified with
+  `buildflow config lint`), so the documented global key is the durable
+  form; docs still pass `--max-time 30m`.
+- Probe-script lint doctrine (2026-10-23, closes D4.2): `docs/probes/`
+  scripts are ruff-clean under the CI floor with NO per-file-ignores - a
+  fired rule is fixed in the script; the executable bit is the shebang's
+  partner, and a single justified `# noqa: <RULE> - <why>` is allowed only
+  where the finding is structurally correct (a child process's long-lived
+  stdout handle). Encoded in CONTRIBUTING "Probe scripts".
+- E2E runtime-budget doctrine (2026-10-23, closes W6.4/E2): the ~35 s
+  unknown-recipient resolver wait and the ~75 s report-ingestion window are
+  load-bearing evidence, not waste; a test-profile knob may shorten a WAIT
+  but never relax a product assertion. Written into the `stalwart-e2e`
+  header next to the one allowed deviation (`directoryCacheTtlNegative`).
 - Docs-health full-corridor pass (2026-10-23): the whole 2026-10-17 ->
   2026-10-20 status-report corridor (13 reports) verified against code and
   annotated inline (575 verdicts via annotate.go repair + the identical
@@ -452,6 +497,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- Probe-script lint residue (2026-10-23, closes D4.1): the nine warning-level
+  ruff findings in `docs/probes/2026-10-19-carddav-demo-vm/` are gone -
+  read-once `/proc/loadavg` and log opens became `Path.read_text()`
+  (SIM115 x3), `re.I`/`re.M` became `re.IGNORECASE`/`re.MULTILINE`
+  (FURB167 x2), and the inspected-returncode `subprocess.run` calls pass an
+  explicit `check=False` (PLW1510 x3). The one remaining handle (a child's
+  stdout) carries a named, justified `noqa`. `ruff check docs/probes
+  scripts` is clean.
 - Provision bootstrap applied the plan to a FOREIGN service (2026-10-23,
   pbx-artmann burn): the unit's fallback accepted any endpoint that
   answered `curl --fail` on `127.0.0.1:8080`. On a host where that
