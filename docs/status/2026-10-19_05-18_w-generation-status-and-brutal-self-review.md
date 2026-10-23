@@ -79,16 +79,16 @@
 
 ## b) PARTIALLY DONE
 
-1. **W6**: push/not-rerun assertions shipped and green; the bounce-path
+1. **W6**: push/not-rerun assertions shipped and green; the bounce-path **→ TODO_LIST rows (bounce-path W6.3, runtime trim W6.4, ping probe W6.7)**
    subtest (W6.3), runtime-trim investigation (W6.4), and `ping`
    parameter probe (W6.7) are routed to TODO, not done.
-2. **W12**: 1 of 3 filings done (#552103). dnsmasq-forward note (venue
+2. **W12**: 1 of 3 filings done (#552103). dnsmasq-forward note (venue **→ #552103 filed (6258512488); dnsmasq + T13b in the TODO filings row**
    undecided) and dprint T13b (needs its own verify pass) remain.
-3. **W10**: TLS-node coverage for the Netease/LinkedIn fixtures (W10.2)
+3. **W10**: TLS-node coverage for the Netease/LinkedIn fixtures (W10.2) **→ TODO_LIST row**
    never started; the rest of W10 landed.
-4. **W13 BuildFlow noise**: not touched this session (binary rebuild
+4. **W13 BuildFlow noise**: not touched this session (binary rebuild **→ TODO_LIST BuildFlow row**
    blocked by the concurrent session; diagnoses not started either).
-5. **W15.6 harvest**: TODO rows updated inline during the session, but
+~~5. **W15.6 harvest**: TODO rows updated inline during the session, but~~ done (docs-health pass 2026-10-23)
    no dedicated final docs-health HARVEST pass over THIS report's f-list
    (deliberate: the user decides what survives).
 
@@ -204,107 +204,107 @@
 
 ## f) Up to 50 things next (tier-ordered; 1-3 gate everything)
 
-1. **ANSWER C43** (cut v0.5.0 with the vendored module now?) — unblocks 2-9.
-2. **ANSWER C44** (secrets doctrine for provision plans).
-3. **ANSWER C45** (0.16.22 pin vs 0.16.26 overlay; delta table is the input).
-4. W4: cut v0.5.0 (Unreleased pass → gates → scratch-tag dry-run →
+1. **ANSWER C43** (cut v0.5.0 with the vendored module now?) — unblocks 2-9. **→ decision-batch C43**
+2. **ANSWER C44** (secrets doctrine for provision plans). **→ decision-batch C44**
+3. **ANSWER C45** (0.16.22 pin vs 0.16.26 overlay; delta table is the input). **→ decision-batch C45**
+4. W4: cut v0.5.0 (Unreleased pass → gates → scratch-tag dry-run → **→ TODO_LIST v0.5.0 row**
    annotated tag → tag-CI → gh release → SECURITY.md bump).
-5. W5: SystemNix pin advance to v0.5.0 (wrapper-API deltas, both
+5. W5: SystemNix pin advance to v0.5.0 (wrapper-API deltas, both **→ TODO_LIST SystemNix pin row**
    CHANGELOGs).
-6. W3 remainder: C39 (MemoryMax), C41 (AGENTS cap 229 vs 220), C46
+6. W3 remainder: C39 (MemoryMax), C41 (AGENTS cap 229 vs 220), C46 **→ decision-batch (C41 moot since 07-18)**
    (flap), ratify the `[rec]` adoptions.
-7. W8: policy batch (C18/C19/C22/C24/C29/C34, Q4, bandit/vulture CI
+7. W8: policy batch (C18/C19/C22/C24/C29/C34, Q4, bandit/vulture CI **→ decision-batch + TODO blocked-on-user rows**
    scope, demo g1/g2, qcow2 history verdict, D1/D2 timeline, Resend key).
-8. Update AGENTS.md: check registration is FOUR sites + README bullet
+~~8. Update AGENTS.md: check registration is FOUR sites + README bullet~~ done — superseded same day: X9 single-sourced the set (AGENTS now says TWO sites + tests/check-expected.json)
    (this report d/3).
-9. Check + update the FEATURES.md migration row for the now-working
+~~9. Check + update the FEATURES.md migration row for the now-working~~ done — migration row is FULLY_FUNCTIONAL 9/9 (verified 2026-10-23)
    migration path (this report d/8).
-10. Reconcile tests/common.nix vs the dedup-against CHANGELOG verdict
+~~10. Reconcile tests/common.nix vs the dedup-against CHANGELOG verdict~~ done — reconciled: common.nix shipped same day; dedup-AGAINST scoped to fetchurl fixtures; both CHANGELOG entries present (2026-10-23)
     (handshake row, then align both texts).
-11. Root-cause the gate count line ("running 7" vs 10) in nix's check
+~~11. Root-cause the gate count line ("running 7" vs 10) in nix's check~~ done — attributed buildflow-emitted (2026-10-19; BuildFlow-side residue in the TODO row)
     runner; replace "known noise" with the actual semantics.
-12. W6.3: relay bounce-path e2e subtest (Mailpit/queue state, never
+12. W6.3: relay bounce-path e2e subtest (Mailpit/queue state, never **→ TODO_LIST row**
     journal greps).
-13. W6.4: e2e runtime-trim investigation + test-profile TTL doctrine.
-14. W6.7: EventSource `ping` parameter probe on the demo VM.
-15. W12.3: dnsmasq-forward upstream note (decide venue: nixos-test
+13. W6.4: e2e runtime-trim investigation + test-profile TTL doctrine. **→ TODO_LIST row**
+14. W6.7: EventSource `ping` parameter probe on the demo VM. **→ TODO_LIST row**
+15. W12.3: dnsmasq-forward upstream note (decide venue: nixos-test **→ TODO_LIST upstream-filings row**
     docs? stalwart discussions?).
-16. W12.4: dprint T13b filing (run the verify-before-filing gates on
+16. W12.4: dprint T13b filing (run the verify-before-filing gates on **→ TODO_LIST upstream-filings row**
     the eaten-cells repro first).
-17. W18.3: apply-log dump-on-failure fault-injection proof.
-18. W18.4: audit all VM-test steps that redirect to VM-local files for
+~~17. W18.3: apply-log dump-on-failure fault-injection proof.~~ done — X17.1 (2026-10-20, 60e7916)
+~~18. W18.4: audit all VM-test steps that redirect to VM-local files for~~ done — X17.2 (2026-10-20, c430db4 + 28e5dd7)
     the dump rule.
-19. W18.5: external-link re-verification sweep over living docs.
-20. W13.1-2: reproduce + reconcile BuildFlow nix-checker 12-vs-2 and
+~~19. W18.5: external-link re-verification sweep over living docs.~~ done — X10 (2026-10-19, zero dead links)
+20. W13.1-2: reproduce + reconcile BuildFlow nix-checker 12-vs-2 and **→ TODO_LIST BuildFlow row**
     bandit 54-vs-4 count gaps (read-only diagnosis).
-21. W13.3: file the ruff findings-identity bug (missing_file=55,
+21. W13.3: file the ruff findings-identity bug (missing_file=55, **→ TODO_LIST BuildFlow row**
     json parsing).
-22. W13.4-5: detect-only-under-sibling-failure proposal + vulture
+22. W13.4-5: detect-only-under-sibling-failure proposal + vulture **→ TODO_LIST BuildFlow row**
     confidence policy docs (their repo).
-23. W13.6: BuildFlow binary rebuild + ef32fa0..HEAD delta review ONCE
+23. W13.6: BuildFlow binary rebuild + ef32fa0..HEAD delta review ONCE **→ TODO_LIST BuildFlow row**
     the concurrent session lands.
-24. W16: SystemNix CI debt (credential, canary allowlist, 2 pin flips,
+24. W16: SystemNix CI debt (credential, canary allowlist, 2 pin flips, **→ TODO_LIST SystemNix row**
     scheduled-vs-push divergence).
-25. W17: D1 enablement slice (rotate placeholder secrets, live dmarc
+25. W17: D1 enablement slice (rotate placeholder secrets, live dmarc **→ TODO_LIST D1-gated rows**
     poll, vandelay-vs-imapsync, canary skeleton).
-26. TLS-node coverage for Netease + LinkedIn parsedmarc fixtures.
-27. A one-time aarch64 eval gate run (`nix flake check --all-systems`
+26. TLS-node coverage for Netease + LinkedIn parsedmarc fixtures. **→ TODO_LIST row**
+27. A one-time aarch64 eval gate run (`nix flake check --all-systems` **→ ROADMAP aarch64 posture (occasional local --all-systems eval)**
     or the shape eval) to actually EXECUTE the aarch64 check set
     including migrate-convert-eval.
-28. Declarative catch-all wrapper option (post-C44 backlog).
-29. Typed secrets option (post-C44).
-30. Queue-depth observability surface (consumer poll spec from
+28. Declarative catch-all wrapper option (post-C44 backlog). **→ ROADMAP 0.16-born ideas**
+29. Typed secrets option (post-C44). **→ ROADMAP (post-C44)**
+30. Queue-depth observability surface (consumer poll spec from **→ ROADMAP 0.16-born ideas**
     MONITORING row 2 — needs the counter-divergence rule encoded on
     the SystemNix side).
-31. parsedmarc on REAL 0.16 mail (live mailbox poll — D1 slice
+31. parsedmarc on REAL 0.16 mail (live mailbox poll — D1 slice **→ ROADMAP 0.16-born ideas**
     adjacent).
-32. OIDC wiring (ROADMAP).
-33. Branch-protection + Renovate execution (post-C18/C19).
-34. aarch64 posture decision (ROADMAP).
-35. treefmt standardization (rejected once; revisit only with new
+32. OIDC wiring (ROADMAP). **→ ROADMAP theme 6**
+33. Branch-protection + Renovate execution (post-C18/C19). **→ TODO_LIST blocked-on-user rows**
+34. aarch64 posture decision (ROADMAP). **→ ROADMAP (documented-manual posture)**
+~~35. treefmt standardization (rejected once; revisit only with new~~ **NOT-DO — rejected without new evidence (AGENTS conventions; alejandra CI contract).**
     evidence).
-36. vulnix replacement (osv-scanner) — vulnix crashes fleet-wide.
-37. DOMAIN_LANGUAGE.md authoring (ROADMAP).
-38. Non-goals confirmation pass (ROADMAP).
-39. Watch: nixpkgs #552103 merge → vendored-module retirement
+36. vulnix replacement (osv-scanner) — vulnix crashes fleet-wide. **→ ROADMAP repo-excellence**
+~~37. DOMAIN_LANGUAGE.md authoring (ROADMAP).~~ done — ROADMAP line added (2026-10-23 docs-health pass)
+38. Non-goals confirmation pass (ROADMAP). **→ ROADMAP non-goals (confirmation rides the next roadmap pass)**
+~~39. Watch: nixpkgs #552103 merge → vendored-module retirement~~ done — TODO_LIST watch row carries the retirement checklist
     checklist (restore meta.doc/partOf, drop the ExecStartPost patch).
-40. Watch: #566282 pin-advance fallout (provision.opensearch port
+~~40. Watch: #566282 pin-advance fallout (provision.opensearch port~~ done — TODO_LIST watch row + README runbook step 2
     procedure — README runbook step 2).
-41. Watch: 0.16.26 `sd_notify` note onto the vendored module comment
+~~41. Watch: 0.16.26 `sd_notify` note onto the vendored module comment~~ done — README delta table carries it (module comment updates only if 0.16.26 is ever overlaid, C45)
     (C45-adjacent).
-42. Watch: #563651/#563652/#563777 + mailsuite#65 (all open/silent
+~~42. Watch: #563651/#563652/#563777 + mailsuite#65 (all open/silent~~ done — TODO_LIST watch row (re-checked 2026-10-19)
     as of today's re-check).
-43. Snapshot-vs-wrapper matchOn: consider an upstream doc PR to
+~~43. Snapshot-vs-wrapper matchOn: consider an upstream doc PR to~~ **NOT-DO — the file is vendored; the divergence is documented in the README ledger - no upstream ask.**
     migrate_v016.py explaining the deliberate divergence (the ledger
     line now exists on our side).
-44. migrate-e2e: assert the `.v015-premigrate` backup EXISTS after the
+~~44. migrate-e2e: assert the `.v015-premigrate` backup EXISTS after the~~ done — asserted (tests/stalwart-migrate-e2e.nix:237)
     script (currently only the marker is asserted).
-45. migrate-e2e: cover the NO-backup-dir flow (clean live store) —
+45. migrate-e2e: cover the NO-backup-dir flow (clean live store) — **→ TODO_LIST row (new 2026-10-23)**
     today only the poisoned/--backup-dir path runs.
-46. MONITORING: encode the row-15 provision-failure alert as a
+~~46. MONITORING: encode the row-15 provision-failure alert as a~~ done — row 15 SPEC stands; consumer encoding is SystemNix-side; validationFailed signature added 2026-10-23
     concrete Gatus/systemd spec on the consumer side (their repo).
-47. Consider a `nix-health` mention in AGENTS commands (devShell
+~~47. Consider a `nix-health` mention in AGENTS commands (devShell~~ done — FEATURES devShell row + the devshells.nix comment carry it (AGENTS at its 220-line cap)
     ships it; the doc doesn't say so yet).
-48. Docs-health HARVEST of this report's f-list (once the user rules
+~~48. Docs-health HARVEST of this report's f-list (once the user rules~~ done (docs-health pass 2026-10-23)
     on what survives).
-49. Delete/refresh the `fir-determinism-*` /tmp probe logs (foreign,
+~~49. Delete/refresh the `fir-determinism-*` /tmp probe logs (foreign,~~ done (docs-health pass 2026-10-23)
     months old — someone's residue; confirm ownership first).
-50. Session-start baseline ritual note: three crush sessions were
+~~50. Session-start baseline ritual note: three crush sessions were~~ done — AGENTS session-start ritual owns it
     active at peak; the ritual held, but a `docs/status` same-day
     scan BEFORE first edit caught the contacts session only by luck.
 
 ## g) Questions I can NOT answer myself
 
-1. **C43**: Cut v0.5.0 NOW with the vendored 0.16 module (the gate is
+1. **C43**: Cut v0.5.0 NOW with the vendored 0.16 module (the gate is **→ decision-batch C43**
    green, the migration works, CI is green), or wait for nixpkgs
    PR #552103 to merge and release without the vendored copy? This
    gates W4/W5 and the whole fleet pin-advance chain.
-2. **C44**: Which account-secrets doctrine for real hosts — sops-
+2. **C44**: Which account-secrets doctrine for real hosts — sops- **→ decision-batch C44**
    rendered runtime `stalwart-cli apply`, admin-created accounts
    (passwords never in the Nix store), or a wrapper credential-file
    secret type? 0.16 provision plans carry passwords in the
    world-readable store; production readiness is blocked on this.
-3. **C45**: Stay on the pin's `stalwart_0_16` 0.16.22, or overlay
+3. **C45**: Stay on the pin's `stalwart_0_16` 0.16.22, or overlay **→ decision-batch C45**
    0.16.26? The delta table (README) says 0.16.26 is BREAKING for
    pre-x86-64-v2 CPUs and adds `sd_notify`; the DNSBL `bit_and` fix
    (0.16.23) is already neutralized here by the always-reconcile

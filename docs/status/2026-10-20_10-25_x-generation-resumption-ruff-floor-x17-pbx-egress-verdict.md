@@ -96,29 +96,29 @@ X18, X19, X20, X12 filings.
 
 ## f) NEXT (top items)
 
-1. Owner: bless the hermetic pbx override (spec in (b)) - one more
+1. Owner: bless the hermetic pbx override (spec in (b)) - one more **→ 14-19 f/1 = TODO pbx row (owner, open)**
    pbx VM run lands the flip.
-2. Next nix-email daemon push: first CI exercise of ruff->lockstep->
+~~2. Next nix-email daemon push: first CI exercise of ruff->lockstep->~~ done — pushed; run 39864876276 (2026-10-22) green end-to-end
    shape->flake-check in order; expect GREEN end-to-end (no push from
    assistants - daemon/owner action).
-3. X8/X15 heavy VM lanes (relay bounce-path, TLS-node breadth) - each
+3. X8/X15 heavy VM lanes (relay bounce-path, TLS-node breadth) - each **→ TODO_LIST rows**
    is its own session-sized run.
-4. X12.2: reproduce the dnsmasq forward-vs-blackhole claim BEFORE
+4. X12.2: reproduce the dnsmasq forward-vs-blackhole claim BEFORE **→ TODO_LIST upstream-filings row**
    filing (verify-before-filing); note the new scope split (driver VM
    vs demo VM egress differ).
-5. X13 after the BuildFlow session lands + binary rebuild (their HEAD
+5. X13 after the BuildFlow session lands + binary rebuild (their HEAD **→ TODO_LIST BuildFlow row**
    9e3ccb0 is already ahead of the installed binary ef32fa0).
-6. X7.1/X7.2 bandit/vulture doctrine draft (owner blessing = 5-min
+6. X7.1/X7.2 bandit/vulture doctrine draft (owner blessing = 5-min **→ TODO_LIST CI python-lint row**
    read).
 
 ## g) Owner questions (unchanged set, evidence upgraded)
 
-1. pbx live-fetch doctrine: ANSWERED BY EVIDENCE - live is impossible
+1. pbx live-fetch doctrine: ANSWERED BY EVIDENCE - live is impossible **→ TODO pbx row (hermetic blessing pending)**
    in driver VMs; only the hermetic shape remains. Bless it?
-2. Wrapper-owned route-wait vs consumer-side: the working instance is
+2. Wrapper-owned route-wait vs consumer-side: the working instance is **→ owner call (TODO pbx row evidence)**
    consumer-side (pbx test file). Should the WRAPPER ship a route-wait
    affordance for network-directing consumers?
-3. Cross-repo red-master tolerance: yesterday's wait-for discipline
+3. Cross-repo red-master tolerance: yesterday's wait-for discipline **→ owner call (cross-repo policy)**
    worked (no collisions), but it left master red for ~26h. Keep the
    wait-for, or add an "error-class fixes may cross a LANDED session's
    files" rule with the hand-off row as the gate?

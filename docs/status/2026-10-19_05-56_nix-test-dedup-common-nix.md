@@ -65,12 +65,12 @@
 
 ## b) PARTIALLY DONE
 
-1. **Session close-out loop.** A re-engagement pass identified 8 open gaps
+~~1. **Session close-out loop.** A re-engagement pass identified 8 open gaps~~ done — residue executed same day + next sessions (statix/deadnix green in gates; CI observed green; CHANGELOG entry added 2026-10-23)
    (format re-check, statix, deadnix, inventory scripts, dprint
    verification, CHANGELOG entry, accepted-duplication rationale, CI
    observation). Only the format re-check was executed before this report
    was requested; the rest are enumerated in (c). Effort: S each.
-2. **dprint verification of this session's markdown edits** (AGENTS.md,
+~~2. **dprint verification of this session's markdown edits** (AGENTS.md,~~ done — dprint pinned in the devShell (07-18 pass, 2026-10-19)
    TODO_LIST.md, this report). What works: the repo's own md lints pass.
    What remains: an actual `dprint check` pass — the binary is absent from
    PATH and from the flake devShell, so CI is currently the only executor.
@@ -78,24 +78,24 @@
 
 ## c) NOT STARTED
 
-1. `buildflow -s statix` — W20 posture of the restructured node configs
+~~1. `buildflow -s statix` — W20 posture of the restructured node configs~~ done — green in every gate since (pinned statix; CI 2026-10-22 green)
    (machine node kept a `services = { mail-server ...; stalwart.provision
    ...; }` wrapper; flood node was fully collapsed) is unproven this
    session. Priority: high (CI-adjacent).
-2. `buildflow -s deadnix` — same surface, unused-args class.
-3. Local runs of `scripts/check-inventory.sh` +
+~~2. `buildflow -s deadnix` — same surface, unused-args class.~~ done — green in every gate since (07-18 verified its auto-fixes)
+~~3. Local runs of `scripts/check-inventory.sh` +~~ done — pre-push + CI run them (green chain through 2026-10-22)
    `scripts/check-check-set-drift.sh` (CI parity; check set is provably
    unchanged, so expected green — but unexecuted).
-4. CHANGELOG `[Unreleased]` entry for the dedup (blocked on question g2 —
+~~4. CHANGELOG `[Unreleased]` entry for the dedup (blocked on question g2 —~~ done — added 2026-10-23 (docs-health pass)
    doctrine call).
-5. AGENTS.md line recording the ACCEPTED duplication groups (eval grep
+~~5. AGENTS.md line recording the ACCEPTED duplication groups (eval grep~~ done — AGENTS records the common.nix convention (import, never restate); the accepted-clone enumeration stays in this report
    skeletons, cross-file account blocks, cert runCommands) so a future
    session does not relitigate them. Currently the rationale exists only
    in this session's chat.
-6. CI observation: origin state unobserved; daemon commits are local as
+~~6. CI observation: origin state unobserved; daemon commits are local as~~ done — green chain 2026-10-19 through 2026-10-22 (run 39864876276)
    far as this session saw. First CI run of the refactored tree is
    pending.
-7. docs-health HARVEST of this report's (f) list (awaiting instruction
+~~7. docs-health HARVEST of this report's (f) list (awaiting instruction~~ done (docs-health pass 2026-10-23)
    per this session's brief: report, then wait).
 
 ## d) TOTALLY FUCKED UP
@@ -146,55 +146,55 @@
 
 ## f) Top next tasks (ranked; honest count 15, not padded to 50)
 
-1. Run `buildflow -s statix` on the restructured node configs. Impact:
+~~1. Run `buildflow -s statix` on the restructured node configs. Impact:~~ done — green in every gate since
    High. Effort: S. Category: Quality.
-2. Run `buildflow -s deadnix` on the same surface. Impact: Med. Effort:
+~~2. Run `buildflow -s deadnix` on the same surface. Impact: Med. Effort:~~ done — green in every gate since
    S. Category: Quality.
-3. Run `scripts/check-inventory.sh` plus `scripts/check-check-set-drift.sh`
+~~3. Run `scripts/check-inventory.sh` plus `scripts/check-check-set-drift.sh`~~ done — pre-push + CI (green chain)
    locally. Impact: High. Effort: S. Category: Quality.
-4. Establish a pinned local dprint invocation, then check AGENTS.md plus
+~~4. Establish a pinned local dprint invocation, then check AGENTS.md plus~~ done — devShell pin (07-18 pass)
    TODO_LIST.md plus this report. Impact: High. Effort: S. Category:
    Quality.
-5. Observe the first CI run over the refactored tree (push state
+~~5. Observe the first CI run over the refactored tree (push state~~ done — green (runs 39190484173/39191414206 through 39864876276)
    currently unobserved). Impact: High. Effort: S. Category: Quality.
-6. CHANGELOG `[Unreleased]` entry for the dedup (gated on g2). Impact:
+~~6. CHANGELOG `[Unreleased]` entry for the dedup (gated on g2). Impact:~~ done — added 2026-10-23
    Med. Effort: S. Category: Documentation.
-7. AGENTS.md: record the accepted-duplication groups plus rationale.
+~~7. AGENTS.md: record the accepted-duplication groups plus rationale.~~ done — convention recorded; enumeration stays in this report
    Impact: Med. Effort: S. Category: Documentation.
-8. docs-health HARVEST of this report's (f) list. Impact: Med. Effort:
+~~8. docs-health HARVEST of this report's (f) list. Impact: Med. Effort:~~ done (docs-health pass 2026-10-23)
    S. Category: Documentation.
-9. Flood-flake watch: on recurrence, capture journal plus limiter bucket
+9. Flood-flake watch: on recurrence, capture journal plus limiter bucket **→ TODO_LIST flood watch row**
    state BEFORE rerun (TODO_LIST row exists). Impact: Low. Effort: S.
    Category: Quality.
-10. Decide flood-subtest posture: watch-item vs built-in
+10. Decide flood-subtest posture: watch-item vs built-in **→ TODO_LIST flood row (owner taste call, open)**
     retry-with-capture (gated on g3). Impact: Low. Effort: S. Category:
     Quality.
-11. If a third consumer of the account-provision shape appears, extract
+~~11. If a third consumer of the account-provision shape appears, extract~~ **NOT-DO — conditional; accept stands at two consumers.**
     a cross-file `mkUser` (accept stands at two). Impact: Low. Effort: M.
     Category: Cleanup.
-12. If a fifth eval-contract check appears, consider a shared
+~~12. If a fifth eval-contract check appears, consider a shared~~ **NOT-DO — conditional; accept stands at four checks.**
     derivation+grep helper (accept stands at four). Impact: Low. Effort:
     M. Category: Cleanup.
-13. Fleet ask: add dprint to the devShell pattern (BuildFlow/repo
+~~13. Fleet ask: add dprint to the devShell pattern (BuildFlow/repo~~ done — shipped 2026-10-19 (devshells.nix pins dprint)
     owners). Impact: Low. Effort: S. Category: Quality.
-14. AGENTS.md working-rules: extend the `--rebuild` note with the
+~~14. AGENTS.md working-rules: extend the `--rebuild` note with the~~ done — AGENTS carries the cache-hit/--rebuild rule; the never-built/failed-output variants stay in this report
     never-built and failed-output variants. Impact: Low. Effort: S.
     Category: Documentation.
-15. docs-health VERIFY pass over this report's claims when convenient.
+~~15. docs-health VERIFY pass over this report's claims when convenient.~~ done (docs-health pass 2026-10-23)
     Impact: Low. Effort: S. Category: Documentation.
 
 ## g) Questions I cannot answer myself
 
-1. **dprint local invocation:** is there a sanctioned pinned way to run
+~~1. **dprint local invocation:** is there a sanctioned pinned way to run~~ done — answered: pinned in the devShell (2026-10-19)
    `dprint check` outside CI in this repo? Tried: PATH, `nix develop -c
    dprint`, bare `dprint` — all absent. Unwilling to use the registry's
    `nixpkgs#dprint` blindly (version drift vs the CI pin could produce a
    false red/green). Answer unblocks task f4.
-2. **CHANGELOG doctrine:** do internal test-infrastructure refactors get a
+~~2. **CHANGELOG doctrine:** do internal test-infrastructure refactors get a~~ done — answered by practice: internal infra refactors DO get entries (guard-tooling batch; the dedup entry added 2026-10-23)
    `[Unreleased]` entry when they land, or only at release-cut time? The
    existing entries are feature/behavior level; this dedup changed no
    module behavior (bit-identity proofs). Answer decides f6 either way.
-3. **Flood-subtest posture:** harden now (built-in retry with journal +
+3. **Flood-subtest posture:** harden now (built-in retry with journal + **→ TODO_LIST flood row (owner call, open)**
    bucket-state capture on the retry path) or keep the TODO watch-item?
    Hardening reduces flake signal noise but adds a second attempt to a
    test whose value is single-shot evidence (M14). Owner taste call.

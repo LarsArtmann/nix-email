@@ -85,11 +85,11 @@ CHANGELOG, and the module header carry the full dialect.
 
 ## c) Owner questions still gating (W3/W8 — cannot be self-answered)
 
-1. **C43**: cut v0.5.0 with the vendored module now? (W4/W5 chain)
-2. **C45**: 0.16.22 vs the 0.16.26 overlay (README delta table is the input).
-3. **C44**: account-secrets doctrine (sops-rendered apply vs admin-created).
-4. **C39/C41/C46** + the `[rec]` ratifications (sitting #1).
-5. W8 batch: C18/C19/C22/C24/C29/C34, Q4, bandit/vulture CI scope, demo
+1. **C43**: cut v0.5.0 with the vendored module now? (W4/W5 chain) **→ decision-batch C43**
+2. **C45**: 0.16.22 vs the 0.16.26 overlay (README delta table is the input). **→ decision-batch C45 (delta table written)**
+3. **C44**: account-secrets doctrine (sops-rendered apply vs admin-created). **→ decision-batch C44**
+4. **C39/C41/C46** + the `[rec]` ratifications (sitting #1). **→ decision-batch sittings (open)**
+5. W8 batch: C18/C19/C22/C24/C29/C34, Q4, bandit/vulture CI scope, demo **→ decision-batch + TODO blocked-on-user rows**
    g1/g2, qcow2 history verdict, D1/D2 timeline, Resend key.
 
 ## d) Known state

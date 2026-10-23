@@ -46,20 +46,20 @@ CRM-relevant takeaway (Kith CRM's `Source` seam, "CardDAV later"): viable sync t
 
 ## b) PARTIALLY DONE
 
-1. **Version grounding:** source review was of 0.16.26 while the deployed/demo-verified pin is 0.16.22 (4 patch releases of drift). Root cause found and verified (registry vs lock eval); the 0.16.22↔0.16.26 contacts-crate diff itself was NOT checked — the verdict is probably robust to patch drift but that is an assumption, not a fact.
-2. **Upstream-issue evidence:** single GitHub search page; new upstream bugs are filed on support.stalw.art, not GitHub — "all closed" is weak negative evidence and was only partially caveated in-session.
-3. **calcard test quality:** counted inline `#[cfg(test)]` presence (modest, ~15 across the crate) but did not read them; no verdict on their depth.
-4. **Config surface:** saw groupware knobs exist in source (`max_vcard_size`, `vcard_version`) but never mapped what the vendored nix-email module exposes or overrides.
+~~1. **Version grounding:** source review was of 0.16.26 while the deployed/demo-verified pin is 0.16.22 (4 patch releases of drift). Root cause found and verified (registry vs lock eval); the 0.16.22↔0.16.26 contacts-crate diff itself was NOT checked — the verdict is probably robust to patch drift but that is an assumption, not a fact.~~ done — addendum f)1: contacts crates byte-identical 0.16.22 vs 0.16.26 (verdict holds for the pin)
+~~2. **Upstream-issue evidence:** single GitHub search page; new upstream bugs are filed on support.stalw.art, not GitHub — "all closed" is weak negative evidence and was only partially caveated in-session.~~ done — filing-gate rule landed in AGENTS (no filing without a measured victim; benchmark = the gate)
+~~3. **calcard test quality:** counted inline `#[cfg(test)]` presence (modest, ~15 across the crate) but did not read them; no verdict on their depth.~~ **NOT-DO — ratified as-is - the verdict stands on read code + live probes; test-depth stays unassessed by design.**
+~~4. **Config surface:** saw groupware knobs exist in source (`max_vcard_size`, `vcard_version`) but never mapped what the vendored nix-email module exposes or overrides.~~ done — addendum: knobs source-verified, defaults healthy, document-don't-expose verdict
 
 ## c) NOT STARTED
 
-1. **Live probing** — no demo VM boot, no CardDAV transcript set (PUT vCard 3/4, addressbook-query, multiget, sync-collection token flow). This repo's own transcript rule ("a claim without a transcript is a guess") applies: my verdict is source-level and was labeled as such, but nothing was live-verified for contacts specifically.
-2. **Webmail UI assessment** — the contacts editor UI is not in the server repo; whether the nixpkgs build bundles the webmail dist at all was not checked. UI quality remains unknown.
-3. **Real-client interop** — no Apple Contacts / Thunderbird / eM Client dialect testing (the historically bumpy area).
-4. **JSContact edge regression checks on the pin** — e.g., #2884-class (SOCIALPROFILE w/o uri) on 0.16.22 specifically.
-5. **Contacts→spam-classification and autocomplete interactions** — known to exist upstream; unexamined here.
-6. **CRM CardDAV Source design work** — only the viability verdict was delivered, no design doc.
-7. Cleanup of `/tmp/stalwart-review/` (~50 MB extracted) — left in place deliberately (see f) item 20).
+~~1. **Live probing** — no demo VM boot, no CardDAV transcript set (PUT vCard 3/4, addressbook-query, multiget, sync-collection token flow). This repo's own transcript rule ("a claim without a transcript is a guess") applies: my verdict is source-level and was labeled as such, but nothing was live-verified for contacts specifically.~~ done — CardDAV probe set landed (docs/probes/2026-10-19-carddav-demo-vm/, addendum 07:45)
+2. **Webmail UI assessment** — the contacts editor UI is not in the server repo; whether the nixpkgs build bundles the webmail dist at all was not checked. UI quality remains unknown. **→ TODO_LIST webmail-dist row (new 2026-10-23)**
+3. **Real-client interop** — no Apple Contacts / Thunderbird / eM Client dialect testing (the historically bumpy area). **→ ROADMAP theme 5 (device-interop rides CardDAV enablement, D1-gated)**
+~~4. **JSContact edge regression checks on the pin** — e.g., #2884-class (SOCIALPROFILE w/o uri) on 0.16.22 specifically.~~ done — SOCIALPROFILE-without-uri PASS on the pin (addendum 07:55; non-issue)
+~~5. **Contacts→spam-classification and autocomplete interactions** — known to exist upstream; unexamined here.~~ done — addendum 08:05: ZERO coupling (source-verified)
+6. **CRM CardDAV Source design work** — only the viability verdict was delivered, no design doc. **→ crm repo (data-mesh CardDAV plan T19 lives there)**
+~~7. Cleanup of `/tmp/stalwart-review/` (~50 MB extracted) — left in place deliberately (see f) item 20).~~ done (docs-health pass 2026-10-23)
 
 ## d) TOTALLY FUCKED UP!
 
@@ -71,46 +71,46 @@ CRM-relevant takeaway (Kith CRM's `Source` seam, "CardDAV later"): viable sync t
 
 ## e) WHAT WE SHOULD IMPROVE!
 
-1. **Transcript discipline for contacts claims:** before any contacts wire-claim gets encoded into this repo's docs (the way `docs/INBOXCLEAN.md` does for JMAP), boot the demo VM and capture a CardDAV probe set under `docs/probes/`. Source-level reading is not this repo's evidence standard.
-2. **Version resolution rule:** always ground "pinned version" statements in `flake.lock` revs (parse lock → eval at rev), not registry nixpkgs. Add to the pin-advance checklist mentally.
-3. **Tool defaults:** `download` tool for fetches, never curl; clean rg patterns the first time.
-4. **Label evidence levels explicitly in every report** ([SRC]/[LIVE]/[WEB]) — this report does it; keep the habit.
-5. **Scope honesty:** "up to 50 next things" padding would have been noise; ~20 real items is the honest ceiling for a single read-only session. Quality over quota.
+~~1. **Transcript discipline for contacts claims:** before any contacts wire-claim gets encoded into this repo's docs (the way `docs/INBOXCLEAN.md` does for JMAP), boot the demo VM and capture a CardDAV probe set under `docs/probes/`. Source-level reading is not this repo's evidence standard.~~ done — AGENTS rule: the INBOXCLEAN transcript rule extends to CardDAV/JMAP-contacts
+~~2. **Version resolution rule:** always ground "pinned version" statements in `flake.lock` revs (parse lock → eval at rev), not registry nixpkgs. Add to the pin-advance checklist mentally.~~ done — AGENTS source-assessment discipline bullet (resolve through flake.lock)
+~~3. **Tool defaults:** `download` tool for fetches, never curl; clean rg patterns the first time.~~ **NOT-DO — tool-contract enforced; nothing repo-side to do.**
+~~4. **Label evidence levels explicitly in every report** ([SRC]/[LIVE]/[WEB]) — this report does it; keep the habit.~~ done — the [SRC]/[LIVE]/[WEB] labeling is modeled by this report; habit kept
+~~5. **Scope honesty:** "up to 50 next things" padding would have been noise; ~20 real items is the honest ceiling for a single read-only session. Quality over quota.~~ **NOT-DO — style note; nothing to do.**
 
 ## f) Things we should get done next (impact-sorted; honest count: 20)
 
 **nix-email (hardening the assessment into this repo's evidence standard):**
 
-1. Diff contacts-relevant crates (`calcard`, `crates/{groupware,dav,jmap-proto}`) between v0.16.22 and v0.16.26 — confirm the verdict holds for the locked rev; note deltas in this report's appendix if any.
-2. Boot demo VM (`nix run .#vm`), run a CardDAV transcript set: PUT vCard 4.0 + 3.0, addressbook-query with prop/param filters, multiget, sync-collection token round-trip → `docs/probes/<date>-carddav-demo-vm/`.
-3. Probe the #2884-class edge on the pin: SOCIALPROFILE-without-uri through JMAP `ContactCard/get` vs CardDAV GET.
-4. Verify UID-uniqueness + ETag/If-Match behavior live (source says enforced; pin behavior should have a transcript).
-5. Check whether nixpkgs `stalwart_0_16` bundles the webmail dist; if not, document how to serve it or flag the gap in README.
-6. Map groupware config knobs (`max_vcard_size`, `vcard_version`) through the vendored module — expose or explicitly default them.
-7. Add a Contacts section to README/FEATURES posture (today contacts appears only inside `docs/INBOXCLEAN.md`'s capability list — it has no first-class documentation in this repo).
-8. Decide + document whether CardDAV should be exposed through the production wrapper's reverse-proxy posture (currently only JMAP posture is documented for InboxClean).
+~~1. Diff contacts-relevant crates (`calcard`, `crates/{groupware,dav,jmap-proto}`) between v0.16.22 and v0.16.26 — confirm the verdict holds for the locked rev; note deltas in this report's appendix if any.~~ done — addendum 08:05: byte-identical (delta table in-file)
+~~2. Boot demo VM (`nix run .#vm`), run a CardDAV transcript set: PUT vCard 4.0 + 3.0, addressbook-query with prop/param filters, multiget, sync-collection token round-trip → `docs/probes/<date>-carddav-demo-vm/`.~~ done — docs/probes/2026-10-19-carddav-demo-vm/ (07:45 addendum)
+~~3. Probe the #2884-class edge on the pin: SOCIALPROFILE-without-uri through JMAP `ContactCard/get` vs CardDAV GET.~~ done — PASS, non-issue (07:55 addendum)
+~~4. Verify UID-uniqueness + ETag/If-Match behavior live (source says enforced; pin behavior should have a transcript).~~ done — probed live (07:45 addendum: 412 no-uid-conflict, stale-If-Match 412)
+5. Check whether nixpkgs `stalwart_0_16` bundles the webmail dist; if not, document how to serve it or flag the gap in README. **→ TODO_LIST webmail-dist row (new 2026-10-23)**
+~~6. Map groupware config knobs (`max_vcard_size`, `vcard_version`) through the vendored module — expose or explicitly default them.~~ done — addendum: defaults healthy, document-don't-expose
+~~7. Add a Contacts section to README/FEATURES posture (today contacts appears only inside `docs/INBOXCLEAN.md`'s capability list — it has no first-class documentation in this repo).~~ done — FEATURES contacts rows (CardDAV / JMAP contacts / search) present (verified 2026-10-23)
+8. Decide + document whether CardDAV should be exposed through the production wrapper's reverse-proxy posture (currently only JMAP posture is documented for InboxClean). **→ ROADMAP theme 5 (exposure rides enablement, D1-gated)**
 
 **Kith CRM (if the CardDAV-later `Source` seam is the driver):**
-9. Design doc for the CardDAV `Source`: UID key discipline ↔ gcontacts one-key invariant, sync-token vs the atomic per-account state JSON, ETag conflict policy, one-way posture.
-10. Decide one-way vs two-way sync before any code (mirrors the ratified gcontacts strictly-one-way rule).
-11. vCard emitter decisions: version (4.0 vs 3.0 for client compat), mandatory FN/N synthesis, photo encoding policy, tags→CATEGORIES mapping.
-12. Matching ladder analog in Go: ext-id (UID) → email → name; never pushdown (mirrors gcontacts).
-13. Reuse `machineapi`'s `phoneMatches` digit-normalization for TEL-based matching (stored phones verbatim — same contract as /rest).
-14. Field mapping table CRM contact → vCard (company→ORG, notes→NOTE, relations: vCard has no relation graph — keep relations CRM-side, RELATED best-effort or skip).
-15. Test harness: fake CardDAV server with scripted specSources (gcontacts pattern) + optional E2E against the demo VM.
-16. Addressbook discovery via `.well-known/carddav` + principals (check what 0.16.22 serves).
+9. Design doc for the CardDAV `Source`: UID key discipline ↔ gcontacts one-key invariant, sync-token vs the atomic per-account state JSON, ETag conflict policy, one-way posture. **→ crm repo (T19 plan)**
+~~10. Decide one-way vs two-way sync before any code (mirrors the ratified gcontacts strictly-one-way rule).~~ done — answered: one-way mirror (owner decision 2026-10-19, ROADMAP theme 5)
+11. vCard emitter decisions: version (4.0 vs 3.0 for client compat), mandatory FN/N synthesis, photo encoding policy, tags→CATEGORIES mapping. **→ crm repo (T19 plan)**
+12. Matching ladder analog in Go: ext-id (UID) → email → name; never pushdown (mirrors gcontacts). **→ crm repo (T19 plan)**
+13. Reuse `machineapi`'s `phoneMatches` digit-normalization for TEL-based matching (stored phones verbatim — same contract as /rest). **→ crm repo (T19 plan)**
+14. Field mapping table CRM contact → vCard (company→ORG, notes→NOTE, relations: vCard has no relation graph — keep relations CRM-side, RELATED best-effort or skip). **→ crm repo (T19 plan)**
+15. Test harness: fake CardDAV server with scripted specSources (gcontacts pattern) + optional E2E against the demo VM. **→ crm repo (T19 plan)**
+~~16. Addressbook discovery via `.well-known/carddav` + principals (check what 0.16.22 serves).~~ done — probed live (07:45 addendum: 307 chain, principals, home-set)
 
 **Meta / hygiene:**
-17. If the owner ratifies this assessment as durable knowledge, promote the verdict into `docs/reviews/` (or a CONTACTS.md) instead of leaving it only in this timestamped snapshot.
-18. Record the "registry vs lock" version lesson where the next session will hit it (this report is the record; consider the pin-advance runbook in README too).
-19. If/when the nixpkgs pin advances past 0.16.22: the INBOXCLEAN re-verification procedure should gain a contacts step (re-run items 2–4).
-20. Trash `/tmp/stalwart-review/` (~50 MB) once no more source cross-referencing is planned this session.
+~~17. If the owner ratifies this assessment as durable knowledge, promote the verdict into `docs/reviews/` (or a CONTACTS.md) instead of leaving it only in this timestamped snapshot.~~ done — ratified: AGENTS.md points at this report as the verdict home (2026-10-19 rule)
+~~18. Record the "registry vs lock" version lesson where the next session will hit it (this report is the record; consider the pin-advance runbook in README too).~~ done — AGENTS source-assessment discipline bullet
+~~19. If/when the nixpkgs pin advances past 0.16.22: the INBOXCLEAN re-verification procedure should gain a contacts step (re-run items 2–4).~~ done — TODO_LIST pin-advance contacts probe row
+~~20. Trash `/tmp/stalwart-review/` (~50 MB) once no more source cross-referencing is planned this session.~~ done (docs-health pass 2026-10-23)
 
 ## g) Questions I can NOT figure out myself
 
-1. **Who is the consumer of this assessment?** The CRM's CardDAV-later `Source` seam, a planned nix-email contacts deployment for your own mail, InboxClean adjacency, or general triage? This decides whether f) items 1–8 or 9–16 go first.
-2. **Does this assessment become durable repo knowledge?** Promote to `docs/reviews/` (or CONTACTS.md) in nix-email, or does the timestamped snapshot suffice? I chose snapshot-only.
-3. **For a future CRM CardDAV sync: is two-way EVER on the table,** or is one-way CRM→server a hard constraint like gcontacts? I can't infer your trust posture for server-side edits made by phones/clients from the repos alone — and it changes the design (conflict policy, UID ownership, delete semantics).
+~~1. **Who is the consumer of this assessment?** The CRM's CardDAV-later `Source` seam, a planned nix-email contacts deployment for your own mail, InboxClean adjacency, or general triage? This decides whether f) items 1–8 or 9–16 go first.~~ done — answered: the Kith CRM out-mirror is live (owner decision 2026-10-19; FEATURES contacts rows)
+~~2. **Does this assessment become durable repo knowledge?** Promote to `docs/reviews/` (or CONTACTS.md) in nix-email, or does the timestamped snapshot suffice? I chose snapshot-only.~~ done — ratified as the durable record (AGENTS pointer, 2026-10-19)
+~~3. **For a future CRM CardDAV sync: is two-way EVER on the table,** or is one-way CRM→server a hard constraint like gcontacts? I can't infer your trust posture for server-side edits made by phones/clients from the repos alone — and it changes the design (conflict policy, UID ownership, delete semantics).~~ done — answered: one-way (ROADMAP theme 5: nothing writes into Kith from Stalwart)
 
 ---
 

@@ -31,7 +31,7 @@ DIFFERENT live session (handed off, not touched).
 
 ## b) PARTIALLY DONE
 
-1. Full buildflow pipeline green.
+~~1. Full buildflow pipeline green.~~ done — ruff-check-fix cleared 2026-10-20 (X11.1/11.2, 40cfed4); CI green 2026-10-22
    Works: every step except ruff-check-fix (rerun 07:13, 52.9s warm).
    Missing: ruff-check-fix red on 4 findings in 2 files another session was
    writing at 07:13:56 (same-second burst): `carddav_probe.py` F841 `token0`
@@ -40,14 +40,14 @@ DIFFERENT live session (handed off, not touched).
    owner per the no-cross-edit rule. Blocker: ownership, not difficulty.
    Effort to finish: S (10 min) once the owning session is done.
 
-2. AGENTS.md at the cap with zero headroom.
+~~2. AGENTS.md at the cap with zero headroom.~~ done — standing constraint (219-220/220; the next lesson must edit, not append)
    Works: 220/220, preflight silent on the final text (measured mid-edit at
    221, fixed before yielding).
    Missing: the next hard-won lesson has nowhere to go without a cut. The C41
    "repo-local cap ~230" blessing is now moot, but the file will re-warn on
    the next addition. Effort: S per occurrence.
 
-3. BuildFlow binary freshness (advisory warning, both runs).
+3. BuildFlow binary freshness (advisory warning, both runs). **→ TODO_LIST BuildFlow row**
    Works: triaged precisely - BuildFlow repo HEAD cf606f8 is 2 daemon commits
    past the binary build ef32fa0, AND BuildFlow's working tree has uncommitted
    `vendorHash.nix` (another session mid go-vendor/build cycle).
@@ -55,7 +55,7 @@ DIFFERENT live session (handed off, not touched).
    installing a foreign WIP intermediate risks shipping a broken binary.
    Blocker: BuildFlow repo must land first. Effort: S after that.
 
-4. CardDAV probe workstream (other session, observed not driven by me).
+~~4. CardDAV probe workstream (other session, observed not driven by me).~~ done — landed 2026-10-20 08:40 (probes + README index); its ruff debt fixed by X11 same day
    Works: probe file exists (15 KB), EXE001 cleared by my chmod, archived
    specs dir populated.
    Missing: F841/RUF059/SIM115 x2 + whatever their T04 probe sequence still
@@ -63,23 +63,23 @@ DIFFERENT live session (handed off, not touched).
 
 ## c) NOT STARTED
 
-1. HARVEST of this report's section (f) into TODO_LIST.md/ROADMAP.md
+~~1. HARVEST of this report's section (f) into TODO_LIST.md/ROADMAP.md~~ done (docs-health pass 2026-10-23)
    (docs-health HARVEST) - deliberately deferred: you instructed
    report-then-wait. The 2 rows THIS session already produced are in
    TODO_LIST; the (f) brainstorm below is not yet harvested.
-2. `.buildflow.yml` durable step-timeout: bake `nix-build=25m` (or similar)
+2. `.buildflow.yml` durable step-timeout: bake `nix-build=25m` (or similar) **→ TODO_LIST row (new 2026-10-23; owner eyes on the shared gate config)**
    into repo config so future full runs do not depend on remembering the
    flag. One-line config + rationale comment; not started (config change to
    the shared gate deserves owner eyes).
-3. CHANGELOG entry for this session's user-visible bits (devShell tool pins,
+~~3. CHANGELOG entry for this session's user-visible bits (devShell tool pins,~~ done — added 2026-10-23 (devShell pins + AGENTS/CONTRIBUTING restructure entry)
    AGENTS.md restructure, CONTRIBUTING section). The daemon commits carry no
    narrative; nothing written yet.
-4. Origin CI verification of today's daemon-pushed commits (last known green
+~~4. Origin CI verification of today's daemon-pushed commits (last known green~~ done — green chain (10-19 runs through 39864876276, 2026-10-22)
    run 39191414206 predates all of today's commits).
-5. Probe-script executable-bit doctrine (chmod vs drop-shebang vs
+5. Probe-script executable-bit doctrine (chmod vs drop-shebang vs **→ TODO_LIST probe-lint row (new 2026-10-23)**
    per-file-ignore for EXE001) - ruff will fire on every future probe with a
    shebang; needs a one-line convention decision. Not started (owner call).
-6. nix-checker "sha256 in tests/common.nix - extract to sha256.nix" info
+6. nix-checker "sha256 in tests/common.nix - extract to sha256.nix" info **→ TODO_LIST BuildFlow row (added 2026-10-23)**
    finding: accept-or-fix decision not started (info-level, non-blocking).
 
 ## d) TOTALLY FUCKED UP
@@ -159,70 +159,70 @@ items already living in TODO_LIST are marked so they are not double-created).
 
 | #  | Task                                                                                                                       | Impact | Effort | Category      | Source                         |
 | -- | -------------------------------------------------------------------------------------------------------------------------- | ------ | ------ | ------------- | ------------------------------ |
-| 1  | Fix `carddav_probe.py` F841 (`token0`, :232) - prefix underscore or wire into the T04 assertions                           | Medium | S      | Bug           | NEW (handoff row)              |
-| 2  | Fix `carddav_probe.py` RUF059 (`headers2`, :245)                                                                           | Medium | S      | Bug           | NEW (handoff row)              |
-| 3  | Fix `gen-repair-spec.py` SIM115 x2 with context managers (:6, :51)                                                         | Low    | S      | Quality       | NEW (handoff row)              |
-| 4  | Re-run full buildflow (30m budget) for the first fully-green ruff-check-fix once 1-3 land                                  | High   | S      | Quality       | NEW                            |
-| 5  | Bake `step-timeout nix-build` into `.buildflow.yml` with rationale comment                                                 | High   | S      | Quality       | NEW                            |
-| 6  | Rebuild + reinstall BuildFlow binary after its repo lands `vendorHash.nix`; re-review ef32fa0..cf606f8+ delta first        | Medium | S      | Cleanup       | NEW                            |
-| 7  | HARVEST this report into TODO_LIST/ROADMAP (docs-health)                                                                   | High   | S      | Documentation | NEW (skill-mandated)           |
-| 8  | CHANGELOG entries: devShell tool pins, AGENTS restructure, CONTRIBUTING "VM debug loops"                                   | Low    | S      | Documentation | NEW                            |
-| 9  | Verify origin CI green on today's daemon-pushed commits (post 39191414206)                                                 | High   | S      | Quality       | NEW                            |
-| 10 | Probe-script lint doctrine: per-file-ignores for docs/probes (F841/RUF059/EXE001) vs written chmod convention              | Medium | S      | Quality       | NEW                            |
-| 11 | AGENTS.md headroom policy: bless 225 working cap or cut one more block (repo-tool traps -> CONTRIBUTING candidate)         | Medium | S      | Documentation | NEW                            |
-| 12 | Validate the "--max-time >= 30m" number against a COLD-cache full buildflow run (today was warm) and adjust if tight       | Medium | M      | Quality       | NEW                            |
-| 13 | md prose-mangle lint: awk twin of check-md-table-pipes.sh for list-item continuation lines starting with `>`/`-`/`+`       | Medium | S      | Quality       | NEW                            |
-| 14 | CardDAV session completion: land transcripts under docs/probes/ + README index, settle wire-claims per the transcript rule | High   | M      | Feature       | NEW (their plan)               |
-| 15 | Verify the new FOURth guard site (README anti-drift CI step) end-to-end on a real check add/remove                         | Medium | S      | Quality       | NEW (their change)             |
-| 16 | Confirm deadnix-removed `hardeningOk` is not referenced in FEATURES/README/status docs (contract variable vanished)        | Low    | S      | Documentation | NEW                            |
-| 17 | nixpkgs parsedmarc-module dovecot rename warning: note for the next pin-advance (upstream fix or local mute)               | Low    | S      | Cleanup       | NEW                            |
-| 18 | Decide nix-checker "extract sha256 to sha256.nix" (tests/common.nix): accept as info or do the 2-line extraction           | Low    | S      | Cleanup       | NEW                            |
-| 19 | After next full executed gate, refresh the ledger/e2e-evidence pointers that cite cached greens (release evidence hygiene) | Medium | M      | Quality       | NEW                            |
-| 20 | Relay bounce-path e2e subtest (W6.3): assert via Mailpit/queue, never journal                                              | Low    | M      | Feature       | TODO row (exists)              |
-| 21 | E2E runtime trim investigation (W6.4 TTL windows)                                                                          | Low    | S      | Quality       | TODO row (exists)              |
-| 22 | Flood-subtest refill flake: capture plan if it recurs                                                                      | Low    | S      | Bug           | TODO row (exists)              |
-| 23 | EventSource `ping` parameter probe (last unprobed JMAP quirk)                                                              | Low    | S      | Feature       | TODO row (exists)              |
-| 24 | Apply-log dump-on-failure fault-injection proof (W18.3)                                                                    | Low    | S      | Quality       | TODO row (exists)              |
-| 25 | External-link re-verification sweep (T15)                                                                                  | Low    | S      | Documentation | TODO row (exists)              |
-| 26 | Upstream filings remainder (dnsmasq note, dprint T13b)                                                                     | Low    | M      | Documentation | TODO row (exists)              |
-| 27 | Upstream watch batch (#563651/#563652/#563777/mailsuite#65/#552103 retirement)                                             | Medium | S      | Cleanup       | TODO row (exists)              |
-| 28 | BuildFlow upstream follow-ups (identity parsing, bandit count gap, masking docs)                                           | Low    | M      | Bug           | TODO row (exists)              |
-| 29 | buildflow local-noise batch (nix-hash-fix WARN, lychee policy, interrogate skip)                                           | Low    | M      | Cleanup       | TODO row (exists)              |
-| 30 | TLS-node coverage for Netease/LinkedIn parsedmarc fixtures                                                                 | Low    | M      | Feature       | TODO row (exists)              |
-| 31 | Pin VM debug-driver recipe as a script (CONTRIBUTING section now documents it; scripting still open)                       | Low    | M      | Quality       | TODO row (exists)              |
-| 32 | dmarc-eval IFD cleanup                                                                                                     | Low    | S      | Cleanup       | TODO row (exists)              |
-| 33 | Local lockstep eval guard (attrNames == ci.yml expected, locally)                                                          | Medium | S      | Quality       | TODO row (exists)              |
-| 34 | Flood-limiter robustness (relaxed-bound transcript check)                                                                  | Low    | S      | Quality       | TODO row (exists)              |
-| 35 | "running N flake checks" log-line reconciliation                                                                           | Low    | S      | Bug           | TODO row (exists)              |
-| 36 | nixpkgs `stalwart` rename watch past 0.16 (disabledModules collision)                                                      | Low    | S      | Cleanup       | TODO row (exists)              |
-| 37 | check-inventory.sh CI twin (daemon pushes bypass pre-push)                                                                 | Low    | S      | Quality       | TODO row (exists)              |
-| 38 | Cut v0.5.0 (C43 doctrine call + dry-run of release procedure)                                                              | High   | L      | Release       | TODO row (exists, C43-blocked) |
-| 39 | SystemNix pin advance runbook (post v0.5.0)                                                                                | High   | L      | Release       | TODO row (exists, blocked)     |
-| 40 | C42 dmarc-monitor retire-or-keep decision                                                                                  | Medium | S      | Decision      | TODO row (exists, blocked)     |
-| 41 | C44 real-host account-secrets doctrine                                                                                     | Medium | M      | Decision      | TODO row (exists, blocked)     |
-| 42 | C45 Stalwart 0.16.22-vs-0.16.26 overlay decision + delta table                                                             | Medium | M      | Decision      | TODO row (exists, blocked)     |
-| 43 | dmarc-monitor live validation (D1 mailbox decision)                                                                        | High   | M      | Feature       | TODO row (exists, blocked)     |
-| 44 | MemoryMax policy decision (C39)                                                                                            | Medium | S      | Decision      | TODO row (exists, blocked)     |
-| 45 | Match-property audit remainder: dead wrapper-option ride + snapshot-vs-wrapper matchOn ledger line                         | Medium | M      | Quality       | TODO row (exists, in progress) |
-| 46 | CI python-lint scope: deeper ruleset decision (PERF/FURB/BLE vs floor)                                                     | Low    | S      | Quality       | TODO row (exists, in progress) |
-| 47 | pbx-artmann stalwart-host-wiring flip + f27 cell restore (their repo)                                                      | Medium | S      | Bug           | TODO row (exists, their repo)  |
-| 48 | Consider recording "register reads with view before edit" as a mechanized pre-edit hook instead of a ritual line           | Low    | M      | Quality       | NEW                            |
-| 49 | E2E polish batch: restart-persistence extension (provision unit must not re-run)                                           | Low    | M      | Quality       | TODO row (exists)              |
-| 50 | JMAP anti-rot: `ping` probe (merge with #23 if harvested once)                                                             | Low    | S      | Feature       | TODO row (exists)              |
+| ~~1~~ done — fixed 2026-10-20 (X11, 40cfed4) | ~~Fix `carddav_probe.py` F841 (`token0`, :232) - prefix underscore or wire into the T04 assertions~~ | ~~Medium~~ | ~~S~~ | ~~Bug~~ | ~~NEW (handoff row)~~ |
+| ~~2~~ done — fixed 2026-10-20 (X11, 40cfed4) | ~~Fix `carddav_probe.py` RUF059 (`headers2`, :245)~~ | ~~Medium~~ | ~~S~~ | ~~Bug~~ | ~~NEW (handoff row)~~ |
+| ~~3~~ done — fixed 2026-10-20 (X11, 40cfed4) | ~~Fix `gen-repair-spec.py` SIM115 x2 with context managers (:6, :51)~~ | ~~Low~~ | ~~S~~ | ~~Quality~~ | ~~NEW (handoff row)~~ |
+| ~~4~~ done — full gates green (2026-10-19/20 sessions; CI green 2026-10-22) | ~~Re-run full buildflow (30m budget) for the first fully-green ruff-check-fix once 1-3 land~~ | ~~High~~ | ~~S~~ | ~~Quality~~ | ~~NEW~~ |
+| 5 **→ TODO_LIST row (new 2026-10-23)** | Bake `step-timeout nix-build` into `.buildflow.yml` with rationale comment | High | S | Quality | NEW |
+| 6 **→ TODO_LIST BuildFlow row** | Rebuild + reinstall BuildFlow binary after its repo lands `vendorHash.nix`; re-review ef32fa0..cf606f8+ delta first | Medium | S | Cleanup | NEW |
+| ~~7~~ done (docs-health pass 2026-10-23) | ~~HARVEST this report into TODO_LIST/ROADMAP (docs-health)~~ | ~~High~~ | ~~S~~ | ~~Documentation~~ | ~~NEW (skill-mandated)~~ |
+| ~~8~~ done — added 2026-10-23 | ~~CHANGELOG entries: devShell tool pins, AGENTS restructure, CONTRIBUTING "VM debug loops"~~ | ~~Low~~ | ~~S~~ | ~~Documentation~~ | ~~NEW~~ |
+| ~~9~~ done — green through run 39864876276 (2026-10-22) | ~~Verify origin CI green on today's daemon-pushed commits (post 39191414206)~~ | ~~High~~ | ~~S~~ | ~~Quality~~ | ~~NEW~~ |
+| 10 **→ TODO_LIST probe-lint row (new 2026-10-23)** | Probe-script lint doctrine: per-file-ignores for docs/probes (F841/RUF059/EXE001) vs written chmod convention | Medium | S | Quality | NEW |
+| ~~11~~ done — standing constraint: 220 cap, edit-don't-append (14-19 f/43 note) | ~~AGENTS.md headroom policy: bless 225 working cap or cut one more block (repo-tool traps -> CONTRIBUTING candidate)~~ | ~~Medium~~ | ~~S~~ | ~~Documentation~~ | ~~NEW~~ |
+| ~~12~~ **NOT-DO — warm-run validated; cold-cache validation folded into the step-timeout TODO row.** | ~~Validate the "--max-time >= 30m" number against a COLD-cache full buildflow run (today was warm) and adjust if tight~~ | ~~Medium~~ | ~~M~~ | ~~Quality~~ | ~~NEW~~ |
+| ~~13~~ done — check-md-list-markers.sh shipped (W11, empirically scoped) | ~~md prose-mangle lint: awk twin of check-md-table-pipes.sh for list-item continuation lines starting with `>`/`-`/`+`~~ | ~~Medium~~ | ~~S~~ | ~~Quality~~ | ~~NEW~~ |
+| ~~14~~ done — landed 2026-10-20 (transcripts + README index; FEATURES contacts rows) | ~~CardDAV session completion: land transcripts under docs/probes/ + README index, settle wire-claims per the transcript rule~~ | ~~High~~ | ~~M~~ | ~~Feature~~ | ~~NEW (their plan)~~ |
+| ~~15~~ done — README-completeness step caught real drifts on day one (W11); superseded by X9 single-sourcing | ~~Verify the new FOURth guard site (README anti-drift CI step) end-to-end on a real check add/remove~~ | ~~Medium~~ | ~~S~~ | ~~Quality~~ | ~~NEW (their change)~~ |
+| ~~16~~ done — zero refs repo-wide (07-18 grep) | ~~Confirm deadnix-removed `hardeningOk` is not referenced in FEATURES/README/status docs (contract variable vanished)~~ | ~~Low~~ | ~~S~~ | ~~Documentation~~ | ~~NEW~~ |
+| 17 **→ rides the bump; triaged upstream-not-actionable (07-18)** | nixpkgs parsedmarc-module dovecot rename warning: note for the next pin-advance (upstream fix or local mute) | Low | S | Cleanup | NEW |
+| 18 **→ TODO_LIST BuildFlow row (added 2026-10-23)** | Decide nix-checker "extract sha256 to sha256.nix" (tests/common.nix): accept as info or do the 2-line extraction | Low | S | Cleanup | NEW |
+| ~~19~~ done — FEATURES gate/CI rows refreshed 2026-10-23 (run 39864876276) | ~~After next full executed gate, refresh the ledger/e2e-evidence pointers that cite cached greens (release evidence hygiene)~~ | ~~Medium~~ | ~~M~~ | ~~Quality~~ | ~~NEW~~ |
+| 20 **→ TODO_LIST row** | Relay bounce-path e2e subtest (W6.3): assert via Mailpit/queue, never journal | Low | M | Feature | TODO row (exists) |
+| 21 **→ TODO_LIST row** | E2E runtime trim investigation (W6.4 TTL windows) | Low | S | Quality | TODO row (exists) |
+| 22 **→ TODO_LIST row** | Flood-subtest refill flake: capture plan if it recurs | Low | S | Bug | TODO row (exists) |
+| 23 **→ TODO_LIST row** | EventSource `ping` parameter probe (last unprobed JMAP quirk) | Low | S | Feature | TODO row (exists) |
+| ~~24~~ done — X17.1 (2026-10-20) | ~~Apply-log dump-on-failure fault-injection proof (W18.3)~~ | ~~Low~~ | ~~S~~ | ~~Quality~~ | ~~TODO row (exists)~~ |
+| ~~25~~ done — X10 (2026-10-19) | ~~External-link re-verification sweep (T15)~~ | ~~Low~~ | ~~S~~ | ~~Documentation~~ | ~~TODO row (exists)~~ |
+| 26 **→ TODO_LIST upstream-filings row** | Upstream filings remainder (dnsmasq note, dprint T13b) | Low | M | Documentation | TODO row (exists) |
+| ~~27~~ done — TODO_LIST watch row | ~~Upstream watch batch (#563651/#563652/#563777/mailsuite#65/#552103 retirement)~~ | ~~Medium~~ | ~~S~~ | ~~Cleanup~~ | ~~TODO row (exists)~~ |
+| 28 **→ TODO_LIST BuildFlow row** | BuildFlow upstream follow-ups (identity parsing, bandit count gap, masking docs) | Low | M | Bug | TODO row (exists) |
+| ~~29~~ done — X14 landed 2026-10-19 | ~~buildflow local-noise batch (nix-hash-fix WARN, lychee policy, interrogate skip)~~ | ~~Low~~ | ~~M~~ | ~~Cleanup~~ | ~~TODO row (exists)~~ |
+| 30 **→ TODO_LIST row** | TLS-node coverage for Netease/LinkedIn parsedmarc fixtures | Low | M | Feature | TODO row (exists) |
+| ~~31~~ done — scripts/vm-debug.sh (X16) | ~~Pin VM debug-driver recipe as a script (CONTRIBUTING section now documents it; scripting still open)~~ | ~~Low~~ | ~~M~~ | ~~Quality~~ | ~~TODO row (exists)~~ |
+| ~~32~~ done — W9 | ~~dmarc-eval IFD cleanup~~ | ~~Low~~ | ~~S~~ | ~~Cleanup~~ | ~~TODO row (exists)~~ |
+| ~~33~~ done — check-set-lockstep (X9) | ~~Local lockstep eval guard (attrNames == ci.yml expected, locally)~~ | ~~Medium~~ | ~~S~~ | ~~Quality~~ | ~~TODO row (exists)~~ |
+| 34 **→ TODO_LIST row** | Flood-limiter robustness (relaxed-bound transcript check) | Low | S | Quality | TODO row (exists) |
+| ~~35~~ done — attributed buildflow-emitted (2026-10-19) | ~~"running N flake checks" log-line reconciliation~~ | ~~Low~~ | ~~S~~ | ~~Bug~~ | ~~TODO row (exists)~~ |
+| ~~36~~ done — TODO_LIST stalwart-rename row | ~~nixpkgs `stalwart` rename watch past 0.16 (disabledModules collision)~~ | ~~Low~~ | ~~S~~ | ~~Cleanup~~ | ~~TODO row (exists)~~ |
+| ~~37~~ done — README-completeness CI step + lockstep (W11/X9) | ~~check-inventory.sh CI twin (daemon pushes bypass pre-push)~~ | ~~Low~~ | ~~S~~ | ~~Quality~~ | ~~TODO row (exists)~~ |
+| 38 **→ TODO_LIST v0.5.0 row (C43-blocked)** | Cut v0.5.0 (C43 doctrine call + dry-run of release procedure) | High | L | Release | TODO row (exists, C43-blocked) |
+| 39 **→ TODO_LIST SystemNix pin row** | SystemNix pin advance runbook (post v0.5.0) | High | L | Release | TODO row (exists, blocked) |
+| 40 **→ decision-batch C42** | C42 dmarc-monitor retire-or-keep decision | Medium | S | Decision | TODO row (exists, blocked) |
+| 41 **→ decision-batch C44** | C44 real-host account-secrets doctrine | Medium | M | Decision | TODO row (exists, blocked) |
+| 42 **→ decision-batch C45 (delta table written)** | C45 Stalwart 0.16.22-vs-0.16.26 overlay decision + delta table | Medium | M | Decision | TODO row (exists, blocked) |
+| 43 **→ TODO_LIST (D1-gated row)** | dmarc-monitor live validation (D1 mailbox decision) | High | M | Feature | TODO row (exists, blocked) |
+| 44 **→ decision-batch C39** | MemoryMax policy decision (C39) | Medium | S | Decision | TODO row (exists, blocked) |
+| ~~45~~ done — X6 closed 2026-10-19 (zero dead options; ledger line existed) | ~~Match-property audit remainder: dead wrapper-option ride + snapshot-vs-wrapper matchOn ledger line~~ | ~~Medium~~ | ~~M~~ | ~~Quality~~ | ~~TODO row (exists, in progress)~~ |
+| 46 **→ TODO_LIST CI python-lint row** | CI python-lint scope: deeper ruleset decision (PERF/FURB/BLE vs floor) | Low | S | Quality | TODO row (exists, in progress) |
+| ~~47~~ done — flip landed on their master (runs 15/16 verdict); f27 cell restored 2026-10-19; remainder = TODO pbx row (owner blessing) | ~~pbx-artmann stalwart-host-wiring flip + f27 cell restore (their repo)~~ | ~~Medium~~ | ~~S~~ | ~~Bug~~ | ~~TODO row (exists, their repo)~~ |
+| ~~48~~ **NOT-DO — the edit-tool guard enforces it; ritual line exists in AGENTS.** | ~~Consider recording "register reads with view before edit" as a mechanized pre-edit hook instead of a ritual line~~ | ~~Low~~ | ~~M~~ | ~~Quality~~ | ~~NEW~~ |
+| ~~49~~ done — W6: provision NOT re-run pinned across restart | ~~E2E polish batch: restart-persistence extension (provision unit must not re-run)~~ | ~~Low~~ | ~~M~~ | ~~Quality~~ | ~~TODO row (exists)~~ |
+| 50 **→ TODO_LIST row** | JMAP anti-rot: `ping` probe (merge with #23 if harvested once) | Low | S | Feature | TODO row (exists) |
 
 HARVEST note: items 1-19 are this session's new ground; 20-50 already live in
 TODO_LIST (do not double-create - verify + link instead).
 
 ## g) Questions I cannot answer myself
 
-1. The CardDAV/archive session owned the 2 red files at 07:13:56 and was
+~~1. The CardDAV/archive session owned the 2 red files at 07:13:56 and was~~ done — superseded: the owning session landed 2026-10-20 08:40; the fixes landed same day (X11)
    still writing 4 minutes later. Is that session still active, and do you
    want me to KEEP HANDING OFF (my current posture) or TAKE OVER the 4
    findings now (breaking the no-cross-edit rule for a ~10 min green gate)?
-2. Budget policy: should `.buildflow.yml` carry a durable
+2. Budget policy: should `.buildflow.yml` carry a durable **→ TODO_LIST step-timeout row (new 2026-10-23; owner call)**
    `nix-build` step-timeout (+ documented 30m full-run budget), or do you
    prefer the flags per invocation so the operator always feels the cost?
-3. Probe-script lint doctrine: for `docs/probes/**`, do you want
+3. Probe-script lint doctrine: for `docs/probes/**`, do you want **→ TODO_LIST probe-lint row (new 2026-10-23; owner call)**
    per-file-ignores (accept F841/RUF059 as probe idioms), a written
    "always chmod +x new probes" convention, or shebangs dropped instead?
    (I fixed today's instances mechanically; the doctrine decides whether
