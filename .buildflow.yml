@@ -3,6 +3,16 @@
 # Canonical keys: BuildFlow skill references/commands.md.
 # Telemetry opt-out (verified in the binary env surface, 2026-10-19):
 # BUILDFLOW_TELEMETRY_DISABLED=1
+#
+# Per-step ceiling: the VM E2E checks build a full NixOS image and a
+# cold nix-build exceeds BuildFlow's per-tool deadline, so the full gate
+# used to require `--step-timeout nix-build=25m` from memory on every
+# invocation. This binary (ed9ce48) has NO config map for per-tool
+# timeouts - `step_timeouts:` is rejected as an unknown key (verified
+# 2026-10-23 via `buildflow config lint`) - so the durable form is the
+# documented global key at the same 25m budget. Pair with
+# `--max-time 30m` (or more) on the invocation.
+default_step_timeout: 25m
 skip_steps:
   # vulnix crashes fleet-wide updating the NVD feed: HTTP 404 on
   # nvdcve-2.0-modified.json.gz (NVD retired the legacy JSON 2.0 feeds;

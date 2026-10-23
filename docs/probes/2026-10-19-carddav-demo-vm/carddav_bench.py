@@ -20,6 +20,7 @@ import statistics
 import sys
 import time
 import xml.etree.ElementTree as ET
+from pathlib import Path
 
 HOST, PORT = "127.0.0.1", 18080
 USER = "demo@mail.demo.test"
@@ -83,7 +84,7 @@ def card(n: int) -> str:
 
 def main() -> int:
     print(f"# CardDAV 10k benchmark {time.strftime('%Y-%m-%dT%H:%M:%S%z')} book={BOOK}", flush=True)
-    load = open("/proc/loadavg").read().strip()
+    load = Path("/proc/loadavg").read_text().strip()
     print(f"# host loadavg at start: {load}", flush=True)
 
     # Fresh book (run-1 leftovers are deleted by the operator; new timestamp).
@@ -205,7 +206,7 @@ def main() -> int:
     print(f"B4 single GET: median {statistics.median(runs) * 1000:.1f}ms "
           f"(runs {'/'.join(f'{r * 1000:.1f}' for r in runs)}ms)", flush=True)
 
-    load = open("/proc/loadavg").read().strip()
+    load = Path("/proc/loadavg").read_text().strip()
     print(f"# host loadavg at end: {load}", flush=True)
     print("# NOTE: demo VM shares the host with other workloads; treat as "
           "order-of-magnitude evidence, not lab numbers.", flush=True)

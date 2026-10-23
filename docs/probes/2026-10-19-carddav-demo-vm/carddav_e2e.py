@@ -166,7 +166,7 @@ def assert_mirror() -> None:
         cards = multiget_cards(hrefs)
         shapes = {
             "VERSION:4.0": (2, len(re.findall(r"VERSION:4\.0", cards))),
-            "KIND individual": (2, len(re.findall(r"KIND:INDIVIDUAL", cards, re.I))),
+            "KIND individual": (2, len(re.findall(r"KIND:INDIVIDUAL", cards, re.IGNORECASE))),
             "FN:Ada Lovelace": (1, cards.count("FN:Ada Lovelace")),
             "N:Lovelace;Ada;;;": (1, cards.count("N:Lovelace;Ada;;;")),
             "EMAIL:ada@example.com": (1, cards.count("EMAIL:ada@example.com")),

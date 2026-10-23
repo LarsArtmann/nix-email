@@ -22,6 +22,7 @@ import socket
 import subprocess
 import sys
 import time
+from pathlib import Path
 
 CRM_REPO = "/home/lars/projects/crm"
 BIN = "/tmp/crm-e2e-server"
@@ -66,6 +67,7 @@ def build() -> bool:
     done = subprocess.run(
         ["go", "build", "-o", BIN, "./cmd/crm-server"],
         cwd=CRM_REPO, env=env, capture_output=True, text=True, timeout=600,
+        check=False,
     )
     if done.returncode != 0:
         print(done.stdout + done.stderr, flush=True)
@@ -90,7 +92,7 @@ def fresh_book() -> None:
 
 
 def boot_server() -> subprocess.Popen | None:
-    log = open(SERVER_LOG, "w")
+    log = open(SERVER_LOG, "w")  # noqa: SIM115 - child stdout lives as long as the server
     proc = subprocess.Popen(
         [BIN, "-addr", f"{CRM_ADDR}:{CRM_PORT}", "-db", DB],
         stdout=log, stderr=subprocess.STDOUT,
@@ -118,11 +120,12 @@ def driver(phase: str) -> bool:
     done = subprocess.run(
         [sys.executable, DRIVER, phase],
         timeout=180, capture_output=True, text=True,
+        check=False,
     )
     print(done.stdout, end="", flush=True)
     if done.stderr:
         print(done.stderr, file=sys.stderr, end="", flush=True)
-    phase_fails = re.findall(r"^VERDICT .*FAIL.*$", done.stdout, re.M)
+    phase_fails = re.findall(r"^VERDICT .*FAIL.*$", done.stdout, re.MULTILINE)
     return done.returncode == 0 and not phase_fails
 
 
@@ -143,7 +146,10 @@ def sync(label: str) -> dict[str, int] | None:
         "-carddav-book", "Kith-E2E",
         "-carddav-state", STATE,
     ]
-    done = subprocess.run(args, env=env, capture_output=True, text=True, timeout=300)
+    done = subprocess.run(
+        args, env=env, capture_output=True, text=True, timeout=300,
+        check=False,
+    )
     out = done.stdout + done.stderr
     print(out, end="", flush=True)
     match = SUMMARY_RE.search(out)
@@ -170,7 +176,7 @@ def main() -> int:
 
     proc = boot_server()
     if proc is None:
-        print(open(SERVER_LOG).read(), flush=True)
+        print(Path(SERVER_LOG).read_text(), flush=True)
         verdict("E2E boot server", False, "port never opened")
     else:
         verdict("E2E boot server", True)
