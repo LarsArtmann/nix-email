@@ -77,6 +77,17 @@ no problems.
 - T6 `sudo bash scripts/ci-dispatch.sh` is not agent-executable (sudo
   ban); the push-trigger path makes it optional anyway.
 
+## Addendum (18:52): origin CI verdict on the pushed commits
+
+Run 40110026400 (exporter-fix commit `456840b`): EVERY content step
+green in CI - including the fail-closed ruff python lint over the new
+script - and only `nix flake check` died, on the GitHub-API rate-limit
+class (magic-nix-cache substituter HTTP 418, `ResourceExhausted: rate
+limit exceeded` in the log; shared API budget across the day's runs).
+The follow-up docs runs hit the same limit even earlier (Install Nix).
+Infra, not content: the flake was untouched this session and was green
+2026-10-22 (run 39864876276); the rate limit resets hourly.
+
 ## Corridor
 
 - TODO_LIST harvested: publish-handoff row (blocked, foreign
