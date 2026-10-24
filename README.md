@@ -489,6 +489,24 @@ Gatus checks for the VPS (on evo-x2, external viewpoint):
   conditions: ["[CONNECTED] == true", "[CERTIFICATE_EXPIRATION] > 720h"]
 ```
 
+## EventCatalog (catalog.home.lan)
+
+nix-email is a fully governed EventCatalog source:
+`scripts/export-catalog.py` emits the catalog tree (authored service
+pages for `mail-server` and `dmarc-monitor` plus seven ADRs) and the
+eventcatalog-hub consumes it via its `sources.manual.json` - a MANUAL
+source, because the hub's depgraph only discovers Go modules.
+Composition rule: our tree provides the service BODIES, deployment
+badges union in from the SystemNix inventory tree (first-wins body,
+badges union through - merge.py contract). The exporter is stdlib-only,
+byte-deterministic, and `--selftest`-guarded (version lockstep 1.0.0
+with the hub's inventory renderer, appliesTo resolution, no badges, no
+catalog.index.json manifest). ADR statuses are honest: C42
+(parsedmarc keep-or-retire) and C45 (stalwart pin vs overlay) ship
+`proposed` until the owner decides. Content edits happen in the
+exporter's data dicts, never in generated trees; details in AGENTS.md
+"EventCatalog integration".
+
 ## Go-live runbook (outline)
 
 1. Provision Hetzner VPS (CX22-class); NixOS via the existing

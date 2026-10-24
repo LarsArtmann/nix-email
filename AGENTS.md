@@ -200,6 +200,28 @@ transcript-pinned dialect).
   facts + citations live in
   docs/status/archived/2026-10-19_02-35_stalwart-contacts-assessment.md.
 
+## EventCatalog integration (catalog.home.lan)
+
+- `scripts/export-catalog.py` is the ONLY content source for the
+  eventcatalog-hub adoption; edit its data dicts, never a generated tree.
+  Adoption lives in the HUB's `sources.manual.json` (depgraph discovers
+  Go modules only - a `.eventcatalog-hub.json` convention file here would
+  be dead weight). After hub-side edits: `scripts/generate-sources.sh`
+  regenerates `sources.json` (never hand-edit), commit both together.
+- Hard contract pins (selftest-enforced): service `version` LOCKSTEP
+  `1.0.0` with the hub's `render-inventory.py` (a mismatch forks the id's
+  version set in the union); NO `badges` (deployment chips union in from
+  the SystemNix inventory tree, merge.py unions by content); NO
+  `catalog.index.json` manifest (manifest-free sources render "-"); all
+  `appliesTo` pointers must resolve inside the exported tree.
+- Export invocation is ALWAYS `python3 scripts/export-catalog.py -o ...`
+  (CI clone dirs are NOEXEC - never `./scripts/...`); re-export must stay
+  idempotent (the hub RETRIES export jobs; the outdir guard only refuses
+  dirs that are not a previous export of ours).
+- ADR statuses are honest: `parsedmarc-keep-or-retire` (C42) and
+  `stalwart-pin-vs-overlay` (C45) ship `proposed`; flip them in the
+  exporter data when the owner decides.
+
 ## Documentation map
 
 - `README.md` - architecture, module docs, go-live runbook, VERIFIED-FACTS

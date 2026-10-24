@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- EventCatalog source export (2026-10-24, plan
+  `docs/planning/2026-10-24_17-07_nix-email-eventcatalog-hub-perfect-integration.md`):
+  `scripts/export-catalog.py` emits the catalog tree (service pages for
+  `mail-server` + `dmarc-monitor`, seven ADRs) that eventcatalog-hub
+  consumes via `sources.manual.json` - nix-email renders on
+  catalog.home.lan as a fully governed source (full-severity linter
+  included). Stdlib-only, byte-deterministic, `--selftest`-guarded;
+  service `version` stays lockstep `1.0.0` with the hub's inventory
+  renderer and deployment badges union in from the SystemNix inventory
+  tree (sources never emit badges).
 - `scripts/check-testscript-shell.py` (2026-10-23, closes D1): `bash -n`
   over every constant shell fragment embedded in `tests/*.nix`
   testScripts. It extracts each `testScript = ''...'';` block, parses it
