@@ -213,7 +213,9 @@ transcript-pinned dialect).
   version set in the union); NO `badges` (deployment chips union in from
   the SystemNix inventory tree, merge.py unions by content); NO
   `catalog.index.json` manifest (manifest-free sources render "-"); all
-  `appliesTo` pointers must resolve inside the exported tree.
+  `appliesTo` pointers and the `owners` reference (`users/lars.mdx` is
+  shipped in-tree) must resolve inside the exported tree - the hub's
+  per-source linter checks each source IN ISOLATION.
 - Export invocation is ALWAYS `python3 scripts/export-catalog.py -o ...`
   (CI clone dirs are NOEXEC - never `./scripts/...`); re-export must stay
   idempotent (the hub RETRIES export jobs; the outdir guard only refuses

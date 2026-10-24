@@ -5,7 +5,11 @@ Contract (hub: eventcatalog-hub build.sh + merge.py, verified 2026-10-24):
 - Invoked as `python3 scripts/export-catalog.py -o <tree>` from the clone
   root. NEVER as `./scripts/...` - CI clone dirs are NOEXEC, only the
   interpreter (from PATH) executes.
-- Emits ONLY services/<id>/index.mdx and adrs/<id>/index.mdx. No
+- Emits ONLY services/<id>/index.mdx, adrs/<id>/index.mdx, and
+  users/lars.mdx (the owner reference must resolve inside the tree:
+  the hub's per-source governance lint checks each source IN
+  ISOLATION - refs/owner-exists - so every source that names an owner
+  ships its own user resource; identical copies union first-wins). No
   catalog.index.json (manifest-free sources render "-" in error
   insights; zero schemaVersion risk), no bootstrap files (hub owns
   them), no badges (deployment chips union in from the SystemNix
@@ -458,7 +462,21 @@ ADRS = [
 def expected_paths():
     paths = [f"services/{s['id']}/index.mdx" for s in SERVICES]
     paths += [f"adrs/{a['id']}/index.mdx" for a in ADRS]
+    paths.append("users/lars.mdx")
     return sorted(paths)
+
+
+def render_user():
+    lines = [
+        "---",
+        f"id: {OWNER}",
+        "name: Lars Artmann",
+        "email: git@lars.software",
+        "---",
+        "",
+        "# Lars Artmann",
+    ]
+    return "\n".join(lines) + "\n"
 
 
 def render_service(svc):
@@ -508,13 +526,13 @@ def ensure_writable(outdir: Path) -> None:
         return
     if not outdir.is_dir():
         raise SystemExit(f"output path exists and is not a directory: {outdir}")
-    known = {"services", "adrs"}
+    known = {"services", "adrs", "users"}
     foreign = sorted(p.name for p in outdir.iterdir() if p.name not in known)
     if foreign:
         raise SystemExit(
             f"refusing to export into non-empty dir {outdir}: "
-            f"unexpected entries {foreign} (only services/ and adrs/ are "
-            "ever written; is -o pointing at a checkout?)"
+            f"unexpected entries {foreign} (only services/, adrs/ and "
+            "users/ are ever written; is -o pointing at a checkout?)"
         )
 
 
@@ -528,6 +546,9 @@ def export_tree(outdir: Path) -> None:
         target = outdir / "adrs" / adr["id"] / "index.mdx"
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(render_adr(adr))
+    user = outdir / "users" / f"{OWNER}.mdx"
+    user.parent.mkdir(parents=True, exist_ok=True)
+    user.write_text(render_user())
 
 
 def frontmatter_of(text):
@@ -600,9 +621,13 @@ def selftest() -> None:
                 f"{rel}: export is not byte-deterministic"
             )
 
+        user_fm = frontmatter_of((first / "users/lars.mdx").read_text())
+        assert f"id: {OWNER}" in user_fm, "user resource must match OWNER"
+
     print(
         f"selftest PASS: {len(SERVICES)} services, {len(ADRS)} adrs, "
-        f"{len(expected)} files, deterministic, appliesTo resolves in-tree"
+        f"1 user, {len(expected)} files, deterministic, appliesTo and "
+        "owner resolve in-tree"
     )
 
 
