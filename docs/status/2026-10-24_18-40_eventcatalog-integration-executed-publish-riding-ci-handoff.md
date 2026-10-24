@@ -12,18 +12,19 @@ Executes
 same-day, tasks T1-T9. Everything under this repo's control is landed,
 pushed, and pipeline-verified end to end; the catalog publish (T6/T8) is
 gated on a CONCURRENT session's in-flight hub workstream (details below)
+
 - exact handoff included.
 
 ## Landed (all receipts reproducible)
 
-| What                                        | Where                                              | Receipt                                                                                                                       |
-| ------------------------------------------- | -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| Exporter (2 services + 7 ADRs + 1 user)     | `scripts/export-catalog.py` @ `456840b` (pushed)   | `--selftest` PASS (10 files, deterministic, appliesTo + owner resolve in-tree); BuildFlow gate EXIT:0 (ruff/bandit/vulture)    |
-| Hub adoption (manual source + lint block)   | hub `sources.manual.json` @ `0788a21`              | `generate-sources.sh` wrote it between mesh-orders and pbx-lens; `--check` clean; dprint clean; both files committed together   |
-| Full pipeline rehearsal (scoped)            | hub snapshot build `/tmp/hub-build4.log`           | EXIT:0 - export, merge (copied 10, union-merged 2), governance gate, per-source lint + merged-render lint both "No problems!", npm ci, generate + build, `check-dist-output --expect-source nix-email` OK |
-| Badge-union composition (the "perfect" bit) | merged `services/mail-server/index.mdx`            | OUR frontmatter/body + `badges: not deployed (orange)` unioned in from the SystemNix inventory tree; dmarc-monitor likewise    |
-| Live preview eyeball                        | `npx eventcatalog preview` on the built dist      | `/docs/services/mail-server/1.0.0` renders: title, summary, owners Lars Artmann, the not-deployed chip, listener table, Decision Records tab; all 7 ADR routes present in dist |
-| Docs                                        | AGENTS.md + README.md + CHANGELOG.md @ `7153ed4`  | "EventCatalog integration" contract section (lockstep, NOEXEC, no-badges/no-manifest, honest ADR statuses); dprint + pipe lints clean |
+| What                                        | Where                                            | Receipt                                                                                                                                                                                                   |
+| ------------------------------------------- | ------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Exporter (2 services + 7 ADRs + 1 user)     | `scripts/export-catalog.py` @ `456840b` (pushed) | `--selftest` PASS (10 files, deterministic, appliesTo + owner resolve in-tree); BuildFlow gate EXIT:0 (ruff/bandit/vulture)                                                                               |
+| Hub adoption (manual source + lint block)   | hub `sources.manual.json` @ `0788a21`            | `generate-sources.sh` wrote it between mesh-orders and pbx-lens; `--check` clean; dprint clean; both files committed together                                                                             |
+| Full pipeline rehearsal (scoped)            | hub snapshot build `/tmp/hub-build4.log`         | EXIT:0 - export, merge (copied 10, union-merged 2), governance gate, per-source lint + merged-render lint both "No problems!", npm ci, generate + build, `check-dist-output --expect-source nix-email` OK |
+| Badge-union composition (the "perfect" bit) | merged `services/mail-server/index.mdx`          | OUR frontmatter/body + `badges: not deployed (orange)` unioned in from the SystemNix inventory tree; dmarc-monitor likewise                                                                               |
+| Live preview eyeball                        | `npx eventcatalog preview` on the built dist     | `/docs/services/mail-server/1.0.0` renders: title, summary, owners Lars Artmann, the not-deployed chip, listener table, Decision Records tab; all 7 ADR routes present in dist                            |
+| Docs                                        | AGENTS.md + README.md + CHANGELOG.md @ `7153ed4` | "EventCatalog integration" contract section (lockstep, NOEXEC, no-badges/no-manifest, honest ADR statuses); dprint + pipe lints clean                                                                     |
 
 The rehearsal was scoped to nix-email as the sole source BY DESIGN: two
 FOREIGN sources were red mid-flight during this session (webphone's

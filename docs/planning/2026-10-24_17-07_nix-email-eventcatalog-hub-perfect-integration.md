@@ -1,7 +1,7 @@
 ---
 title: "nix-email x eventcatalog-hub: perfect integration plan"
 date: 2026-10-24 17:07
-status: plan (research-verified; not yet executed)
+status: executed 2026-10-24 (T1-T5, T7, T9 done; T6/T8 publish rides the CI handoff - docs/status/2026-10-24_18-40_eventcatalog-integration-executed-publish-riding-ci-handoff.md)
 owner: lars
 ---
 
@@ -290,6 +290,23 @@ flowchart TD
   repurposing; no `catalog.index.json` manifest; no convention file in
   nix-email (dead weight — depgraph never queries it); no hub pipeline
   changes; no weakening of module defaults or governance severities.
+
+## Execution record (2026-10-24, same-day)
+
+| Task | Verdict                                                                                                                                                                                                                                                                        |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| T1   | DONE - exporter @ `456840b` pushed; selftest + BuildFlow green                                                                                                                                                                                                                 |
+| T2   | DONE - hub @ `0788a21` (manual entry + regenerated sources.json, check + dprint clean)                                                                                                                                                                                         |
+| T3   | DONE - 7 ADRs shipped inside the exporter (one commit with T1; dependency order preserved)                                                                                                                                                                                     |
+| T4   | DONE - lint block adopted; per-source linter green (10 files, no problems) after the users/lars.mdx fix the rehearsal caught                                                                                                                                                   |
+| T5   | DONE (scoped) - full pipeline EXIT:0 in a hub snapshot with nix-email as sole source (two FOREIGN sources red mid-flight: webphone export, go-cqrs-lite MarkDemo - concurrent workstream, hands off); merge union + both linters + dist assertions + preview eyeball all green |
+| T6   | HANDED OFF - publish fires on hub-master push (build.yml) or `sudo ci-dispatch.sh` on evo-x2; blocked on the concurrent workstream + the nix-email Forgejo mirror picking up `456840b` (TODO_LIST row)                                                                         |
+| T7   | DONE - AGENTS/README/CHANGELOG @ `7153ed4`; hub prose counts verified current (no touch-up needed)                                                                                                                                                                             |
+| T8   | PARTIAL - receipts in the 18-40 status report (local preview: bodies + chips + ADR routes render); catalog.home.lan verification rides T6                                                                                                                                      |
+| T9   | DONE - TODO_LIST rows (publish handoff BLOCKED, description-sync TODO, deferred-kinds standing verdict) + this annotation                                                                                                                                                      |
+
+Deviation note: T1/T3 landed as one exporter commit; T5 ran scoped after
+foreign reds. Full detail + receipts: the 18-40 status report.
 
 ## Sources of truth used
 
