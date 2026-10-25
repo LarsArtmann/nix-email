@@ -13,11 +13,11 @@ Three advisory answers were delivered (store-backend comparison, storage-engine 
 
 ## Session Work Inventory
 
-| # | Turn | Deliverable | Grounding |
-|---|------|-------------|-----------|
-| 1 | "RocksDB vs SQLite" | Comparison table (model, write path, debuggability, backup, ops, sweet spot) + verdict: wrapper's 0.16 RocksDB default is right for the real host; SQLite better for probe/dev VMs | `modules/stalwart-module/default.nix:288-308` (dual layout: legacy SQLite+fs vs 0.16 RocksDB), store taxonomy in `modules/stalwart-module/migrate_v016.py` |
-| 2 | "LSM-tree vs B-tree / BTRFS snapshots?" | Mechanics table (write path, compaction, crash recovery) + verdict: atomic CoW subvolume snapshot fixes torn-copy for BOTH engines; keep CoW enabled on the data dir; restore drill required; snapshots are not backup, pair with send/receive | Model knowledge (engine internals) + in-repo layout fact that data + blobs co-locate under `${cfg.dataDir}` |
-| 3 | "How does RocksDB affect clusters?" | Verdict: RocksDB/SQLite are the single-node options (embedded, one process, one lock, no replication); Stalwart clusters need shared stores (FoundationDB / PostgreSQL / MySQL) + shared blob store | Store taxonomy from `migrate_v016.py` (in-repo); cluster-behavior claims from model knowledge (unverified — see d/e) |
+| # | Turn                                    | Deliverable                                                                                                                                                                                                                                    | Grounding                                                                                                                                                  |
+| - | --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1 | "RocksDB vs SQLite"                     | Comparison table (model, write path, debuggability, backup, ops, sweet spot) + verdict: wrapper's 0.16 RocksDB default is right for the real host; SQLite better for probe/dev VMs                                                             | `modules/stalwart-module/default.nix:288-308` (dual layout: legacy SQLite+fs vs 0.16 RocksDB), store taxonomy in `modules/stalwart-module/migrate_v016.py` |
+| 2 | "LSM-tree vs B-tree / BTRFS snapshots?" | Mechanics table (write path, compaction, crash recovery) + verdict: atomic CoW subvolume snapshot fixes torn-copy for BOTH engines; keep CoW enabled on the data dir; restore drill required; snapshots are not backup, pair with send/receive | Model knowledge (engine internals) + in-repo layout fact that data + blobs co-locate under `${cfg.dataDir}`                                                |
+| 3 | "How does RocksDB affect clusters?"     | Verdict: RocksDB/SQLite are the single-node options (embedded, one process, one lock, no replication); Stalwart clusters need shared stores (FoundationDB / PostgreSQL / MySQL) + shared blob store                                            | Store taxonomy from `migrate_v016.py` (in-repo); cluster-behavior claims from model knowledge (unverified — see d/e)                                       |
 
 ## a) FULLY DONE
 
@@ -43,14 +43,14 @@ Three advisory answers were delivered (store-backend comparison, storage-engine 
 
 - "Three answers, zero durable artifacts" — process outcome, not damage; encoding unverified claims WOULD have been the fuckup, and it didn't happen.
 - "Advisory claims not ledger-pinned" — exposure, not breakage (see e1).
-- "Ledger not read before answering" — the AGENTS.md rule scopes the ledger to *touching Stalwart/parsedmarc config keys*; no keys were touched, so no rule was broken. Spirit-level miss, logged in e1.
+- "Ledger not read before answering" — the AGENTS.md rule scopes the ledger to _touching Stalwart/parsedmarc config keys_; no keys were touched, so no rule was broken. Spirit-level miss, logged in e1.
 
 ## Self-Review (operator's three questions)
 
 **What did I forget?**
 
 1. To read the README VERIFIED-FACTS LEDGER before answering Stalwart store questions. In a repo where "several obvious keys are wrong", store-doctrine claims deserve the same transcript-pinning discipline as config keys. Nothing I said contradicted anything I saw in-repo, but I did not CHECK that.
-2. To classify my claims explicitly *at answer time* (verified-in-repo vs model-knowledge) instead of only in this report.
+2. To classify my claims explicitly _at answer time_ (verified-in-repo vs model-knowledge) instead of only in this report.
 3. To offer the three pending owner decisions inline, at the moment each answer landed, rather than deferring them all to a status report.
 
 **What could I have done better?**
@@ -100,4 +100,4 @@ Operator asked for "up to 50". Filling to 50 would require exactly the project-w
 
 ---
 
-*Per the status-report skill: section (f) is primary HARVEST input for TODO_LIST/ROADMAP — harvest pending operator go-ahead since three items are owner-gated. Report written per operator's explicit `.md` path demand (skill default is HTML; override honored, not propagated). No manual commit — the auto-commit daemon picks this file up (harness forbids commits without explicit request).*
+_Per the status-report skill: section (f) is primary HARVEST input for TODO_LIST/ROADMAP — harvest pending operator go-ahead since three items are owner-gated. Report written per operator's explicit `.md` path demand (skill default is HTML; override honored, not propagated). No manual commit — the auto-commit daemon picks this file up (harness forbids commits without explicit request)._
