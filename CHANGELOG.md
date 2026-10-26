@@ -9,6 +9,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- `stalwart-relay-e2e` bounce-path subtest (2026-10-26, closes W6.3
+  residue): with the smarthost DOWN (TCP refusal), a non-local
+  submission is ACCEPTED and held deferred - asserted via the
+  `queue_rescheduled` Prometheus counter (0.16 exposes NO queue-depth
+  gauge; the counter is the deferred signal, transcript value 1), never
+  journal greps (0.16 journal is silent on this class). Smarthost
+  recovery then drains the queue into Mailpit via the retry path
+  (measured 119.5 s, 300 s bound). Also: the smtp node's 587 port wait
+  went 60 s -> 180 s - 587 is a PROVISIONED listener that binds only
+  after the ~70 s boot-time provision+restart chain (run-2 flake
+  transcript).
+- `parsedmarc-e2e` TLS-node forensic breadth subtest (2026-10-26): the
+  Netease + LinkedIn failure fixtures - previously plaintext-node-only -
+  are now asserted on the IMAPS node as well (reported domains, the
+  +0800/+0000 UTC normalizations, csv row count); host-parse dry-runs
+  re-run GREEN first.
+- EventSource `ping` parameter probe transcripts (2026-10-26,
+  `docs/probes/2026-10-26-es-ping/`): on 0.16.22 numeric `ping` values
+  are ACCEPTED (the 0.15.5 blanket-400 quirk is GONE) but INERT - zero
+  keep-alive comments at any cadence down to 100 ms; non-numeric `ping`
+  still 400s. INBOXCLEAN.md updated: never rely on `ping` for liveness.
+- Flood-subtest capture-first protocol (2026-10-26): the M14
+  still-gated final probe now dumps the flood journal + both probe logs
+  + limiter metrics into the build log BEFORE failing on a recurrence
+  (the 2026-10-19 single-observation flake left no evidence); the flood
+  node gained `metrics.enable` for the limiter series.
+- dprint markdown plugin bumped 0.22.1 -> 0.28.2 (2026-10-26): <=0.22.1
+  silently DROPPED overflow table cells on format (reproduced: a 3-cell
+  row in a 2-column table loses `| c`); 0.28.2 keeps them (verified
+  against both shapes before bumping). The archived corridors
+  (`docs/{status,planning}/archived/**`) are now dprint-EXCLUDED
+  (frozen snapshots; the pipe lint still covers them). No upstream
+  filing needed - verify-before-filing proved the bug fixed in current
+  releases.
 - EventCatalog source export (2026-10-24, plan
   `docs/planning/2026-10-24_17-07_nix-email-eventcatalog-hub-perfect-integration.md`):
   `scripts/export-catalog.py` emits the catalog tree (service pages for
@@ -507,6 +541,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- MONITORING.md signal-inventory row 15 had been rendering
+  COLUMN-SHIFTED since 2026-10-20: a raw pipe inside the code span
+  `validationFailed | Network error` faked the missing cell boundary
+  and fused the alert-condition and severity cells (the exact
+  eaten-cells class - the pipe lint passes it because the counts
+  coincide). Repaired: pipe escaped, cells split, lint green. Row 2
+  corrected the same day: a SECOND queue series exists
+  (`queue_rescheduled`); the no-depth-gauge verdict stands.
+- Vendored stalwart module: the `webadmin.resource` default now picks
+  `passthru.webui`/`webui.zip` when the package exposes it (0.16 line),
+  falling back to `webadmin`/`webadmin.zip` (0.15 line). Mechanism
+  correction recorded in the README ledger: the 10-23 "a 0.16 consumer
+  with an http listener would hit it" claim was wrong (the whole
+  webadmin block is pre-0.16-only dead code); the real landmine was
+  proven by a forced-branch probe (threw `attribute 'webadmin' missing`
+  pre-fix, evaluates `webui-1.0.10/webui.zip` post-fix, 0.15 line
+  byte-identical). Upstream #552103 (same shape at head 9b15e1f) fix
+  drafted in `docs/drafts/552103-webui-resource-comment.md`; filing
+  pending `gh` auth.
 - Probe-script lint residue (2026-10-23, closes D4.1): the nine warning-level
   ruff findings in `docs/probes/2026-10-19-carddav-demo-vm/` are gone -
   read-once `/proc/loadavg` and log opens became `Path.read_text()`
