@@ -32,8 +32,13 @@
 > g-questions - flood posture, report rename, report cadence - and the
 > AGENTS.md line-cap lint were unanswered; all seven now sit in Batches 5
 > and 7, so ONE sitting still clears the board). Technical lane this
-> session: the C42 ARF ingest e2e probe (the last "docs-verified, not
-> runtime-verified" gap).
+> session: the C42 ARF ingest e2e probe - the last "docs-verified, not
+> runtime-verified" gap is now CLOSED on the pin (report-specific
+> consumption + a delivered report-less control; subtest 16b). Proof:
+> full `nix flake check` EXIT 0 on the final tree (executed
+> stalwart-e2e drv, `nix log` shows the control leg), alejandra +
+> dprint + both md lints green, and `buildflow --max-time 30m` EXIT 0
+> (33 success / 0 failed, binary 58115f7).
 > Previous row change: 2026-10-26 20:44 (Z-plan D-lane executed and
 > deleted: port-wait sweep VERDICT CLEAN - the 587@60 instance was the
 > ONLY under-budgeted provisioned-port wait in tests/ (all others are
