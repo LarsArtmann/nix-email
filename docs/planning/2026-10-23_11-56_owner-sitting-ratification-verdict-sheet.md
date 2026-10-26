@@ -15,7 +15,9 @@
 
 # Owner sitting - ratification + verdict sheet (2026-10-23)
 
-> **Time budget:** ~60 min. Answer with IDs only (`C43: cut`, `C19: drop`).
+> **Time budget:** ~70 min (60 as drafted + the 2026-10-26 coverage
+> additions in Batch 5 and Batch 7). Answer with IDs only
+> (`C43: cut`, `C19: drop`).
 > **Unanswered = still BLOCKED** (no silent defaults, Y-plan kill-switch).
 > Verdicts get written into `docs/planning/decision-batch.md` and the
 > TODO_LIST re-rowed in the same session (O3).

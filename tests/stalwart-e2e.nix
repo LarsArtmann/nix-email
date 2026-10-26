@@ -51,6 +51,12 @@
 #      ReportSettings.inboundReportAddresses recipient with
 #      inboundReportForwarding=false is CONSUMED (no INBOX delivery; the
 #      pre-0.16 /api/reports store read is gone with the REST API)
+#  16b. ARF ingest (C42's last runtime gap): an RFC 5965
+#      message/feedback-report with Feedback-Type: auth-failure to the same
+#      recipient is CONSUMED too - detection there is MIME-typed, not
+#      filename-based (upstream arf/parse.rs) - while a report-LESS control
+#      message to that address IS delivered (excludes address-wide
+#      swallowing)
 #  17. JMAP: session, mailboxes, and the delivered needle over the API
 #  17b. JMAP push: EventSource delivers StateChange on a new mail
 #  18. Nothing panics in the journal
@@ -813,6 +819,23 @@ in
           # aggregate subtest's proof).
           machine.succeed(
               "imap-probe absent arf-consumed-needle-4b8e reports@example.test '${testPass}' 30"
+          )
+          # CONTROL (excludes "reports@ swallows everything"): a message to
+          # the SAME address carrying NO report part is delivered normally
+          # (upstream: "messages to report addresses containing no report
+          # are delivered normally"). The absence above is therefore
+          # report-specific, not address-wide.
+          machine.succeed(
+              "swaks --timeout 120 --server 127.0.0.1:25 "
+              "--ehlo reporter.external.example "
+              "--from reporter@external.example --to reports@example.test "
+              "--header 'Subject: not a report' "
+              "--body 'control-delivered-needle-6c1d' "
+              "> /tmp/swaks-control.log 2>&1"
+          )
+          machine.succeed("cat /tmp/swaks-control.log >&2")
+          machine.succeed(
+              "imap-probe wait control-delivered-needle-6c1d reports@example.test '${testPass}'"
           )
 
       with subtest("JMAP: session, mailboxes, and the delivered needle over the API"):
