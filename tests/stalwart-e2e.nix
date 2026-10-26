@@ -70,9 +70,12 @@
 #     resolver timeouts. That wait IS the evidence (a resolver that
 #     answered instantly would prove nothing about the real path), so it
 #     stays.
-#   - the reports subtest (~75 s): swaks upload + the analyzer's window.
-#     Shrinking it means asserting before ingestion can finish, i.e.
-#     trading determinism for speed.
+#   - the report-ingestion subtests (~200 s together: ~75 s for the DMARC
+#     aggregate leg, ~121 s for the ARF leg + its delivery control). Each
+#     swaks upload stalls ~45 s in the DNS-less VM (real RCPT policy
+#     lookups) and the non-delivery windows are the proof. Shrinking them
+#     means asserting before ingestion can finish, i.e. trading
+#     determinism for speed.
 # The ONLY test-profile knob allowed to differ is directoryCacheTtlNegative
 # (= 5 here, upstream default 3600): a low negative-cache TTL makes a stall
 # LOUD sooner and is a canary, not a relaxation. Doctrine: a test-profile

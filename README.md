@@ -822,8 +822,19 @@ json/yaml/markdown.
   inbound authentication-failure reports (DKIM/SPF/DMARC ARF) - governed by
   `inboundReportAddresses` / `inboundReportForwarding` /
   `holdMtaReportsFor`. C42 evidence base complete: parsedmarc's remaining
-  unique value = file sinks + arbitrary-mailbox polling (docs-verified, not
-  yet runtime-verified on the pin).
+  unique value = file sinks + arbitrary-mailbox polling. RUNTIME-VERIFIED
+  2026-10-26 on the pin (stalwart-e2e subtest 16b, transcript in the gate
+  log): an RFC 5965 `message/feedback-report` with `Feedback-Type:
+  auth-failure` sent to the configured report recipient is CONSUMED (never
+  in the INBOX), while a report-LESS message to the SAME address IS
+  delivered - so the detector is report-specific, not address-wide.
+  Detection for ARF is MIME-typed, not filename-based (upstream
+  `crates/smtp-report/src/arf/parse.rs` requires a
+  `message/feedback-report` part carrying a recognised `Feedback-Type`;
+  the aggregate detector instead keys on the attachment NAME - the
+  asymmetry is why a single filename-shaped probe proves nothing about
+  ARF). At default tracing verbosity 0.16 logs nothing per message, so
+  the runtime evidence is the delivery outcome, not a journal event.
 - **Contacts surface (CardDAV + JMAP contacts, probe-pinned on the
   deployed pin 2026-10-19/20; transcripts
   `docs/probes/2026-10-19-carddav-demo-vm/`)**: the HTTP listener serves

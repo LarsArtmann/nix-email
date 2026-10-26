@@ -306,6 +306,18 @@ is the fleet pin, but the call stays owner-gated.
   mail an ARF/failure report to an `inboundReportAddresses` recipient
   and assert consumed-not-delivered (same shape as the aggregate
   subtest) - parked as test-polish, not evidence.
+- **RUNTIME GAP CLOSED 2026-10-26** (stalwart-e2e subtest 16b, gate log
+  transcript): an RFC 5965 `message/feedback-report` carrying
+  `Feedback-Type: auth-failure` sent from an unauthenticated session to
+  `reports@example.test` is CONSUMED (30 s non-delivery window, exit 0),
+  and the delivery CONTROL - a report-less message to the SAME address -
+  IS delivered, so the absence is report-specific rather than
+  address-wide. Detection shape pinned from upstream source: ARF is
+  MIME-typed (`message/feedback-report` + a recognised `Feedback-Type`),
+  NOT filename-based like the aggregate detector. Subtest cost +45 s
+  (two swaks uploads at ~45 s each in the DNS-less VM); total
+  stalwart-e2e script time 302 s -> 342 s. Remaining C42 facts are all
+  established; only the owner verdict is outstanding.
 - Cost of delay: the wrapper may be partially redundant on 0.16; the
   rationale text in README/FEATURES carries the 0.16 caveat meanwhile.
 
