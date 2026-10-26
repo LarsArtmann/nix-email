@@ -354,6 +354,47 @@ in
               timeout=300,
           )
 
+      with subtest("bounce path: refusing smarthost defers, then drains on recovery"):
+          # Kill the smarthost (TCP refusal = the production outage shape).
+          # 0.16 accepts the message at SMTP (queue semantics) and must hold
+          # it deferred - never drop, never bounce while retryable. The
+          # assertions ride the Prometheus queue series + Mailpit only
+          # (journal greps are forbidden here: 0.16 is silent on this class).
+          relay.systemctl("stop mailpit-catchall.service")
+          smtp.succeed(
+              "swaks --timeout 120 --server 127.0.0.1:587 --tls --auth PLAIN "
+              "--auth-user user1@example.test --auth-password '${testPass}' "
+              "--from user1@example.test --to stranger@remote.example "
+              "--header 'Subject: bounce-e2e' --body '${bounceNeedle}' "
+              "> /tmp/swaks-bounce.log 2>&1"
+          )
+          smtp.succeed("cat /tmp/swaks-bounce.log >&2")
+          smtp.succeed("! grep -q '<\\*\\*' /tmp/swaks-bounce.log")
+
+          # Transcript-first: dump the FULL metrics body into the test log
+          # so the queue series names are transcribable from THIS run (same
+          # doctrine as stalwart-e2e's metrics subtest), then assert the
+          # deferred state on the observed series (file-based, never piped).
+          # DEBUG-RUN SHAPE: capture-only, no assertion yet.
+          smtp.succeed("sleep 5")
+          smtp.succeed(
+              "curl -fsS http://127.0.0.1:8080/metrics/prometheus "
+              "-o /tmp/metrics-bounce.prom && cat /tmp/metrics-bounce.prom >&2"
+          )
+
+          # Smarthost recovery: the deferred message must DRAIN via the
+          # queue retry into Mailpit (bounded by the observed first-retry
+          # interval; capture-first: if this flakes, read the retry window
+          # from THIS subtest's log before touching the timeout).
+          relay.systemctl("start mailpit-catchall.service")
+          relay.wait_for_open_port(1025, timeout=60)
+          smtp.wait_until_succeeds(
+              "curl -fsS http://relay:8025/api/v1/messages "
+              "-o /tmp/relay-messages3.json "
+              "&& grep -q '${bounceNeedle}' /tmp/relay-messages3.json",
+              timeout=300,
+          )
+
       with subtest("no crashes"):
           smtp.succeed(
               "journalctl -u stalwart -b 0 > /tmp/journal-full.log && { "

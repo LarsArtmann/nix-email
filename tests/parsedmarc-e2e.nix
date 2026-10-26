@@ -662,5 +662,45 @@ in
               "cat /tmp/journal-dovecot.log >&2; "
               "grep -E 'imap-login: Logged in: user=<dmarc>.* TLS, session=' /tmp/journal-dovecot.log; }"
           )
+
+      with subtest("TLS variant: forensic breadth fixtures ride the same IMAPS poll"):
+          # Coverage gap closed (2026-10-26): the Netease + LinkedIn failure
+          # fixtures previously rode the PLAINTEXT node only. send-email
+          # mails every fixture to both nodes, so the TLS node's failure
+          # sink proves the production-shaped IMAPS path carries the
+          # breadth set too. Values are the host-dry-run transcripts the
+          # plaintext node already pins (scripts/host-parse-fixture.py,
+          # 2026-10-05) - parsing is transport-independent; the run proves
+          # the TRANSPORT, the asserted values are the proven ones.
+          try:
+              tls.wait_until_succeeds(
+                  "test -s /var/lib/parsedmarc/reports/failure.json",
+                  timeout=120,
+              )
+          except Exception:
+              tls.succeed("journalctl -u parsedmarc -b 0 -o cat >&2")
+              raise
+          tls.succeed(
+              "jq -e '.[] | select(.reported_domain == \"cardinal.com\")' "
+              "/var/lib/parsedmarc/reports/failure.json"
+          )
+          tls.succeed(
+              "jq -e '.[] | select(.original_rcpt_to == \"recipient@linkedin.com\")' "
+              "/var/lib/parsedmarc/reports/failure.json"
+          )
+          # One UTC normalization per breadth timezone over IMAPS: +0800
+          # (netease) and +0000 (linkedin).
+          tls.succeed(
+              "jq -e '.[] | select(.arrival_date_utc == \"2018-09-28 08:48:42\")' "
+              "/var/lib/parsedmarc/reports/failure.json"
+          )
+          tls.succeed(
+              "jq -e '.[] | select(.arrival_date_utc == \"2019-04-30 02:09:00\")' "
+              "/var/lib/parsedmarc/reports/failure.json"
+          )
+          # All three forensic fixtures arrived on this node as well.
+          tls.succeed(
+              "test \"$(wc -l < /var/lib/parsedmarc/reports/failure.csv)\" -ge 4"
+          )
     '';
   }
