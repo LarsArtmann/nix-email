@@ -177,9 +177,7 @@ scratch-tag dry-run's tag-CI observation) is dead until `gh auth login`.
 
 ---
 
-_Gate state at report time: the three touched VM checks individually
-GREEN (relay run 3, stalwart-e2e, parsedmarc-e2e); the full
-`nix flake check` result is recorded in the session's final summary
-(it was still running when this report was drafted - read the CHANGELOG
-entry or the gate log `/tmp/gate-final.log` for the authoritative
-verdict)._
+_Gate state at closeout: `nix fmt -- . --check` EXIT:0 AND the full
+`nix flake check` EXIT:0 (11-check set) on the final tree - the three
+touched VM checks individually green beforehand (relay run 3,
+stalwart-e2e, parsedmarc-e2e)._
