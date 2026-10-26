@@ -22,8 +22,12 @@ that touches Stalwart re-runs the probe (see "Re-verification" below).
 > contacts/calendars/websocket/sieve/blob/quota/principals(+availability)/
 > filenode/mail:share plus `urn:stalwart:jmap` and
 > `urn:ietf:params:jmap:emailpush` — new on 0.16); EventSource accepts
-> `closeafter=no` (the 0.15.5 `400 Invalid parameters` quirk is GONE;
-> `ping` unprobed); the StateChange payload shape is unchanged. The
+> `closeafter=no` (the 0.15.5 `400 Invalid parameters` quirk is GONE);
+> `ping` numeric values are ACCEPTED but INERT on 0.16.22 — zero
+> keep-alive comments at any cadence down to 100 ms; non-numeric `ping`
+> still 400s (probe transcripts 2026-10-26,
+> `docs/probes/2026-10-26-es-ping/`); the StateChange payload shape is
+> unchanged. The
 > Junk-filing automation path verified end-to-end: `Email/set`
 > mailboxIds move to the `role:"junk"` mailbox (`updated`, Junk=1 /
 > Inbox=2, state saq→sau). IMAP LIST roles on 0.16: INBOX, Junk Mail
@@ -117,6 +121,15 @@ keep one poll sweep as startup/fallback. Evidence:**
   any value; only `types` is accepted (matrix-probed, both user and
   admin). Clients must send `?types=<comma-list-or-*>` alone and treat
   disconnects as the closeafter signal.
+- **0.16 update (probe 2026-10-26, `docs/probes/2026-10-26-es-ping/`):**
+  `closeafter=no` and numeric `ping` values are both ACCEPTED on
+  0.16.22 (non-numeric `ping` still 400s with `Invalid parameters`).
+  But `ping` is INERT: no keep-alive comment or event frame at any
+  cadence (100 ms/1 s/2 s/5 s, types=Email and types=*, windows to
+  35 s; default stream sends no keep-alives either - the 2026-10-18
+  40 s window saw only the state event). Do NOT rely on `ping` for
+  liveness; consumer-side read timeouts + reconnect stay the
+  mechanism.
 - `urn:ietf:params:jmap:websocket` (`/jmap/ws`) is the other push
   channel; EventSource is the simpler one for a spike-grade consumer.
 - Poll parity: `Email/query` carries `queryState` and
