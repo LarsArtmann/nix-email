@@ -18,8 +18,9 @@ proved the bug fixed upstream), the admin-bundle landmine defused in the
 vendored copy with a corrected mechanism writeup, the flood flake's
 capture-first protocol mechanized INTO the test, and the upstream watch
 re-dated. One hard external blocker surfaced: **the `gh` token is expired**
+
 - every authenticated GitHub action (filings, CI watching, the
-scratch-tag dry-run's tag-CI observation) is dead until `gh auth login`.
+  scratch-tag dry-run's tag-CI observation) is dead until `gh auth login`.
 
 ---
 
