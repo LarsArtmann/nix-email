@@ -541,6 +541,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- MONITORING.md §5.5 series inventory no longer claims
+  `queue_authenticated_message_queued` is the ONLY queue series (a
+  same-file split brain against row 2's 2026-10-26 correction): the
+  relay-e2e bounce-subtest transcript proves the second counter
+  `queue_rescheduled` (HELP "Message rescheduled for delivery",
+  observed 1 within seconds of a down-smarthost deferral). Inventory
+  and verdict now cite both transcripts (2026-10-19 dump + 2026-10-26
+  amendment); the no-depth/age-gauge verdict stands. README was checked
+  and carries no queue-series claim - MONITORING.md is the sole owner.
+- First full `buildflow` run on the final E/F tree (2026-10-26, D3):
+  gate GREEN (exit 0, warning-threshold findings only). Residue fixed:
+  the new es-ping probe was flagged EXE001 (shebang without exec bit;
+  now 100755 like the older probes), RUF007 (`zip` ->
+  `itertools.pairwise`), and 10 ruff-format nits - semantics-identical
+  changes; `buildflow -s ruff-check` / `-s ruff-format` re-run fresh
+  and clean. The older probes' RUF100 hits under a wider manual
+  selection are NOT gate findings (their `noqa` directives are live
+  under buildflow's ruleset) and stay untouched.
 - MONITORING.md signal-inventory row 15 had been rendering
   COLUMN-SHIFTED since 2026-10-20: a raw pipe inside the code span
   `validationFailed | Network error` faked the missing cell boundary
