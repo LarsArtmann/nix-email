@@ -4,7 +4,14 @@
      re-read against the current tree, not copied blind: entries whose [rec]
      is now stale are marked STALE with the correction inline. Nothing here
      is executed by the agent sitting - the executor records verdicts
-     verbatim (Y-plan O3) and never defaults an unanswered row. -->
+     verbatim (Y-plan O3) and never defaults an unanswered row.
+
+     2026-10-26 COVERAGE RE-PROOF (Z-plan O1 audit): the "every open call"
+     claim above was FALSE. C36, C37, and Q5 sit OPEN in decision-batch.md
+     and appeared on no sheet; the three 2026-10-26 session g-questions
+     (flood posture, report rename, report cadence) and the AGENTS.md
+     line-cap lint were answered nowhere either. All seven are ADDED below
+     (Batch 5 + Batch 7) so ONE sitting can still clear the board. -->
 
 # Owner sitting - ratification + verdict sheet (2026-10-23)
 
@@ -71,6 +78,21 @@ plus CONTRIBUTING "VM debug loops" (f).
 | Q4  | README ops-detail level (public runbook detail has recon value)                                                       | **Keep as-is** until D1 lands, then re-decide                                                                     | None                                                                                            |
 | CI  | CI python-lint scope: keep the ruff error floor, or move bandit/vulture (and BuildFlow's deeper ruleset) into CI too? | **Keep the error floor in CI** (`--select E4,E7,E9,F`); bandit/vulture stay BuildFlow detect-only                 | Move them into CI (204 bandit + 436 ruff-format findings today - a gate nobody can go green on) |
 | Q6  | Spam/Junk ownership                                                                                                   | **Tag-only now** - the auto-move half is MOOT (upstream hard-codes INBOX-spam to JUNK; no wrapper setting exists) | Ratification only                                                                               |
+| C36 | InboxClean + corpus topology: evo-x2 at home, or the VPS beside Stalwart? (decides DR, backup failure domain, auth path) | **evo-x2** (corpus-as-backup wants a failure domain independent of the VPS)                                       | Blocks row-175 deployment + the Gatus split                                                     |
+| C37 | InboxClean build order: adapter-first (row 173) or corpus-first (row 174)?                                             | **Corpus-first**, JMAP spike in parallel (corpus needs no JMAP; ADR-023's order is a choice)                      | Orders the next two InboxClean sessions                                                         |
+| Q5  | Declarative provisioning: grow `domains`/`accounts` options, or keep account state imperative/webadmin?                | **Add the options** - the e2e already provisions mechanically; declarative is the NixOS contract                | Same verdict powers M22; without it the demo/canary stays hand-built                            |
+| AGENTS | AGENTS.md line cap: the doctor flags 247 lines against a 220 cap (pre-existing, every session) - trim to cap, or accept? | **Accept the overage** (the 30 KB flag is the real ceiling and AGENTS is under it; line count is the wrong metric) | The warning rides every session's doctor output until answered                                  |
+
+## Batch 7 - the 2026-10-26 session g-questions (Z-plan O2.4)
+
+Harvested from `docs/status/2026-10-26_20-48_*` (g/1-g/3) and the Z-plan;
+none of these had a home on this sheet before the 2026-10-26 audit.
+
+| ID               | The call                                                                                                 | Recommendation                                                                                                                      | Cost of delay                                                            |
+| ---------------- | -------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| FLOOD (D5 taste) | Flood subtest posture: keep the strict final probe (now capture-first, so a recurrence self-captures), or relax it to a soft warning? | **Keep strict** - the M14 probe is the only runtime proof the limiter trips; the capture block already removed the diagnosis tax      | One recurring judgement call per stalwart-e2e red; no live impact        |
+| REPORT-RENAME    | The line-mis-timestamped report `docs/status/2026-10-26_20-15_y-plan-ef-lanes-execution-bounce-ping-tls-dprint.md` - rename to its real hour, or leave it? | **Rename** - the filename is a citation key in TODO rows and CHANGELOG; a wrong hour is a real (if small) split brain                  | Every future citation repeats the wrong hour                            |
+| REPORT-CADENCE   | Status-report cadence: keep the per-session full status + brutal self-review default, or move to on-demand only?              | **Keep per-session** - the two kept-live reports and the TODO harvest both depend on it                                                | Ad-hoc reporting loses the harvest trail that made these sweeps cheap   |
 
 ## Batch 6 - ratify the agent-executed adoptions (reversible, 2026-10-05)
 
@@ -107,10 +129,15 @@ No CVEs in the window; the pin's 0.16.22 is past the one that mattered.
 | C45           | C2.2 (overlay execution or stand-verdict)                          |
 | C44           | C5 (implementation + THREAT_MODEL)                                 |
 | C39           | C6 (MemoryMax landing)                                             |
+| C42           | C7 (retire execution or keep-plus-docs-fetch)                      |
 | PBX blessing  | B1-B3 (their gate + the corridor closeout)                         |
-| D1/D2         | C7 (rotation runbook, vandelay-vs-imapsync, dmarc live poll)       |
-| Resend key    | C7.4 (the one live smoke)                                          |
-| CI lint scope | D3 (ci.yml/.buildflow.yml scope landing + negative test)           |
+| D1/D2         | C8 (rotation runbook, vandelay-vs-imapsync, dmarc live poll) + G7  |
+| Resend key    | C8.3 (the one live smoke)                                          |
+| CI lint scope | D4 (ci.yml/.buildflow.yml scope landing + negative test)           |
+| C36/C37/Q5    | the InboxClean/M22 lanes (topology, build order, declarative plan)|
 | C18/C19/C22   | settings micros (branch protection, app install/drop, Discussions) |
 | C24/C29       | G7 monitoring encoding (taxonomy, canary)                          |
 | C34/Q4/Q6     | ratifications; ROADMAP non-goals pass (G7)                         |
+| FLOOD         | D5 (close the row as-is, or soften + rerun stalwart-e2e)           |
+| REPORT-*      | the corridor rename + the cadence line in AGENTS/docs policy       |
+| AGENTS        | retires the doctor line from every session's output                |

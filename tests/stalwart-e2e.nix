@@ -764,6 +764,57 @@ in
               "imap-probe absent report-consumed-needle-9d2f reports@example.test '${testPass}' 30"
           )
 
+      with subtest("native ingestion: ARF auth-failure report consumed, not delivered"):
+          # C42 evidence gap (decision-batch: "the remaining runtime gap is
+          # ONE e2e probe ... parked as test-polish"): 0.16 also analyses
+          # inbound authentication-failure reports. Detection here is
+          # MIME-typed, NOT filename-based (upstream
+          # crates/smtp-report/src/arf/parse.rs: the message/feedback-report
+          # part must carry a Feedback-Type field with a known value; the
+          # multipart/report wrapper, the Subject, and the envelope sender
+          # are never inspected - contrast the aggregate detector, which
+          # keys on the attachment NAME). swaks --attach-type shapes the
+          # part; the body carries the needle.
+          machine.succeed(
+              "cat > /tmp/arf-feedback.txt <<'EOF'\n"
+              "Feedback-Type: auth-failure\n"
+              "User-Agent: e2e-report-generator/1.0\n"
+              "Version: 1\n"
+              "Original-Mail-From: victim@external.example\n"
+              "Original-Rcpt-To: reports@example.test\n"
+              "Reported-Domain: external.example\n"
+              "Source-IP: 203.0.113.9\n"
+              "Authentication-Results: external.example; dmarc=fail "
+              "header.from=external.example\n"
+              "EOF"
+          )
+          machine.succeed(
+              "swaks --timeout 120 --server 127.0.0.1:25 "
+              "--ehlo reporter.external.example "
+              "--from reporter@external.example --to reports@example.test "
+              "--header 'Subject: Report Domain: external.example' "
+              "--body 'arf-consumed-needle-4b8e' "
+              "--attach-type message/feedback-report "
+              "--attach '@/tmp/arf-feedback.txt' "
+              "> /tmp/swaks-arf.log 2>&1"
+          )
+          machine.succeed("cat /tmp/swaks-arf.log >&2")
+          machine.succeed("! grep -q '<\\*\\*' /tmp/swaks-arf.log")
+          # Transcript-first: the whole journal is dumped BEFORE the verdict
+          # so a red here carries its own evidence (the incoming-report.*
+          # event names are not asserted - upstream is not evidence of what
+          # the pin logs; this dump is how a future assertion gets pinned).
+          machine.succeed(
+              "journalctl -u stalwart -b 0 -o cat > /tmp/journal-arf.log"
+          )
+          machine.succeed("cat /tmp/journal-arf.log >&2")
+          # Consumed, never delivered: analysis returns before the delivery
+          # queue, so non-delivery is deterministic (same shape as the
+          # aggregate subtest's proof).
+          machine.succeed(
+              "imap-probe absent arf-consumed-needle-4b8e reports@example.test '${testPass}' 30"
+          )
+
       with subtest("JMAP: session, mailboxes, and the delivered needle over the API"):
           # 0.16 moved the session endpoint (demo-VM transcript,
           # 2026-10-16): GET /jmap is 404; /.well-known/jmap answers 307
