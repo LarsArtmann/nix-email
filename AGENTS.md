@@ -58,11 +58,13 @@ transcript-pinned dialect).
   gate red may belong to ANOTHER session's in-flight fix: check
   `git status` for files you didn't touch, date outputs via
   `nix path-info --json registrationTime`, never edit the foreign file.
-- Markdown is dprint-formatted: a table cell with a literal `|` MUST be
-  escaped `\|` (dprint DROPS overflow cells; lint:
-  `scripts/check-md-table-pipes.sh`); never let a mid-sentence `-`/`+`
-  start a line (parses as a nested list item) - `git diff` after every
-  dprint pass over prose.
+- Markdown is dprint-formatted (markdown plugin PINNED 0.28.2, 2026-10-26:
+  <=0.22.1 silently DROPPED overflow table cells, 0.28.2 keeps them):
+  escape a literal `|` in a cell as `\|` (GFM splits on raw pipes anyway;
+  lint: `scripts/check-md-table-pipes.sh`); never let a mid-sentence
+  `-`/`+` start a line - `git diff` after every dprint pass over prose.
+  The archived corridors (`docs/{status,planning}/archived/**`) are
+  dprint-EXCLUDED (frozen snapshots; the pipe lint still covers them).
 - HOST-SIDE PARSER DRY-RUN before any VM test feeding a fixture to a
   python service: `python3 scripts/host-parse-fixture.py <fixture>
   --check parsedmarc-e2e` (~30 s, reproduces VM parser reds in seconds;

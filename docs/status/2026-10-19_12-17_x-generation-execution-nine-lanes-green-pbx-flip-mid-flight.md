@@ -136,7 +136,7 @@ processes), and a pbx-artmann session was touching that repo's AGENTS.md
      route + resolver are REALLY up? Nobody has observed a post-route
      probe yet - every DNS probe so far raced the lease. The one-edit
      resume: add `machine.wait_until_succeeds("ip route show default |
-   grep -q .", timeout=90)` before the forensics, run once, read the
+     grep -q .", timeout=90)` before the forensics, run once, read the
      transcript.
      CONSEQUENCE: pbx master (their daemon pushes) is RED right now -
      red-by-my-in-progress-flip, not red-by-design anymore. Their repo's

@@ -224,7 +224,12 @@ in
       smtp.log("null-relay route address: ${nullRelayAsserts}")
 
       smtp.wait_for_unit("stalwart.service", timeout=180)
-      smtp.wait_for_open_port(587, timeout=60)
+      # 587 is a PROVISIONED listener (unlike stalwart-e2e's built-in
+      # 25/8080): it binds only after the boot-time stalwart-provision
+      # apply + ExecStartPost restart chain, which measured ~70 s under
+      # host load (run-2 transcript 2026-10-26: apply at 69.5 s, the 60 s
+      # port window expired first - a timing flake, not a bind failure).
+      smtp.wait_for_open_port(587, timeout=180)
       relay.wait_for_open_port(1025, timeout=120)
       relay.wait_for_open_port(8025, timeout=60)
 

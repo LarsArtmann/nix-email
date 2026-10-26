@@ -744,8 +744,7 @@ json/yaml/markdown.
 
 ### Stalwart 0.16 (transcript-pinned during the 2026-10-16/17 upgrade)
 
-- **JMAP session endpoint moved**: `GET /jmap` -> 404 for everyone; session
-  = `/.well-known/jmap` -> 307 (`location: /jmap/session`) -> 200 authed.
+- **JMAP session endpoint moved**: `GET /jmap` -> 404 for everyone; session = `/.well-known/jmap` -> 307 (`location: /jmap/session`) -> 200 authed.
   ANONYMOUS session requests return 200 with `primaryAccounts: {}` (NOT
   401 - the enforcement point is the API POST, which 401s). `apiUrl` is an
   absolute `https://<host>/jmap/` URL (unusable in a DNS-less VM; tests
