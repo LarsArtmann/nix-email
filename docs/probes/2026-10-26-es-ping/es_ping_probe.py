@@ -16,7 +16,6 @@ Modes (--mode): ping    - types=Email&closeafter=no&ping=<ms>, watch
 import argparse
 import base64
 import http.client
-import sys
 import time
 import urllib.parse
 
@@ -77,7 +76,7 @@ elif args.mode == "control":
     open_stream("types=Email&closeafter=no", "control", args.seconds)
 else:
     for query, label in [
-        (f"types=Email&closeafter=no&ping=0", "ping=0"),
+        ("types=Email&closeafter=no&ping=0", "ping=0"),
         ("types=Email&closeafter=no&ping=abc", "ping=abc"),
         ("types=Email&closeafter=no", "closeafter-only-regression"),
     ]:
