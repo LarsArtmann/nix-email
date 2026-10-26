@@ -89,8 +89,9 @@ plus CONTRIBUTING "VM debug loops" (f).
 
 ## Batch 7 - the 2026-10-26 session g-questions (Z-plan O2.4)
 
-Harvested from `docs/status/2026-10-26_20-48_*` (g/1-g/3) and the Z-plan;
-none of these had a home on this sheet before the 2026-10-26 audit.
+Harvested from `docs/status/2026-10-26_19-00_*` (g/1-g/3; the 20-15 report
+repeats g/1) and the Z-plan's O2.4 agenda; none of these had a home on this
+sheet before the 2026-10-26 audit.
 
 | ID               | The call                                                                                                                                                   | Recommendation                                                                                                                   | Cost of delay                                                         |
 | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
