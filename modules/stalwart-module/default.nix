@@ -342,7 +342,19 @@ in {
           # delete the stored webadmin blob host-side and restart. (A
           # bundle-hash mismatch alone does NOT prove a version skew:
           # JS chunk hashes vary per toolchain build.)
-          resource = lib.mkIf hasHttpListener (lib.mkDefault "file://${cfg.package.webadmin}/webadmin.zip");
+          # Version-aware: the 0.16 package line (stalwart_0_16) exposes the
+          # bundle as passthru.webui (webui-1.0.10 containing webui.zip);
+          # the 0.15 line exposes webadmin/webadmin.zip. Pinned-rev
+          # verified 2026-10-26; a bare cfg.package.webadmin threw
+          # "attribute 'webadmin' missing" for any 0.16 consumer with an
+          # http settings listener (eval transcript 2026-10-23).
+          resource =
+            lib.mkIf hasHttpListener
+            (lib.mkDefault (
+              if cfg.package ? webui
+              then "file://${cfg.package.webui}/webui.zip"
+              else "file://${cfg.package.webadmin}/webadmin.zip"
+            ));
         };
       };
 
