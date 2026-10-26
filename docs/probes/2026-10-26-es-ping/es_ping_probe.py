@@ -18,6 +18,7 @@ import base64
 import http.client
 import time
 import urllib.parse
+from itertools import pairwise
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--seconds", type=int, default=12)
@@ -40,7 +41,9 @@ def open_stream(query, label, seconds):
     resp = conn.getresponse()
     print(f"[{label}] HTTP {resp.status} {resp.reason}", flush=True)
     if resp.status != 200:
-        print(f"[{label}] body: {resp.read().decode(errors='replace')[:300]}", flush=True)
+        print(
+            f"[{label}] body: {resp.read().decode(errors='replace')[:300]}", flush=True
+        )
         conn.close()
         return start, False
     markers = []
@@ -60,7 +63,7 @@ def open_stream(query, label, seconds):
             if text.lstrip().startswith(":"):
                 markers.append(stamp)
     if len(markers) >= 2:
-        gaps = [round(b - a, 2) for a, b in zip(markers, markers[1:])]
+        gaps = [round(b - a, 2) for a, b in pairwise(markers)]
         print(f"[{label}] keep-alive gaps: {gaps}", flush=True)
     elif not markers:
         print(f"[{label}] NO keep-alive comment in window", flush=True)
