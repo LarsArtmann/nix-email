@@ -143,14 +143,16 @@ Quarantine review in the 0.15.5 reality = inspect queued messages +
 `GET /api/queue/reports` (ingested reports) - the tag-only spam posture
 (ROADMAP Q6) means there is no separate quarantine folder to review.
 
-### 5.5 Prometheus series inventory (0.16.22, transcript-pinned 2026-10-19)
+### 5.5 Prometheus series inventory (0.16.22, transcript-pinned 2026-10-19, amended 2026-10-26)
 
 The canonical transcription of every HELP series in the
 `/metrics/prometheus` payload, from the first full gate's stalwart-e2e
-metrics dump (build log 2026-10-19; transcribe, never guess). Queue
-verdict: the ONLY queue series is the cumulative counter
-`queue_authenticated_message_queued` - there is NO depth/age gauge
-(row 2).
+metrics dump (build log 2026-10-19; transcribe, never guess), amended
+by the relay-e2e bounce-subtest dump (build log 2026-10-26). Queue
+verdict: TWO queue counters exist - `queue_authenticated_message_queued`
+(throughput) and `queue_rescheduled` (HELP "Message rescheduled for
+delivery", observed 1 within seconds of a down-smarthost deferral) -
+there is STILL no depth/age gauge (row 2).
 
 - auth: `auth_failed`, `auth_success`
 - connections (active/start/request-time triplets): `smtp_`, `imap_`,
@@ -159,7 +161,8 @@ verdict: the ONLY queue series is the cumulative counter
   `imap_connection_start`
 - delivery: `delivery_attempt_start`, `delivery_attempt_time`,
   `delivery_completed`, `delivery_dsn_success`, `delivery_total_time`
-- queue: `queue_authenticated_message_queued` (counter, no gauge)
+- queue: `queue_authenticated_message_queued` (counter),
+  `queue_rescheduled` (counter, deferred/retry signal) - no gauge
 - store: `store_blob_read`, `store_blob_write`, `store_data_iterate`,
   `store_data_write`
 - policy/dns: `smtp_dkim_fail`, `smtp_iprev_pass`, `smtp_spf_ehlo_fail`,
