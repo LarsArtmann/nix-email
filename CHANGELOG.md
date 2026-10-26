@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- ARF ingest subtest in `stalwart-e2e` (2026-10-26, closes C42's LAST
+  evidence gap): an RFC 5965 `message/feedback-report` carrying
+  `Feedback-Type: auth-failure`, mailed from an unauthenticated session
+  to a configured `inboundReportAddresses` recipient with forwarding
+  off, is CONSUMED (30 s non-delivery window). The delivery CONTROL - a
+  report-less message to the SAME address - IS delivered, so the absence
+  is report-specific, not address-wide. Detection shape pinned from
+  upstream source: ARF is MIME-typed (`message/feedback-report` + a
+  recognised `Feedback-Type`), unlike the aggregate detector which keys
+  on the attachment name - so a filename-shaped probe could never have
+  proven ARF. Cost: +45 s script time (302 s -> 342 s), both legs
+  transcript-pinned in the gate log.
 - `stalwart-relay-e2e` bounce-path subtest (2026-10-26, closes W6.3
   residue): with the smarthost DOWN (TCP refusal), a non-local
   submission is ACCEPTED and held deferred - asserted via the
@@ -541,6 +553,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- Owner-sitting sheet coverage re-proof (2026-10-26): the sheet claimed
+  to hold EVERY open owner call, but C36, C37, and Q5 sat open in the
+  decision batch and appeared on no sheet, and three 2026-10-26 session
+  g-questions (flood posture, report rename, report cadence) plus the
+  AGENTS.md line-cap lint were answered nowhere. All seven are now on
+  the sheet (Batch 5 + Batch 7), so one sitting still clears the board.
+  Appendix C's stale task IDs (Resend -> C8.3 not C7.4, CI lint scope ->
+  D4 not D3, D1/D2 -> C8 not C7) were corrected too.
 - MONITORING.md §5.5 series inventory no longer claims
   `queue_authenticated_message_queued` is the ONLY queue series (a
   same-file split brain against row 2's 2026-10-26 correction): the
