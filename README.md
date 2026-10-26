@@ -857,20 +857,27 @@ json/yaml/markdown.
   frontend bundles (the admin is the downloadable Application bundle at
   `/admin`) - the module's contacts story is API-surface only.
 - **The 0.16 admin bundle is a SEPARATE package output, and its spelling
-  changed** (re-verified 2026-10-23 against the pin): `stalwart_0_16`
+  changed** (re-verified 2026-10-26 against the pin): `stalwart_0_16`
   exposes `passthru.webui` = `webui-1.0.10` containing `webui.zip` (the
   admin Application bundle). The 0.15 alias `pkgs.stalwart` (0.15.5)
   exposes `passthru.webadmin` instead, containing `webadmin.zip`. The
-  vendored module's `webadmin.resource` default still spells
-  `cfg.package.webadmin` + `/webadmin.zip`, which is a LATENT eval bug on
-  0.16: it is dormant here only because the wrapper provisions listeners
-  through `services.stalwart.provision`, so `settings.server.listener`
-  stays empty and `hasHttpListener` is false. A 0.16 consumer that sets
-  `settings.server.listener.<name>.protocol = "http"` would hit
-  "attribute 'webadmin' missing"; the fix is a version-aware default
-  (`cfg.package.webui` + `/webui.zip` on 0.16) and belongs upstream in
-  PR #552103, not in this vendored copy. User webmail remains a non-goal
-  (C34): Bulwark on the consumer host is the JMAP-native client.
+  module's `webadmin.resource` default used to spell a bare
+  `cfg.package.webadmin`. 2026-10-26 probe correction of the earlier
+  "a 0.16 consumer with an http listener would hit it" claim: that
+  consumer CANNOT - the whole webadmin block lives in the module's
+  PRE-0.16 settings branch, so on 0.16 `settings.webadmin` does not
+  exist at all (three-shape eval probes). The real landmine is the
+  else-branch expression against a webui-only package (forced-branch
+  repro: `stalwart_0_16.overrideAttrs (_: { version = "0.15.99"; })` +
+  an http settings listener threw `attribute 'webadmin' missing`
+  pre-fix, eval transcripts 2026-10-26). The vendored copy now carries
+  the version-aware default (`? webui` -> webui.zip, else
+  webadmin.zip; zero behavioral delta proven: 0.15 line identical, 0.16
+  line dormant both sides); upstream #552103 (identical shape at head
+  9b15e1f) has the fix drafted in
+  `docs/drafts/552103-webui-resource-comment.md` - filing pending gh
+  auth. User webmail remains a non-goal (C34): Bulwark on the consumer
+  host is the JMAP-native client.
 
 ### Stalwart 0.15.5 era (historical facts; several are superseded above)
 
