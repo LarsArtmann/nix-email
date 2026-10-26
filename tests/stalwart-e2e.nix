@@ -421,6 +421,10 @@ in
         enable = true;
         hostname = "mail.flood.test";
         admin.secretFile = "/etc/test-admin-secret";
+        # Limiter observability for the capture-first protocol below:
+        # the Prometheus body carries the rate-limiter series the flake
+        # forensics need.
+        metrics.enable = true;
         rateLimits = {
           enable = true;
           rate = "3/1m";
@@ -910,6 +914,13 @@ in
           )
 
       with subtest("wrapper rate limiter trips at runtime (M14 evidence)"):
+          # CAPTURE-FIRST PROTOCOL (2026-10-19 single-observation refill
+          # flake): the final still-gated probe once got a banner (burst
+          # counts exact, immediate rerun green, config eval-identical).
+          # If ANY assertion in this subtest fails again, the dump below
+          # carries the flood journal + both probe logs + the limiter
+          # metrics INTO THIS BUILD LOG - debug from that transcript,
+          # never blind-rerun (a rerun destroys the bucket state).
           flood.wait_for_unit("stalwart.service", timeout=180)
           flood.wait_for_open_port(25, timeout=60)
           # 10 rapid connections from one source IP: the wrapper's 3/1m
@@ -937,6 +948,21 @@ in
               "else echo HANGUP >> /tmp/flood2.log; fi; exec 3<&- 3>&-"
           )
           flood.succeed("cat /tmp/flood2.log >&2")
-          flood.succeed("grep -q HANGUP /tmp/flood2.log")
+          try:
+              flood.succeed("grep -q HANGUP /tmp/flood2.log")
+          except Exception:
+              # Capture-first: preserve the evidence BEFORE the failure
+              # propagates (files die with the VM; the build log survives).
+              flood.succeed(
+                  "journalctl -u stalwart -b 0 > /tmp/flood-journal.log "
+                  "&& cat /tmp/flood-journal.log >&2"
+              )
+              flood.succeed("cat /tmp/flood.log /tmp/flood2.log >&2")
+              flood.succeed(
+                  "curl -fsS http://127.0.0.1:8080/metrics/prometheus "
+                  "-o /tmp/flood-metrics.prom "
+                  "&& cat /tmp/flood-metrics.prom >&2"
+              )
+              raise
     '';
   }

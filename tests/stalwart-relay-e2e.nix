@@ -329,57 +329,22 @@ in
           # so the queue series names are transcribable from THIS run (same
           # doctrine as stalwart-e2e's metrics subtest), then assert the
           # deferred state on the observed series (file-based, never piped).
-          smtp.succeed(
-              "curl -fsS http://127.0.0.1:8080/metrics/prometheus "
-              "> /tmp/metrics-bounce.prom 2>&1; cat /tmp/metrics-bounce.prom >&2"
-          )
-          smtp.wait_until_succeeds(
-              "curl -fsS http://127.0.0.1:8080/metrics/prometheus "
-              "> /tmp/metrics-bounce.prom 2>&1 "
-              "&& grep -qE '^stalwart_queue_messages" + r'\{' + r'\}' + " [1-9]' "
-              "/tmp/metrics-bounce.prom",
-              timeout=90,
-          )
-
-          # Smarthost recovery: the deferred message must DRAIN via the
-          # queue retry into Mailpit (bounded by the observed first-retry
-          # interval; capture-first: if this flakes, read the retry window
-          # from THIS subtest's log before touching the timeout).
-          relay.systemctl("start mailpit-catchall.service")
-          relay.wait_for_open_port(1025, timeout=60)
-          smtp.wait_until_succeeds(
-              "curl -fsS http://relay:8025/api/v1/messages "
-              "> /tmp/relay-messages3.json 2>&1 "
-              "&& grep -q '${bounceNeedle}' /tmp/relay-messages3.json",
-              timeout=300,
-          )
-
-      with subtest("bounce path: refusing smarthost defers, then drains on recovery"):
-          # Kill the smarthost (TCP refusal = the production outage shape).
-          # 0.16 accepts the message at SMTP (queue semantics) and must hold
-          # it deferred - never drop, never bounce while retryable. The
-          # assertions ride the Prometheus queue series + Mailpit only
-          # (journal greps are forbidden here: 0.16 is silent on this class).
-          relay.systemctl("stop mailpit-catchall.service")
-          smtp.succeed(
-              "swaks --timeout 120 --server 127.0.0.1:587 --tls --auth PLAIN "
-              "--auth-user user1@example.test --auth-password '${testPass}' "
-              "--from user1@example.test --to stranger@remote.example "
-              "--header 'Subject: bounce-e2e' --body '${bounceNeedle}' "
-              "> /tmp/swaks-bounce.log 2>&1"
-          )
-          smtp.succeed("cat /tmp/swaks-bounce.log >&2")
-          smtp.succeed("! grep -q '<\\*\\*' /tmp/swaks-bounce.log")
-
-          # Transcript-first: dump the FULL metrics body into the test log
-          # so the queue series names are transcribable from THIS run (same
-          # doctrine as stalwart-e2e's metrics subtest), then assert the
-          # deferred state on the observed series (file-based, never piped).
-          # DEBUG-RUN SHAPE: capture-only, no assertion yet.
-          smtp.succeed("sleep 5")
+          # 0.16 exposes NO queue-depth gauge - only counters (2026-10-26
+          # transcript: queue_authenticated_message_queued 2,
+          # queue_rescheduled 1 at +5 s with the smarthost down). The
+          # reschedule counter IS the deferred state: it ticks when the
+          # first delivery attempt fails and the queue schedules a retry
+          # (the 0.15 'Message rescheduled for delivery' journal line is
+          # gone in 0.16 - the metric carries its HELP text verbatim).
           smtp.succeed(
               "curl -fsS http://127.0.0.1:8080/metrics/prometheus "
               "-o /tmp/metrics-bounce.prom && cat /tmp/metrics-bounce.prom >&2"
+          )
+          smtp.wait_until_succeeds(
+              "curl -fsS http://127.0.0.1:8080/metrics/prometheus "
+              "-o /tmp/metrics-bounce.prom "
+              "&& grep -qE '^queue_rescheduled [1-9]' /tmp/metrics-bounce.prom",
+              timeout=90,
           )
 
           # Smarthost recovery: the deferred message must DRAIN via the
