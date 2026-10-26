@@ -353,9 +353,11 @@ in
           )
 
           # Smarthost recovery: the deferred message must DRAIN via the
-          # queue retry into Mailpit (bounded by the observed first-retry
-          # interval; capture-first: if this flakes, read the retry window
-          # from THIS subtest's log before touching the timeout).
+          # queue retry into Mailpit. Observed first-retry drain ~120 s
+          # (green run-3 transcript 2026-10-26) - the 300 s bound is 2.5x
+          # headroom; if this flakes, read THIS subtest's log (the retry
+          # window and the metrics dump are both in it) before touching
+          # the timeout.
           relay.systemctl("start mailpit-catchall.service")
           relay.wait_for_open_port(1025, timeout=60)
           smtp.wait_until_succeeds(
