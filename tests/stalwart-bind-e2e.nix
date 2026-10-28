@@ -206,8 +206,16 @@ in
         };
       };
 
+      # 60s ceiling (raised from 20s 2026-10-28): the refusal itself lands
+      # in ~10-20 s, but on a LOADED CI runner the guest can stall mid-boot
+      # (17 s journal gap in the v0.5.0 tag-run transcript) and a 20 s
+      # systemd timeout kills the unit BEFORE the identity check emits the
+      # named refusal - two consecutive tag-run reds with "Failed with
+      # result 'timeout'" and an empty refusal, while the same drv ran
+      # green locally. The ceiling only bounds the worst case; the
+      # driver-side wait_until_succeeds (120 s) still bounds the test.
       systemd.services.stalwart-provision.serviceConfig.TimeoutStartSec =
-        lib.mkForce "20s";
+        lib.mkForce "60s";
 
       virtualisation.memorySize = 1024;
     };
