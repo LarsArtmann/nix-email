@@ -9,8 +9,10 @@ claims after the fe132422 advance (stalwart_0_16 0.16.22 -> 0.16.26).
 - Demo VM (`nixosConfigurations.demo` via `extendModules`, FIFO console)
   on the existing demo disk; Stalwart **0.16.26** (`stalwart --version`
   in-guest). Host port **28080** -> guest 8080 (18080 was squatted by an
-  unrelated `webphone` process; the probe copy in this dir is the 10-19
-  script with only `PORT` changed - diff it to verify).
+  unrelated `webphone` process). The probe ran as the UNMODIFIED 10-19
+  suite plus the single port-line change - `probe-port.diff` is the
+  exact delta (kept as a diff, not a copied script: the corridor's
+  transcript-pinned artifacts stay single-sourced).
 - `stalwart-cpu-preflight.service` (new in the wrapper this session):
   **active, Result=success** on `-cpu max` — the first live proof of the
   x86-64-v2 preflight. Development note: the first boot caught a
@@ -33,6 +35,6 @@ rejection, ETag If-Match stale-412 + matching-2xx.
 
 ## Files
 
-- `carddav_probe.py` — the 10-19 suite, PORT=28080 only.
+- `probe-port.diff` — the exact delta vs the 10-19 suite (one line: PORT).
 - `carddav-probe.log` — full transcript (18 verdicts).
 - `vm-console-excerpt.log` — preflight/stalwart/version evidence.

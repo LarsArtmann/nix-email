@@ -1,0 +1,11 @@
+--- docs/probes/2026-10-19-carddav-demo-vm/carddav_probe.py	2026-10-20 09:48:55.924495601 +0200
++++ docs/probes/2026-10-28-carddav-01626/carddav_probe.py	2026-10-28 20:34:05.091097090 +0100
+@@ -24,7 +24,7 @@
+ import time
+ import xml.etree.ElementTree as ET
+ 
+-HOST, PORT = "127.0.0.1", 18080
++HOST, PORT = "127.0.0.1", 28080
+ USER = "demo@mail.demo.test"
+ PASS = "demo-nixemail-2026"
+ BOOK = f"kith-probe-{int(time.time())}"
