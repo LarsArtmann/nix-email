@@ -90,7 +90,12 @@ transcript-pinned dialect).
   since fe132422 (C45 SUPERSEDED - the overlay question dissolved when
   the pin itself shipped 0.16.26; x86-64-v2 absorbed in VMs by
   tests/common.nix `v2CpuPatches` = `-cpu max`, TCG-safe - real hosts
-  need a consumer-side v2 CPU check).
+  need a consumer-side v2 CPU check; the wrapper EVAL-GUARDS the import
+  via a `vmV2CpuPatched` marker set by v2CpuPatches - reading
+  `virtualisation.qemu.options` from assertions is structurally
+  recursive (its definition pulls system.build.toplevel, which renders
+  assertions), so the marker travels through a wrapper-own option and
+  the qemu presence is probed declarations-only via `options ?`).
 - flake-parts: FLOATING input (lock-pinned only - the fleet's control);
   `nixpkgs-lib.follows = "nixpkgs"` is NOT optional (a dropped follow
   smuggles a second nixpkgs into every consumer lock). Rejected without
@@ -136,6 +141,18 @@ transcript-pinned dialect).
   belong to the CONSUMER wrapper, not here.
 
 ## Working rules (learned the hard way)
+
+- systemd namespace semantics (three VM runs, 2026-10-28):
+  ReadWritePaths with the `-` prefix is evaluated ONCE at namespace
+  setup - a path that appears LATER (e.g. postfix's localMail maildir
+  at first delivery) never gets the rw bind and ProtectSystem=strict
+  keeps it read-only forever (silent Errno 30). And EVERY ExecStartPre
+  command is namespaced - the `+` prefix exempts only
+  user/group/credentials, NOT mounts, so a pre-creation step dies at
+  `226/NAMESPACE` before its command runs. Pre-create such paths via
+  systemd.tmpfiles (boot time) and whitelist UNPREFIXED so regressions
+  fail the unit loudly; the dmarc localMail contract is eval-pinned in
+  dmarc-eval's localMail-shape eval.
 
 - The 0.15 -> 0.16 store boundary is a POISON class (pbx outage
   2026-10-17): the 0.16 binary PANICS (exit 101) on a pre-0.16 store AND

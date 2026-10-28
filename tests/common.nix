@@ -52,8 +52,28 @@ in {
   # invalid) exposes the full TCG feature set incl. v2, and works
   # under KVM too. aarch64 guests don't need it (no v2 concept) and
   # the VM-test set is x86_64-only anyway.
+  #
+  # The module also marks services.mail-server.vmV2CpuPatched = true
+  # (guarded: only when the wrapper module is in the same evaluation)
+  # - the wrapper's x86-64-v2 eval-time assertion consumes the marker
+  # (reading the qemu option value from assertions is impossible:
+  # infinite recursion via system.build.toplevel, proven 2026-10-28).
+  # A node running 0.16 WITHOUT this import fails at EVAL, not 30
+  # minutes later at boot.
   v2CpuPatches = {
-    virtualisation.qemu.options = ["-cpu" "max"];
+    config,
+    lib,
+    options,
+    ...
+  }: {
+    config = lib.mkMerge [
+      {
+        virtualisation.qemu.options = ["-cpu" "max"];
+      }
+      (lib.mkIf (options ? services.mail-server.vmV2CpuPatched) {
+        services.mail-server.vmV2CpuPatched = true;
+      })
+    ];
   };
 
   # Real DMARC aggregate report sample (upstream parsedmarc, the same
