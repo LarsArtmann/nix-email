@@ -15,12 +15,13 @@
   # The fleet-verified nixpkgs pin (compat doctrine, AGENTS.md
   # Conventions). SystemNix floats `nixos-unstable`, so its lock moves
   # autonomously (auto-daemon); this constant is the rev both locks
-  # shared at the last coordinated advance (2026-09-22: SystemNix lock
-  # 6774f7bc, presence list re-verified: stalwart 0.15.5, parsedmarc
-  # 11.0.1, mailpit 1.31.1, swaks 20240103.0, imapsync 2.314). When the
+  # shared at the last coordinated advance (2026-10-28: SystemNix lock
+  # fe132422, presence list re-verified: stalwart_0_16 0.16.26,
+  # parsedmarc 11.0.2 (imapclient 4.1.0), mailpit 1.31.4, swaks
+  # 20240103.0, imapsync 2.314, stalwart-cli 1.0.13). When the
   # guard fires, the fleet has moved: diff the two flake.locks, re-run
   # the presence list, advance BOTH, then update this constant.
-  fleetNixpkgsPin = "6774f7bc253789b113a4f39285dc0fa100abeacc";
+  fleetNixpkgsPin = "fe13242281a67641c0102cdb1087f0ebe586c7df";
 
   nixpkgsNode = lockFile.nodes.nixpkgs or (throw "flake.lock has no nixpkgs node");
 

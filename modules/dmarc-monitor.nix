@@ -1,5 +1,5 @@
 # Thin opinionated wrapper around the nixpkgs parsedmarc module
-# (services.parsedmarc - 11.0.1).
+# (services.parsedmarc - 11.0.2 at the fe132422 pin).
 #
 # PURPOSE: close the domains-repo findings H1/H2 ("no rua anywhere - the
 # reject domains enforce blindly") with a deliberately LIGHT footprint:
@@ -8,7 +8,9 @@
 # Elasticsearch/OpenSearch/Splunk - those are the heavy default sinks and
 # their provision flags stay off.
 #
-# VERIFIED FACTS this module is built on (parsedmarc 11.0.1 source):
+# VERIFIED FACTS this module is built on (parsedmarc 11.0.1 source;
+# the pin ships 11.0.2 - same ini contract, fixture-verified via
+# scripts/host-parse-fixture.py):
 #   - [general] `output` is the ini key for the report output directory
 #     (cli.py reads general_config["output"]).
 #   - There is NO SQLite sink. JSON/CSV files are the zero-dependency
@@ -31,15 +33,10 @@
 }: let
   cfg = config.services.dmarc-monitor;
 
-  # Compatibility pin (README ledger 2026-09-15; re-check procedure:
-  # README "Pin-advance runbook"): imapclient `starttls()` assigns
-  # the read-only-since-python-3.14 `IMAP4.file`, so parsedmarc crashes
-  # at its first IMAP connect (AttributeError, exit 255) on the py3.14
-  # scope; the py3.13 build works there. Current pin `6774f7bc` ships
-  # imapclient 4.0.1 on BOTH pythons (`nix eval` 2026-09-22), and 4.0.1
-  # is still broken. Revert when nixpkgs ships imapclient >= 4.1.0 (the
-  # fix release: mjs/imapclient#663 MERGED 2026-09-18).
-  parsedmarcPackage = pkgs.python313Packages.parsedmarc;
+  # (The py3.13 parsedmarcPackage pin was REVERTED 2026-10-28: the
+  # fe132422 pin ships imapclient 4.1.0 with the starttls() fix,
+  # mjs/imapclient#663 - the module's own pkgs.parsedmarc ExecStart is
+  # correct again. History: README ledger + "Pin-advance runbook".)
 in {
   options.services.dmarc-monitor = {
     enable = lib.mkEnableOption "DMARC/TLS-RPT report collection via parsedmarc (IMAP polling, JSON/CSV output, no search-stack dependency)";
@@ -103,7 +100,9 @@ in {
       enable = true;
       provision = {
         # Heavy sinks stay OFF - this module's whole point is lightness.
-        elasticsearch = lib.mkDefault false;
+        # (opensearch since the fe132422 pin: nixpkgs PR #566282 renamed
+        # provision.elasticsearch away with mkRemovedOptionModule.)
+        opensearch = lib.mkDefault false;
         geoIp = lib.mkDefault false;
       };
       settings = lib.mkMerge [
@@ -141,34 +140,26 @@ in {
       RestrictRealtime = lib.mkDefault true;
       RestrictSUIDSGID = lib.mkDefault true;
       SystemCallArchitectures = lib.mkDefault "native";
-      # Compatibility pin (see parsedmarcPackage above): the module hardcodes
-      # ${lib.getExe pkgs.parsedmarc} (the py3.14 env). Same parsedmarc
-      # version, same CLI, same ini contract - only the interpreter moves.
-      ExecStart = lib.mkForce "${parsedmarcPackage}/bin/parsedmarc -c /run/parsedmarc/parsedmarc.ini";
       # WORKAROUND (nixpkgs bug, README ledger 2026-09-15; retirement
       # procedure: README "Pin-advance runbook"): with
-      # provision.elasticsearch = false the module's settings submodule
-      # still materializes elasticsearch.cert_path (types.path, defaults
-      # to the CA bundle) and .ssl (types.bool); both survive the module's
-      # null/[]/{} filter, so the rendered ini carries an [elasticsearch]
-      # section WITHOUT hosts and parsedmarc 11 refuses to start
-      # ("hosts setting missing from the elasticsearch config section",
-      # cli.py ConfigurationError). Neither key can be nulled through the
-      # option types, so strip the section from the RENDERED ini after the
-      # module's own ExecStartPre. Guarded: a real [elasticsearch] (ES
-      # provisioned) must survive.
-      # UPSTREAM (merged 2026-10-13, nixpkgs PR #566282; NOT in our pin
-      # yet): master renamed the option to provision.opensearch (default
-      # TRUE, mkRemovedOptionModule throws on the old name) - the first
-      # pin past it breaks BOTH the mkDefault above and this guard, and
-      # the host-less section reappears as [opensearch] (bug persists,
-      # #563651 still open). Port procedure: README "Pin-advance runbook"
-      # step 2.
-      ExecStartPre = lib.mkIf (!config.services.parsedmarc.provision.elasticsearch) (
+      # provision.opensearch = false the module's settings submodule
+      # still materializes opensearch.cert_path (types.path, defaults
+      # to the CA bundle) and .ssl (types.bool, false); both survive
+      # the module's null/[]/{} filter, so the rendered ini carries an
+      # [opensearch] section WITHOUT hosts and parsedmarc 11 refuses to
+      # start (ConfigurationError, "hosts setting missing" - the
+      # elasticsearch-era message shape). Neither key can be nulled
+      # through the option types, so strip the section from the RENDERED
+      # ini after the module's own ExecStartPre. Guarded: a real
+      # [opensearch] (OpenSearch provisioned) must survive.
+      # PORTED 2026-10-28 at the fe132422 pin advance (PR #566282
+      # renamed the option; the host-less-section bug persists as
+      # [opensearch], nixpkgs #563651 still open).
+      ExecStartPre = lib.mkIf (!config.services.parsedmarc.provision.opensearch) (
         lib.mkAfter [
-          (pkgs.writeShellScript "parsedmarc-strip-elasticsearch-section" ''
+          (pkgs.writeShellScript "parsedmarc-strip-opensearch-section" ''
             set -eu
-            ${pkgs.gawk}/bin/awk '/^\[/{keep = ($0 != "[elasticsearch]")} keep' \
+            ${pkgs.gawk}/bin/awk '/^\[/{keep = ($0 != "[opensearch]")} keep' \
               /run/parsedmarc/parsedmarc.ini > /run/parsedmarc/parsedmarc.ini.tmp
             ${pkgs.coreutils}/bin/mv /run/parsedmarc/parsedmarc.ini.tmp \
               /run/parsedmarc/parsedmarc.ini

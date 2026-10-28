@@ -6,13 +6,20 @@
     # services.stalwart runs Stalwart 0.16.x via pkgs.stalwart_0_16 +
     # the VENDORED 0.16 module (modules/stalwart-module/, from nixpkgs
     # PR #552103 - nixpkgs' own stalwart.nix is still the 0.15 module at
-    # this rev and is disabledModules-swapped by our wrapper).
-    # Also verified present at this rev: services.parsedmarc 11.0.1,
-    # services.mailpit, swaks 20240103.0, imapsync 2.314, stalwart-cli
-    # 1.0.12 (the provision CLI - must stay >= 1.0.2).
-    # ADVANCED 2026-09-22 eaad0894 -> 6774f7bc to track SystemNix's lock
-    # (their nixpkgs floats nixos-unstable).
-    nixpkgs.url = "github:NixOS/nixpkgs/6774f7bc253789b113a4f39285dc0fa100abeacc";
+    # this rev (pkgs.stalwart = 0.15.5, PR OPEN 2026-10-28) and is
+    # disabledModules-swapped by our wrapper.
+    # Verified present at this rev (nix eval 2026-10-28): stalwart_0_16
+    # 0.16.26 (x86_64 needs x86-64-v2 - VMs set -cpu max, see
+    # tests/common.nix v2CpuPatches), parsedmarc 11.0.2 (py3.14,
+    # imapclient 4.1.0 - the starttls() pin is REVERTED), services.mailpit
+    # 1.31.4, swaks 20240103.0, imapsync 2.314, stalwart-cli 1.0.13 (the
+    # provision CLI - must stay >= 1.0.2). PR #566282 (parsedmarc
+    # OpenSearch switch) IS in this pin: provision.elasticsearch is
+    # mkRemovedOptionModule - the wrapper ports to provision.opensearch.
+    # ADVANCED 2026-10-28 6774f7bc -> fe132422 to track SystemNix's lock
+    # (their nixpkgs floats nixos-unstable; they moved first - their
+    # follows already forced this rev onto the wrapper's contract check).
+    nixpkgs.url = "github:NixOS/nixpkgs/fe13242281a67641c0102cdb1087f0ebe586c7df";
 
     # flake-parts (SystemNix / nix-international-telephony pattern).
     # nixpkgs-lib follows OUR pinned nixpkgs, so perSystem's `lib` special

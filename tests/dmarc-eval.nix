@@ -10,7 +10,7 @@
 #
 # The unit-hardening readout (DynamicUser / SystemCallFilter /
 # RestrictAddressFamilies) is a DROP detector for pin advances: the
-# nixpkgs module owns that hardening (pin 6774f7bc, parsedmarc.nix), and
+# nixpkgs module owns that hardening (pin fe132422, parsedmarc.nix), and
 # a pin move that silently drops it must fail HERE, not in production.
 # Additions (stricter than the pin) deliberately pass - only drops fail.
 {
@@ -69,7 +69,7 @@
   rendered = builtins.toJSON {
     enabled = cfg.services.parsedmarc.enable;
     settings = cfg.services.parsedmarc.settings;
-    elasticsearch = cfg.services.parsedmarc.provision.elasticsearch;
+    opensearch = cfg.services.parsedmarc.provision.opensearch;
     geoIp = cfg.services.parsedmarc.provision.geoIp;
     stateDirectory = unit.StateDirectory;
     execStart = unit.ExecStart;
@@ -78,8 +78,8 @@
     inherit parsedmarcVersion;
   };
 
-  # Regression guard for the [elasticsearch]-section workaround (README
-  # ledger 2026-09-15): the ExecStartPre list must hold the module's own
+  # Regression guard for the [opensearch]-section workaround (README
+  # ledger 2026-09-15, ported 2026-10-28): the ExecStartPre list must hold the module's own
   # ini-writing step AND the wrapper's strip script, with the strip LAST -
   # the strip must therefore run AFTER the module rendered the ini. lib.last
   # is an ordering proof only while the list has both entries (on a single
@@ -122,16 +122,16 @@ in
         ''
           grep -q '"enabled":true' "$renderedPath"
           grep -q '"output":"/var/lib/parsedmarc/reports"' "$renderedPath"
-          grep -q '"elasticsearch":false' "$renderedPath"
+          grep -q '"opensearch":false' "$renderedPath"
           grep -q '"geoIp":false' "$renderedPath"
           grep -q '"_secret":"/nix/store' "$renderedPath"
           grep -q '"offline":true' "$renderedPath"
           grep -q '"stateDirectory":"parsedmarc"' "$renderedPath"
-          grep -q 'python3.13-parsedmarc' "$renderedPath"
+          grep -q 'python3.14-parsedmarc-11.0.2' "$renderedPath"
           grep -q '"dynamicUser":true' "$renderedPath"
           grep -q '"~@privileged"' "$renderedPath"
           grep -q '"AF_INET6"' "$renderedPath"
-          grep -q '\[elasticsearch\]' "$stripScript"
+          grep -q '\[opensearch\]' "$stripScript"
           grep -q 'keep' "$stripScript"
           grep -q 'dmarc-monitor' "$optionsCommonMark"
           grep -q 'RETENTION' "$optionsCommonMark"
