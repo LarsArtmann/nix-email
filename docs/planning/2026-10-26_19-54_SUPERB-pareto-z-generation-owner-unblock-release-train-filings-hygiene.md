@@ -8,6 +8,15 @@
      A). New rows surfaced by the 2026-10-26 session are harvested into
      TODO_LIST by this plan (Appendix B). -->
 
+> **UPDATE 2026-10-28 (pin advance fe132422, owner-facing):** C1 is
+> EXECUTED (the #566282 elasticsearch->opensearch port landed with the
+> advance). **C45 has DISSOLVED** - the pin itself now ships
+> `stalwart_0_16` 0.16.26, so "stay on the pin's 0.16.22 vs overlay"
+> has no live branch: the O2 sitting agenda shrinks by one decision,
+> and C2's "OR C45 overlay execution" alternative is moot (only the
+> #552103-retirement branch remains). C43 (v0.5.0 cut doctrine) is
+> UNCHANGED and still owner-gated.
+
 # Z-generation: through the owner unblock to the 0.16 fleet (Pareto plan)
 
 ## 0. State of the world (verified 2026-10-26 19:5x CEST)

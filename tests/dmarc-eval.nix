@@ -80,6 +80,9 @@
       ../modules/dmarc-monitor.nix
       {
         system.stateVersion = "26.05";
+        # localMail.hostname defaults to networking.fqdn - give the
+        # eval a determinable one (NixOS asserts otherwise).
+        networking.fqdn = "localhost";
         services.dmarc-monitor.enable = true;
         services.parsedmarc.provision.localMail.enable = true;
       }

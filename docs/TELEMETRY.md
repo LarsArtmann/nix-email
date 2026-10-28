@@ -9,7 +9,8 @@ fit together, and a recommended baseline that avoids the known footguns.
 > model (WebUI `Settings › Telemetry` objects: `Tracer`, `Metrics`,
 > `WebHook`, `Alert`, `TracingStore`, `MetricsStore`, `DataRetention`,
 > `EventTracingLevel`). **This repo ran Stalwart 0.15.5 when this was
-> written; 0.16.22 landed in tree 2026-10-17** (vendored module) - the
+> written; 0.16.22 landed in tree 2026-10-17** (vendored module; the pin
+> has shipped **0.16.26** since the 2026-10-28 fe132422 advance) - the
 > version-skew caveat below still applies and the 0.16 keys need a
 > binary spot-check before wiring (TODO_LIST row — see README ledger).
 > Exact TOML key paths under `services.stalwart.settings` must be verified
