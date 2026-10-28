@@ -128,7 +128,21 @@ in {
       StateDirectory = lib.mkDefault "parsedmarc";
       # "-" prefix: the directory may not exist until parsedmarc's first
       # makedirs() - a missing path must not fail the unit at start.
-      ReadWritePaths = ["-${cfg.outputDirectory}"];
+      #
+      # localMail (fe132422+ shape, PR #566282): the provision watches a
+      # MAILDIR inside postfix's spool, and parsedmarc's maildir source
+      # CREATES .Archive/.Invalid/... folders there at connect time
+      # (mailbox.Maildir.create_folder -> mailsuite). ProtectSystem=strict
+      # below makes the spool read-only and the mkdir dies
+      # (OSError Errno 30 '/var/spool/mail/<user>/.Archive', VM transcript
+      # 2026-10-28) - so the provision's own storage is whitelisted,
+      # mirroring the path expression the module renders into
+      # settings.maildir.maildir_path.
+      ReadWritePaths =
+        ["-${cfg.outputDirectory}"]
+        ++ lib.optionals config.services.parsedmarc.provision.localMail.enable [
+          "-${config.services.postfix.settings.main.mail_spool_directory}/${config.services.parsedmarc.provision.localMail.recipientName}"
+        ];
       # parsedmarc writes reports and nothing else: a read-only FS (with the
       # StateDirectory auto-whitelisted by systemd) plus the remaining
       # namespace/privilege restrictions the upstream unit omits.
