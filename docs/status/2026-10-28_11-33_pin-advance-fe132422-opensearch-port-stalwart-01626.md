@@ -184,7 +184,7 @@
     gap once proven by the rerun.
 14. Sweep remaining `0.16.22`-as-current mentions in corridor LIVE docs
     (dated evidence stays; only current-tense claims change) — CONTRIBUTING
-    + TELEMETRY spot-check.
+    - TELEMETRY spot-check.
 15. If parsedmarc-e2e still red: read the new traceback FIRST (the two prior
     reds were both precisely diagnosable from the journal; no guessing).
 16. Update FEATURES.md parsedmarc-e2e row to the new two-shape architecture
