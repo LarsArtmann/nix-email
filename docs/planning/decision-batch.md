@@ -323,6 +323,13 @@ is the fleet pin, but the call stays owner-gated.
 
 ### C43 — v0.5.0 release doctrine: ship the vendored module, or wait?
 
+> **VERDICT 2026-10-28 (owner): CUT.** v0.5.0 was released the same day
+> (tag at `6295ce5`, tag-CI green, GitHub release published) after the
+> fe132422 pin advance landed with gate + buildflow green. Context drift
+> since this entry was written: SystemNix now FLOATS master rather than
+> hard-pinning release tags, so the tag is traceability, not a
+> deployment gate - the [rec] rationale stands unchanged.
+
 The 0.16 upgrade VENDORS nixpkgs PR #552103 (rev `9b15e1f`) under
 `modules/stalwart-module/` with two documented patches (meta.doc dropped;
 `partOf` dropped + `ExecStartPost` stalwart restart). SystemNix hard-pins

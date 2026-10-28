@@ -17,7 +17,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
-- Nothing yet.
+- `stalwart-bind-e2e` guarded-node flake (2026-10-28, caught by the
+  v0.5.0 tag CI): the subtest shortened `stalwart-provision`'s
+  `TimeoutStartSec` to 20 s, but on a loaded CI runner a mid-boot guest
+  stall can exceed that before the identity check emits its NAMED
+  refusal - the unit then dies a bare systemd timeout and the subtest
+  fails on a missing line (two consecutive tag-run reds while the same
+  derivation ran green locally; the master run of the same commit was a
+  cache hit and never executed the check). Ceiling raised to 60 s: the
+  refusal still lands in 10-20 s, the driver-side wait still bounds the
+  test at 120 s. Included in the re-tagged v0.5.0 (the original tag was
+  moved BEFORE the release was published - never after).
 
 ## [0.5.0] - 2026-10-28
 

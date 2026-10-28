@@ -331,3 +331,46 @@ Honesty addendum to (d): the `rg -r` hook trap fired a FOURTH time on this
 host this session (`rg -rln` during the defaults research — blocked, no
 damage; the rule is in AGENTS.md AND was in context. Muscle memory is the
 enemy).
+
+## Appendix 2 — owner verdicts executed (2026-10-28 ~21:50 CET)
+
+The g-questions were answered mid-session; everything below is
+transcript-backed.
+
+1. **g/3 CardDAV probe: RUN — 17/18 PASS on 0.16.26, baseline reproduced**
+   (the one FAIL is the identical T04.4 server fact). Demo VM booted via
+   `extendModules` on host port 28080 (18080 squatted by an unrelated
+   `webphone` process — not ours to kill); transcripts +
+   `probe-port.diff` (the exact one-line delta vs the 10-19 suite) in
+   `docs/probes/2026-10-28-carddav-01626/`; INBOXCLEAN + README +
+   FEATURES re-pinned; TODO row 104 closed (re-arms at next bump).
+2. **g/2 v2 fleet guard: HANDLED — upstream, in the wrapper.**
+   `stalwart-cpu-preflight.service` (boot-time oneshot, Before= +
+   RequiredBy= stalwart, glibc v2 flag set) in `modules/mail-server.nix`:
+   every consumer inherits it (SystemNix wrapper, pbx direct import,
+   demo); SystemNix needs NO local copy. The demo boot caught a real
+   false positive before any gate ran (SSE3 is `pni` in /proc/cpuinfo —
+   the substring "sse3" only ever appears inside "ssse3") and the fix is
+   live-proven (preflight Result=success, stalwart active, 0.16.26).
+3. **g/1 C43: CUT — v0.5.0 RELEASED.** Procedure per CONTRIBUTING:
+   A1 CHANGELOG audit clean -> cut commit `06ab701` (rename + SECURITY
+   bump, same-call commit) -> A2 release-tree proof (flake check EXIT:0,
+   buildflow EXIT:0 after replacing the jscpd-flagged archived probe
+   script copy with `probe-port.diff`) -> tag -> push -> **tag CI red
+   TWICE** (bind-e2e `guarded`: 20s TimeoutStartSec killed provision
+   before the named refusal on a stalled CI boot; the master run of the
+   same commit was a CACHE HIT and never executed it - "green" was not
+   execution) -> fix (ceiling 60s, local green) -> **tag MOVED to the
+   fix commit BEFORE the release existed** (delete + re-tag + push,
+   never after publish) -> **tag CI GREEN** -> `gh release create`
+   (not draft, Latest, pin-evidence footer: rev fe132422, narHash
+   advanced from v0.4.0 by design). C43 verdict recorded in
+   decision-batch; z-gen banner updated (A-lane executed, A3 skipped in
+   favor of the real cut).
+4. **#563651: ON HOLD per owner** (draft review before posting) -
+   recorded in TODO row 100. gh auth is LIVE again (z-gen O1 satisfied).
+5. Lesson harvested: a CI "green" that is a cache hit is NOT execution
+   evidence for a NEW derivation - the release gate must read the run's
+   step LOGS (build lines present), not just the conclusion. The
+   tag-run reds were only visible because the tag run missed the cache
+   the master run hit.

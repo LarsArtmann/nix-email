@@ -25,8 +25,10 @@ DMARC/TLS-RPT monitor, packaged as a NixOS flake for consumption by
 > State at this banner's date: **GATE GREEN** - `nix flake check`
 > passes the full check set on 0.16.26/11.0.2 (stalwart-e2e,
 > parsedmarc-e2e both ends, bind/migrate/relay re-proven at the pin;
-> buildflow EXIT:0 same day). Release vehicle remains the owner-gated
-> v0.5.0 (C43).
+> buildflow EXIT:0 same day). **v0.5.0 was CUT this same day** (owner
+> verdict C43: cut) - tagged, tag-CI green, GitHub release published;
+> the CardDAV probe baseline re-pinned on 0.16.26 (17/18 reproduced,
+> `docs/probes/2026-10-28-carddav-01626/`).
 >
 > - live status in
 >   [TODO_LIST.md](TODO_LIST.md), the transcript-pinned fact set in the

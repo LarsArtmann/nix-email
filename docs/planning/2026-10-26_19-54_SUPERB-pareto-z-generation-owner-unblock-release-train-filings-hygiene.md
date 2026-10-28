@@ -14,8 +14,13 @@
 > `stalwart_0_16` 0.16.26, so "stay on the pin's 0.16.22 vs overlay"
 > has no live branch: the O2 sitting agenda shrinks by one decision,
 > and C2's "OR C45 overlay execution" alternative is moot (only the
-> #552103-retirement branch remains). C43 (v0.5.0 cut doctrine) is
-> UNCHANGED and still owner-gated.
+> #552103-retirement branch remains). **C43 is ANSWERED (owner verdict:
+> CUT) - v0.5.0 was released 2026-10-28** (tag `6295ce5`, tag-CI green,
+> GitHub release published): the A-lane (A1/A2 release-tree proof, A4
+> cut+push, A5 banner) is EXECUTED; A3 (scratch-tag dry-run) was
+> skipped in favor of the real thing. O1 (gh auth) also HAPPENED - the
+> F-lane filings are unblocked (the #563651 follow-up is ON HOLD per
+> owner verdict pending draft review).
 
 # Z-generation: through the owner unblock to the 0.16 fleet (Pareto plan)
 
