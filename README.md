@@ -763,10 +763,13 @@ starts at `/.well-known/carddav`; addressbooks are MKCOL-able collections
 under `/dav/card/<address>/<book>/`; JMAP contacts speak
 `urn:ietf:params:jmap:contacts` at the session's `apiUrl`. The full
 chain (discovery, CRUD, conditional PUT, multiget, addressbook-query,
-sync-collection) is probe-verified on the deployed 0.16.22 pin —
-transcripts and the server-dialect notes that bit the first mirror
-(`If-Match` REQUIRED on overwrite, `no-uid-conflict`, async ingestion,
-sync-level 1) live in `docs/probes/2026-10-19-carddav-demo-vm/README.md`.
+sync-collection) is probe-verified on the deployed 0.16.26 pin
+(re-baselined 2026-10-28 after the fe132422 advance: 17/18 PASS, the
+0.16.22 baseline reproduced unchanged — transcripts
+`docs/probes/2026-10-28-carddav-01626/`; the original run and the
+server-dialect notes that bit the first mirror (`If-Match` REQUIRED on
+overwrite, `no-uid-conflict`, async ingestion, sync-level 1) live in
+`docs/probes/2026-10-19-carddav-demo-vm/README.md`).
 No webmail frontend ships in the package (verified-facts ledger below) —
 the contacts story is the API surface; the Kith CRM out-mirror consumes
 exactly this.
@@ -788,10 +791,12 @@ json/yaml/markdown.
 
 > **PIN RIDE-ALONG 2026-10-28**: the fe132422 advance moved the binary
 > 0.16.22 -> 0.16.26 (delta table above). Re-verified on 0.16.26:
-> provision-plan-eval (object shapes/typecheck) and the stalwart-e2e
-> VM run (this sitting's transcript). The transcript-pinned facts below
-> date to 0.16.22 unless re-marked; the CardDAV/contacts probe baseline
-> (17/18 PASS) is 0.16.22-era and re-runs per TODO_LIST.
+> provision-plan-eval (object shapes/typecheck), the stalwart-e2e VM run,
+> the full parsedmarc-e2e suite, and the CardDAV probe baseline (17/18
+> PASS reproduced unchanged; `docs/probes/2026-10-28-carddav-01626/`).
+> The remaining transcript-pinned facts below date to 0.16.22 unless
+> re-marked (a JMAP-specific probe re-run is NOT done - only the CardDAV
+> surface was re-proven; re-run at the next bump that touches JMAP).
 
 - **JMAP session endpoint moved**: `GET /jmap` -> 404 for everyone; session = `/.well-known/jmap` -> 307 (`location: /jmap/session`) -> 200 authed.
   ANONYMOUS session requests return 200 with `primaryAccounts: {}` (NOT
