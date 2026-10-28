@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Nothing yet.
+
+### Changed
+
+- Nothing yet.
+
+### Fixed
+
+- Nothing yet.
+
+## [0.5.0] - 2026-10-28
+
+### Added
+
 - `stalwart-cpu-preflight.service` (owner verdict 2026-10-28 "handle now"):
   a boot-time oneshot on x86_64 that verifies the glibc x86-64-v2 flag set
   (cx16, lahf_lm, popcnt, pni/SSE3, sse4_1, sse4_2, ssse3) BEFORE

@@ -4,7 +4,7 @@
 
 | Version | Supported  |
 | ------- | ---------- |
-| v0.4.0  | ✅ Current |
+| v0.5.0  | ✅ Current |
 
 Only the latest release receives security fixes. Please update to the latest
 version before reporting issues found in older releases.
