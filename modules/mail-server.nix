@@ -646,12 +646,19 @@ in {
             esac
           done < /proc/cpuinfo
           missing=""
-          for f in cx16 lahf_lm popcnt sse3 sse4_1 sse4_2 ssse3; do
+          for f in cx16 lahf_lm popcnt sse4_1 sse4_2 ssse3; do
             case " $flags " in
               *" $f "*) ;;
               *) missing="$missing $f" ;;
             esac
           done
+          # SSE3 is named "pni" in /proc/cpuinfo (the kernel never emits a
+          # standalone "sse3" token - the substring only ever appears inside
+          # "ssse3"; caught live on the demo VM, 2026-10-28). Accept either.
+          case " $flags " in
+            *" pni "*|*" sse3 "*) ;;
+            *) missing="$missing sse3(pni)" ;;
+          esac
           if [ -n "$missing" ]; then
             echo "stalwart-cpu-preflight: CPU lacks x86-64-v2 flags:$missing" >&2
             echo "  Stalwart 0.16.26+ (x86_64 builds) requires x86-64-v2 and would SIGILL at start." >&2

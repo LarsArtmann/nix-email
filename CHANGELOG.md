@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- `stalwart-cpu-preflight.service` (owner verdict 2026-10-28 "handle now"):
+  a boot-time oneshot on x86_64 that verifies the glibc x86-64-v2 flag set
+  (cx16, lahf_lm, popcnt, pni/SSE3, sse4_1, sse4_2, ssse3) BEFORE
+  `stalwart.service` starts (Before= + RequiredBy=), so a pre-v2 host gets
+  a named-flags refusal instead of a bare SIGILL from the 0.16.26 binary
+  (the fe132422 pin advance made the v2 requirement live for every real
+  host rebuild). Lives in the wrapper so ALL consumers inherit it
+  (SystemNix's wrapper module, pbx's direct import, the demo); aarch64
+  skips. Live-caught and fixed on the demo VM during development:
+  /proc/cpuinfo names SSE3 as `pni` (the substring "sse3" only ever
+  appears inside "ssse3" - a naive token check false-fires and blocks the
+  stack on perfectly capable hardware).
 - ARF ingest subtest in `stalwart-e2e` (2026-10-26, closes C42's LAST
   evidence gap): an RFC 5965 `message/feedback-report` carrying
   `Feedback-Type: auth-failure`, mailed from an unauthenticated session
