@@ -1,7 +1,9 @@
 # Eval-time contract test for modules/dmarc-monitor.nix: the wrapper must
 # (a) flip services.parsedmarc.enable, (b) keep the heavy sinks off, and
 # (c) land general.output in the rendered settings with consumer settings
-# still mergeable. Pure eval - no VM, no services started.
+# still mergeable. Pure eval - no VM, no services started. TWO evals: the
+# IMAP-shape contract below, and (since the fe132422 pin) a localMail-shape
+# STORAGE contract - see localMailEval.
 #
 # The wrapper's contract is verified against parsedmarc 11 semantics
 # ([imap] connection section, `_secret` paths, no SQLite sink). Pin the
@@ -60,6 +62,36 @@
   cfg = eval.config;
   unit = cfg.systemd.services.parsedmarc.serviceConfig;
 
+  # localMail-shape eval (fe132422+): the wrapper-vs-module STORAGE
+  # contract, asserted at eval time so the OSError Errno 30 class
+  # dies here in seconds instead of a 25-minute VM red. Under
+  # provision.localMail the module renders settings.maildir
+  # .maildir_path into postfix's spool; the wrapper must (1)
+  # whitelist EXACTLY that path UNPREFIXED (a "-"/ignore-missing
+  # entry is evaluated once at namespace setup - a path absent at
+  # exec time is silently skipped and the spool stays read-only under
+  # ProtectSystem=strict forever; the maildir only exists once
+  # postfix delivers, which races unit start - two VM transcripts
+  # 2026-10-28) and (2) PRE-CREATE it via a privileged ExecStartPre
+  # ("+" = outside the sandbox, before ExecStart's namespace setup).
+  localMailEval = nixpkgs.lib.nixosSystem {
+    inherit system;
+    modules = [
+      ../modules/dmarc-monitor.nix
+      {
+        system.stateVersion = "26.05";
+        services.dmarc-monitor.enable = true;
+        services.parsedmarc.provision.localMail.enable = true;
+      }
+    ];
+  };
+
+  localMailUnit = localMailEval.config.systemd.services.parsedmarc.serviceConfig;
+  localMailExecStartPre = localMailUnit.ExecStartPre;
+  # The module's own rendered path (its expression, quoted back): the
+  # wrapper's whitelist must match it string-for-string.
+  moduleMaildirPath = localMailEval.config.services.parsedmarc.settings.maildir.maildir_path;
+
   # Options-docs rendering drift check (never built before 2026-09-16):
   # the options doc is grepped BUILD-TIME (below) - referencing its store
   # path does not force the derivation during eval (the old readFile/
@@ -76,6 +108,15 @@
     dynamicUser = unit.DynamicUser;
     inherit (unit) SystemCallFilter RestrictAddressFamilies;
     inherit parsedmarcVersion;
+  };
+
+  renderedLocalMail = builtins.toJSON {
+    readWritePaths = lib.toList localMailUnit.ReadWritePaths;
+    execStartPre = localMailExecStartPre;
+    dynamicUser = localMailUnit.DynamicUser;
+    user = localMailUnit.User;
+    maildir = localMailEval.config.services.parsedmarc.settings.maildir;
+    mailboxWatch = localMailEval.config.services.parsedmarc.settings.mailbox.watch;
   };
 
   # Regression guard for the [opensearch]-section workaround (README
@@ -103,6 +144,12 @@
     "AF_INET"
     "AF_INET6"
   ];
+  localMailReadWriteOk = builtins.elem moduleMaildirPath (lib.toList localMailUnit.ReadWritePaths);
+  localMailDashRegression = builtins.elem "-${moduleMaildirPath}" (lib.toList localMailUnit.ReadWritePaths);
+  localMailHasPrepareStep =
+    builtins.any
+    (entry: lib.isString entry && lib.hasInfix "parsedmarc-prepare-local-maildir" entry)
+    localMailExecStartPre;
 in
   assert versionOk || throw "dmarc-monitor contract is verified against parsedmarc >= 11 (got ${parsedmarcVersion}) - re-verify the [imap]/_secret/output semantics before touching the floor.";
   assert lib.isList execStartPre || throw "dmarc-eval: parsedmarc ExecStartPre is not a list - lib.last would return a character, not the strip script; re-verify the unit shape.";
@@ -110,12 +157,18 @@ in
   assert unit.DynamicUser == true || throw "dmarc-eval: the pinned parsedmarc module dropped DynamicUser hardening (got ${toString unit.DynamicUser}) - re-verify the unit sandbox before advancing the pin.";
   assert syscallDrops == [] || throw "dmarc-eval: the pinned parsedmarc module dropped SystemCallFilter entries ${toString syscallDrops} (has ${toString unit.SystemCallFilter}) - re-verify the unit sandbox before advancing the pin.";
   assert familyDrops == [] || throw "dmarc-eval: the pinned parsedmarc module dropped RestrictAddressFamilies entries ${toString familyDrops} (has ${toString unit.RestrictAddressFamilies}) - re-verify the unit sandbox before advancing the pin.";
+  assert lib.isList localMailExecStartPre || throw "dmarc-eval: localMail ExecStartPre is not a list - re-verify the unit shape.";
+  assert builtins.length localMailExecStartPre >= 3 || throw "dmarc-eval: under localMail ExecStartPre must hold the module's ini step + the maildir preparation + the strip script (>= 3, got ${toString (builtins.length localMailExecStartPre)}) - f/17 shape check.";
+  assert localMailReadWriteOk || throw "dmarc-eval: under provision.localMail the wrapper must whitelist the module's maildir (${moduleMaildirPath}) in ReadWritePaths - ProtectSystem=strict makes the spool read-only and parsedmarc's .Archive mkdirs die with OSError Errno 30 (VM transcripts 2026-10-28).";
+  assert !localMailDashRegression || throw "dmarc-eval: the localMail ReadWritePaths entry must NOT carry the '-' ignore-missing prefix - the whitelist is evaluated once at namespace setup and the maildir (postfix creates it at first delivery) is missing at unit start, so a '-' entry silently leaves the spool read-only (two VM transcripts 2026-10-28).";
+  assert localMailHasPrepareStep || throw "dmarc-eval: the privileged maildir-preparation ExecStartPre (parsedmarc-prepare-local-maildir) is missing under localMail - without it the unprefixed ReadWritePaths entry fails the unit at start.";
+  assert lib.hasInfix "parsedmarc-strip-opensearch-section" (lib.last localMailExecStartPre) || throw "dmarc-eval: under localMail the strip script must stay the LAST ExecStartPre step (it rewrites the ini the earlier steps wrote).";
     builtins.derivation {
       name = "dmarc-eval";
       inherit system;
       PATH = "${pkgs.coreutils}/bin:${pkgs.gnugrep}/bin:${pkgs.gnused}/bin";
-      passAsFile = ["rendered"];
-      inherit rendered stripScript optionsCommonMark;
+      passAsFile = ["rendered" "renderedLocalMail"];
+      inherit rendered renderedLocalMail stripScript optionsCommonMark;
       builder = "/bin/sh";
       args = [
         "-c"
@@ -133,6 +186,17 @@ in
           grep -q '"AF_INET6"' "$renderedPath"
           grep -q '\[opensearch\]' "$stripScript"
           grep -q 'keep' "$stripScript"
+          # localMail storage contract greps (fixed strings: the path
+          # contains a literal "//" from the postfix default's
+          # trailing slash - do NOT switch to regex here).
+          grep -F -- "${moduleMaildirPath}" "$renderedLocalMailPath"
+          if grep -F -- "-${moduleMaildirPath}" "$renderedLocalMailPath"; then
+            echo "FATAL: dashed localMail maildir whitelist regression" >&2
+            exit 1
+          fi
+          grep -F 'parsedmarc-prepare-local-maildir' "$renderedLocalMailPath"
+          grep -q '"user":"dmarc"' "$renderedLocalMailPath"
+          grep -q '"dynamicUser":false' "$renderedLocalMailPath"
           grep -q 'dmarc-monitor' "$optionsCommonMark"
           grep -q 'RETENTION' "$optionsCommonMark"
           grep -q 'parsedmarc.ini' "$optionsCommonMark"
