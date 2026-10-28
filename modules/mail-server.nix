@@ -620,6 +620,48 @@ in {
         ''
       ];
 
+    # x86-64-v2 runtime preflight (owner verdict 2026-10-28, "handle now"):
+    # stalwart_0_16 >= 0.16.26 requires x86-64-v2 on x86_64 and dies with a
+    # bare SIGILL on older silicon. VM nodes are covered structurally
+    # (tests/common.nix v2CpuPatches at TEST level); REAL hosts (pbx,
+    # evo-x2, the VPS - anything rebuilding after the fe132422 pin advance)
+    # get this check at BOOT, before the binary ever executes. Lives HERE
+    # (upstream) so every consumer inherits it: SystemNix's wrapper module,
+    # pbx's direct import, the demo. aarch64 skips (no v2 concept). Flag
+    # set = the glibc x86-64-v2 baseline; pure-bash (no unit-PATH traps -
+    # see CONTRIBUTING on unit-script PATH).
+    systemd.services.stalwart-cpu-preflight = lib.mkIf pkgs.stdenv.hostPlatform.isx86_64 {
+      description = "Verify x86-64-v2 CPU features before Stalwart (0.16 requirement)";
+      wantedBy = ["multi-user.target"];
+      before = ["${stalwartUnit}.service"];
+      requiredBy = ["${stalwartUnit}.service"];
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+        ExecStart = "${pkgs.writeShellScript "stalwart-cpu-preflight" ''
+          flags=""
+          while IFS= read -r line; do
+            case "$line" in
+              flags*) flags="$line"; break ;;
+            esac
+          done < /proc/cpuinfo
+          missing=""
+          for f in cx16 lahf_lm popcnt sse3 sse4_1 sse4_2 ssse3; do
+            case " $flags " in
+              *" $f "*) ;;
+              *) missing="$missing $f" ;;
+            esac
+          done
+          if [ -n "$missing" ]; then
+            echo "stalwart-cpu-preflight: CPU lacks x86-64-v2 flags:$missing" >&2
+            echo "  Stalwart 0.16.26+ (x86_64 builds) requires x86-64-v2 and would SIGILL at start." >&2
+            echo "  This host cannot run the deployed mail stack - halt the migration here." >&2
+            exit 1
+          fi
+        ''}";
+      };
+    };
+
     services.stalwart = {
       enable = true;
       # The 0.16 package attr; pkgs.stalwart is still the 0.15 line at this
