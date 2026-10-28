@@ -300,6 +300,8 @@ in
         ../modules/mail-server.nix
         common.dnslessVmPatches
         common.testAdminSecretModule
+        # 0.16.26 needs x86-64-v2 (tests/common.nix v2CpuPatches)
+        common.v2CpuPatches
       ];
 
       services = {
@@ -422,6 +424,8 @@ in
         ../modules/mail-server.nix
         common.dnslessVmPatches
         common.testAdminSecretModule
+        # 0.16.26 needs x86-64-v2 (tests/common.nix v2CpuPatches)
+        common.v2CpuPatches
       ];
 
       system.stateVersion = "26.05";

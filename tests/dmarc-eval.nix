@@ -127,7 +127,7 @@ in
           grep -q '"_secret":"/nix/store' "$renderedPath"
           grep -q '"offline":true' "$renderedPath"
           grep -q '"stateDirectory":"parsedmarc"' "$renderedPath"
-          grep -q 'python3.14-parsedmarc-11.0.2' "$renderedPath"
+          grep -q 'python3.14-parsedmarc' "$renderedPath"
           grep -q '"dynamicUser":true' "$renderedPath"
           grep -q '"~@privileged"' "$renderedPath"
           grep -q '"AF_INET6"' "$renderedPath"

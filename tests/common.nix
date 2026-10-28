@@ -43,6 +43,19 @@ in {
     };
   };
 
+  # x86-64-v2 CPU patches - the canonical copy; every node that runs
+  # the 0.16.26+ stalwart_0_16 binary imports THIS (e2e nodes + the
+  # demo host). Stalwart 0.16.26 x86_64 builds (non-musl) REQUIRE
+  # x86-64-v2 and refuse to start otherwise; QEMU's default qemu64
+  # model lacks v2 (README ledger "0.16.22 -> 0.16.26" delta). `-cpu
+  # max` (NOT `host`: CI VMs run TCG without KVM, where `host` is
+  # invalid) exposes the full TCG feature set incl. v2, and works
+  # under KVM too. aarch64 guests don't need it (no v2 concept) and
+  # the VM-test set is x86_64-only anyway.
+  v2CpuPatches = {
+    virtualisation.qemu.options = ["-cpu" "max"];
+  };
+
   # Real DMARC aggregate report sample (upstream parsedmarc, the same
   # artifact nixpkgs' own parsedmarc VM test uses - report_id 2940, org
   # infonacot.gob.mx, policy domain example.com). Shared by

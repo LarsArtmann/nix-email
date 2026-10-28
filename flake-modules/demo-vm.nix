@@ -46,6 +46,8 @@ in {
           # off, with the 2026-10-18 demo boot-race rationale): the
           # canonical copy lives in tests/common.nix.
           common.dnslessVmPatches
+          # 0.16.26 needs x86-64-v2 (tests/common.nix v2CpuPatches)
+          common.v2CpuPatches
         ];
         services = {
           mail-server = {

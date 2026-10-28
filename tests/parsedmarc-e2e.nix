@@ -432,13 +432,14 @@ in
       )
       machine.succeed(
           # The strip workaround's OWN contract, asserted directly: with
-          # Elasticsearch off, nixpkgs still renders an inert host-less
-          # [elasticsearch] section (cert_path/ssl are typed and survive
-          # the module's null/[]/{} filter) - it must be provably GONE
-          # from the runtime ini. parsedmarc merely STARTING is necessary
-          # but not sufficient: cli.py only refuses a section that is
-          # present AND hosts-less.
-          "! grep -qiE '^\\[elasticsearch\\]' /run/parsedmarc/parsedmarc.ini"
+          # OpenSearch off, nixpkgs still renders an inert host-less
+          # [opensearch] section (cert_path/ssl are typed and survive
+          # the module's null/[]/{} filter; PR #566282 renamed the
+          # option 2026-10-28 at the fe132422 pin) - it must be provably
+          # GONE from the runtime ini. parsedmarc merely STARTING is
+          # necessary but not sufficient: cli.py only refuses a section
+          # that is present AND hosts-less.
+          "! grep -qiE '^\\[opensearch\\]' /run/parsedmarc/parsedmarc.ini"
       )
       machine.succeed(
           # ini renders key=value with NO spaces (parsedmarc.nix flips

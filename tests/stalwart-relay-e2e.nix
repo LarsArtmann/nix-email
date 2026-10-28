@@ -82,7 +82,12 @@ in
 
     nodes = {
       smtp = {...}: {
-        imports = [../modules/mail-server.nix common.testAdminSecretModule];
+        imports = [
+          ../modules/mail-server.nix
+          common.testAdminSecretModule
+          # 0.16.26 needs x86-64-v2 (tests/common.nix v2CpuPatches)
+          common.v2CpuPatches
+        ];
 
         services = {
           mail-server = {

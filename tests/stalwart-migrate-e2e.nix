@@ -96,6 +96,9 @@ in
           ../modules/mail-server.nix
           common.dnslessVmPatches
           common.testAdminSecretModule
+          # 0.16.26 needs x86-64-v2 (tests/common.nix v2CpuPatches);
+          # mig015 runs 0.15.5 and does not
+          common.v2CpuPatches
         ];
 
         system.stateVersion = "26.05";
