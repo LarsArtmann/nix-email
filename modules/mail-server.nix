@@ -48,7 +48,6 @@
 {
   config,
   lib,
-  options,
   pkgs,
   ...
 }: let
@@ -188,21 +187,6 @@ in {
 
   options.services.mail-server = {
     enable = lib.mkEnableOption "an opinionated Stalwart mail server (all-in-one SMTP/IMAP/JMAP, built-in spam filter, web admin)";
-
-    # EVAL-TIME x86-64-v2 VM guard marker: set ONLY by tests/common.nix
-    # v2CpuPatches (the one canonical way a VM node gets a v2-capable
-    # QEMU cpu). The assertion below fires when a QEMU-VM evaluation
-    # runs Stalwart >= 0.16 without it - reading the qemu option VALUE
-    # from assertions is structurally impossible (its definition pulls
-    # config.system.build.toplevel, which renders assertions ->
-    # infinite recursion, proven 2026-10-28), so the marker travels
-    # through this own-module option instead.
-    vmV2CpuPatched = lib.mkOption {
-      type = lib.types.bool;
-      internal = true;
-      default = false;
-      description = "Set by tests/common.nix v2CpuPatches; consumed by the wrapper's x86-64-v2 VM assertion.";
-    };
 
     hostname = lib.mkOption {
       type = lib.types.str;
@@ -558,25 +542,6 @@ in {
         {
           assertion = cfg.admin.secretFile != null;
           message = "services.mail-server.admin.secretFile is REQUIRED - the 0.16 fallback admin is the provisioning CLI's only credential path (systemd-creds), and without it stalwart-provision cannot authenticate.";
-        }
-        {
-          # x86-64-v2 guard (2026-10-28, fe132422/0.16.26): the 0.16
-          # binary requires x86-64-v2 on x86_64 and QEMU's DEFAULT cpu
-          # (qemu64) lacks it - the node SIGILLs before any test output.
-          # The flood/guarded near-miss (a 0.16 VM node missing
-          # v2CpuPatches fails the gate ~30 minutes later at RUN time)
-          # is the failure mode this kills at EVAL time. `options ?` is
-          # a declarations-only probe (no config values -> no recursion:
-          # the qemu option's own definition pulls system.build.toplevel
-          # which renders assertions); real hosts declare no
-          # virtualisation.qemu at all and pass unconditionally.
-          assertion =
-            !pkgs.stdenv.hostPlatform.isx86_64
-            || !(options ? virtualisation.qemu)
-            || !lib.versionAtLeast config.services.stalwart.package.version "0.16"
-            || config.services.mail-server.vmV2CpuPatched;
-          message = ''
-            services.mail-server: this evaluation declares virtualisation.qemu (a QEMU VM) and Stalwart >= 0.16 requires x86-64-v2 on x86_64, which QEMU's default cpu lacks - import tests/common.nix v2CpuPatches (["-cpu" "max"], TCG-safe) or the VM node dies at boot (SIGILL class, 2026-10-28 pin-advance lesson). Real hosts are unaffected (no virtualisation.qemu declarations).'';
         }
       ]
       ++ lib.optionals (cfg.relay != null) [

@@ -80,13 +80,16 @@ in
   pkgs.testers.runNixOSTest {
     name = "stalwart-relay-e2e";
 
+    # Test-level v2 cpu for EVERY node (structurally unforgottable,
+    # tests/common.nix v2CpuPatches; the relay/Mailpit node gets it
+    # too - a harmless feature superset).
+    defaults = common.v2CpuPatches;
+
     nodes = {
       smtp = {...}: {
         imports = [
           ../modules/mail-server.nix
           common.testAdminSecretModule
-          # 0.16.26 needs x86-64-v2 (tests/common.nix v2CpuPatches)
-          common.v2CpuPatches
         ];
 
         services = {

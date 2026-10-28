@@ -33,6 +33,11 @@ in
   pkgs.testers.runNixOSTest {
     name = "stalwart-migrate-e2e";
 
+    # Test-level v2 cpu for EVERY node (structurally unforgottable,
+    # tests/common.nix v2CpuPatches). mig015 (0.15.5) gets it too -
+    # a harmless feature superset, it does not REQUIRE v2.
+    defaults = common.v2CpuPatches;
+
     nodes = {
       # PHASE A: the pre-upgrade world - raw module, 0.15.5 binary,
       # provision off (JMAP apply does not exist there), one loopback
@@ -96,9 +101,6 @@ in
           ../modules/mail-server.nix
           common.dnslessVmPatches
           common.testAdminSecretModule
-          # 0.16.26 needs x86-64-v2 (tests/common.nix v2CpuPatches);
-          # mig015 runs 0.15.5 and does not
-          common.v2CpuPatches
         ];
 
         system.stateVersion = "26.05";

@@ -43,37 +43,26 @@ in {
     };
   };
 
-  # x86-64-v2 CPU patches - the canonical copy; every node that runs
-  # the 0.16.26+ stalwart_0_16 binary imports THIS (e2e nodes + the
-  # demo host). Stalwart 0.16.26 x86_64 builds (non-musl) REQUIRE
-  # x86-64-v2 and refuse to start otherwise; QEMU's default qemu64
-  # model lacks v2 (README ledger "0.16.22 -> 0.16.26" delta). `-cpu
-  # max` (NOT `host`: CI VMs run TCG without KVM, where `host` is
-  # invalid) exposes the full TCG feature set incl. v2, and works
-  # under KVM too. aarch64 guests don't need it (no v2 concept) and
-  # the VM-test set is x86_64-only anyway.
-  #
-  # The module also marks services.mail-server.vmV2CpuPatched = true
-  # (guarded: only when the wrapper module is in the same evaluation)
-  # - the wrapper's x86-64-v2 eval-time assertion consumes the marker
-  # (reading the qemu option value from assertions is impossible:
-  # infinite recursion via system.build.toplevel, proven 2026-10-28).
-  # A node running 0.16 WITHOUT this import fails at EVAL, not 30
-  # minutes later at boot.
+  # x86-64-v2 CPU patches - the canonical copy; applied at TEST level
+  # (`defaults = common.v2CpuPatches;` in every runNixOSTest) so EVERY
+  # node gets it structurally - a per-node import can no longer be
+  # forgotten (the flood/guarded near-miss, 2026-10-28). Harmless on
+  # nodes that do not need it (0.15.5 binaries, Mailpit): `-cpu max`
+  # is a feature superset, not a requirement. Stalwart 0.16.26 x86_64
+  # builds (non-musl) REQUIRE x86-64-v2 and refuse to start otherwise;
+  # QEMU's default qemu64 model lacks v2 (README ledger
+  # "0.16.22 -> 0.16.26" delta). `-cpu max` (NOT `host`: CI VMs run
+  # TCG without KVM, where `host` is invalid) exposes the full TCG
+  # feature set incl. v2, and works under KVM too. aarch64 guests
+  # don't need it (no v2 concept) and the VM-test set is x86_64-only
+  # anyway. (An ASSERTION-based guard was tried and is impossible:
+  # reading virtualisation.qemu.options from assertions recurses via
+  # system.build.toplevel, and an options-existence probe cannot
+  # discriminate VM evals - qemu-vm.nix declares its options in EVERY
+  # NixOS evaluation, provision-plan-eval proved it. Test-level
+  # defaults are the structural fix. Proven 2026-10-28.)
   v2CpuPatches = {
-    config,
-    lib,
-    options,
-    ...
-  }: {
-    config = lib.mkMerge [
-      {
-        virtualisation.qemu.options = ["-cpu" "max"];
-      }
-      (lib.mkIf (options ? services.mail-server.vmV2CpuPatched) {
-        services.mail-server.vmV2CpuPatched = true;
-      })
-    ];
+    virtualisation.qemu.options = ["-cpu" "max"];
   };
 
   # Real DMARC aggregate report sample (upstream parsedmarc, the same

@@ -89,13 +89,15 @@ transcript-pinned dialect).
   remains the 0.15.5 line); binary = the pin's `stalwart_0_16` = 0.16.26
   since fe132422 (C45 SUPERSEDED - the overlay question dissolved when
   the pin itself shipped 0.16.26; x86-64-v2 absorbed in VMs by
-  tests/common.nix `v2CpuPatches` = `-cpu max`, TCG-safe - real hosts
-  need a consumer-side v2 CPU check; the wrapper EVAL-GUARDS the import
-  via a `vmV2CpuPatched` marker set by v2CpuPatches - reading
-  `virtualisation.qemu.options` from assertions is structurally
-  recursive (its definition pulls system.build.toplevel, which renders
-  assertions), so the marker travels through a wrapper-own option and
-  the qemu presence is probed declarations-only via `options ?`).
+  tests/common.nix `v2CpuPatches` = `-cpu max`, TCG-safe, applied at
+  TEST level via `defaults = common.v2CpuPatches;` in every
+  runNixOSTest so a node cannot forget it - real hosts need a
+  consumer-side v2 CPU check. An assertion-based guard is IMPOSSIBLE:
+  reading `virtualisation.qemu.options` from assertions recurses via
+  system.build.toplevel (which renders assertions), and
+  options-existence cannot discriminate VM evals - qemu-vm.nix
+  declares its options in EVERY NixOS eval (provision-plan-eval
+  proved it). Proven 2026-10-28).
 - flake-parts: FLOATING input (lock-pinned only - the fleet's control);
   `nixpkgs-lib.follows = "nixpkgs"` is NOT optional (a dropped follow
   smuggles a second nixpkgs into every consumer lock). Rejected without

@@ -295,13 +295,16 @@ in
   pkgs.testers.runNixOSTest {
     name = "stalwart-e2e";
 
+    # Test-level v2 cpu for EVERY node (structurally unforgottable -
+    # the flood near-miss lesson 2026-10-28; tests/common.nix
+    # v2CpuPatches).
+    defaults = common.v2CpuPatches;
+
     nodes.machine = {...}: {
       imports = [
         ../modules/mail-server.nix
         common.dnslessVmPatches
         common.testAdminSecretModule
-        # 0.16.26 needs x86-64-v2 (tests/common.nix v2CpuPatches)
-        common.v2CpuPatches
       ];
 
       services = {
@@ -424,8 +427,6 @@ in
         ../modules/mail-server.nix
         common.dnslessVmPatches
         common.testAdminSecretModule
-        # 0.16.26 needs x86-64-v2 (tests/common.nix v2CpuPatches)
-        common.v2CpuPatches
       ];
 
       system.stateVersion = "26.05";
