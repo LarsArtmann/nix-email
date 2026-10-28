@@ -143,7 +143,8 @@ and nothing else:
   `nix flake check` with both sets spelled out (eval-time, so it fails
   before any VM build). Makes the 2026-09-23 missing-entry class fail
   locally regardless of pre-push hook state.
-- `stalwart-e2e`: real Stalwart 0.16.22 in a VM - declarative provisioning
+- `stalwart-e2e`: real Stalwart 0.16.26 in a VM (0.16.22 until the
+  2026-10-28 fe132422 advance) - declarative provisioning
   plan applied clean (accounts incl. quota + alias, dual declarative DKIM
   rsa+ed25519, listeners, singletons; idempotent second apply),
   unknown-recipient 550 rejection, implicit-TLS IMAPS greeting, JMAP
@@ -154,7 +155,8 @@ and nothing else:
   runtime catch-all via a second `stalwart-cli apply` (in-plan `#id`
   ordering + match-property dialect), and the over-quota contract
   (SMTP-accept `250 Message queued with id`, IMAP absence, 0.16 journal
-  silence). GREEN end-to-end on 0.16.22 as of 2026-10-17 - all 17
+  silence). GREEN end-to-end on 0.16.22 as of 2026-10-17 AND on 0.16.26
+  as of 2026-10-28 (fe132422 advance, `-cpu max` v2CpuPatches) - all 17
   subtests incl. GTUBE, native DMARC ingestion, and the flood limiter.
 - `stalwart-bind-e2e`: dedicated non-default `httpBind` (`127.0.0.1:8082`,
   the pbx-artmann consumer shape) on a virgin store - the bootstrap class
@@ -471,17 +473,21 @@ integration-registry backup-freshness entry) and is eval-contract-tested in
 consumer-config flip plus filling the real
 `platforms/nixos/secrets/nix-email.yaml` secret, not new wiring.
 
-PIN DISCIPLINE: consumers of this flake MUST pin it by a hard rev/tag (not
-`?ref=master`): the wrapper is verified against a SPECIFIC Stalwart version
-(0.16.22 via the vendored module + the pin's `stalwart_0_16`) at a specific
+PIN DISCIPLINE: consumers of this flake SHOULD pin it by a hard rev/tag
+(not `?ref=master`): the wrapper is verified against a SPECIFIC Stalwart
+version (0.16.26 via the vendored module + the pin's `stalwart_0_16`
+since the 2026-10-28 fe132422 advance) at a specific
 nixpkgs rev, and both repos deliberately pin the SAME nixpkgs rev (compat
 doctrine - bump both together; Renovate PRs are approval-gated so a nixpkgs
-move never lands unreviewed). STATUS 2026-10-05: SystemNix COMPLIES - its input is
-HARD-PINNED `github:LarsArtmann/nix-email?ref=v0.4.0` (decision-batch C17a
-executed; the 2026-09-22 "floats ?ref=master" violation is fixed, the pin
-rides each release tag from here). v0.4.0 is the 0.15 world - the fleet
-moves to 0.16 at the v0.5.0 tag (breaking; wrapper API changed, see
-CHANGELOG). InboxClean's `?ref=master` is fine there because it has no
+move never lands unreviewed). STATUS 2026-10-28: SystemNix currently
+FLOATS `github:LarsArtmann/nix-email` (master; lock at our HEAD -
+verified) instead of the earlier `?ref=v0.4.0` tag pin (C17a): their
+stated mitigation is upstream master's own CI + the E2E suites and the
+`nixpkgs.follows`-forced contract check (`checks.nix-email-contract`),
+which is why the lockstep catch-up here was urgent - a trailing wrapper
+lock breaks THEIR gate. The v0.5.0 tag remains the wanted pin point for
+the 0.16 world (owner-gated, C43). InboxClean's `?ref=master` is fine
+there because it has no
 nixpkgs-version-sensitive contract; this repo does.
 
 Gatus checks for the VPS (on evo-x2, external viewpoint):

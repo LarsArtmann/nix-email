@@ -10,6 +10,13 @@ pinned nixpkgs rev). The repo's transcript rule applies across the
 boundary: a claim without a transcript is a guess, and a pin advance
 that touches Stalwart re-runs the probe (see "Re-verification" below).
 
+> **PIN RIDE-ALONG NOTE 2026-10-28**: the pin's Stalwart moved 0.16.22 ->
+> 0.16.26 (fe132422 advance). Every claim below is 0.16.22-transcript-pinned
+> until the demo-VM probe set is re-run on 0.16.26 (TODO_LIST row 104 /
+> the re-verification section below owns the procedure; 0.16.23-0.16.26
+> changelog scan shows no JMAP/EventSource-adjacent changes, but the
+> transcript rule is the transcript rule).
+
 > **0.16 RE-VERIFIED (2026-10-18, demo VM on the pin, Stalwart 0.16.22;**
 > transcripts: `docs/probes/2026-10-18-demo-smoke-backup/`): the wire
 > contract SURVIVES 0.16 with these deltas — `/.well-known/jmap` 307 →
