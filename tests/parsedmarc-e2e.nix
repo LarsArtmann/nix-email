@@ -1,21 +1,21 @@
 # End-to-end VM test for modules/dmarc-monitor.nix against the REAL
-# parsedmarc 11.0.1 binary from nixpkgs (no mocks).
+# parsedmarc 11.0.2 binary from nixpkgs (no mocks).
 #
 # WHY: tests/dmarc-eval.nix only proves the rendered configuration; this
 # test proves the service actually COLLECTS: real DMARC reports (RFC 7489
 # aggregate, RFC 8460 SMTP TLS-RPT, RFC 6591 forensic/failure) are mailed
-# into the provisioned local mailbox, parsedmarc polls them over
-# IMAP (the production mechanism), and parsed JSON+CSV land in the
-# wrapper's output directory - the zero-dependency file sink this wrapper
-# exists to provide (no Elasticsearch, no Splunk).
+# to the dmarc recipient, parsedmarc ingests them, and parsed JSON+CSV
+# land in the wrapper's output directory - the zero-dependency file sink
+# this wrapper exists to provide (no OpenSearch, no Splunk).
 #
-#   1. provision.localMail wires dovecot (IMAP 143) + postfix + the dmarc
-#      user with a runtime-randomized password (nixpkgs-proven path)
+#   1. machine: provision.localMail (postfix + a [maildir] watch - since
+#      the fe132422 pin (PR #566282) localMail no longer wires dovecot/
+#      IMAP at all; nixpkgs' own localMail test rides the same shape)
 #   2. A real upstream sample aggregate report (.xml.zip attachment) is
 #      SMTP'd to dmarc@localhost
 #   3. parsedmarc (watch=true) parses it and save_output() writes
 #      aggregate.json/aggregate.csv into /var/lib/parsedmarc/reports
-#      (verified against 11.0.1 source: cli.py "if opts.output:" ->
+#      (verified against 11.x source: cli.py "if opts.output:" ->
 #      __init__.py save_output with fixed filenames)
 #   4. The StateDirectory/ReadWritePaths hardening from the wrapper is
 #      what makes step 3 possible at all - the nixpkgs DynamicUser unit
@@ -25,14 +25,17 @@
 # Sample report: the same upstream sample nixpkgs' own parsedmarc VM test
 # uses (report_id 2940, org infonacot.gob.mx, policy domain example.com).
 #
-# TWO nodes, two IMAP shapes:
-#   machine - plaintext localMail (ssl="no" dovecot fixture; mailsuite
-#             auto-STARTTLS would break it otherwise - ledger entry)
-#   tls     - production-shaped IMAPS 993: self-signed cert with proper
-#             SANs, trusted machine-wide, parsedmarc ssl=true with
-#             DEFAULT certificate verification (parsedmarc only exposes
-#             skip_certificate_verification, default off; mailsuite uses
-#             create_default_context() - full chain + hostname checks)
+# TWO nodes, two collection shapes:
+#   machine - maildir flow (the module's own localMail provision)
+#   tls     - production-shaped IMAPS 993 polling over the WRAPPER's
+#             settings.imap: the test owns the mail stack (dovecot +
+#             postfix + dmarc user) since the module stopped providing
+#             one (shape mirrors nixpkgs' parsedmarc-external-mail test);
+#             self-signed cert with proper SANs, trusted machine-wide,
+#             parsedmarc ssl=true with DEFAULT certificate verification
+#             (parsedmarc only exposes skip_certificate_verification,
+#             default off; mailsuite uses create_default_context() - full
+#             chain + hostname checks)
 {pkgs}: let
   common = import ./common.nix;
 
@@ -255,37 +258,6 @@ in
       virtualisation.memorySize = 2048;
 
       services = {
-        dovecot2 = {
-          # nixpkgs' localMail provision ships no auth config: on this pin
-          # (dovecot 2.4) enablePAM defaults FALSE, so the auth service
-          # crash-loops with "No passdbs specified ... PLAIN mechanism needs
-          # one" and IMAP login is impossible (observed in this test,
-          # 2026-09-15). enablePAM adds the passdb/userdb blocks + PAM
-          # service; the dmarc system user authenticates via PAM unix auth.
-          enablePAM = true;
-          settings = {
-            # Dovecot 2.4 on this nixpkgs pin REQUIRES explicit version pins
-            # (base-module assertions), but nixpkgs' parsedmarc localMail
-            # provision enables dovecot2 without setting them - any localMail
-            # consumer hits the assertion (upstream gap, verified in the
-            # pinned module source). The VM's storage is ephemeral, so pin
-            # both to the shipped package version (the auto-update variant).
-            dovecot_config_version = config.services.dovecot2.package.version;
-            dovecot_storage_version = config.services.dovecot2.package.version;
-            # 2.4 needs explicit storage; must match postfix's home_mailbox
-            # below so the IMAP INBOX is exactly the Maildir postfix writes.
-            mail_driver = "maildir";
-            mail_path = "~/Maildir";
-            # VM fixture: no TLS material, so dovecot would advertise
-            # STARTTLS it cannot complete - mailsuite auto-activates STARTTLS
-            # whenever the capability is advertised (mailsuite/imap.py) and
-            # the handshake dies with WRONG_VERSION_NUMBER. plaintext IMAP
-            # inside the VM loop; production rua mailboxes use real TLS
-            # (the `tls` node below exercises that path).
-            ssl = "no";
-          };
-        };
-
         dmarc-monitor = {
           enable = true;
           # parsedmarc 11 does DNS at PARSE time (reverse-DNS map, geolocation)
@@ -296,10 +268,11 @@ in
           settings.general.offline = true;
         };
 
-        # The nixpkgs parsedmarc module's localMail provision: dovecot + postfix
-        # + dmarc system user + runtime-randomized IMAP password, and the
-        # [imap]/[mailbox] settings (localhost:143, ssl=false, watch=true)
-        # merged into services.parsedmarc.settings. The wrapper's own
+        # The nixpkgs parsedmarc module's localMail provision at the
+        # fe132422 pin (PR #566282 reworked it): postfix + the dmarc user
+        # + a [maildir] watch merged into services.parsedmarc.settings -
+        # NO dovecot, NO [imap] leg (the IMAP-polling proof moved to the
+        # `tls` node, which owns its mail stack). The wrapper's own
         # contributions stay in force: general.output=/var/lib/parsedmarc/reports,
         # heavy sinks off, StateDirectory/ReadWritePaths on the unit.
         # Collapsed attrset (statix W20 robustness - a dotted
@@ -314,11 +287,6 @@ in
             };
           };
         };
-
-        # Deliver INTO the Maildir dovecot serves (postfix local(8) default
-        # is the mbox in /var/mail, which dovecot's maildir INBOX would
-        # never see - observed as "empty INBOX forever" in testing).
-        postfix.settings.main.home_mailbox = "Maildir/";
       };
 
       environment.systemPackages = [
@@ -327,11 +295,13 @@ in
       ];
     };
 
-    # Production-shaped IMAPS variant: same localMail provision, but the
-    # dovecot fixture serves implicit TLS on 993 with a trusted cert and
-    # parsedmarc connects with ssl=true and DEFAULT verification on
-    # (create_default_context: chain + hostname). mkForce beats the
-    # provision's plain localhost:143/ssl=false definitions.
+    # Production-shaped IMAPS variant: since the fe132422 pin (PR #566282)
+    # the module's localMail provides NO mail server, so this node owns the
+    # stack outright (shape mirrors nixpkgs' parsedmarc-external-mail
+    # test): dovecot IMAPS 993 with a machine-trusted fixture cert +
+    # postfix delivering into the dmarc user's Maildir, and parsedmarc
+    # polling it through the WRAPPER's settings.imap with ssl=true and
+    # DEFAULT verification (create_default_context: chain + hostname).
     nodes.tls = {
       config,
       lib,
@@ -345,15 +315,34 @@ in
       # verification context accepts the chain.
       security.pki.certificateFiles = ["${imapTestCert}/cert.pem"];
 
+      # The IMAP login user (localMail used to create it; test-owned now).
+      # isNormalUser: PAM unix auth + a home dir for the ~/Maildir postfix
+      # delivers into (postfix home_mailbox below).
+      users.users.dmarc = {
+        isNormalUser = true;
+        password = "dmarc-imap-fixture-pass";
+      };
+
       services = {
         dovecot2 = {
+          enable = true;
+          # PAM passdb for the dmarc user's login (the 2.4 module ships no
+          # passdb by default - enablePAM adds passdb/userdb + the PAM
+          # service; plaintext-password unix auth).
           enablePAM = true;
           settings = {
-            # Same 2.4 version-pin requirement as the plaintext node.
+            # Dovecot 2.4 REQUIRES explicit version pins (base-module
+            # assertions). The VM's storage is ephemeral, so pin both to
+            # the shipped package version (the auto-update variant).
             dovecot_config_version = config.services.dovecot2.package.version;
             dovecot_storage_version = config.services.dovecot2.package.version;
+            protocols.imap = true;
+            # Must match postfix's home_mailbox below so the IMAP INBOX is
+            # exactly the Maildir postfix writes.
             mail_driver = "maildir";
             mail_path = "~/Maildir";
+            # Implicit TLS on 993 (imap-login "TLS," marker in the journal
+            # is asserted below as the positive handshake proof).
             ssl = "required";
             # Dovecot 2.4 cert key names (the NixOS module's own rename
             # assertion names them; 2.3 was ssl_cert/ssl_key). NO "<" prefix:
@@ -365,28 +354,36 @@ in
           };
         };
 
+        postfix = {
+          enable = true;
+          settings.main = {
+            myhostname = "localhost";
+            mydestination = "localhost";
+            myorigin = "localhost";
+            # Deliver INTO the Maildir dovecot serves (postfix local(8)
+            # default is the mbox in /var/mail, which dovecot's maildir
+            # INBOX would never see).
+            home_mailbox = "Maildir/";
+          };
+        };
+
+        # The wrapper path (production shape): the consumer's imap block
+        # rides services.dmarc-monitor.settings; the password is a store
+        # path STRING, which the module's imap.password apply wraps into
+        # {_secret = ...} - exercising the ini secret-replacement path.
         dmarc-monitor = {
           enable = true;
-          settings.general.offline = true;
-        };
-
-        parsedmarc = {
-          provision = {
-            geoIp = false;
-            localMail = {
-              enable = true;
-              hostname = "localhost";
+          settings = {
+            general.offline = true;
+            imap = {
+              host = "127.0.0.1";
+              port = 993;
+              ssl = true;
+              user = "dmarc";
+              password = "${pkgs.writeText "dmarc-imap-password" "dmarc-imap-fixture-pass"}";
             };
           };
-
-          # Force the TLS path over the provision's plaintext defaults.
-          settings.imap = {
-            port = lib.mkForce 993;
-            ssl = lib.mkForce true;
-          };
         };
-
-        postfix.settings.main.home_mailbox = "Maildir/";
       };
 
       # Boot-race resilience (fixture-level): parsedmarc connects to IMAPS
@@ -394,7 +391,16 @@ in
       # 1. The nixpkgs unit ships no Restart policy, so one lost race would
       # leave it dead - a poller daemon should retry (SystemNix layers the
       # same intent via startLimitBurst on the consumer side).
+      #
+      # DynamicUser: the module computes it as `!localMail.enable` = true
+      # here, while its ExecStartPre chowns the ini to User=dmarc - a name
+      # that EXISTS statically on this node (dovecot PAM + Maildir need
+      # it). Force the static shape: systemd would reuse the static user
+      # anyway; pinning it removes the dynamic-allocation corner from the
+      # fixture entirely (StateDirectory re-owns /var/lib/parsedmarc to
+      # the static dmarc).
       systemd.services.parsedmarc.serviceConfig = {
+        DynamicUser = lib.mkForce false;
         Restart = "on-failure";
         RestartSec = "2s";
       };
@@ -409,19 +415,13 @@ in
       start_all()
 
       machine.wait_for_unit("postfix.service")
-      # The 2.4 module renamed the unit: systemd.services.dovecot (was
-      # dovecot2.service on 2.3-era nixpkgs).
-      machine.wait_for_unit("dovecot.service")
       machine.wait_for_unit("parsedmarc.service")
       machine.wait_for_open_port(25, timeout=60)
-      machine.wait_for_open_port(143, timeout=60)
 
       # The wrapper must render a clean unit BEFORE any report exists:
-      # the ini secret replacement ran (no @imap-password@ placeholder
-      # left in /run) and the heavy sinks stayed out of the config.
-      machine.succeed(
-          "! grep -q '@imap-password@' /run/parsedmarc/parsedmarc.ini"
-      )
+      # the heavy sinks stay out of the config (the maildir flow carries
+      # no secret; the tls node below asserts the secret-replacement
+      # contract on its [imap] leg).
       machine.succeed(
           # The WRAPPER's contract is that no sink TARGET is configured:
           # no splunk_hec section, no hosts line anywhere in the ini.
@@ -621,6 +621,16 @@ in
       # parsedmarc may still be in its boot-race restart loop; wait for it
       # to settle into active after the listener exists.
       tls.wait_for_unit("parsedmarc.service")
+
+      # Secret-replacement contract (rode the machine node's [imap] leg
+      # until fe132422; this node owns the [imap] section now): the
+      # writeText password _secret must be MATERIALIZED in the runtime
+      # ini - a positive proof, stronger than grepping for an unexpanded
+      # placeholder shape (the module's replace-secret writes the hash and
+      # swaps it for the file contents at unit start).
+      tls.succeed(
+          "grep -q 'dmarc-imap-fixture-pass' /run/parsedmarc/parsedmarc.ini"
+      )
 
       with subtest("TLS variant: report collected over IMAPS 993"):
           # The runtime ini must carry the production shape: ssl=True on
