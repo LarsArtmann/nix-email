@@ -78,11 +78,19 @@ transcript-pinned dialect).
 ## Conventions
 
 - nixpkgs pinned to SystemNix's lock rev (compat doctrine; bump both
-  together - README "Pin-advance runbook"). SystemNix HARD-PINNS this
-  flake's release tags. STALWART SURFACE: the wrapper VENDORS the 0.16
-  module (`modules/stalwart-module/`, nixpkgs PR #552103; provenance +
-  retirement checklist in-file); binary = the pin's `stalwart_0_16`; the
-  0.16.26-overlay question is decision C45.
+  together - README "Pin-advance runbook"). ADVANCED 2026-10-28
+  6774f7bc -> fe132422: SystemNix moved first (their lock floats
+  nixos-unstable and their flake floats `github:LarsArtmann/nix-email`
+  master + `nixpkgs.follows`) - the contract test via follows is the
+  operative doctrine; a trailing lock here breaks THEIR gate, not just
+  ours. STALWART SURFACE: the wrapper VENDORS the 0.16 module
+  (`modules/stalwart-module/`, nixpkgs PR #552103; provenance +
+  retirement checklist in-file; PR still OPEN 2026-10-28 - `pkgs.stalwart`
+  remains the 0.15.5 line); binary = the pin's `stalwart_0_16` = 0.16.26
+  since fe132422 (C45 SUPERSEDED - the overlay question dissolved when
+  the pin itself shipped 0.16.26; x86-64-v2 absorbed in VMs by
+  tests/common.nix `v2CpuPatches` = `-cpu max`, TCG-safe - real hosts
+  need a consumer-side v2 CPU check).
 - flake-parts: FLOATING input (lock-pinned only - the fleet's control);
   `nixpkgs-lib.follows = "nixpkgs"` is NOT optional (a dropped follow
   smuggles a second nixpkgs into every consumer lock). Rejected without
@@ -97,8 +105,10 @@ transcript-pinned dialect).
   priority 100 there, so mkDefault lists are discarded wholesale.
   Hardening defaults OFF by design (`rateLimits`, `spamFilter.dnsbl`) -
   do NOT "fix" to ON; the DNSBL plan section ALWAYS carries the
-  (empty-by-default) reconcile set destroying 0.16.22's 18 shipped-broken
-  default rows. Limiter identity: `MtaInboundThrottle` matches on
+  (empty-by-default) reconcile set (posture: DNSBL off by default; the
+  0.16.22 broken-defaults rationale is history - 0.16.23 fixed bit_and,
+  and 0.16.24 made upstream rule updates insert-only, the standing
+  argument for declarative reconcile). Limiter identity: `MtaInboundThrottle` matches on
   `description` (no `name`); key vocabulary `authenticated_as` (NOT
   auth_as); dnsbl zone/tag are QUOTED expression constants.
 - Tests: VM E2E for behavior, eval contract for wiring. Never weaken

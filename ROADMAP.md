@@ -165,16 +165,18 @@ ideas, all D1-gated:
 - Post-cutover: retire-or-keep decision documentation for the Resend-only path
 - Retire the in-repo workarounds once upstream fixes land - re-check on
   every nixpkgs bump; module comments carry the revert conditions:
-  (a) the two parsedmarc workarounds (host-less `[elasticsearch]`
-  emission; imapclient on python 3.13) - TRIGGER UPDATED 2026-10-16:
-  nixpkgs PR #566282 (parsedmarc overhaul + OpenSearch rename) MERGED
-  2026-10-13 (`22579286`) - the port procedure in the README runbook
-  step 2 is mandatory at the first pin advance past it; (b) NEW 2026-10-17:
+  (a) the two parsedmarc workarounds - TRIGGER EXECUTED 2026-10-28 at
+  the fe132422 advance (PR #566282 in-pin): the imapclient py3.13 pin
+  and the `ExecStart = mkForce` override are RETIRED (pin ships
+  imapclient 4.1.0); the host-less-section strip-guard is PORTED to
+  `[opensearch]` (nixpkgs #563651 still open - it retires only when the
+  module stops emitting the section); (b) 2026-10-17:
   the VENDORED stalwart module (`modules/stalwart-module/`, PR #552103 @
   `9b15e1f`) - retires when that PR merges into the pinned rev (restore
   `meta.doc` + `partOf`, drop the ExecStartPost patch; checklist in the
-  module header); (c) the Stalwart version surface is decision C45
-  (0.16.22 vs overlay 0.16.26, which needs x86-64-v2)
+  module header); (c) RESOLVED BY EVENTS 2026-10-28: C45 superseded -
+  the pin itself ships `stalwart_0_16` 0.16.26 (x86-64-v2 absorbed via
+  `tests/common.nix` `v2CpuPatches`)
 - 0.16-born raw ideas (2026-10-17 harvest): declarative catch-all wrapper
   option (today: runtime-plan only; product-shape call documented in the
   README); a typed `credentials.<user>.secretFile` wrapper option

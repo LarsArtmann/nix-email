@@ -32,7 +32,6 @@
   ...
 }: let
   cfg = config.services.dmarc-monitor;
-
   # (The py3.13 parsedmarcPackage pin was REVERTED 2026-10-28: the
   # fe132422 pin ships imapclient 4.1.0 with the starttls() fix,
   # mjs/imapclient#663 - the module's own pkgs.parsedmarc ExecStart is

@@ -349,6 +349,15 @@ credential-file secret type wired through the wrapper.
 
 ### C45 — Stalwart package version: 0.16.22 (pin) vs overlay 0.16.26
 
+> **SUPERSEDED 2026-10-28** (resolved without an owner verdict): SystemNix's
+> lock advanced to `fe132422` first (their `follows` already forced that rev
+> onto the wrapper's contract check), and the lockstep catch-up landed
+> `stalwart_0_16` 0.16.26 VIA THE PIN - the overlay arm is moot. VM gates
+> absorb the x86-64-v2 requirement via `-cpu max` (tests/common.nix
+> `v2CpuPatches`, TCG-safe); real hosts need a consumer-side v2 CPU check
+> (their follows already carries the advanced rev). The delta table (README)
+> is the landed-change record; the rec below is preserved for the record.
+
 The pinned nixpkgs rev ships `stalwart_0_16` 0.16.22 with two known bugs: the
 reload-doesn't-rebind-listeners gap (upstream #352, open since 2024 - our
 ExecStartPost patch covers it) and the broken default DNSBL rows (fixed

@@ -295,6 +295,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- nixpkgs pin advance `6774f7bc` -> `fe132422` (2026-10-28, lockstep
+  catch-up: SystemNix's lock moved first and its `follows` already forced
+  the rev onto the wrapper's contract check - the stale wrapper's
+  `provision.elasticsearch` definition could not even eval against the
+  consumer pin). Ride-alongs, each per the Pin-advance runbook:
+  `stalwart_0_16` 0.16.22 -> 0.16.26 (C45 superseded; x86-64-v2 absorbed
+  by `tests/common.nix` `v2CpuPatches` = `-cpu max`, TCG-safe, imported
+  by every 0.16 VM node + the demo host), parsedmarc 11.0.1 -> 11.0.2 on
+  the default py3.14 scope (imapclient 4.1.0: the py3.13
+  `parsedmarcPackage` pin and `ExecStart = mkForce` override REVERTED),
+  `provision.elasticsearch` -> `provision.opensearch` port (mkRemovedOption;
+  the host-less-section strip-guard re-targets `[opensearch]`, nixpkgs
+  #563651 still open), stalwart-cli 1.0.13, mailpit 1.31.4. All five
+  parsedmarc-e2e fixtures re-verified host-side under 11.0.2 BEFORE the
+  VM run (aggregate identity fields + the three transcribed
+  `arrival_date_utc` values byte-identical); `fleetNixpkgsPin` guard and
+  flake.nix presence list updated.
 - Planning-plans corridor closed (2026-10-23, Y-plan F1): the P/V/W/X chain
   plus the 10-16 N-generation ancestor ARCHIVED with an `## Appendix R —
   Resolution` table per file (DONE with its artifact path, or ROUTED to a
