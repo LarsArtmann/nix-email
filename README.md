@@ -24,9 +24,9 @@ DMARC/TLS-RPT monitor, packaged as a NixOS flake for consumption by
 > read-only; eval-pinned in `dmarc-eval`'s localMail-shape eval).
 > State at this banner's date: **GATE GREEN** - `nix flake check`
 > passes the full check set on 0.16.26/11.0.2 (stalwart-e2e,
-> parsedmarc-e2e both ends, bind/migrate/relay re-proven at the pin).
-> Release vehicle remains the owner-gated v0.5.0
-> (C43).
+> parsedmarc-e2e both ends, bind/migrate/relay re-proven at the pin;
+> buildflow EXIT:0 same day). Release vehicle remains the owner-gated
+> v0.5.0 (C43).
 >
 > - live status in
 >   [TODO_LIST.md](TODO_LIST.md), the transcript-pinned fact set in the

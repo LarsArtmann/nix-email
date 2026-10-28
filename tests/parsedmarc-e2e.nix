@@ -257,7 +257,7 @@ in
   pkgs.testers.runNixOSTest {
     name = "parsedmarc-e2e";
 
-    nodes.machine = { ...}: {
+    nodes.machine = {...}: {
       imports = [../modules/dmarc-monitor.nix];
 
       virtualisation.memorySize = 2048;
