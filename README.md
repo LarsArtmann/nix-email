@@ -7,18 +7,26 @@ Declarative mail stack for LarsArtmann hosts: an opinionated
 DMARC/TLS-RPT monitor, packaged as a NixOS flake for consumption by
 [SystemNix](../SystemNix) (upstream-flake pattern, like InboxClean/DiscordSync).
 
-> **STATUS 2026-10-17: the Stalwart 0.15.5 -> 0.16.22 upgrade is in tree**
-> (breaking; release vehicle = the pending v0.5.0). The wrapper now maps its
-> options onto the 0.16 JMAP object model and renders declarative
-> `services.stalwart.provision` plans through a vendored 0.16 module
-> (nixpkgs PR #552103). REST `/api` management recipes are GONE upstream
-> (CORRECTED 2026-10-18: only the CLI/REST export variants died - the
-> MAIN-binary `--export`/`--import` exists and is VM-proven, see the
-> backup step in the go-live runbook); the demo renamed to
-> `mail.demo.test`. State at this banner's date: **GATE GREEN** -
-> `nix flake check` passes all checks on the 0.16 tree (stalwart-e2e 17/17
-> subtests in a real run, relay-e2e 3/3, buildflow EXIT:0, alejandra
-> clean; the 03-34 status report). What remains is release doctrine (C43)
+> **STATUS 2026-10-28: nixpkgs pin advanced to fe132422 - Stalwart 0.16.26,
+> parsedmarc 11.0.2, GATE GREEN.** SystemNix's lock moved first and their
+> `follows` forces their pin onto the wrapper's contract check, so this
+> repo caught up to the shared rev (the compat doctrine; their
+> `checks.nix-email-contract` re-greens when they pull this master).
+> Ride-alongs, each per the Pin-advance runbook: nixpkgs PR #566282
+> ported (`provision.opensearch`, strip-guard re-targeted, #563651
+> still open), the imapclient py3.13 pin REVERTED (pin ships 4.1.0),
+> 0.16.26's x86-64-v2 requirement absorbed (test-level
+> `defaults = common.v2CpuPatches` in every VM test - structurally
+> unforgottable), and the localMail STORAGE contract landed (new-pin
+> localMail watches a postfix maildir; the wrapper pre-creates it at
+> boot via tmpfiles and whitelists it UNPREFIXED - a `-` prefix is
+> evaluated-once at namespace setup and silently leaves the spool
+> read-only; eval-pinned in `dmarc-eval`'s localMail-shape eval).
+> State at this banner's date: **GATE GREEN** - `nix flake check`
+> passes the full check set on 0.16.26/11.0.2 (stalwart-e2e,
+> parsedmarc-e2e both ends, bind/migrate/relay re-proven at the pin).
+> Release vehicle remains the owner-gated v0.5.0
+> (C43).
 >
 > - live status in
 >   [TODO_LIST.md](TODO_LIST.md), the transcript-pinned fact set in the
@@ -338,7 +346,8 @@ IfBlocks).
 null (default) = direct-to-MX. When set, non-local mail transits the
 smarthost - the wrapper renders the 0.16 MtaRoute relay object (with the
 outbound strategy expression); the shape is exercised by the two-node VM
-test `stalwart-relay-e2e` (green on 0.16.22; the 0.15-era
+test `stalwart-relay-e2e` (green on 0.16.22 and, after the 2026-10-28
+fe132422 advance, 0.16.26; the 0.15-era
 `queue.route` IfBlock rendering is retired with the upgrade):
 
 ```nix
