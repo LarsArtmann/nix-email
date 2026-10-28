@@ -543,6 +543,26 @@ in {
           assertion = cfg.admin.secretFile != null;
           message = "services.mail-server.admin.secretFile is REQUIRED - the 0.16 fallback admin is the provisioning CLI's only credential path (systemd-creds), and without it stalwart-provision cannot authenticate.";
         }
+        {
+          # x86-64-v2 guard (2026-10-28, fe132422/0.16.26): the 0.16
+          # binary requires x86-64-v2 on x86_64 and QEMU's DEFAULT cpu
+          # (qemu64) lacks it - the node SIGILLs before any test output.
+          # Only meaningful inside QEMU VM evaluations: on real hosts
+          # the virtualisation.qemu option does not exist at all, and
+          # aarch64 has no v2 requirement. The flood/guarded near-miss
+          # (a 0.16 VM node missing v2CpuPatches fails the gate ~30
+          # minutes later at RUN time) is the failure mode this kills
+          # at EVAL time. tests/common.nix v2CpuPatches satisfies it;
+          # `config ? ...` leniently handles evals without the qemu
+          # module (the `?` operator does not throw on missing
+          # intermediates).
+          assertion =
+            !pkgs.stdenv.hostPlatform.isx86_64
+            || !lib.versionAtLeast config.services.stalwart.package.version "0.16"
+            || builtins.elem "-cpu" (config.virtualisation.qemu.options or []);
+          message = ''
+            services.mail-server: Stalwart >= 0.16 requires x86-64-v2 on x86_64 and QEMU's default cpu lacks it - set virtualisation.qemu.options to an explicit v2-capable cpu (tests/common.nix v2CpuPatches = ["-cpu" "max"], TCG-safe) or the VM node dies at boot (SIGILL class, 2026-10-28 pin-advance lesson).'';
+        }
       ]
       ++ lib.optionals (cfg.relay != null) [
         {
