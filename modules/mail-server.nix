@@ -824,17 +824,22 @@ in {
               };
             }
           ]
-          # ALWAYS reconciled (not optionals): stalwart 0.16.22 SHIPS 18
-          # default SpamDnsblServer rows whose tag expressions use an
-          # operator ("bit_and") the binary's own parser rejects - every
-          # apply's reload validation FAILS on them and the core never
-          # swaps (provisioned listeners never activate; VM transcripts
-          # 2026-10-16, docs/status/2026-10-16_20-48_*). Reconciling the
-          # set (empty unless the consumer configures servers) destroys
-          # the broken defaults, which ALSO mechanizes the wrapper's
+          # ALWAYS reconciled (not optionals): HISTORICAL ROOT (0.16.22,
+          # VM transcripts 2026-10-16, docs/status/2026-10-16_20-48_*):
+          # the binary SHIPPED 18 default SpamDnsblServer rows whose tag
+          # expressions use an operator ("bit_and") its own parser
+          # rejected - every apply's reload validation FAILED on them and
+          # the core never swapped (provisioned listeners never
+          # activate). 0.16.23 ADDED bit_and, so on the 0.16.26 pin
+          # (since 2026-10-28) the defaults no longer break validation -
+          # but the reconcile posture STAYS: it mechanizes the wrapper's
           # long-standing "DNSBL off by default" posture (DNS-less E2E
-          # lesson). Consumers merging their own servers into this set
-          # keep them; reconcile deletes only rows outside the plan.
+          # lesson), and 0.16.24 made upstream rule updates INSERT-ONLY
+          # for existing installs ("upstream changes to existing rules,
+          # DNSBL servers, HTTP lookups ... never reach an existing
+          # installation") - only a reconciled declarative set converges.
+          # Consumers merging their own servers into this set keep them;
+          # reconcile deletes only rows outside the plan.
           ++ [
             {
               SpamDnsblServer = {

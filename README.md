@@ -49,7 +49,7 @@ internet: Internet {
 
 proxy: Reverse proxy (Caddy on consumer host, TLS)
 
-stalwart: Stalwart 0.16.22 (services.mail-server wrapper) {
+stalwart: Stalwart 0.16.26 (services.mail-server wrapper) {
   smtp_in: SMTP listeners (25 MX, 587 submission, 465 submissions)
   imaps: IMAPS listener (993, implicit TLS)
   http: HTTP listener (127.0.0.1:8080, loopback only)
@@ -246,8 +246,9 @@ the secret), `stateVersion`, `relay` (outbound smarthost, see below),
 tier with completeness assertions), and the hardening options `rateLimits`
 (opt-in sustained inbound damper - see the sizing note below) and
 `spamFilter.dnsbl.servers` (typed DNS blocklist entries, default `{}`;
-the plan ALWAYS carries an empty reconcile set so 0.16.22's shipped-broken
-default DNSBL rows are destroyed at apply time).
+the plan ALWAYS carries an empty-by-default reconcile set - the
+"DNSBL off by default" posture, mechanized; see the delta table below
+for the 0.16.22-era broken-defaults history).
 
 `services.stalwart.settings` is now ONLY the config.json datastore
 descriptor - everything else (domains, accounts, DKIM, routes, catch-all)
@@ -274,10 +275,15 @@ consumer port lists merge additively.
 
 No CVEs in the window (CVE-2026-81036 affects through 0.16.19 only; the
 pin's 0.16.22 is past it). C45 (stay on the pin's 0.16.22 vs overlay a
-newer 0.16.x) stays owner-gated; the delta above is the decision input -
-the wrapper's VM tests run on QEMU's default CPU model on CI, so any
-0.16.26+ overlay ALSO needs a VM cpu-type change before the gate can
-even boot it.
+newer 0.16.x) stayed owner-gated until **2026-10-28: SUPERSEDED - the
+consumer-driven pin advance to fe132422 landed `stalwart_0_16` 0.16.26
+via the PIN** (SystemNix's lock moved first; their `follows` already
+forced that rev onto the wrapper's contract check). The overlay arm is
+moot; the delta table above is now the landed-change record. The VM
+cpu-type requirement is absorbed by `tests/common.nix` `v2CpuPatches`
+(`-cpu max`, TCG-safe); REAL hosts need an x86-64-v2 CPU check on the
+consumer side before deploying the advanced pin (their follows already
+carries it).
 
 ### Rate-limit sizing (`rateLimits`)
 
@@ -587,36 +593,39 @@ inside nixpkgs are invisible to it, so the checks below are manual):
 2. **Re-check the shipped workarounds - the presence list** (module comments
    carry the code side; this is the procedure side; every bullet is a fact
    the module depends on, re-verify each against the new pin):
-   - `[elasticsearch]` emission: rerun `nix build .#checks.x86_64-linux.dmarc-eval`
-     and the `parsedmarc-e2e` VM test. **nixpkgs PR #566282 MERGED
-     2026-10-13 (`22579286`)**: it replaces
-     `services.parsedmarc.provision.elasticsearch` with
-     `provision.opensearch` and throws on elasticsearch provisioning - the
-     first pin past it breaks our `provision.elasticsearch = mkDefault false`
-     and the `ExecStartPre` guard that reads the option. Port both to the
-     new option shape and retire the strip-guard if the host-less section
-     stops materializing (check `nixos/modules/services/monitoring/parsedmarc.nix`).
+   - `[elasticsearch]`/`[opensearch]` emission: rerun `nix build
+     .#checks.x86_64-linux.dmarc-eval`
+     and the `parsedmarc-e2e` VM test. **EXECUTED 2026-10-28 at the
+     fe132422 advance**: nixpkgs PR #566282 (merged 2026-10-13) is IN the
+     pin - the wrapper ports to `provision.opensearch` (mkRemovedOption
+     on the elasticsearch name). The strip-guard STAYS (same shape,
+     renamed `[opensearch]`; nixpkgs #563651 still open).
    - imapclient/python pin: check the NixOS python scope's `imapclient`
      version. Revert `parsedmarcPackage` in `modules/dmarc-monitor.nix` (and
-     the `dmarc-eval` pin assertion) when the pin ships imapclient >= 4.1.0:
-     upstream fixed `starttls()` there (mjs/imapclient#663 merged, released
-     2026-09-18, confirmed by the maintainer on nixpkgs #563652); the
-     imapclient 4.0.1 → 4.1.0 bump rode PR #566282 (merged 2026-10-13), so
-     the first pin past `22579286` likely ships it - verify the version
-     before reverting the pin.
-   - Stalwart version surface (updated 2026-10-17): the wrapper no longer
-     uses nixpkgs' `services.stalwart` module - the 0.16 module is VENDORED
-     (`modules/stalwart-module/`, PR #552103 @ `9b15e1f`) and the binary is
-     the pin's `stalwart_0_16` (0.16.22). The re-verification surface at a
-     bump is now: (a) when PR #552103 merges into the pinned rev, retire the
-     vendored dir (restore `meta.doc` + `partOf`, drop the ExecStartPost
-     patch - checklist in the module header); (b) re-verify the wrapper's
-     0.16 object shapes if `stalwart_0_16` moves (schema.json diff + the
-     plan typecheck); (c) the 0.16.26 overlay question is decision C45.
-     Expected noise during the bump's check evals: the `dovecot2.protocols`
-     rename warning is nixpkgs-internal (`parsedmarc.nix` sets it under
-     `provision.localMail.enable`; verdict 2026-09-16: not ours) and should
-     disappear on a future pin advance - do not chase it.
+     the `dmarc-eval` pin assertion) when the pin ships imapclient >= 4.1.0
+     (mjs/imapclient#663). **EXECUTED 2026-10-28**: fe132422 ships 4.1.0
+     (`nix eval`) + parsedmarc 11.0.2 on the py3.14 default scope - the
+     py3.13 pin and the `ExecStart = mkForce` override are REVERTED; all
+     five e2e fixtures re-verified host-side first
+     (`scripts/host-parse-fixture.py`, incl. the three transcribed
+     `arrival_date_utc` values and the aggregate identity fields).
+   - Stalwart version surface (updated 2026-10-28): the wrapper vendors
+     the 0.16 module (`modules/stalwart-module/`, nixpkgs PR #552103 -
+     still OPEN 2026-10-28, `pkgs.stalwart` is still the 0.15.5 line at
+     fe132422, so the vendored dir stays) and the binary is the pin's
+     `stalwart_0_16` - **0.16.26** since the fe132422 advance (was
+     0.16.22). The re-verification surface at a bump: (a) when PR
+     #552103 merges into the pinned rev, retire the vendored dir
+     (checklist in the module header); (b) re-verify the wrapper's 0.16
+     object shapes if `stalwart_0_16` moves (schema.json diff via the
+     provision check + the plan typecheck; DONE 2026-10-28 -
+     provision-plan-eval green, stalwart-e2e green on 0.16.26);
+     (c) 0.16.26's x86-64-v2 requirement is LIVE since the advance:
+     every VM node running the 0.16 binary sets `-cpu max`
+     (tests/common.nix `v2CpuPatches`, TCG-safe - `host` is invalid
+     without KVM); REAL hosts need a v2-capable CPU check on the
+     consumer side. The 0.16.26-overlay question (C45) is superseded -
+     the pin itself now ships 0.16.26.
 3. **Advance the SystemNix consumer pin**: update the `nix-email` input rev
    (hard rev or release tag - see PIN DISCIPLINE above), `nix flake update
    nix-email`, restore any option-gated test cases the old pin forced out
@@ -743,6 +752,13 @@ json/yaml/markdown.
 ## Verified-facts ledger (do not re-derive from memory)
 
 ### Stalwart 0.16 (transcript-pinned during the 2026-10-16/17 upgrade)
+
+> **PIN RIDE-ALONG 2026-10-28**: the fe132422 advance moved the binary
+> 0.16.22 -> 0.16.26 (delta table above). Re-verified on 0.16.26:
+> provision-plan-eval (object shapes/typecheck) and the stalwart-e2e
+> VM run (this sitting's transcript). The transcript-pinned facts below
+> date to 0.16.22 unless re-marked; the CardDAV/contacts probe baseline
+> (17/18 PASS) is 0.16.22-era and re-runs per TODO_LIST.
 
 - **JMAP session endpoint moved**: `GET /jmap` -> 404 for everyone; session = `/.well-known/jmap` -> 307 (`location: /jmap/session`) -> 200 authed.
   ANONYMOUS session requests return 200 with `primaryAccounts: {}` (NOT
@@ -1091,7 +1107,12 @@ json/yaml/markdown.
   provisioned. Re-checked against nixpkgs MASTER 2026-09-15: still present
   (`elasticsearch.ssl`/`.cert_path` defaults pass the same
   `lib.filterAttrsRecursive` null/[]/{} filter), so the issue is still live
-  upstream, not stale.
+  upstream, not stale. **PORTED 2026-10-28 at the fe132422 pin advance**
+  (PR #566282 in-pin): the option is now `provision.opensearch`
+  (`mkRemovedOptionModule` on the elasticsearch name) and the host-less
+  section materializes as `[opensearch]` - same guarded strip, renamed
+  script, asserted by `tests/dmarc-eval.nix` (green) and the
+  parsedmarc-e2e ini assertion.
 - NIXPKGS BUG (workaround shipped 2026-09-15; filed upstream as
   NixOS/nixpkgs#563652): on this rev the NixOS
   python scope resolves imapclient 3.1.0 for parsedmarc, and 3.1.0 is
@@ -1108,7 +1129,12 @@ json/yaml/markdown.
   the common connect path is fixed - but `imapclient.py` `starttls()`
   still assigns `self._imap.file`, so 4.x on python 3.14 still breaks the
   STARTTLS-upgrade path (`lib/python3.14/imaplib.py:337` is the read-only
-  property). Cite both halves when filing.
+  property). Cite both halves when filing. **PIN REVERTED 2026-10-28**:
+  the fe132422 pin ships imapclient 4.1.0 (`nix eval` 2026-10-28) and
+  parsedmarc 11.0.2 on the DEFAULT py3.14 scope, so the wrapper dropped
+  the py3.13 `parsedmarcPackage` pin and the `ExecStart = mkForce`
+  override; `tests/dmarc-eval.nix` now asserts the module's own
+  `python3.14-parsedmarc` ExecStart.
 - mailsuite (parsedmarc's IMAP layer) AUTO-ACTIVATES STARTTLS whenever the
   server advertises the capability (mailsuite/imap.py:284: `if not ssl and
   b"STARTTLS" in self.capabilities()`). A dovecot that advertises STARTTLS
@@ -1378,19 +1404,17 @@ conditions in the module comments and the Pin-advance runbook):
   the null filter) and parsedmarc still exits 255 ("hosts setting missing
   from the opensearch config section", cli.py re-verified on parsedmarc
   master 2026-10-19). Issue still OPEN, zero maintainer response; the
-  wrapper port procedure is mandatory at the first pin past the rework
-  (Pin-advance runbook step 2).
+  wrapper port landed 2026-10-28 at the fe132422 pin (guard + tests on
+  the `[opensearch]` shape; see the NIXPKGS BUG ledger entry).
 - [NixOS/nixpkgs#563652](https://github.com/NixOS/nixpkgs/issues/563652) -
   imapclient `starttls()` assigns the read-only `imaplib.IMAP4.file` on
   python 3.14. Wrapper workaround: unit pinned to the py3.13 build. UPSTREAM
   FIX LANDED: [mjs/imapclient#663](https://github.com/mjs/imapclient/pull/663)
   MERGED 2026-09-18 and released in imapclient 4.1.0 (maintainer comment on
   the nixpkgs issue; no further movement - the 2026-10-01 touch was only a
-  title rename); nixpkgs master ships 4.1.0 as of the 2026-10-19 re-check
-  (rode PR #566282), while the pinned rev `6774f7bc` still ships 4.0.1 on
-  py3.13 AND py3.14 (`nix eval`), so the
-  py3.13 pin retires at the next bump carrying >= 4.1.0 (Pin-advance
-  runbook). [mjs/imapclient#662](https://github.com/mjs/imapclient/issues/662)
+  title rename); the 2026-10-28 fe132422 pin ships 4.1.0 (`nix eval`),
+  so the py3.13 pin is RETIRED (workaround reverted 2026-10-28; the
+  module's own py3.14 ExecStart is back). [mjs/imapclient#662](https://github.com/mjs/imapclient/issues/662)
   (the upstream crash report) is CLOSED as fixed.
 - [NixOS/nixpkgs#563777](https://github.com/NixOS/nixpkgs/issues/563777) -
   parsedmarc module ships no systemd `Restart` policy: the poller exits 255
