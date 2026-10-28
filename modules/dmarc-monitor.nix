@@ -38,10 +38,10 @@
   # correct again. History: README ledger + "Pin-advance runbook".)
   # localMail storage path (fe132422+ shape): the exact expression the
   # nixpkgs module renders into settings.maildir.maildir_path - bound
-  # once so the ReadWritePaths entry and the privileged pre-start
-  # mkdir below stay in lockstep with the module's own layout (the
-  # postfix mail_spool_directory default carries a trailing slash; the
-  # kernel collapses the resulting "//").
+  # once so the ReadWritePaths entry and the tmpfiles rule below stay
+  # in lockstep with the module's own layout (the postfix
+  # mail_spool_directory default carries a trailing slash; the kernel
+  # collapses the resulting "//").
   localMailMaildirPath = "${config.services.postfix.settings.main.mail_spool_directory}/${config.services.parsedmarc.provision.localMail.recipientName}";
 in {
   options.services.dmarc-monitor = {
@@ -155,11 +155,16 @@ in {
           # and this maildir only appears when postfix delivers the
           # first mail, typically AFTER unit start (OSError Errno 30
           # on '/var/spool/mail/<user>/.Archive', two VM transcripts
-          # 2026-10-28). The privileged pre-start rule below creates
-          # the maildir BEFORE the namespace is set up; keeping the
-          # prefix off means a future regression fails the unit
-          # loudly at start instead of surfacing as a read-only
-          # filesystem in production.
+          # 2026-10-28). The tmpfiles rule below pre-creates the
+          # maildir at BOOT (ExecStartPre CANNOT do it: systemd applies
+          # the mount namespace to EVERY ExecStartPre command - the
+          # "+" prefix exempts only user/group/credential settings,
+          # not namespace options - so a "+" prepare step died at
+          # step NAMESPACE, status 226, before its command even ran,
+          # VM transcript 2026-10-28 run 4). Keeping the prefix off
+          # means a future regression fails the unit loudly at start
+          # instead of surfacing as a read-only filesystem in
+          # production.
           localMailMaildirPath
         ];
       # parsedmarc writes reports and nothing else: a read-only FS (with the
@@ -172,37 +177,23 @@ in {
       RestrictRealtime = lib.mkDefault true;
       RestrictSUIDSGID = lib.mkDefault true;
       SystemCallArchitectures = lib.mkDefault "native";
-      # localMail: materialize the provisioned maildir (owned by the
-      # recipient) BEFORE ExecStart's namespace setup, so the
-      # unprefixed ReadWritePaths entry above binds it writable -
-      # postfix only creates the maildir at first delivery, which
-      # races (and loses against) unit start. The "+" prefix runs the
-      # script with full privileges OUTSIDE the unit sandbox, the same
-      # escape the module's own ini-writing ExecStartPre uses.
-      # install -d is mkdir -p + ownership/mode - idempotent, never
-      # touches delivered mail.
-      ExecStartPre = lib.mkAfter (
-        lib.optionals config.services.parsedmarc.provision.localMail.enable [
-          "+${pkgs.writeShellScript "parsedmarc-prepare-local-maildir" ''
-            ${pkgs.coreutils}/bin/install -d -m 0700 -o ${config.services.parsedmarc.provision.localMail.recipientName} ${localMailMaildirPath}
-          ''}"
-        ]
-        # WORKAROUND (nixpkgs bug, README ledger 2026-09-15; retirement
-        # procedure: README "Pin-advance runbook"): with
-        # provision.opensearch = false the module's settings submodule
-        # still materializes opensearch.cert_path (types.path, defaults
-        # to the CA bundle) and .ssl (types.bool, false); both survive
-        # the module's null/[]/{} filter, so the rendered ini carries an
-        # [opensearch] section WITHOUT hosts and parsedmarc 11 refuses to
-        # start (ConfigurationError, "hosts setting missing" - the
-        # elasticsearch-era message shape). Neither key can be nulled
-        # through the option types, so strip the section from the RENDERED
-        # ini after the module's own ExecStartPre. Guarded: a real
-        # [opensearch] (OpenSearch provisioned) must survive.
-        # PORTED 2026-10-28 at the fe132422 pin advance (PR #566282
-        # renamed the option; the host-less-section bug persists as
-        # [opensearch], nixpkgs #563651 still open).
-        ++ lib.optionals (!config.services.parsedmarc.provision.opensearch) [
+      # WORKAROUND (nixpkgs bug, README ledger 2026-09-15; retirement
+      # procedure: README "Pin-advance runbook"): with
+      # provision.opensearch = false the module's settings submodule
+      # still materializes opensearch.cert_path (types.path, defaults
+      # to the CA bundle) and .ssl (types.bool, false); both survive
+      # the module's null/[]/{} filter, so the rendered ini carries an
+      # [opensearch] section WITHOUT hosts and parsedmarc 11 refuses to
+      # start (ConfigurationError, "hosts setting missing" - the
+      # elasticsearch-era message shape). Neither key can be nulled
+      # through the option types, so strip the section from the RENDERED
+      # ini after the module's own ExecStartPre. Guarded: a real
+      # [opensearch] (OpenSearch provisioned) must survive.
+      # PORTED 2026-10-28 at the fe132422 pin advance (PR #566282
+      # renamed the option; the host-less-section bug persists as
+      # [opensearch], nixpkgs #563651 still open).
+      ExecStartPre = lib.mkIf (!config.services.parsedmarc.provision.opensearch) (
+        lib.mkAfter [
           (pkgs.writeShellScript "parsedmarc-strip-opensearch-section" ''
             set -eu
             ${pkgs.gawk}/bin/awk '/^\[/{keep = ($0 != "[opensearch]")} keep' \
@@ -213,5 +204,19 @@ in {
         ]
       );
     };
+
+    # localMail: materialize the provisioned maildir (owned by the
+    # recipient, mode 0700) at BOOT, before ANY unit start - the
+    # unprefixed ReadWritePaths entry above then binds it writable.
+    # postfix only creates the maildir at first delivery, which races
+    # (and loses against) unit start; tmpfiles is the one mechanism
+    # that runs early enough (NixOS activation creates the user before
+    # tmpfiles-setup; ExecStartPre is too late by construction - see
+    # the ReadWritePaths comment). "d" = mkdir -p + owner/mode,
+    # idempotent, never touches delivered mail; group stays root,
+    # irrelevant at mode 0700.
+    systemd.tmpfiles.rules = lib.optionals config.services.parsedmarc.provision.localMail.enable [
+      "d ${localMailMaildirPath} 0700 ${config.services.parsedmarc.provision.localMail.recipientName} - -"
+    ];
   };
 }

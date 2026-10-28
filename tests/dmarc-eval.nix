@@ -72,8 +72,11 @@
   # exec time is silently skipped and the spool stays read-only under
   # ProtectSystem=strict forever; the maildir only exists once
   # postfix delivers, which races unit start - two VM transcripts
-  # 2026-10-28) and (2) PRE-CREATE it via a privileged ExecStartPre
-  # ("+" = outside the sandbox, before ExecStart's namespace setup).
+  # 2026-10-28) and (2) PRE-CREATE it via a tmpfiles rule (boot time;
+  # ExecStartPre is too late by construction - systemd applies the
+  # namespace to every ExecStartPre command, so a "+" prepare step
+  # dies at step NAMESPACE, status 226, VM transcript 2026-10-28
+  # run 4).
   localMailEval = nixpkgs.lib.nixosSystem {
     inherit system;
     modules = [
@@ -120,6 +123,7 @@
     user = localMailUnit.User;
     maildir = localMailEval.config.services.parsedmarc.settings.maildir;
     mailboxWatch = localMailEval.config.services.parsedmarc.settings.mailbox.watch;
+    tmpfiles = localMailEval.config.systemd.tmpfiles.rules;
   };
 
   # Regression guard for the [opensearch]-section workaround (README
@@ -149,10 +153,10 @@
   ];
   localMailReadWriteOk = builtins.elem moduleMaildirPath (lib.toList localMailUnit.ReadWritePaths);
   localMailDashRegression = builtins.elem "-${moduleMaildirPath}" (lib.toList localMailUnit.ReadWritePaths);
-  localMailHasPrepareStep =
+  localMailHasTmpfilesRule =
     builtins.any
-    (entry: lib.isString entry && lib.hasInfix "parsedmarc-prepare-local-maildir" entry)
-    localMailExecStartPre;
+    (rule: lib.isString rule && lib.hasPrefix "d ${moduleMaildirPath} " rule)
+    (lib.toList localMailEval.config.systemd.tmpfiles.rules);
 in
   assert versionOk || throw "dmarc-monitor contract is verified against parsedmarc >= 11 (got ${parsedmarcVersion}) - re-verify the [imap]/_secret/output semantics before touching the floor.";
   assert lib.isList execStartPre || throw "dmarc-eval: parsedmarc ExecStartPre is not a list - lib.last would return a character, not the strip script; re-verify the unit shape.";
@@ -161,11 +165,9 @@ in
   assert syscallDrops == [] || throw "dmarc-eval: the pinned parsedmarc module dropped SystemCallFilter entries ${toString syscallDrops} (has ${toString unit.SystemCallFilter}) - re-verify the unit sandbox before advancing the pin.";
   assert familyDrops == [] || throw "dmarc-eval: the pinned parsedmarc module dropped RestrictAddressFamilies entries ${toString familyDrops} (has ${toString unit.RestrictAddressFamilies}) - re-verify the unit sandbox before advancing the pin.";
   assert lib.isList localMailExecStartPre || throw "dmarc-eval: localMail ExecStartPre is not a list - re-verify the unit shape.";
-  assert builtins.length localMailExecStartPre >= 3 || throw "dmarc-eval: under localMail ExecStartPre must hold the module's ini step + the maildir preparation + the strip script (>= 3, got ${toString (builtins.length localMailExecStartPre)}) - f/17 shape check.";
   assert localMailReadWriteOk || throw "dmarc-eval: under provision.localMail the wrapper must whitelist the module's maildir (${moduleMaildirPath}) in ReadWritePaths - ProtectSystem=strict makes the spool read-only and parsedmarc's .Archive mkdirs die with OSError Errno 30 (VM transcripts 2026-10-28).";
   assert !localMailDashRegression || throw "dmarc-eval: the localMail ReadWritePaths entry must NOT carry the '-' ignore-missing prefix - the whitelist is evaluated once at namespace setup and the maildir (postfix creates it at first delivery) is missing at unit start, so a '-' entry silently leaves the spool read-only (two VM transcripts 2026-10-28).";
-  assert localMailHasPrepareStep || throw "dmarc-eval: the privileged maildir-preparation ExecStartPre (parsedmarc-prepare-local-maildir) is missing under localMail - without it the unprefixed ReadWritePaths entry fails the unit at start.";
-  assert lib.hasInfix "parsedmarc-strip-opensearch-section" (lib.last localMailExecStartPre) || throw "dmarc-eval: under localMail the strip script must stay the LAST ExecStartPre step (it rewrites the ini the earlier steps wrote).";
+  assert localMailHasTmpfilesRule || throw "dmarc-eval: the localMail maildir tmpfiles rule (boot-time pre-creation) is missing - without it the unprefixed ReadWritePaths entry fails the unit at start (ExecStartPre cannot pre-create: systemd namespaces every ExecStartPre command, status 226/NAMESPACE).";
     builtins.derivation {
       name = "dmarc-eval";
       inherit system;
@@ -197,7 +199,8 @@ in
             echo "FATAL: dashed localMail maildir whitelist regression" >&2
             exit 1
           fi
-          grep -F 'parsedmarc-prepare-local-maildir' "$renderedLocalMailPath"
+          grep -F "d ${moduleMaildirPath} 0700" "$renderedLocalMailPath"
+          grep -F 'parsedmarc-strip-opensearch-section' "$renderedLocalMailPath"
           grep -q '"user":"dmarc"' "$renderedLocalMailPath"
           grep -q '"dynamicUser":false' "$renderedLocalMailPath"
           grep -q 'dmarc-monitor' "$optionsCommonMark"
