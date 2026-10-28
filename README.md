@@ -606,6 +606,24 @@ inside nixpkgs are invisible to it, so the checks below are manual):
      pin - the wrapper ports to `provision.opensearch` (mkRemovedOption
      on the elasticsearch name). The strip-guard STAYS (same shape,
      renamed `[opensearch]`; nixpkgs #563651 still open).
+   - DIFF the parsedmarc module source at every advance, not just the
+     known workaround keys (lesson 2026-10-28: the #566282 dovecot
+     removal was discoverable in the fetched module in seconds, but was
+     only found via a 25-minute VM red): fetch
+     `nixos/modules/services/monitoring/parsedmarc.nix` at the new rev
+     and grep for REMOVED wiring (`dovecot`, `localMail` shape, unit
+     hardening changes) before building any VM check. **EXECUTED
+     2026-10-28**: localMail no longer wires dovecot at all (postfix +
+     a `[maildir]` watch only), which surfaced a REAL wrapper gap - the
+     ProtectSystem=strict sandbox vs parsedmarc's `.Archive` mkdirs in
+     postfix's spool. Fixed by the wrapper's storage contract (boot-time
+     `tmpfiles` pre-creation of the maildir + an UNPREFIXED
+     ReadWritePaths entry; a `-` prefix is silently evaluated-once at
+     namespace setup and an ExecStartPre pre-creation dies at
+     `226/NAMESPACE` - systemd namespaces EVERY ExecStartPre command);
+     the whole contract is eval-pinned in `dmarc-eval`'s localMail-shape
+     eval (three transcript-diagnosed VM runs, all evidence in
+     CHANGELOG [Unreleased]/Fixed).
    - imapclient/python pin: check the NixOS python scope's `imapclient`
      version. Revert `parsedmarcPackage` in `modules/dmarc-monitor.nix` (and
      the `dmarc-eval` pin assertion) when the pin ships imapclient >= 4.1.0
@@ -1060,6 +1078,11 @@ json/yaml/markdown.
   renamed the UNIT: `systemd.services.dovecot` (was `dovecot2.service`) -
   `wait_for_unit "dovecot2.service"` fails with "inactive, no pending jobs"
   even though dovecot is running (observed in parsedmarc-e2e, 2026-09-15).
+  SUPERSEDED SURFACE 2026-10-28 (fe132422, PR #566282): localMail no
+  longer wires dovecot AT ALL (postfix + a `[maildir]` watch only), so
+  this trap now bites only test-owned dovecot stacks - the e2e's `tls`
+  node pins both versions for exactly that reason; historical evidence
+  below stays.
 - Per-account storage QUOTA (VERIFIED in VM, 2026-09-15; 0.16.22 delta
   2026-10-17): the `quota` principal field is an integer byte count on
   any individual. An over-quota message is ACCEPTED at SMTP but never

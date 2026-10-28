@@ -570,6 +570,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- `dmarc-monitor` localMail storage contract (2026-10-28, surfaced by the
+  fe132422 pin advance): under `provision.localMail` the parsedmarc
+  maildir watcher mkdirs `.Archive`/`.Invalid` inside postfix's spool,
+  and the wrapper's `ProtectSystem=strict` killed it with
+  `OSError Errno 30`. Two stacked root causes, both transcript-diagnosed
+  (three VM runs): (1) the ReadWritePaths entry carried the `-`
+  ignore-missing prefix - systemd evaluates the whitelist ONCE at
+  namespace setup, and the maildir (created by postfix only at FIRST
+  delivery) does not exist at unit start, so the rw bind was silently
+  skipped forever; (2) an ExecStartPre pre-creation is impossible by
+  construction - systemd applies the mount namespace to EVERY
+  ExecStartPre command (`+` exempts only user/group/credentials), so a
+  privileged prepare step died at `status=226/NAMESPACE` before its
+  command ran. Fix: the wrapper now pre-creates the maildir at BOOT via
+  a `systemd.tmpfiles.rules` entry (mirroring the module's exact
+  `settings.maildir.maildir_path` expression) and whitelists it
+  UNPREFIXED, so any future regression fails the unit loudly at start
+  instead of surfacing as a read-only filesystem in production. The
+  whole contract is pinned at eval time: `dmarc-eval` gained a
+  localMail-shape eval asserting whitelist equality with the module's
+  rendered path, the no-dash doctrine, and the tmpfiles rule
+  (~10 s instead of a 25-minute VM red).
 - Owner-sitting sheet coverage re-proof (2026-10-26): the sheet claimed
   to hold EVERY open owner call, but C36, C37, and Q5 sat open in the
   decision batch and appeared on no sheet, and three 2026-10-26 session

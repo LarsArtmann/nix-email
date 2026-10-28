@@ -227,8 +227,13 @@
 
   # Self-signed cert fixture for the TLS node. SANs matter: mailsuite's
   # default verification context does HOSTNAME checks against the
-  # configured host (localhost), not just chain validation - a bare
-  # CN-only cert fails with a hostname mismatch.
+  # configured host, not just chain validation - a bare CN-only cert
+  # fails with a hostname mismatch. The tls node connects as
+  # host = "127.0.0.1" (IP literal), so the load-bearing SAN is
+  # IP:127.0.0.1 - and the full login proof passed against it
+  # (imap-login "Logged in: ... TLS", parsedmarc-e2e runs 2-3
+  # transcripts 2026-10-28): Python's ssl match_hostname DOES verify
+  # IP entries in subjectAltName, not just DNS names.
   #
   # DISTINCTION vs bind-e2e's testCert (2026-10-23): both use `-days 3650`
   # but the failure modes differ. Here the cert is CLIENT-TRUST only (the
@@ -275,6 +280,12 @@ in
         # `tls` node, which owns its mail stack). The wrapper's own
         # contributions stay in force: general.output=/var/lib/parsedmarc/reports,
         # heavy sinks off, StateDirectory/ReadWritePaths on the unit.
+        # Delivery semantics (pinned from the green run's journal,
+        # 2026-10-28 run 5): postfix 3.11.7 local(8) delivers into a
+        # MAILDIR TREE at /var/spool/mail/dmarc - "status=sent (delivered
+        # to maildir)" - because the module's mail_spool_directory
+        # default carries a TRAILING SLASH (postfix's maildir-delivery
+        # trigger); not an mbox file.
         # Collapsed attrset (statix W20 robustness - a dotted
         # parsedmarc.<key> pair trips W20 the moment a second one appears,
         # tests/parsedmarc-e2e.nix tls node + AGENTS.md Working rules).
