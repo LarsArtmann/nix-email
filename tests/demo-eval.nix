@@ -46,6 +46,7 @@
     # quickstart invokes via `nix run .#vm`.
     systemName = demoConfig.system.name;
     provisionType = provisionUnit.serviceConfig.Type;
+    provisionRemainAfterExit = provisionUnit.serviceConfig.RemainAfterExit == true;
     provisionAfter = lib.concatStringsSep "," provisionUnit.after;
     provisionWantedBy = lib.concatStringsSep "," provisionUnit.wantedBy;
     # nix-email#4: the cli invocation moved INSIDE a writeShellScript store
@@ -81,6 +82,11 @@ in
   assert renderedAttrs.forwardPairs == "127.0.0.1:18080->8080,127.0.0.1:2525->25,127.0.0.1:2587->587,127.0.0.1:2593->993" || throw "demo-eval: QEMU forward pairs drifted - the README quickstart ports are the demo's contract.";
   assert renderedAttrs.systemName == "demo" || throw "demo-eval: system.name drifted - it names the run-demo-vm runner script the quickstart uses.";
   assert renderedAttrs.provisionType == "oneshot" || throw "demo-eval: provision unit must stay a oneshot.";
+  # 2026-10-29 boot-only burn: without RemainAfterExit a changed plan never
+  # re-applies at a nixos-rebuild switch (inactive oneshots are not
+  # restarted by switch-to-configuration) - the unit must stay active
+  # (exited) so a changed unit file restarts it on every deploy.
+  assert renderedAttrs.provisionRemainAfterExit || throw "demo-eval: provision unit must set RemainAfterExit (deploy-time re-apply).";
   assert renderedAttrs.provisionAfter == "stalwart.service" || throw "demo-eval: provision unit must start after stalwart.service.";
   assert renderedAttrs.provisionWantedBy == "multi-user.target" || throw "demo-eval: provision unit must be wanted by multi-user.target.";
   assert renderedAttrs.provisionUsesCli || throw "demo-eval: provision unit must apply the plan via stalwart-cli (the 0.16 management surface - /api/principal is gone).";
@@ -113,6 +119,7 @@ in
           grep -q '"forwardPairs":"127.0.0.1:18080->8080,127.0.0.1:2525->25,127.0.0.1:2587->587,127.0.0.1:2593->993"' "$renderedPath"
           grep -q '"systemName":"demo"' "$renderedPath"
           grep -q '"provisionType":"oneshot"' "$renderedPath"
+          grep -q '"provisionRemainAfterExit":true' "$renderedPath"
           grep -q '"provisionAfter":"stalwart.service"' "$renderedPath"
           grep -q '"provisionWantedBy":"multi-user.target"' "$renderedPath"
           grep -q '"provisionUsesCli":true' "$renderedPath"

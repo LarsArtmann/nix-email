@@ -260,12 +260,20 @@ in {
         # then VERIFIES cfg.url came up (restartAndVerify above).
         # partOf MUST go with it: a stalwart restart would propagate back
         # into a provision restart (partOf semantics) and the unit would
-        # restart stalwart again - an infinite loop. NixOS switch
-        # semantics stay intact: a changed plan changes the unit file,
-        # which restarts the provision unit on every deploy.
+        # restart stalwart again - an infinite loop.
+        # RemainAfterExit (2026-10-29): WITHOUT it the exited oneshot is
+        # inactive, and switch-to-configuration does NOT restart inactive
+        # units whose file changed - a changed plan (new embedded ndjson)
+        # applied at BOOT ONLY, never at a nixos-rebuild deploy (proven on
+        # the pbx host 2026-10-29: the sungroup disable lanes shipped in a
+        # clean switch yet never applied until an explicit
+        # `systemctl restart stalwart-provision`). With RemainAfterExit the
+        # unit stays active (exited), so a changed unit file IS restarted
+        # on every deploy - and rotation stays `restart`, never `start`.
         after = ["stalwart.service"];
         serviceConfig = {
           Type = "oneshot";
+          RemainAfterExit = true;
           # Bounded wait: the probe+apply in ExecStart must never wedge a
           # NixOS switch forever — Type=oneshot defaults to an INFINITE start
           # timeout, so a management listener that never answers holds the
