@@ -15,13 +15,21 @@
 default_step_timeout: 25m
 # Frozen probe transcripts under docs/probes/ are RUN EVIDENCE, not
 # maintained code: successive probe sets legitimately share their harness
-# (carddav 2026-10-19 vs caldav 2026-10-29 = the jscpd ERROR the
-# 2026-10-30 gate run tripped on), and reformatting/deduplicating them
-# would falsify recorded evidence. The maintained Python surface is
-# scripts/ + modules/ + tests/ - all still scanned.
+# (carddav 2026-10-19 vs caldav 2026-10-29), and reformatting or
+# deduplicating them would falsify recorded evidence. The maintained
+# Python surface is scripts/ + modules/ + tests/ - all still scanned.
 exclude:
-  - docs/probes/
+  - docs/probes/**
 skip_steps:
+  # jscpd has NO per-tool path exclusion (a `tool_options: {jscpd: ...}`
+  # guess was silently inert, 2026-10-30) and does not honor the global
+  # `exclude:` - its only findings here are the frozen probe-transcript
+  # harness overlap under docs/probes/ (the 58-line carddav/caldav ERROR
+  # that redened the 2026-10-30 gate). Maintained-code duplication stays
+  # owned by the deduplicate-code doctrine via art-dupl. Re-enable when
+  # BuildFlow ships per-tool excludes or jscpd respects `exclude:`
+  # (their-repo follow-up, TODO_LIST BuildFlow row).
+  - jscpd
   # vulnix crashes fleet-wide updating the NVD feed: HTTP 404 on
   # nvdcve-2.0-modified.json.gz (NVD retired the legacy JSON 2.0 feeds;
   # vulnix 1.12.5 is unmaintained upstream). BuildFlow's "unscannable
