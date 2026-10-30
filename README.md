@@ -543,8 +543,9 @@ stands until that call.
 nix-email.url = "github:LarsArtmann/nix-email";
 # consumer wrapper (DiscordSync pattern): import nixosModules.default, layer
 # sops template for the IMAP password, port registration (lib/ports.nix),
-# harden overrides, onFailure -> Discord, Gatus checks, backup-coordination
-# for outputDirectory.
+# harden overrides, onFailure -> Discord (incl. the deliverability probe
+# unit mail-deliverability-probe.service), Gatus checks,
+# backup-coordination for outputDirectory.
 ```
 
 The consumer wrapper already exists as

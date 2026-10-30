@@ -40,11 +40,13 @@ Hetzner project/location, size ceiling (CX22-class?), backup target (evo-x2 btrf
 
 - **[rec] Discord** via the existing SystemNix DiscordSync layer (already in-fleet, phone-reachable); ntfy as fallback.
 - Unblocks: M11 taxonomy routing table, M15 auth alerts, M12 queue alerts, M13 dead-man switch.
+- STATUS 2026-10-30 (agent note, ratification pending): the owner asked for "fully automated continuous deliverability checks with alerts e.g. Desktop, SigNoz, Gatus" - read as a MULTI-channel direction, not a single pick. Executed: the probe's emission surfaces (unit exit code, Prometheus textfile gauges, JSON report) now serve ALL three named channels; copy-paste wirings in MONITORING.md section 8. The FORMAL channel pick (Discord vs ntfy for the push leg) stays this decision's to close.
 
 ### C29 — Round-trip canary vantage (send→receive SLO probe)
 
 - **[rec] evo-x2** (residential, independent network + DNS path; cron/systemd timer sending via Resend to a canary mailbox, asserting delivery SLO).
 - Unblocks: M18 canary implementation.
+- STATUS 2026-10-30: DISSOLVED operationally - the canary SHIPPED in both shapes (`services.mail-server.deliverabilityChecks` host timer + the `deliverability-probe` flake package for any vantage), so the vantage is a deployment choice, not a design blocker. evo-x2 remains the recommendation for the outside run; machinery VM-e2e'd (`deliverability-e2e`).
 
 ## Repo policy (2-min answers)
 

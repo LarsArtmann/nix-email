@@ -9,7 +9,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
-- Nothing yet.
+- Continuous deliverability checks (`services.mail-server.deliverabilityChecks`,
+  owner request 2026-10-30): a timer-driven probe unit
+  (`mail-deliverability-probe.service`) running a stdlib-only Python probe -
+  DNS MX/SPF/DMARC/DKIM, DNSBL listing per outbound IP (Spamhaus error
+  answers classified WARNING, never "listed"), transport health on
+  25/465/587/993 (STARTTLS/implicit TLS + SASL login when canary
+  credentials are set), certificate expiry, and a round-trip canary that
+  submits a token-unique mail on 587 and asserts IMAPS arrival within the
+  SLO, distinguishing send-failure from delivery-timeout (MONITORING.md
+  section 6). Emission-only by doctrine: exit code (for the consumer's
+  onFailure -> push -> desktop path), `report.json` + pruned history, and
+  a Prometheus textfile with per-check gauges plus the dead-man
+  `mail_deliverability_probe_timestamp_seconds`. Alert ROUTING stays
+  consumer-side; copy-paste wirings for Desktop/push, SigNoz, and Gatus
+  live in docs/MONITORING.md section 8. The same derivation ships as the
+  flake package/app `deliverability-probe` for vantage runs (the outside
+  view; C29 dissolved). New check `deliverability-e2e`: full battery
+  green on a real local DNS zone (MX/SPF/DMARC/DKIM + mock DNSBL) incl.
+  round-trip canary and cleanup, the emission contract (textfile gauges,
+  timer cadence, Persistent), and the negatives (DNSBL listing fails
+  naming the zone; wrong canary credentials fail at phase=send).
 
 ### Changed
 
