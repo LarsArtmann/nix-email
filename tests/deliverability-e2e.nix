@@ -73,9 +73,14 @@
   probeTimer =
     probeConfig.systemd.timers.mail-deliverability-probe;
 
+  # lib.toList: the wrapper sets ExecStart as ONE string (not a list) -
+  # builtins.any/head on a string throw "expected a list but found a
+  # string with context" (the 2026-10-30 buildflow chase).
+  probeExecStart = pkgs.lib.toList probeService.serviceConfig.ExecStart;
+
   probeAsserts = assert probeService.serviceConfig ? LoadCredential;
-  assert builtins.any (line: pkgs.lib.hasInfix "--host" line) probeService.serviceConfig.ExecStart;
-  assert pkgs.lib.hasInfix "deliverability-probe" (builtins.head probeService.serviceConfig.ExecStart);
+  assert builtins.any (line: pkgs.lib.hasInfix "--host" line) probeExecStart;
+  assert pkgs.lib.hasInfix "deliverability-probe" (builtins.head probeExecStart);
   assert !(probeService.serviceConfig ? OnFailure);
   assert probeService.serviceConfig.DynamicUser;
   assert probeTimer.wantedBy == ["timers.target"];
