@@ -139,3 +139,30 @@ live reports carry their own per-item arrows.
 | 2026-10-19_06-05_resumed-thread-pbx-flip-row…      | ARCHIVE        | 3 verdicts: f27 verdict cell restored 2026-10-19 (stable per-cell form); working-tree foreign edits landed via daemon sweep; owner sittings → decision-batch                                                                                       |
 | 2026-10-19_07-18_buildflow-gate-repair…agents-trim | ARCHIVE        | 63 verdicts: the 4 foreign ruff findings fixed by X11 (2026-10-20); step-timeout + probe-lint doctrine harvested as TODO rows; CHANGELOG entries added this pass; f-table 20-50 were TODO-row pointers (verified current)                          |
 | 2026-10-20_10-25_x-generation-resumption…verdict   | ARCHIVE        | 9 verdicts: superseded in place by the same session's 14-19 closeout (bullets struck NOT-DO/subsumed; open items carry arrows to the closeout + TODO rows)                                                                                         |
+
+## Manifest — 2026-10-30 docs-health corridor pass (11 files)
+
+The 2026-10-23 -> 10-28 corridor re-read against the tree; every
+forward-looking item carries an inline verdict (done/routed/NOT-DO with
+dated evidence; check-rows green per file BEFORE the move). The Y-plan
+lives in `docs/planning/archived/` with its own manifest row (Appendix R
+per-task dispositions; plan-class files carry the Appendix R instead of
+inline strikes, per the 2026-10-23 planning-corridor precedent). Kept
+live ON PURPOSE: 2026-10-19_12-17 + 2026-10-20_14-19 (the owner-gated
+pbx flip owns them), 2026-10-23_11-26 (its f/50 defers its archive to
+the same blessing; its closed f-items were annotated this pass), and
+2026-10-30_18-26 (the owning session's fresh report).
+
+| File (date prefix)                                            | Classification | Deciding reason                                                                                                               |
+| ------------------------------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| 2026-10-23_16-10_y-generation-execution-owner-sitting-package-gate-green | ARCHIVE        | 61 verdicts: a/d historical, every b/c/f/g item done or routed (v0.5.0 + pin advance landed 10-28; pbx lanes routed to their row) |
+| 2026-10-24_18-40_eventcatalog-integration-executed-publish-riding-ci-handoff | ARCHIVE        | the 4 publish-handoff steps verdicted (mirror satisfied 10-26; wait/push/verify routed to the TODO publish row)                 |
+| 2026-10-24_19-03_eventcatalog-integration-session-full-status-self-review | ARCHIVE        | 65 verdicts: all f-items routed (publish chain to its row; hardening backlog harvested to ROADMAP 2026-10-30)                   |
+| 2026-10-25_15-26_rocksdb-sqlite-advisory-session-status       | ARCHIVE        | pure advisory; the three owner questions routed to ROADMAP open question 9 (added this pass)                                    |
+| 2026-10-26_19-00_y-plan-ef-session-full-status-brutal-self-review | ARCHIVE        | 27 verdicts: all b/c/f/g closed (executed 10-26 same night or routed)                                                           |
+| 2026-10-26_20-15_y-plan-ef-lanes-execution-bounce-ping-tls-dprint | ARCHIVE        | absorbed by 19-00; 10 verdicts align with it                                                                                    |
+| 2026-10-26_20-44_z-d-lane-d1-d2-d3-port-sweep-queueseries-buildflow-green | ARCHIVE        | D1/D2/D3 landed same night; the NOT-done paragraph routed (auth live 10-28, CI superseded)                                      |
+| 2026-10-26_20-48_z-d-lane-session-full-status-brutal-self-review | ARCHIVE        | 31 verdicts over the f-table + g: all executed or routed                                                                        |
+| 2026-10-26_21-23_z-corridor-completeness-and-arf-runtime-proof | ARCHIVE        | superseded by 21-40 (its own header says so); c/f/g routed                                                                      |
+| 2026-10-26_21-40_z-arf-runtime-proof-and-sheet-coverage-session-status | ARCHIVE        | 59 verdicts: A/C-lanes executed 10-28; the rest routed (sheet + TODO rows)                                                      |
+| 2026-10-28_11-33_pin-advance-fe132422-opensearch-port-stalwart-01626 | ARCHIVE        | its own Appendix 1+2 dispositioned every f-item and answered all g-questions (C43 CUT, v2 guard, CardDAV re-baseline); inline strikes added this pass |

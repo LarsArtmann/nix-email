@@ -75,7 +75,7 @@ only; 9 tools unavailable = the documented Nix-repo noise). Residue:
 
 ## What is NOT done and why (owner-gated, per Z-plan)
 
-O1 `gh auth login` (blocks F1-F4 filings, A3 tag-CI watch, mailsuite **→ routed 2026-10-30: gh auth LIVE again 2026-10-28 (z-gen O1 satisfied, re-verified this pass); O2 = the sitting sheet (partially answered 2026-10-28: C43/C45/contacts); origin CI superseded by later green runs through 40861706874 (2026-10-29)**
+~~O1 `gh auth login` (blocks F1-F4 filings, A3 tag-CI watch, mailsuite~~ **→ routed 2026-10-30: gh auth LIVE again 2026-10-28 (z-gen O1 satisfied, re-verified this pass); O2 = the sitting sheet (partially answered 2026-10-28: C43/C45/contacts); origin CI superseded by later green runs through 40861706874 (2026-10-29)**
 nudge), O2 the sitting (blocks A/B/C verdict lanes, D4/D5, G3/G7).
 Origin CI on pushed `373c30a` remains unwatched until O1. No push this
 session (no explicit request).

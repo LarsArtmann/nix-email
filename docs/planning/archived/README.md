@@ -37,3 +37,9 @@ BEFORE the `git mv`.
 | 2026-10-18_22-20_SUPERB-pareto-v-generation-backlog-burn                 | ARCHIVE        | Per-task dispositions already written by W15.1 (2026-10-19); Appendix R records the archive verdict                           |
 | 2026-10-19_02-34_SUPERB-pareto-w-generation-migration-fix-release-unlock | ARCHIVE        | Appendix R reads all 19 rows: 5 DONE (migration e2e, gate, dmarc-eval pins, guard tooling, docs corridor), rest split/routed  |
 | 2026-10-19_07-35_SUPERB-pareto-x-generation-release-ship-residue-burn    | ARCHIVE        | Appendix R reads all 20 rows: 5 DONE (delta table, local guards, ruff debt, skip set, vm-debug.sh), rest routed to the Y plan |
+
+## Manifest — 2026-10-30 (1 file)
+
+| File (date prefix)                                                            | Classification | Deciding reason                                                                                    |
+| ----------------------------------------------------------------------------- | -------------- | --------------------------------------------------------------------------------------------------- |
+| 2026-10-23_11-49_SUPERB-pareto-y-generation-release-train-owner-gates-full-backlog | ARCHIVE        | Appendix R reads all 46 L1 tasks: 24 DONE (release train, pin advance, D/E lanes, F1/F4/F5/F8, G5/G6), rest SPLIT/ROUTED to the Z plan, the sitting sheet, and TODO_LIST |
