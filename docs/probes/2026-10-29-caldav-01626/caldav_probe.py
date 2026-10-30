@@ -306,7 +306,6 @@ def main() -> int:
     status, headers, data = req(
         "PUT", ev2, EVENT_RECUR, ctype="text/calendar; charset=utf-8"
     )
-    etag2 = headers.get("etag", "")
     record(
         "C7a PUT recurring (RRULE weekly x5, TZID Europe/Berlin)",
         f"PASS ({status})" if 200 <= status < 300 else f"SEE-TRANSCRIPT ({status})",
@@ -361,7 +360,6 @@ def main() -> int:
         ctype="text/calendar; charset=utf-8",
         extra={"If-Match": etag1} if etag1 else {},
     )
-    etag1b = headers.get("etag", "")
     record(
         "C9b matching If-Match -> 2xx",
         "PASS" if 200 <= status < 300 else f"SEE-TRANSCRIPT ({status})",
