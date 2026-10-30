@@ -158,7 +158,7 @@ in the Z-plan
 ~~| 26 | G1: BuildFlow upstream batch (count gaps, identity parsing, detect-only, vulture policy)        | their cadence |~~ **→ routed — TODO BuildFlow row (their repo)**
 ~~| 27 | G2: SystemNix CI-debt lanes (credential, canary allowlist, 2 pin flips, divergence doc)         | their cadence |~~ **→ routed — TODO SystemNix CI-debt row**
 ~~| 28 | G3-G7: qcow2 purge verdict, contacts probe re-run on bump, EventCatalog publish, watch cadence, | O2 / external |~~ **→ routed — qcow2 owner-gated (TODO row); contacts probe EXECUTED 2026-10-28; EventCatalog publish external-blocked; watch ~11-05; policy rows on the sheet**
-|    | policy executions - see Z-plan section 3                                                        |               |
+|    | policy executions - see Z-plan section 3                                                        |               |~~ **→ (row 28 verdict covers this continuation)**
 
 Session-surfaced micro-items to fold at the next TODO touch (NOT yet
 harvested): the `missing_file=17` JSON-mode evidence enrichment (item

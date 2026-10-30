@@ -51,17 +51,17 @@ no problems.
 
 ## Publish handoff (T6/T8 remainder - bounded, not blocked on us)
 
-1. Wait for the concurrent demo-flagging workstream to land (webphone
+~~1. Wait for the concurrent demo-flagging workstream to land (webphone~~ **→ routed — still open: the hub demo-flagging workstream had no commits as of 2026-10-26 (TODO_LIST EventCatalog publish row owns the wait)**
    export fixed + go-cqrs-lite MarkDemo tagged/bumped). A hub-master
    push before that publishes a red run.
-2. Ensure the nix-email Forgejo mirror carries >= `456840b` (mirror
+~~2. Ensure the nix-email Forgejo mirror carries >= `456840b` (mirror~~ **→ done — SATISFIED 2026-10-26: forgejo mirror carries 3f38b79 >= 456840b (ls-remote; TODO row)**
    last synced 15:30, pre-exporter; pulls every <= 6h) - or the CI's
    Forgejo-side clone misses `scripts/export-catalog.py`.
-3. Then EITHER just push hub master (build.yml fires on push; nightly
+~~3. Then EITHER just push hub master (build.yml fires on push; nightly~~ **→ routed — still open: hub-master push / ci-dispatch rides the TODO_LIST publish row**
    03:23 rebuild bounds staleness anyway) OR force it now on evo-x2:
    `sudo bash scripts/ci-dispatch.sh build.yml master` (root-only PAT
    minting; not executable from an agent shell).
-4. Verify T8: catalog.home.lan `/docs/services/mail-server/1.0.0` +
+~~4. Verify T8: catalog.home.lan `/docs/services/mail-server/1.0.0` +~~ **→ routed — still open: catalog.home.lan verification rides the publish (TODO_LIST row)**
    `/docs/services/dmarc-monitor/1.0.0` (bodies ours, chips SystemNix),
    `/docs/adrs/<id>/1.0.0` x7, `build-stamp.json` covering the
    nix-email rev, `check-stale-sources.sh` quiet.

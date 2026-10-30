@@ -58,27 +58,27 @@ Companion execution report: [18-40](2026-10-24_18-40_eventcatalog-integration-ex
 
 ## b) PARTIALLY DONE
 
-1. **T5 full-9-source green**: NOT achieved - two FOREIGN sources were
+~~1. **T5 full-9-source green**: NOT achieved - two FOREIGN sources were~~ **→ routed — still external: the hub demo-flagging workstream had no commits as of 2026-10-26 (TODO publish row)**
    red mid-flight (webphone export boots the app and dies on
    `/var/lib/webphone`; go-cqrs-lite master's mesh-demo calls unlanded
    `reg.MarkDemo`). Scoping to nix-email was the right call, but the
    union-with-all-sources build remains unproven until their workstream
    lands.
-2. **T6 - publish**: not dispatched. Hard parts: sudo is
+~~2. **T6 - publish**: not dispatched. Hard parts: sudo is~~ **→ routed — still open: TODO EventCatalog publish row**
    agent-banned + pushing hub master TODAY would publish a red run (it
    carries their broken sources). Handoff documented (push-trigger path
    - TODO_LIST row). The `publish=false` CI rehearsal (F6.1/F6.2) also
      never ran.
-3. **T8 - live verification**: local receipts only. catalog.home.lan
+~~3. **T8 - live verification**: local receipts only. catalog.home.lan~~ **→ routed — rides the publish (TODO publish row)**
    pages unverified (rides T6). The nix-email Forgejo mirror was at
    15:30 (pre-exporter) at last check - NOT re-verified after my
    pushes; CI's Forgejo-side clone needs it >= `456840b`.
-4. **Preview eyeball was 60% of the pages**: I fully fetched ONLY the
+~~4. **Preview eyeball was 60% of the pages**: I fully fetched ONLY the~~ **→ NOT-DO — point-in-time honesty note; the deeper verification standard is recorded in (e)**
    mail-server page. dmarc-monitor and the 7 ADR pages were verified by
    dist route listings, not by rendered fetch. (My closing summary said
    "preview renders the page + all 7 ADR routes" - precise wording
    would have been "routes present in dist".)
-5. **Origin CI green for session commits**: two red runs are the
+~~5. **Origin CI green for session commits**: two red runs are the~~ **→ done — superseded: later origin runs green through 2026-10-29; the 2026-10-30 ruff-floor red was fixed this pass (14934ac)**
    GitHub-API rate-limit class (magic-nix-cache 418 +
    `ResourceExhausted`; one died at Install Nix). All content steps that
    ran were green, but master's latest CI badge is red until a rerun
@@ -86,19 +86,19 @@ Companion execution report: [18-40](2026-10-24_18-40_eventcatalog-integration-ex
 
 ## c) NOT STARTED
 
-1. Real CI dispatch + publish (F6.1-F6.4) - blocked on the concurrent
+~~1. Real CI dispatch + publish (F6.1-F6.4) - blocked on the concurrent~~ **→ routed — TODO publish row (external workstream + sudo)**
    workstream + sudo.
-2. Live catalog.home.lan verification receipts (F8.1/F8.2) and
+~~2. Live catalog.home.lan verification receipts (F8.1/F8.2) and~~ **→ routed — rides the publish**
    `check-stale-sources.sh` quiet check (F6.4 tail).
-3. `build-stamp.json` covers-nix-email-rev verification (CI-side
+~~3. `build-stamp.json` covers-nix-email-rev verification (CI-side~~ **→ routed — rides the publish (CI-side artifact)**
    artifact).
-4. Full `nix flake check` green on origin for the session's commits
+~~4. Full `nix flake check` green on origin for the session's commits~~ **→ done — superseded: origin green through run 40861706874 (2026-10-29)**
    (rate-limited away; local BuildFlow was green but whether it
    executed the VM checks vs evaluated them is not pinned in my log
    reading - assume eval-level, not VM-run).
-5. SystemNix description-sync (row added; no actual sync needed yet).
-6. Rerun/cleanup of the cancelled CI run 40112947029.
-7. Harvesting this report's section (f) into TODO_LIST/ROADMAP (the
+~~5. SystemNix description-sync (row added; no actual sync needed yet).~~ **→ routed — TODO description-sync row**
+~~6. Rerun/cleanup of the cancelled CI run 40112947029.~~ **→ done — superseded: the cancelled run aged out of the actions list**
+~~7. Harvesting this report's section (f) into TODO_LIST/ROADMAP (the~~ **→ done — THIS pass (2026-10-30): the durable f-items harvested to the ROADMAP exporter-hardening backlog**
    critical rows already exist from T9; the rest is fuel).
 
 ## d) TOTALLY FUCKED UP (all caught and fixed, but they were MY errors)
@@ -166,126 +166,126 @@ Companion execution report: [18-40](2026-10-24_18-40_eventcatalog-integration-ex
 
 Publish chain (highest impact first):
 
-1. Verify the nix-email Forgejo mirror carries >= `456840b`.
-2. Watch for the concurrent demo-flagging workstream landing (webphone
+~~1. Verify the nix-email Forgejo mirror carries >= `456840b`.~~ **→ done — SATISFIED 2026-10-26 (forgejo mirror 3f38b79 >= 456840b)**
+~~2. Watch for the concurrent demo-flagging workstream landing (webphone~~ **→ routed — still pending (TODO publish row)**
    export fix + go-cqrs-lite MarkDemo tagged/bumped).
-3. Push hub master (or `sudo bash scripts/ci-dispatch.sh build.yml
+~~3. Push hub master (or `sudo bash scripts/ci-dispatch.sh build.yml~~ **→ routed — TODO publish row**
    master` on evo-x2) once clear.
-4. Watch the first full-9-source CI run to green (`ci-log.sh --steps`).
-5. Verify catalog.home.lan `/docs/services/mail-server/1.0.0` (body
+~~4. Watch the first full-9-source CI run to green (`ci-log.sh --steps`).~~ **→ routed — TODO publish row (watch the first full run post-publish)**
+~~5. Verify catalog.home.lan `/docs/services/mail-server/1.0.0` (body~~ **→ routed — rides the publish**
    ours, chips SystemNix).
-6. Verify `/docs/services/dmarc-monitor/1.0.0` live.
-7. Verify all 7 `/docs/adrs/<id>/1.0.0` routes live.
-8. Verify `build-stamp.json` covers the nix-email rev.
-9. Verify `check-stale-sources.sh` quiet post-publish.
-10. Append live URLs/screenshots to the 18-40 report (ANNOTATE mode).
-11. Archive the 17-07 plan per corridor policy once T6/T8 close.
-12. Rerun the rate-limited CI runs once the GitHub budget resets
+~~6. Verify `/docs/services/dmarc-monitor/1.0.0` live.~~ **→ routed — rides the publish**
+~~7. Verify all 7 `/docs/adrs/<id>/1.0.0` routes live.~~ **→ routed — rides the publish**
+~~8. Verify `build-stamp.json` covers the nix-email rev.~~ **→ routed — rides the publish**
+~~9. Verify `check-stale-sources.sh` quiet post-publish.~~ **→ routed — rides the publish**
+~~10. Append live URLs/screenshots to the 18-40 report (ANNOTATE mode).~~ **→ routed — rides the publish**
+~~11. Archive the 17-07 plan per corridor policy once T6/T8 close.~~ **→ routed — after T6/T8 close (the 17-07 plan stays live by its own annotation)**
+~~12. Rerun the rate-limited CI runs once the GitHub budget resets~~ **→ done — superseded: later runs green through 2026-10-29; the 2026-10-30 red fixed (14934ac)**
     (`gh run rerun`), confirm master badge green.
 
 Exporter hardening:
 
-13. Selftest: assert body links are absolute http(s) URLs.
-14. Selftest: assert `--plain` output is byte-identical to default.
-15. Add `--check` mode (export to tempdir, diff against an existing
+~~13. Selftest: assert body links are absolute http(s) URLs.~~ **→ routed — ROADMAP exporter-hardening backlog (added 2026-10-30)**
+~~14. Selftest: assert `--plain` output is byte-identical to default.~~ **→ routed — ROADMAP exporter-hardening backlog**
+~~15. Add `--check` mode (export to tempdir, diff against an existing~~ **→ routed — ROADMAP exporter-hardening backlog**
     tree) as a CI-able drift guard.
-16. ADR cross-links: `related:` between vendor-stalwart-016-module and
+~~16. ADR cross-links: `related:` between vendor-stalwart-016-module and~~ **→ routed — ROADMAP exporter-hardening backlog**
     stalwart-pin-vs-overlay; parsedmarc-keep-or-retire and
     hardening-defaults-off.
-17. Decide + document the version policy for content changes (see
+~~17. Decide + document the version policy for content changes (see~~ **→ routed — owner call open (g/2)**
     question 2).
-18. Assert the exact frontmatter line SHAPES (not just keys) so
+~~18. Assert the exact frontmatter line SHAPES (not just keys) so~~ **→ routed — ROADMAP exporter-hardening backlog**
     yaml_str drift is caught.
-19. When C42 resolves: flip the ADR status + update the dmarc-monitor
+~~19. When C42 resolves: flip the ADR status + update the dmarc-monitor~~ **→ routed — C42 open (TODO row; flip in the exporter data on the owner verdict per AGENTS)**
     body caveat + CHANGELOG in one commit.
-20. When C45 resolves: same for stalwart-pin-vs-overlay (+ re-check the
+~~20. When C45 resolves: same for stalwart-pin-vs-overlay (+ re-check the~~ **→ routed — C45 dissolved by events 2026-10-28; the ADR note stands (flip on owner decision per AGENTS)**
     vendor drift note inside it).
-21. Consider a `decisionMakers:` field on ADRs (contract supports it;
+~~21. Consider a `decisionMakers:` field on ADRs (contract supports it;~~ **→ routed — parked idea (owner attribution)**
     owner-gated calls deserve the attribution).
-22. mail-relay authored body decision (see question 3).
+~~22. mail-relay authored body decision (see question 3).~~ **→ routed — owner call open (g/3)**
 
 Content depth (each small):
 
-23. dmarc-monitor body: parsedmarc ini passthrough example.
-24. mail-server body: link docs/MONITORING.md pointer (consumer-side
+~~23. dmarc-monitor body: parsedmarc ini passthrough example.~~ **→ routed — content backlog (next catalog session)**
+~~24. mail-server body: link docs/MONITORING.md pointer (consumer-side~~ **→ routed — content backlog (next catalog session)**
     Gatus contract).
-25. mail-server body: link docs/THREAT_MODEL.md.
-26. mail-server body: demo-VM quickstart pointer (`nix run .#vm`).
-27. Service bodies: mention `docs/INBOXCLEAN.md` JMAP contract
+~~25. mail-server body: link docs/THREAT_MODEL.md.~~ **→ routed — content backlog (next catalog session)**
+~~26. mail-server body: demo-VM quickstart pointer (`nix run .#vm`).~~ **→ routed — content backlog (next catalog session)**
+~~27. Service bodies: mention `docs/INBOXCLEAN.md` JMAP contract~~ **→ routed — content backlog (next catalog session)**
     (consumer ecosystem).
-28. When v0.5.0 ships: refresh the Consumers section (pin version,
+~~28. When v0.5.0 ships: refresh the Consumers section (pin version,~~ **→ routed — the exporter bodies predate the v0.5.0 cut; refresh rides the next catalog session**
     0.16-world language).
 
 Split-brain + sync discipline:
 
-29. Roadmap-decision-id vs exporter-ADR-id sync check (mechanical).
-30. SystemNix description-sync when v0.5.0 changes capabilities.
-31. dmarc-monitor go-live badge flip: verify it rides the inventory
+~~29. Roadmap-decision-id vs exporter-ADR-id sync check (mechanical).~~ **→ routed — ROADMAP exporter-hardening backlog**
+~~30. SystemNix description-sync when v0.5.0 changes capabilities.~~ **→ routed — TODO description-sync row**
+~~31. dmarc-monitor go-live badge flip: verify it rides the inventory~~ **→ routed — next pipeline rehearsal**
     with zero source changes (assert in the next rehearsal).
-32. Hub AGENTS: nix-email as the documented MANUAL-source example
+~~32. Hub AGENTS: nix-email as the documented MANUAL-source example~~ **→ routed — their repo, their call**
     (their doc, their call).
 
 Hub-side observations (their repo, filed here as noticed):
 
-33. lint-sources.sh could print per-source durations (forensics for
+~~33. lint-sources.sh could print per-source durations (forensics for~~ **→ routed — their repo (filed as noticed)**
     hangs like webphone's).
-34. build.sh could validate `sources.json` mtime vs run start (moving-
+~~34. build.sh could validate `sources.json` mtime vs run start (moving-~~ **→ routed — their repo (filed as noticed)**
     master guard) - or at least log the revs it will use up front.
-35. The export-retry loop retries deterministic failures once (15s) -
+~~35. The export-retry loop retries deterministic failures once (15s) -~~ **→ routed — their repo (filed as noticed)**
     a data-dir EPERM is not transient; a cheap failure-classifier
     could save the retry minute.
-36. Rate-limit mitigation for CI (magic-nix-cache tuning / concurrency
+~~36. Rate-limit mitigation for CI (magic-nix-cache tuning / concurrency~~ **→ routed — their repo (filed as noticed)**
     group) - two red runs today were pure infra.
-37. `check-dist-output` could assert the .well-known/api-catalog
+~~37. `check-dist-output` could assert the .well-known/api-catalog~~ **→ routed — their repo (filed as noticed)**
     linkset includes every expected source's services (nix-email
     included).
 
 Session/process lessons (crush-config lessons.md candidates):
 
-38. Moving-master rule: re-verify pipeline inputs before long runs in
+~~38. Moving-master rule: re-verify pipeline inputs before long runs in~~ **→ routed — crush-config lessons.md candidates (cross-project; their commits)**
     hot environments; scope-first rehearsals.
-39. Partial-cell edit ban in wide tables (whole row or python fix).
-40. Per-source-isolation lint implies: every referenced user/team must
+~~39. Partial-cell edit ban in wide tables (whole row or python fix).~~ **→ routed — crush-config lessons.md candidates**
+~~40. Per-source-isolation lint implies: every referenced user/team must~~ **→ routed — crush-config lessons.md candidates**
     ship in-tree (cross-project lesson for any future source repo).
-41. Retry-snapshot pattern for files being atomically rewritten by
+~~41. Retry-snapshot pattern for files being atomically rewritten by~~ **→ routed — crush-config lessons.md candidates**
     other processes (jq/cat with retry loop).
 
 Small hygiene:
 
-42. The plan's mermaid graph says "T6a fail -> LOG -> FIX" - with FIX
+~~42. The plan's mermaid graph says "T6a fail -> LOG -> FIX" - with FIX~~ **→ routed — future-plan shape note**
     pointing back at T1; in reality T6 failures can be foreign (this
     session's case) - future plans should model a foreign-red exit.
-43. Cancelled CI run cleanup / branch-protection check after red runs.
-44. Verify whether BuildFlow's nix-flake-check step executed VM checks
+~~43. Cancelled CI run cleanup / branch-protection check after red runs.~~ **→ done — superseded: the rate-limit class aged out (later runs green)**
+~~44. Verify whether BuildFlow's nix-flake-check step executed VM checks~~ **→ routed — standing discipline (binary-rev stamping in the TODO BuildFlow row)**
     or eval-only for this session (read the step output explicitly).
-45. Screenshot receipts for user-facing proof (fetch-text suffices for
+~~45. Screenshot receipts for user-facing proof (fetch-text suffices for~~ **→ routed — parked idea**
     me, not for humans).
-46. Add the exporter's `--selftest` to CI as a cheap explicit step
+~~46. Add the exporter's `--selftest` to CI as a cheap explicit step~~ **→ routed — parked idea (CI economy)**
     (ruff does not run it; BuildFlow does not either - only I did,
     manually).
-47. EventCatalog integrations page (`docs/generated/integrations`)
+~~47. EventCatalog integrations page (`docs/generated/integrations`)~~ **→ routed — rides the publish**
     should list nix-email post-publish - verify.
-48. llms.txt / api-catalog include the two services - verify
+~~48. llms.txt / api-catalog include the two services - verify~~ **→ routed — rides the publish**
     post-publish.
-49. Consider pinning the exporter's catalog "content version" in
+~~49. Consider pinning the exporter's catalog "content version" in~~ **→ done — the catalog export shipped in the v0.5.0 release notes (CHANGELOG [0.5.0] Added)**
     CHANGELOG Unreleased so v0.5.0 release notes mention the catalog
     export as a feature.
-50. This report: after T6/T8 close, ANNOTATE (never rewrite) with the
+~~50. This report: after T6/T8 close, ANNOTATE (never rewrite) with the~~ **→ routed — pre-annotated this pass (2026-10-30); archive after T6/T8 close**
     final publish receipts.
 
 ## g) Questions I can NOT figure out myself
 
-1. **Who pushes hub master when the concurrent workstream lands?** A
+~~1. **Who pushes hub master when the concurrent workstream lands?** A~~ **→ routed — owner policy call (open)**
    future session of me, or you personally? It fires build.yml, which
    publishes straight to catalog.home.lan - a user-visible artifact. I
    documented the push-trigger path, but the trigger finger is a policy
    call (and sudo ci-dispatch is yours only).
-2. **Catalog version policy**: services stay `1.0.0` lockstep with the
+~~2. **Catalog version policy**: services stay `1.0.0` lockstep with the~~ **→ routed — owner call (open)**
    inventory renderer forever, or do material body changes bump to
    1.1.0+ (forking the id's version set vs the inventory's 1.0.0 - the
    strict gate tolerates it, the pages grow a version history)? Same
    question for ADRs on status flips (bump vs edit-in-place at 1.0.0).
-3. **Does `mail-relay` deserve an authored nix-email body?** It is a
+~~3. **Does `mail-relay` deserve an authored nix-email body?** It is a~~ **→ routed — owner call (open)**
    third inventory row (deployed on evo-x2) whose implementation IS
    this repo's `services.mail-server.relay` option - but the deployed
    relay may be a different thing entirely (SystemNix-owned?). I cannot

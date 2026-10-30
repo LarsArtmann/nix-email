@@ -76,27 +76,27 @@ Three advisory answers were delivered (store-backend comparison, storage-engine 
 
 Operator asked for "up to 50". Filling to 50 would require exactly the project-wide research this report was told NOT to do, so the list stops where evidence stops. Items carry their source. Items marked [owner] need a section-g answer first.
 
-1. [owner] Decide the cluster horizon: is multi-node Stalwart ever planned for this stack? If yes → open a decision note "cluster store choice" (FoundationDB vs PostgreSQL as shared data store). If no → one ROADMAP/README line: "single-host by doctrine; RocksDB default is final until that changes."
-2. [owner] Decide where backup/restore doctrine lives: this flake's README go-live runbook vs SystemNix consumer docs exclusively.
-3. [owner] Decide durability: should this session's advisory content (store comparison, cluster constraints, snapshot doctrine) be verified and pinned into the ledger/module docs, or remain one-off Q&A?
-4. If (3) = durable: verify Stalwart cluster/shared-store claims against upstream docs at the pin's version, then add a ledger row ("store backends and clusters" class).
-5. If (3) = durable: verify the BTRFS nodatacow/snapshot semantics claim against BTRFS docs before encoding it anywhere.
-6. Add a backup/restore row to whichever doc (2) selects: dataDir on its own subvolume, CoW enabled on DB paths (never `chattr +C` on `index.sqlite3` or the RocksDB dir), atomic snapshot captures all store files at one instant, restore = copy + journal replay.
-7. Run the restore drill once: snapshot a live (demo-VM or scratch) store, restore into a clean VM, start the service, capture the journal-replay transcript under `docs/probes/<date>/` — the repo's own "no assertion without a transcript" rule applies to backup claims.
-8. Add the one-line dev-VM doctrine: "SQLite layout (legacy) is the probe/dev default because the store stays inspectable with sqlite3; RocksDB layout is the real-host default" — the carddav probe already depends on the SQLite side of this, only the written doctrine is missing.
-9. README module docs: one paragraph on switching store backends per consumer (`services.stalwart.settings` override path) + the migration reality (dump/convert via the migrate path, never in-place) — grounded in `migrate_v016.py`'s converter surface.
-10. Add a decision-note stub only if (1) says cluster: store taxonomy table (rocksdb/sqlite = single-node; foundationdb/postgresql/mysql = shareable; s3/azure = blobs; elasticsearch/meilisearch = FTS) lifted from `migrate_v016.py`'s own validation messages so it cannot drift from code.
-11. If (2) selects runbook: add the "snapshots are not backup" pairing rule (send/receive off-host) next to the existing dead-man-monitor doctrine in `docs/MONITORING.md`'s neighborhood.
-12. Optionally pin the crash-recovery claim (SQLite WAL replay / RocksDB MANIFEST+WAL replay) into the ledger row from (4) — same verification pass, one visit.
-13. TODO_LIST harvest of this report: section (f) rows 1-12 into TODO_LIST/ROADMAP with the [owner] gates made explicit (docs-health HARVEST mode).
+~~1. [owner] Decide the cluster horizon: is multi-node Stalwart ever planned for this stack? If yes → open a decision note "cluster store choice" (FoundationDB vs PostgreSQL as shared data store). If no → one ROADMAP/README line: "single-host by doctrine; RocksDB default is final until that changes."~~ **→ routed — ROADMAP open question 9a (cluster horizon; added 2026-10-30)**
+~~2. [owner] Decide where backup/restore doctrine lives: this flake's README go-live runbook vs SystemNix consumer docs exclusively.~~ **→ routed — ROADMAP open question 9b (backup-doctrine ownership)**
+~~3. [owner] Decide durability: should this session's advisory content (store comparison, cluster constraints, snapshot doctrine) be verified and pinned into the ledger/module docs, or remain one-off Q&A?~~ **→ routed — ROADMAP open question 9c (durability)**
+~~4. If (3) = durable: verify Stalwart cluster/shared-store claims against upstream docs at the pin's version, then add a ledger row ("store backends and clusters" class).~~ **→ routed — rides 9c**
+~~5. If (3) = durable: verify the BTRFS nodatacow/snapshot semantics claim against BTRFS docs before encoding it anywhere.~~ **→ routed — rides 9c**
+~~6. Add a backup/restore row to whichever doc (2) selects: dataDir on its own subvolume, CoW enabled on DB paths (never `chattr +C` on `index.sqlite3` or the RocksDB dir), atomic snapshot captures all store files at one instant, restore = copy + journal replay.~~ **→ routed — rides 9b**
+~~7. Run the restore drill once: snapshot a live (demo-VM or scratch) store, restore into a clean VM, start the service, capture the journal-replay transcript under `docs/probes/<date>/` — the repo's own "no assertion without a transcript" rule applies to backup claims.~~ **→ routed — the STORE-level restore drill is VM-proven (FEATURES backup row, 2026-10-18 transcripts); the BTRFS-snapshot drill rides 9b**
+~~8. Add the one-line dev-VM doctrine: "SQLite layout (legacy) is the probe/dev default because the store stays inspectable with sqlite3; RocksDB layout is the real-host default" — the carddav probe already depends on the SQLite side of this, only the written doctrine is missing.~~ **→ routed — rides 9a/9c**
+~~9. README module docs: one paragraph on switching store backends per consumer (`services.stalwart.settings` override path) + the migration reality (dump/convert via the migrate path, never in-place) — grounded in `migrate_v016.py`'s converter surface.~~ **→ routed — rides 9c**
+~~10. Add a decision-note stub only if (1) says cluster: store taxonomy table (rocksdb/sqlite = single-node; foundationdb/postgresql/mysql = shareable; s3/azure = blobs; elasticsearch/meilisearch = FTS) lifted from `migrate_v016.py`'s own validation messages so it cannot drift from code.~~ **→ routed — rides 9a (only if cluster becomes planned)**
+~~11. If (2) selects runbook: add the "snapshots are not backup" pairing rule (send/receive off-host) next to the existing dead-man-monitor doctrine in `docs/MONITORING.md`'s neighborhood.~~ **→ routed — rides 9b**
+~~12. Optionally pin the crash-recovery claim (SQLite WAL replay / RocksDB MANIFEST+WAL replay) into the ledger row from (4) — same verification pass, one visit.~~ **→ routed — rides 9c**
+~~13. TODO_LIST harvest of this report: section (f) rows 1-12 into TODO_LIST/ROADMAP with the [owner] gates made explicit (docs-health HARVEST mode).~~ **→ done — THIS pass (2026-10-30): the owner-gated trio routed to ROADMAP open question 9; nothing belongs in TODO_LIST (questions, not tasks)**
 
 **Pre-existing items noticed in passing this session (NOT session work; listed for routing honesty only):** C44 account-secrets doctrine row (TODO_LIST, seen in grep), C42/C45 ADRs shipping `proposed` (seen in grep), `docs/TELEMETRY.md` 0.15-era caveat (AGENTS.md). These already have homes; no new action created here.
 
 ## g) Questions I Cannot Figure Out Myself
 
-1. **Cluster horizon:** Is a second Stalwart node ever on the roadmap for this stack, or is single-host the permanent shape? This decides whether "cluster store choice" becomes a tracked decision now, or a one-line doctrine note forever.
-2. **Backup doctrine ownership:** Should the store-backup mechanics (BTRFS subvolume layout, CoW flag, snapshot + restore-drill procedure) be documented in THIS flake's README runbook, or is all backup doctrine consumer-layer (SystemNix) by design, leaving this flake with nothing to say?
-3. **Durability of this session's answers:** Do you want any of the advisory content verified and pinned (ledger rows / module docs), or was it one-off Q&A with no doc obligation? (If durable, items 4/5/12 define the verification pass.)
+~~1. **Cluster horizon:** Is a second Stalwart node ever on the roadmap for this stack, or is single-host the permanent shape? This decides whether "cluster store choice" becomes a tracked decision now, or a one-line doctrine note forever.~~ **→ routed — 9a**
+~~2. **Backup doctrine ownership:** Should the store-backup mechanics (BTRFS subvolume layout, CoW flag, snapshot + restore-drill procedure) be documented in THIS flake's README runbook, or is all backup doctrine consumer-layer (SystemNix) by design, leaving this flake with nothing to say?~~ **→ routed — 9b**
+~~3. **Durability of this session's answers:** Do you want any of the advisory content verified and pinned (ledger rows / module docs), or was it one-off Q&A with no doc obligation? (If durable, items 4/5/12 define the verification pass.)~~ **→ routed — 9c**
 
 ---
 
