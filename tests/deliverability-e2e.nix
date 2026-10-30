@@ -80,8 +80,7 @@
   assert probeService.serviceConfig.DynamicUser;
   assert probeTimer.wantedBy == ["timers.target"];
   assert probeTimer.timerConfig.OnCalendar == "*:0/15";
-  assert probeTimer.timerConfig.Persistent;
-    probeService.serviceConfig.ExecStart;
+  assert probeTimer.timerConfig.Persistent; "eval-contract-ok";
 
   # The probe derivation for manual negative runs inside the VM - the
   # SAME single-source build the unit uses (modules/deliverability-probe-bin.nix).
@@ -190,6 +189,13 @@ in
     };
 
     testScript = ''
+      # Force the eval contract (relay-e2e's smtp.log pattern): the let-
+      # block asserts only fire when consumed - an unconsumed binding is
+      # dead code AND a deadnix finding. The tail is a plain marker: the
+      # ExecStart string itself carries derivation CONTEXT and cannot be
+      # interpolated into testScript ("expected a list but found a string
+      # with context", buildflow run 2026-10-30).
+      machine.log("deliverability probe eval contract: ${probeAsserts}")
       machine.wait_for_unit("stalwart.service", timeout=180)
       # Provision BEFORE any SMTP probe (the 1 h directory negative-cache
       # trap): the canary account must exist before the probe submits.

@@ -31,22 +31,22 @@ supported-report-set, C13 free-busy-query, C14 calendar-query time-range.
 parity with the CardDAV baseline (17/18) for everything pim-sync's design
 uses. Recommendation to the owner gate (plan 2.3): GO.**
 
-| Verdict | Result |
-| --- | --- |
-| C1 well-known redirect | PASS (307 → /dav/cal) |
-| C2 current-user-principal | PASS |
-| C3 calendar-home-set | PASS |
-| C4 calendar enumeration | PASS (2 hrefs) |
-| C5 MKCOL calendar | PASS (201) |
-| C6 PUT/GET VEVENT round-trip | PASS (etag yes, UID+SUMMARY preserved) |
-| C7 RRULE+TZID fidelity | PASS (all preserved) |
-| C8 RECURRENCE-ID override | **SEE-TRANSCRIPT** — see deviance note |
-| C9 conditional PUT (stale/matching/UID-swap) | PASS ×3 (412 / 2xx / 4xx refusal) |
-| C10 sync-collection token | PASS (initial + advance) |
-| C11 DELETE/tombstone + sync removal | PASS ×2 |
-| C12 supported-report-set | PASS (sync + calendar-query + multiget) |
-| C13 free-busy-query | PASS |
-| C14 calendar-query time-range | PASS (Berlin series found) |
+| Verdict                                        | Result                                                       |
+| ---------------------------------------------- | ------------------------------------------------------------ |
+| C1 well-known redirect                         | PASS (307 → /dav/cal)                                        |
+| C2 current-user-principal                      | PASS                                                         |
+| C3 calendar-home-set                           | PASS                                                         |
+| C4 calendar enumeration                        | PASS (2 hrefs)                                               |
+| C5 MKCOL calendar                              | PASS (201)                                                   |
+| C6 PUT/GET VEVENT round-trip                   | PASS (etag yes, UID+SUMMARY preserved)                       |
+| C7 RRULE+TZID fidelity                         | PASS (all preserved)                                         |
+| C8 RECURRENCE-ID override                      | **SEE-TRANSCRIPT** — see deviance note                       |
+| C9 conditional PUT (stale/matching/UID-swap)   | PASS ×3 (412 / 2xx / 4xx refusal)                            |
+| C10 sync-collection token                      | PASS (initial + advance)                                     |
+| C11 DELETE/tombstone + sync removal            | PASS ×2                                                      |
+| C12 supported-report-set                       | PASS (sync + calendar-query + multiget)                      |
+| C13 free-busy-query                            | PASS                                                         |
+| C14 calendar-query time-range                  | PASS (Berlin series found)                                   |
 | C8b supplemental: EMBEDDED override round-trip | PASS (master + override both preserved, both VEVENTs intact) |
 
 ### Known deviances
@@ -63,8 +63,8 @@ uses. Recommendation to the owner gate (plan 2.3): GO.**
 - Dialect facts re-confirmed for the calendar legs: UID-swap PUT refused
   (412, no silent rewrite — mirrors the CardDAV no-uid-conflict analog);
   tombstones surface in sync-collection (C11b); multiget + sync-collection
-  + calendar-query all in supported-report-set (C12) — the multiget +
-  sync-collection shape caldav client implements is server-confirmed.
+  - calendar-query all in supported-report-set (C12) — the multiget +
+    sync-collection shape caldav client implements is server-confirmed.
 
 ## Files
 
