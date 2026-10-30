@@ -163,7 +163,7 @@
   # as "#domain" in domainId fields).
   wrapperDomainId = "domain";
 
-  deliverabilityChecks = cfg.deliverabilityChecks;
+  inherit (cfg) deliverabilityChecks;
 
   # Single-source probe derivation (host mode unit, vantage package, VM
   # test manual runs all import the same file - modules/deliverability-probe-bin.nix).

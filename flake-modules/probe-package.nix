@@ -22,6 +22,7 @@
     apps.deliverability-probe = {
       type = "app";
       program = pkgs.lib.getExe probe;
+      meta.description = "Deliverability probe for the nix-email stack - run from any vantage against the public mail hostname (MONITORING.md row 10)";
     };
   };
 }
