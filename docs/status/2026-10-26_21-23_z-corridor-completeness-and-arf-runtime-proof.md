@@ -68,7 +68,7 @@
 
 ## c) NOT STARTED (owner-gated by design)
 
-O1 (`gh auth login`), O2 (the sitting - now genuinely one sitting), O3,
+O1 (`gh auth login`), O2 (the sitting - now genuinely one sitting), O3, **→ routed 2026-10-30: O1 SATISFIED 2026-10-28 (auth live); A1-A5/C1/C4 executed 2026-10-28 (v0.5.0 + fe132422); the remainder rides the sitting sheet + TODO rows**
 A1-A5, B1-B3, F1-F4, C1-C8, D4/D5, G1-G7: all untouched, all still owned by
 the Z-plan. Nothing in this session consumed an owner-gated row.
 
@@ -104,20 +104,20 @@ the Z-plan. Nothing in this session consumed an owner-gated row.
 
 ## f) NEXT (unchanged Z-plan order, minus what this session closed)
 
-1. O1: `gh auth login -h github.com` (5 min) - four filings + tag-CI watch
+~~1. O1: `gh auth login -h github.com` (5 min) - four filings + tag-CI watch~~ **→ routed — SATISFIED 2026-10-28: gh auth live (10-28 report Appendix item 20)**
    parked behind it.
-2. O2: the sitting - the sheet is now COMPLETE (C36/C37/Q5/D5/rename/
+~~2. O2: the sitting - the sheet is now COMPLETE (C36/C37/Q5/D5/rename/~~ **→ routed — partially answered 2026-10-28 (C43/C45/contacts); C42/C44/C39-C41/C46 remain on the sheet**
    cadence/AGENTS added); ~70 min clears >51% of the remaining board.
-3. O3 then A1-A5 (v0.5.0), B1-B3 (pbx), C1-C8 (pin advance +
+~~3. O3 then A1-A5 (v0.5.0), B1-B3 (pbx), C1-C8 (pin advance +~~ **→ routed — unlocked lanes EXECUTED 2026-10-28 (v0.5.0 release + fe132422 pin advance); B1-B3 + verdict lanes stay owner-gated**
    verdict executions), D4/D5, G1-G7.
-4. New, cheap: add the mechanical sheet-vs-batch ID diff as a script if the
+~~4. New, cheap: add the mechanical sheet-vs-batch ID diff as a script if the~~ **→ routed — idea stands (its own text: not worth a check yet)**
    sitting slip ever repeats (not worth a check yet).
 
 ## g) Questions I cannot answer myself
 
-1. **O1 timing** - unchanged: when does `gh auth login` run?
-2. **O2 timing** - the sheet is complete now; is the sitting happening?
-3. **C42 verdict** - evidence is complete (aggregates + ARF, runtime-verified
+~~1. **O1 timing** - unchanged: when does `gh auth login` run?~~ **→ routed — ANSWERED: gh auth live again 2026-10-28**
+~~2. **O2 timing** - the sheet is complete now; is the sitting happening?~~ **→ routed — sittings partially held 2026-10-28; the sheet still carries C42/C44/C39-C41/C46**
+~~3. **C42 verdict** - evidence is complete (aggregates + ARF, runtime-verified~~ **→ routed — OPEN: pure owner call (TODO_LIST C42 row; sheet Batch 1)**
    on the pin, controls included). Retire now, or keep through
    stabilization? That is now the ONLY thing standing between C42 and done.
 
