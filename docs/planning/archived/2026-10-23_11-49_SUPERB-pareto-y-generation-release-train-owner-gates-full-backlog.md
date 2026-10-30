@@ -364,3 +364,62 @@ flowchart TD
   lesson: plans must price the assertions behind the pin, not the pin).
 - Rollback posture: every phase lands as its own commit(s); a red gate
   reverts the task, not the doctrine.
+
+---
+
+## Appendix R — Resolution (2026-10-30 docs-health archive pass)
+
+ARCHIVED — superseded by the Z-generation plan (2026-10-26_19-54, itself
+updated 2026-10-28) + TODO_LIST; the L2 micro-graph resolves through its
+parent task. Every L1 task below re-read against the tree; DONE means the
+artifact exists and was verified (CHANGELOG entries, tags, or cited report
+appendices).
+
+| Task | Disposition                                                                                                                                        |
+| ---- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| O1   | DONE - sitting sheet prepared 2026-10-23 (`2026-10-23_11-56`), coverage re-proofed 2026-10-26 (Batches 5+7 added)                                   |
+| O2   | SPLIT - sittings held 2026-10-28 (C43 CUT, C45 superseded, contacts g/3 run); C42/C44/C39-C41/C46 remain on the sheet                                |
+| O3   | SPLIT - answered verdicts recorded (decision-batch banners + 2026-10-28 execution); the remainder rides the sheet                                   |
+| A1   | DONE - v0.5.0 cut commit `06ab701` (CHANGELOG rename + SECURITY bump, same-call)                                                                    |
+| A2   | DONE - release-tree proof 2026-10-28: flake check EXIT:0 + buildflow EXIT:0 (10-28 report Appendix 2/3)                                             |
+| A3   | DONE - SKIPPED in favor of the real cut (z-gen banner); the real tag-CI reds delivered the dry-run lessons                                          |
+| A4   | DONE - v0.5.0 RELEASED 2026-10-28 (tag moved pre-publish after two diagnosed reds, tag-CI green, gh release)                                         |
+| A5   | DONE - README banner flipped to the 2026-10-28 pin-advance state (10-28 report Appendix 5)                                                          |
+| B1   | ROUTED - owner-gated pbx blessing (TODO_LIST pbx row; sheet Batch 2)                                                                                |
+| B2   | ROUTED - waits on B1                                                                                                                                |
+| B3   | ROUTED - the two kept-live reports close after the blessing (their own pre-committed defer)                                                         |
+| C1   | DONE - fe132422 pin advance with the #566282 elasticsearch->opensearch port (10-28 report)                                                          |
+| C2   | SPLIT - #552103 still OPEN (vendored dir stays); the C45 branch DISSOLVED (the pin itself ships stalwart_0_16 0.16.26)                              |
+| C3   | DONE (premise superseded 2026-10-28 - SystemNix floats this repo master; TODO row deleted 2026-10-30)                                               |
+| C4   | DONE - aarch64 shape, dovecot warning GONE, watch re-dated at the advance (10-28 report)                                                            |
+| C5   | ROUTED - C44 owner verdict pending (sheet Batch 1)                                                                                                  |
+| C6   | ROUTED - C39 owner verdict pending (sheet)                                                                                                          |
+| C7   | ROUTED - D1-gated prep pack (TODO_LIST D1 rows)                                                                                                     |
+| D1   | DONE - `scripts/check-testscript-shell.py` shipped (CI step + pre-push + CONTRIBUTING; self-test on the 28e5dd7 shape)                              |
+| D2   | DONE - `default_step_timeout: 25m` in `.buildflow.yml` with rationale                                                                               |
+| D3   | ROUTED - IN_PROGRESS (TODO_LIST CI python-lint row; owner blessing pending)                                                                         |
+| D4   | DONE - probe lint residue 9/9 cleared + doctrine in CONTRIBUTING                                                                                    |
+| D5   | DONE - full buildflow green (a/16; re-run green 2026-10-26 20-44 D3)                                                                                |
+| D6   | DONE - AGENTS session-start ritual now sweeps docs/{status,planning,reviews}                                                                        |
+| E1   | DONE - relay bounce subtest LANDED 2026-10-26 (queue_rescheduled proof + 119.5 s drain; CHANGELOG)                                                  |
+| E2   | DONE - runtime-budget doctrine in the stalwart-e2e header (a/13)                                                                                    |
+| E3   | SPLIT - capture-first mechanized 2026-10-26; the owner-taste call routed (TODO flood row; sheet Batch 5)                                            |
+| E4   | DONE - EventSource ping probe LANDED 2026-10-26 (docs/probes/2026-10-26-es-ping/; CHANGELOG)                                                        |
+| E5   | DONE - no-backup-dir migration leg green (a/14)                                                                                                     |
+| E6   | DONE - TLS-node breadth LANDED 2026-10-26 (CHANGELOG)                                                                                               |
+| E7   | DONE - micro-doc batch (bind-e2e SAN comment + fixture-cert distinction, a/15)                                                                      |
+| F1   | DONE - five plans archived with Appendix R dispositions + manifest (same day)                                                                       |
+| F2   | ROUTED - ON HOLD per owner 2026-10-28 (draft review before posting; TODO watch row)                                                                 |
+| F3   | ROUTED - dnsmasq venue + gh (TODO upstream-filings row)                                                                                             |
+| F4   | DONE - RESOLVED-NO-FILING 2026-10-26: fixed upstream (markdown 0.28.2 keeps cells); plugin bumped, archived corridors excluded                      |
+| F5   | DONE - watch re-checked + evidence re-dated (2026-10-23/26/28)                                                                                      |
+| F6   | ROUTED - no single end-to-end README read ever ran; successive corridor passes spot-verify (2026-10-23/28/30)                                       |
+| F7   | SPLIT - TELEMETRY header re-pinned to 0.16.26 (2026-10-28); the full key re-verify rides the next telemetry-adjacent session (standing caveat)      |
+| F8   | DONE - webui/webadmin finding documented + vendored patch landed 2026-10-26 (the upstream #552103 comment is owner-review-gated)                    |
+| G1   | ROUTED - TODO_LIST BuildFlow row (their repo)                                                                                                       |
+| G2   | ROUTED - TODO_LIST BuildFlow row (binary-rev stamping recorded 2026-10-26)                                                                          |
+| G3   | ROUTED - TODO_LIST SystemNix CI-debt row                                                                                                            |
+| G4   | ROUTED - qcow2 owner verdict (TODO_LIST row)                                                                                                        |
+| G5   | DONE - contacts probe re-run 2026-10-28: 17/18 PASS on 0.16.26 (row closed; re-arms at the next stalwart bump)                                      |
+| G6   | DONE - rename watch re-checked 2026-10-26 (nixpkgs master still ships the pre-0.16 module; folded into the watch row)                               |
+| G7   | ROUTED - ROADMAP owns the standing ideas                                                                                                            |

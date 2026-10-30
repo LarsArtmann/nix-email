@@ -30,6 +30,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   round-trip canary and cleanup, the emission contract (textfile gauges,
   timer cadence, Persistent), and the negatives (DNSBL listing fails
   naming the zone; wrong canary credentials fail at phase=send).
+- Docs-health full-corridor pass (2026-10-30): the 2026-10-23 -> 10-28
+  status corridor re-read and verified against code; the eleven
+  fully-resolved reports annotated inline (dated verdicts via
+  annotate.go status-items; check-rows green per file before the move)
+  and ARCHIVED with manifests, plus the exhausted Y-generation plan
+  (Appendix R dispositions) in docs/planning/archived/; the two
+  pbx-owner reports (10-19 12-17 + 10-20 14-19), the pbx-deferred
+  10-23 docs-health report, and the active Z-plan stay live by design.
+  Living-docs truth-up: the four DONE/STALE TODO rows deleted (v0.5.0
+  released 2026-10-28, SystemNix pin premise superseded, C45 superseded,
+  gh auth live again), the orphaned TODO rows folded back into their
+  table, the FEATURES SystemNix row + 12-check set + CI currency
+  corrected, the 2026-10-25 store-doctrine owner questions routed into
+  ROADMAP (open question 9) and the exporter-hardening backlog into
+  ROADMAP theme 6, and the red ruff-floor CI run (F841 x2 in the
+  2026-10-29 CalDAV probe, run 40991974714) fixed (14934ac).
 
 ### Changed
 
