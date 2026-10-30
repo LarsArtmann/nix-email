@@ -223,8 +223,8 @@ Waits (gate/CI/VM runs) are `[wait]`; owner micros are `[owner]`.
 | E3.1  | Exporter selftest: absolute body-link assertion (kills the REPO_BASE class)                                              | E3     | -          |
 | E3.2  | `--plain` byte-parity + exact frontmatter line-shape assertions                                                           | E3     | E3.1       |
 | E3.3  | `--check` drift mode + ADR cross-links; selftest green                                                                   | E3     | E3.2       |
-| E4.1  | Refresh exporter service bodies to the v0.5.0/0.16.26 world; Consumers section                                           | E4     | P15-pub    |
-| E4.2  | Live URL verifies + receipts appended to the 18-40 report (ANNOTATE mode)                                                 | E4     | P15-pub    |
+| E4.1  | Refresh exporter service bodies to the v0.5.0/0.16.26 world; Consumers section                                           | E4     | A5         |
+| E4.2  | Live URL verifies + receipts appended to the 18-40 report (ANNOTATE mode)                                                 | E4     | A5         |
 | E5.1  | Traced-verbosity ARF variant asserting an `incoming-report.*` event name                                                  | E5     | -          |
 | E5.2  | Aggregate-subtest delivery control; evaluate the combined subtest (runtime budget!)                                       | E5     | E5.1       |
 | E6.1  | DOMAIN_LANGUAGE.md: harvest the vocabulary from the README ledger + module docs (plan, reconcile set, match property...)   | E6     | -          |
