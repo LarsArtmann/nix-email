@@ -235,6 +235,22 @@ transcript-pinned dialect).
   facts + citations live in
   docs/status/archived/2026-10-19_02-35_stalwart-contacts-assessment.md.
 
+- Reload-action egress dependence (2026-10-30, proven from this tree +
+  the pbx-artmann VM): the provision plan's trailing reload action makes
+  stalwart RE-VALIDATE its settings, and an Oidc Directory in the plan
+  turns that validation into a NETWORK operation - the discovery
+  document AND the jwks_uri are GETed over HTTPS via the system resolver
+  and the SYSTEM trust store (rustls-platform-verifier; issuer field
+  must byte-equal the plan's issuerUrl, crates/directory/backend/oidc).
+  Inside a nix build sandbox the VM has no egress at all, so ANY test
+  that provisions an Oidc directory dies at the reload's fetch
+  (validationFailed, "Discovery fetch failed"). None of THIS repo's VM
+  suites provision one today (the suites pin DnsResolver to Cloudflare
+  for the resolver state only) - the working stub pattern lives in
+  pbx-artmann's tests/stalwart-host-wiring.nix: /etc/hosts pin + loopback
+  HTTPS server serving the real discovery doc + security.pki
+  .certificateFiles CA. Note for any future suite that adds SSO objects.
+
 ## EventCatalog integration (catalog.home.lan)
 
 - `scripts/export-catalog.py` is the ONLY content source for the
