@@ -429,6 +429,131 @@ in {
       '';
     };
 
+    deliverabilityChecks = {
+      enable = lib.mkEnableOption ''
+        continuous deliverability probes (systemd timer): DNS
+        (MX/SPF/DMARC/DKIM), DNSBL listing, transport (25/465/587/993 TLS),
+        certificate expiry, and an optional round-trip canary. EMISSION
+        ONLY - exit code, journal, /var/lib report JSON + Prometheus
+        textfile; alert ROUTING (push/SigNoz/Gatus) stays on the consumer
+        host (docs/MONITORING.md "Routing table": alerts never ride the
+        mail stack they watch, and the monitor itself is dead-man'd via
+        mail_deliverability_probe_timestamp_seconds staleness).
+      '';
+
+      frequency = lib.mkOption {
+        type = lib.types.str;
+        default = "*:0/15";
+        description = ''
+          systemd OnCalendar expression for the probe timer (default:
+          every 15 minutes - the MONITORING.md section 6 canary cadence).
+        '';
+      };
+
+      sloSeconds = lib.mkOption {
+        type = lib.types.ints.positive;
+        default = 600;
+        description = "Round-trip canary delivery SLO in seconds (breach = CRITICAL).";
+      };
+
+      domains = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [cfg.hostname];
+        description = ''
+          Mail domains checked for MX/SPF/DMARC/DKIM records. Defaults to
+          the provisioned Domain (= hostname). Add the bare organization
+          domain when mail addresses live under it.
+        '';
+      };
+
+      dkimSelectors = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [];
+        example = ["rs" "ed"];
+        description = "DKIM selectors whose `_domainkey` TXT records are verified (empty = skip).";
+      };
+
+      dnsblZones = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [];
+        example = ["zen.spamhaus.org"];
+        description = ''
+          DNSBL zones queried for each outbound IP (empty = skip; a real
+          listing is CRITICAL). Off by default like every network-DNS
+          feature here: Spamhaus refuses resolver-forwarded queries
+          (127.255.255.x answers are classified WARNING, never "listed"),
+          so only enable this where the host resolves recursively itself
+          (a VPS with provider resolvers qualifies).
+        '';
+      };
+
+      ipAddresses = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [];
+        description = "Outbound IPv4 addresses for PTR/DNSBL checks (empty = resolve from hostname).";
+      };
+
+      ports = lib.mkOption {
+        type = lib.types.listOf lib.types.port;
+        default = [25 465 587 993];
+        description = "Listener ports probed for transport/TLS health (subset of 25/465/587/993).";
+      };
+
+      canary = {
+        address = lib.mkOption {
+          type = lib.types.nullOr lib.types.str;
+          default = null;
+          example = "canary@example.com";
+          description = ''
+            Existing mailbox the round-trip canary sends to and reads from
+            (submit on 587 as this account, assert IMAPS arrival within
+            sloSeconds). The wrapper does NOT provision this account
+            (plan-borne passwords would be store-world-readable - the C44
+            doctrine); provision it via services.stalwart.provision or pick
+            an existing one.
+          '';
+        };
+        secretFile = lib.mkOption {
+          type = lib.types.nullOr lib.types.path;
+          default = null;
+          description = ''
+            File with the canary account password (sops-rendered path on
+            real hosts). Fed through systemd LoadCredential - never lands
+            in the Nix store. Set together with address.
+          '';
+        };
+      };
+
+      tlsVerification = lib.mkOption {
+        type = lib.types.enum ["opportunistic" "required"];
+        default = "opportunistic";
+        description = ''
+          opportunistic (default): untrusted certificates WARN - the
+          self-signed bootstrap tier still gets probed. required: they
+          FAIL - set this together with certificate.mode = acme/manual.
+        '';
+      };
+
+      certWarnDays = lib.mkOption {
+        type = lib.types.ints.positive;
+        default = 14;
+        description = "Warn when the served certificate expires within this many days.";
+      };
+
+      resolver = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        example = "10.0.0.1";
+        description = "DNS server for the probe's dig lookups (null = system resolver).";
+      };
+
+      historyKeep = lib.mkOption {
+        type = lib.types.ints.positive;
+        default = 48;
+        description = "Timestamped report copies kept in /var/lib/mail-deliverability-probe/history.";
+      };
+    };
+
     certificate = lib.mkOption {
       description = ''
         TLS certificate tier. Exactly one mode's material is generated - the
