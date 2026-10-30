@@ -86,8 +86,11 @@ endpoint and replaces it at apply), `publicUrl`, `admin`
 refuses to eval without the secret), `stateVersion`, `relay` (outbound
 smarthost), `metrics.enable` (`/metrics/prometheus` on the HTTP
 listener), `certificate` (`self-signed | acme | manual` tier with
-completeness assertions), and the opt-in hardening options `rateLimits`
-and `spamFilter.dnsbl.servers`.
+completeness assertions), `deliverabilityChecks` (continuous
+deliverability probes: DNS MX/SPF/DMARC/DKIM, DNSBL, transport TLS,
+cert expiry, round-trip canary; emission-only - exit code, report JSON,
+Prometheus textfile; alert routing is consumer-side), and the opt-in
+hardening options `rateLimits` and `spamFilter.dnsbl.servers`.
 
 ## Stalwart 0.16 doctrine
 

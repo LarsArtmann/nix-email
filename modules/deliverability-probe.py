@@ -47,6 +47,9 @@ from email.message import EmailMessage
 from email.utils import formatdate
 
 PROBE_NAME = "deliverability-probe"
+# Stalwart's inbound :25 REJECTS a bare single-label EHLO argument
+# ("550 5.5.0 Invalid EHLO domain", VM transcript 2026-10-30) - greet
+# with an FQDN under the probed domain instead.
 PROBE_VERSION = 1
 
 PASS = "pass"
@@ -272,6 +275,10 @@ def check_dnsbl(config, ip, zone):
 # --- transport checks (stdlib smtplib/imaplib) -----------------------------
 
 
+def ehlo_domain(config):
+    return f"{PROBE_NAME}.{config.host}"
+
+
 def smtp_starttls_context(config):
     if config.tls_verify == "required":
         return ssl.create_default_context()
@@ -283,7 +290,7 @@ def smtp_starttls_context(config):
 
 def check_smtp_starttls(config, port, expect_banner):
     with smtplib.SMTP(config.host, port, timeout=config.timeout) as client:
-        code, banner = client.ehlo(PROBE_NAME)
+        code, banner = client.ehlo(ehlo_domain(config))
         if code != 250:
             return Check("", "", FAIL, f"{expect_banner} on :{port} answered EHLO {code} {banner.decode(errors='replace')[:120]}")
         features = client.esmtp_features
@@ -296,13 +303,13 @@ def check_smtp_starttls(config, port, expect_banner):
                 f"{sorted(features) or 'none - plain SMTP only'})",
             )
         client.starttls(context=smtp_starttls_context(config))
-        client.ehlo(PROBE_NAME)
+        client.ehlo(ehlo_domain(config))
     return Check("", "", PASS, f":{port} banner + EHLO + STARTTLS handshake OK")
 
 
 def check_submission(config, port):
     with smtplib.SMTP(config.host, port, timeout=config.timeout) as client:
-        client.ehlo("deliverability-probe")
+        client.ehlo(ehlo_domain(config))
         if "starttls" not in client.esmtp_features:
             return Check("", "", FAIL, f"submission :{port} does not advertise STARTTLS")
         client.starttls(context=smtp_starttls_context(config))
@@ -438,9 +445,9 @@ def check_canary(config):
 
     try:
         with smtplib.SMTP(config.host, 587, timeout=config.timeout) as client:
-            client.ehlo(PROBE_NAME)
+            client.ehlo(ehlo_domain(config))
             client.starttls(context=smtp_starttls_context(config))
-            client.ehlo(PROBE_NAME)
+            client.ehlo(ehlo_domain(config))
             client.login(config.canary_address, config.canary_password)
             client.send_message(message)
     except smtplib.SMTPAuthenticationError as exc:
@@ -452,23 +459,42 @@ def check_canary(config):
     deadline = time.monotonic() + config.slo_seconds
     found = False
     last_error = ""
+    token_bytes = token.encode()
     while time.monotonic() < deadline:
         try:
             with imaplib.IMAP4_SSL(config.host, 993, timeout=config.timeout) as client:
                 client.login(config.canary_address, config.canary_password)
                 # SEARCH/STORE/EXPUNGE are only legal in a SELECTED state -
                 # select INBOX explicitly (caught live in the VM: "command
-                # SEARCH illegal in state AUTH").
+                # SEARCH illegal in state AUTH"). The match itself is
+                # client-side over fetched bodies: server-side HEADER
+                # searches never matched on 0.16 (VM transcript
+                # 2026-10-30) - the stalwart-e2e probe's proven pattern.
                 status, _ = client.select("INBOX")
                 if status != "OK":
                     last_error = f"SELECT INBOX: {status}"
                 else:
-                    status, data = client.search(None, f'HEADER "X-Deliverability-Token" "{token}"')
-                    if status == "OK" and data[0].split():
-                        found = True
+                    status, data = client.search(None, "ALL")
+                    if status != "OK":
+                        last_error = f"SEARCH ALL: {status}"
+                    else:
+                        matches = []
                         for seq in data[0].split():
-                            client.store(seq, "+FLAGS.SILENT", "\\Deleted")
-                        client.expunge()
+                            status, fetched = client.fetch(seq, "(RFC822)")
+                            if status != "OK":
+                                continue
+                            raw = b"".join(
+                                part[1]
+                                for part in fetched
+                                if isinstance(part, tuple)
+                            )
+                            if token_bytes in raw:
+                                matches.append(seq)
+                        if matches:
+                            found = True
+                            for seq in matches:
+                                client.store(seq, "+FLAGS.SILENT", "\\Deleted")
+                            client.expunge()
             if found:
                 break
         except (imaplib.IMAP4.error, OSError) as exc:
