@@ -258,10 +258,11 @@ in
         ), "clean DNSBL gauges must be emitted as 0, not absent"
         machine.succeed("ls /var/lib/mail-deliverability-probe/history/*.json")
         machine.succeed("systemctl is-enabled mail-deliverability-probe.timer")
-        timer_calendar = machine.succeed("systemctl show -p OnCalendar --value mail-deliverability-probe.timer")
-        assert "*:0/15" in timer_calendar, f"unexpected timer calendar: {timer_calendar}"
-        persistent = machine.succeed("systemctl show -p Persistent --value mail-deliverability-probe.timer")
-        assert persistent.strip() == "yes", "timer must be Persistent"
+        # `systemctl show -p OnCalendar` renders EMPTY for timer units -
+        # assert on the verbatim unit file instead (systemctl cat).
+        timer_unit = machine.succeed("systemctl cat mail-deliverability-probe.timer")
+        assert "OnCalendar=*:0/15" in timer_unit, f"unexpected timer calendar: {timer_unit}"
+        assert "Persistent=true" in timer_unit, "timer must be Persistent"
 
       with subtest("negative: DNSBL listing fails the probe and names the zone"):
         machine.fail(

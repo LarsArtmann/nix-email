@@ -378,13 +378,13 @@ def cert_not_after(config, host, port):
             f"x509 stderr={x509.stderr.strip()[:120]})"
         )
     return datetime.datetime.strptime(match.group(1).strip(), "%b %d %H:%M:%S %Y %Z").replace(
-        tzinfo=datetime.timezone.utc
+        tzinfo=datetime.UTC
     )
 
 
 def check_cert_expiry(config, host, port):
     not_after = cert_not_after(config, host, port)
-    remaining = not_after - datetime.datetime.now(datetime.timezone.utc)
+    remaining = not_after - datetime.datetime.now(datetime.UTC)
     days = remaining.days
     if remaining.total_seconds() <= 0:
         return Check("", "", FAIL, f"certificate on :{port} EXPIRED {abs(days)} day(s) ago ({not_after})")
@@ -552,7 +552,7 @@ def write_json(config, checks, canary, started):
     report = {
         "probe": PROBE_NAME,
         "version": PROBE_VERSION,
-        "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+        "timestamp": datetime.datetime.now(datetime.UTC).isoformat(),
         "host": config.host,
         "domains": config.domains,
         "overall": overall_status(checks),
@@ -565,7 +565,7 @@ def write_json(config, checks, canary, started):
         write_atomic(config.json_out, text)
     if config.history_dir:
         os.makedirs(config.history_dir, exist_ok=True)
-        stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+        stamp = datetime.datetime.now(datetime.UTC).strftime("%Y%m%dT%H%M%SZ")
         write_atomic(os.path.join(config.history_dir, f"{stamp}.json"), text)
         prune_history(config.history_dir, config.history_keep)
     return report
