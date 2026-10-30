@@ -74,6 +74,7 @@
 ## b) PARTIALLY DONE (in flight when the report was requested)
 
 ~~1. **parsedmarc-e2e port — 2 of 3 legs proven**:~~ done — GREEN run 5, all 8 subtests both nodes after two transcript-diagnosed rounds (Appendix 1: 226/NAMESPACE + evaluated-once `-` prefix mechanics)
+
    - Run 1 RED: new-pin localMail wires NO dovecot at all (PR #566282 rework:
      postfix + `[maildir]` watch only) — `wait_for_unit("dovecot.service")`
      dead by construction. Ported the test per upstream's own updated test

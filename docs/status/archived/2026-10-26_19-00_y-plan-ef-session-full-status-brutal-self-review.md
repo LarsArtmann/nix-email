@@ -77,6 +77,7 @@
 ~~4. **EventCatalog publish:** one of two preconditions proven (a8); push~~ **→ routed — TODO EventCatalog publish row (external workstream pending)**
    still waits on the workstream.
 ~~5. **Release scratch-tag dry-run (A3 sub-item):** deliberately deferred~~ **→ done — superseded by the real cut: v0.5.0 released 2026-10-28 with tag-CI watched**
+
    - its entire value is watching tag-CI, which needs gh. Procedure
      itself untouched in CONTRIBUTING.
 
