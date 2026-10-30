@@ -822,42 +822,94 @@ in {
     # pbx's direct import, the demo. aarch64 skips (no v2 concept). Flag
     # set = the glibc x86-64-v2 baseline; pure-bash (no unit-PATH traps -
     # see CONTRIBUTING on unit-script PATH).
-    systemd.services.stalwart-cpu-preflight = lib.mkIf pkgs.stdenv.hostPlatform.isx86_64 {
-      description = "Verify x86-64-v2 CPU features before Stalwart (0.16 requirement)";
-      wantedBy = ["multi-user.target"];
-      before = ["${stalwartUnit}.service"];
-      requiredBy = ["${stalwartUnit}.service"];
-      serviceConfig = {
-        Type = "oneshot";
-        RemainAfterExit = true;
-        ExecStart = "${pkgs.writeShellScript "stalwart-cpu-preflight" ''
-          flags=""
-          while IFS= read -r line; do
-            case "$line" in
-              flags*) flags="$line"; break ;;
-            esac
-          done < /proc/cpuinfo
-          missing=""
-          for f in cx16 lahf_lm popcnt sse4_1 sse4_2 ssse3; do
+    systemd = {
+      services.stalwart-cpu-preflight = lib.mkIf pkgs.stdenv.hostPlatform.isx86_64 {
+        description = "Verify x86-64-v2 CPU features before Stalwart (0.16 requirement)";
+        wantedBy = ["multi-user.target"];
+        before = ["${stalwartUnit}.service"];
+        requiredBy = ["${stalwartUnit}.service"];
+        serviceConfig = {
+          Type = "oneshot";
+          RemainAfterExit = true;
+          ExecStart = "${pkgs.writeShellScript "stalwart-cpu-preflight" ''
+            flags=""
+            while IFS= read -r line; do
+              case "$line" in
+                flags*) flags="$line"; break ;;
+              esac
+            done < /proc/cpuinfo
+            missing=""
+            for f in cx16 lahf_lm popcnt sse4_1 sse4_2 ssse3; do
+              case " $flags " in
+                *" $f "*) ;;
+                *) missing="$missing $f" ;;
+              esac
+            done
+            # SSE3 is named "pni" in /proc/cpuinfo (the kernel never emits a
+            # standalone "sse3" token - the substring only ever appears inside
+            # "ssse3"; caught live on the demo VM, 2026-10-28). Accept either.
             case " $flags " in
-              *" $f "*) ;;
-              *) missing="$missing $f" ;;
+              *" pni "*|*" sse3 "*) ;;
+              *) missing="$missing sse3(pni)" ;;
             esac
-          done
-          # SSE3 is named "pni" in /proc/cpuinfo (the kernel never emits a
-          # standalone "sse3" token - the substring only ever appears inside
-          # "ssse3"; caught live on the demo VM, 2026-10-28). Accept either.
-          case " $flags " in
-            *" pni "*|*" sse3 "*) ;;
-            *) missing="$missing sse3(pni)" ;;
-          esac
-          if [ -n "$missing" ]; then
-            echo "stalwart-cpu-preflight: CPU lacks x86-64-v2 flags:$missing" >&2
-            echo "  Stalwart 0.16.26+ (x86_64 builds) requires x86-64-v2 and would SIGILL at start." >&2
-            echo "  This host cannot run the deployed mail stack - halt the migration here." >&2
-            exit 1
-          fi
-        ''}";
+            if [ -n "$missing" ]; then
+              echo "stalwart-cpu-preflight: CPU lacks x86-64-v2 flags:$missing" >&2
+              echo "  Stalwart 0.16.26+ (x86_64 builds) requires x86-64-v2 and would SIGILL at start." >&2
+              echo "  This host cannot run the deployed mail stack - halt the migration here." >&2
+              exit 1
+            fi
+          ''}";
+        };
+      };
+
+      # Continuous deliverability probes (owner request 2026-10-30): a
+      # oneshot service + timer running the shared probe derivation. EMISSION
+      # ONLY by doctrine - no OnFailure here: SystemNix's onFailure layer
+      # (Discord/ntfy push -> desktop) keys off the unit NAME
+      # mail-deliverability-probe.service and its non-zero exit; SigNoz
+      # scrapes the textfile gauges; Gatus covers the external TCP/TLS view
+      # (docs/MONITORING.md owns the three wiring specs). The unit NEVER
+      # blocks boot or stalwart: it is ordered after, wanted by nobody but
+      # its timer. One `systemd` block for every wrapper unit (statix [20]
+      # collapse-all-the-way-down doctrine).
+      services.mail-deliverability-probe = lib.mkIf deliverabilityChecks.enable {
+        description = "Deliverability probe (DNS/DNSBL/transport/cert/canary; report + Prometheus textfile)";
+        after = ["network-online.target" "${stalwartUnit}.service" "stalwart-provision.service"];
+        wants = ["network-online.target"];
+        serviceConfig = {
+          Type = "oneshot";
+          DynamicUser = true;
+          StateDirectory = "mail-deliverability-probe";
+          LoadCredential =
+            lib.optionals (deliverabilityChecks.canary.secretFile != null)
+            ["canary-password:${toString deliverabilityChecks.canary.secretFile}"];
+          # dig + openssl live on the probe wrapper's own PATH; this PATH is
+          # belt-and-suspenders for the python subprocess lookups.
+          Environment = ''PATH="${lib.makeBinPath [pkgs.dnsutils pkgs.openssl]}"'';
+          ExecStart = "${deliverabilityProbe}/bin/deliverability-probe ${lib.concatStringsSep " " probeArgs}";
+          # The parsedmarc wrapper's hardening set, mirrored (the unit writes
+          # nothing outside its StateDirectory, which ProtectSystem=strict +
+          # StateDirectory auto-whitelist covers).
+          ProtectSystem = "strict";
+          PrivateTmp = true;
+          NoNewPrivileges = true;
+          RestrictNamespaces = true;
+          RestrictRealtime = true;
+          RestrictSUIDSGID = true;
+          SystemCallArchitectures = "native";
+          RestrictAddressFamilies = ["AF_INET" "AF_INET6" "AF_UNIX"];
+          CapabilityBoundingSet = "";
+        };
+      };
+
+      timers.mail-deliverability-probe = lib.mkIf deliverabilityChecks.enable {
+        description = "Run the deliverability probe continuously";
+        wantedBy = ["timers.target"];
+        timerConfig = {
+          OnCalendar = deliverabilityChecks.frequency;
+          Persistent = true;
+          RandomizedDelaySec = 120;
+        };
       };
     };
 
@@ -1187,54 +1239,5 @@ in {
         993
       ]
       ++ lib.optionals (!httpBindIsLoopback && httpBindPort != null) [httpBindPort];
-
-    # Continuous deliverability probes (owner request 2026-10-30): a
-    # oneshot service + timer running the shared probe derivation. EMISSION
-    # ONLY by doctrine - no OnFailure here: SystemNix's onFailure layer
-    # (Discord/ntfy push -> desktop) keys off the unit NAME
-    # mail-deliverability-probe.service and its non-zero exit; SigNoz
-    # scrapes the textfile gauges; Gatus covers the external TCP/TLS view
-    # (docs/MONITORING.md owns the three wiring specs). The unit NEVER
-    # blocks boot or stalwart: it is ordered after, wanted by nobody but
-    # its timer.
-    systemd.services.mail-deliverability-probe = lib.mkIf deliverabilityChecks.enable {
-      description = "Deliverability probe (DNS/DNSBL/transport/cert/canary; report + Prometheus textfile)";
-      after = ["network-online.target" "${stalwartUnit}.service" "stalwart-provision.service"];
-      wants = ["network-online.target"];
-      serviceConfig = {
-        Type = "oneshot";
-        DynamicUser = true;
-        StateDirectory = "mail-deliverability-probe";
-        LoadCredential =
-          lib.optionals (deliverabilityChecks.canary.secretFile != null)
-          ["canary-password:${toString deliverabilityChecks.canary.secretFile}"];
-        # dig + openssl live on the probe wrapper's own PATH; this PATH is
-        # belt-and-suspenders for the python subprocess lookups.
-        Environment = ''PATH="${lib.makeBinPath [pkgs.dnsutils pkgs.openssl]}"'';
-        ExecStart = "${deliverabilityProbe}/bin/deliverability-probe ${lib.concatStringsSep " " probeArgs}";
-        # The parsedmarc wrapper's hardening set, mirrored (the unit writes
-        # nothing outside its StateDirectory, which ProtectSystem=strict +
-        # StateDirectory auto-whitelist covers).
-        ProtectSystem = "strict";
-        PrivateTmp = true;
-        NoNewPrivileges = true;
-        RestrictNamespaces = true;
-        RestrictRealtime = true;
-        RestrictSUIDSGID = true;
-        SystemCallArchitectures = "native";
-        RestrictAddressFamilies = ["AF_INET" "AF_INET6" "AF_UNIX"];
-        CapabilityBoundingSet = "";
-      };
-    };
-
-    systemd.timers.mail-deliverability-probe = lib.mkIf deliverabilityChecks.enable {
-      description = "Run the deliverability probe continuously";
-      wantedBy = ["timers.target"];
-      timerConfig = {
-        OnCalendar = deliverabilityChecks.frequency;
-        Persistent = true;
-        RandomizedDelaySec = 120;
-      };
-    };
   };
 }
