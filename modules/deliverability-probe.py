@@ -283,9 +283,9 @@ def smtp_starttls_context(config):
 
 def check_smtp_starttls(config, port, expect_banner):
     with smtplib.SMTP(config.host, port, timeout=config.timeout) as client:
-        banner = client.noop()[0]
-        if banner != 250:
-            return Check("", "", FAIL, f"{expect_banner} on :{port} answered NOOP {banner}")
+        code, banner = client.ehlo(PROBE_NAME)
+        if code != 250:
+            return Check("", "", FAIL, f"{expect_banner} on :{port} answered EHLO {code} {banner.decode(errors='replace')[:120]}")
         features = client.esmtp_features
         if "starttls" not in features:
             return Check(
@@ -296,7 +296,7 @@ def check_smtp_starttls(config, port, expect_banner):
                 f"{sorted(features) or 'none - plain SMTP only'})",
             )
         client.starttls(context=smtp_starttls_context(config))
-        client.ehlo("deliverability-probe")
+        client.ehlo(PROBE_NAME)
     return Check("", "", PASS, f":{port} banner + EHLO + STARTTLS handshake OK")
 
 
@@ -456,12 +456,19 @@ def check_canary(config):
         try:
             with imaplib.IMAP4_SSL(config.host, 993, timeout=config.timeout) as client:
                 client.login(config.canary_address, config.canary_password)
-                status, data = client.search(None, f'HEADER "X-Deliverability-Token" "{token}"')
-                if status == "OK" and data[0].split():
-                    found = True
-                    for seq in data[0].split():
-                        client.store(seq, "+FLAGS.SILENT", "\\Deleted")
-                    client.expunge()
+                # SEARCH/STORE/EXPUNGE are only legal in a SELECTED state -
+                # select INBOX explicitly (caught live in the VM: "command
+                # SEARCH illegal in state AUTH").
+                status, _ = client.select("INBOX")
+                if status != "OK":
+                    last_error = f"SELECT INBOX: {status}"
+                else:
+                    status, data = client.search(None, f'HEADER "X-Deliverability-Token" "{token}"')
+                    if status == "OK" and data[0].split():
+                        found = True
+                        for seq in data[0].split():
+                            client.store(seq, "+FLAGS.SILENT", "\\Deleted")
+                        client.expunge()
             if found:
                 break
         except (imaplib.IMAP4.error, OSError) as exc:
@@ -580,13 +587,14 @@ def write_prometheus(config, checks, report):
         warned = 1 if check.status == WARN else 0
         lines.append(f'mail_deliverability_check_warn{{check="{check.name}"}} {warned}')
     lines += [
-        "# HELP mail_deliverability_dnsbl_listed 1 if the address is listed at the DNSBL zone.",
+        "# HELP mail_deliverability_dnsbl_listed 1 if the address is listed at the DNSBL zone (0 = clean; always emitted per probed zone/ip).",
         "# TYPE mail_deliverability_dnsbl_listed gauge",
     ]
     for check in checks:
-        if check.name.startswith("dnsbl:") and check.status == FAIL:
+        if check.name.startswith("dnsbl:"):
             _, zone, ip = check.name.split(":", 2)
-            lines.append(f'mail_deliverability_dnsbl_listed{{zone="{zone}",ip="{ip}"}} 1')
+            listed = 1 if check.status == FAIL else 0
+            lines.append(f'mail_deliverability_dnsbl_listed{{zone="{zone}",ip="{ip}"}} {listed}')
     write_atomic(config.prom_out, "\n".join(lines) + "\n")
 
 

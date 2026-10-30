@@ -42,7 +42,11 @@ transcript-pinned dialect).
   failing run): `nix flake check > /tmp/gate.log 2>&1; echo "EXIT:$?" >>
   /tmp/gate.log`. Never run `buildflow` and `nix flake check`
   CONCURRENTLY. An EMPTY `nix build` log means CACHE HIT - force with
-  `--rebuild` when execution is the claim.
+  `--rebuild` when execution is the claim. `--rebuild` TRAP (2026-10-30,
+  hit twice): on a derivation that was NEVER built, `--rebuild` errors
+  with "some outputs are not valid, so checking is not possible" - it
+  implies --check against a prior build; drop it for first builds (they
+  execute anyway).
 - Repo-tool traps: `rg -rln` is NOT "recursive + line-number" (`-r`
   REPLACES matches with the next arg and corrupts output; use `rg -l -n`); bare `nix fmt` forwards no paths and dies on
   STDIN (check-mode: `nix fmt -- . --check`; run before yielding on any

@@ -89,7 +89,10 @@ the verified-source work (what the wrapper OWNS) is done or specified in
   aggregates natively (C42 watch)
 - Gatus external-view checks (starttls :25, tls :993, cert expiry) and
   Prometheus scrape of `/metrics/prometheus` via reverse proxy or tunnel
-- Blacklist (RBL) monitoring for the VPS IP
+  (endpoint + rule copy-paste set: MONITORING.md section 8, since the
+  deliverability probe shipped 2026-10-30)
+- Blacklist (RBL) monitoring for the VPS IP (SHIPPED as probe source
+  2026-10-30 - `deliverabilityChecks.dnsblZones`; consumer wiring remains)
 - Gatus freshness check over the parsedmarc `aggregate.json` sink (verify it
   does not duplicate the consumer registry's `backup.maxAgeHours` coverage)
 
@@ -129,7 +132,9 @@ the verified-source work (what the wrapper OWNS) is done or specified in
     nothing until the live webadmin is inspected (D1) AND parsedmarc JSON
     proves insufficient
 - Optional PostgreSQL sink for parsedmarc (psycopg override experiment)
-- Round-trip canary (MONITORING.md §6; vantage = C29)
+- Round-trip canary: SHIPPED 2026-10-30 (`deliverabilityChecks.canary` +
+  the vantage `deliverability-probe` package; MONITORING.md section 8) -
+  remaining work is consumer-side wiring only
 - Paperless mail accounts off Gmail app passwords onto own IMAP; smartd
   remote-alert path decoupled from the mail relay (circular-dependency risk);
   InboxClean JMAP adapter post-migration - DECIDED 2026-09-30 (InboxClean

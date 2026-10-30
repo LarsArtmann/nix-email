@@ -158,7 +158,11 @@ in
             bind-interfaces = true;
             no-resolv = true;
             server = ["10.0.2.3"];
-            local = ["/mail.example.test/"];
+            # dnsbl.test is LOCAL too: an unlisted IP must get an
+            # authoritative NXDOMAIN from dnsmasq, never a forwarded
+            # query into the QEMU resolver's black hole (the first run's
+            # dig exit-9 timeout lesson, 2026-10-30).
+            local = ["/mail.example.test/" "/dnsbl.test/"];
             host-record = ["mail.example.test,127.0.0.1"];
             mx-host = ["mail.example.test,mail.example.test,10"];
             txt-record = [
@@ -249,6 +253,9 @@ in
         assert 'mail_deliverability_check_success{check="canary-roundtrip"} 1' in metrics
         assert "mail_deliverability_probe_timestamp_seconds " in metrics, "dead-man timestamp gauge missing"
         assert "mail_deliverability_check_warn{check=\"tls-verification\"} 1" in metrics
+        assert (
+            'mail_deliverability_dnsbl_listed{zone="dnsbl.test",ip="127.0.0.3"} 0' in metrics
+        ), "clean DNSBL gauges must be emitted as 0, not absent"
         machine.succeed("ls /var/lib/mail-deliverability-probe/history/*.json")
         machine.succeed("systemctl is-enabled mail-deliverability-probe.timer")
         timer_calendar = machine.succeed("systemctl show -p OnCalendar --value mail-deliverability-probe.timer")
