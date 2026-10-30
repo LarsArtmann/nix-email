@@ -73,7 +73,7 @@
 
 ## b) PARTIALLY DONE (in flight when the report was requested)
 
-1. **parsedmarc-e2e port — 2 of 3 legs proven**:
+~~1. **parsedmarc-e2e port — 2 of 3 legs proven**:~~ done — GREEN run 5, all 8 subtests both nodes after two transcript-diagnosed rounds (Appendix 1: 226/NAMESPACE + evaluated-once `-` prefix mechanics)
    - Run 1 RED: new-pin localMail wires NO dovecot at all (PR #566282 rework:
      postfix + `[maildir]` watch only) — `wait_for_unit("dovecot.service")`
      dead by construction. Ported the test per upstream's own updated test
@@ -93,24 +93,24 @@
      `${postfix mail_spool}/${recipientName}` under
      `provision.localMail.enable`, mirroring the module's own
      `maildir_path` expression. RERUN NOT YET DONE — this is THE next action.
-2. **Full `nix flake check` gate**: run 1 aborted at parsedmarc-e2e; bind /
+~~2. **Full `nix flake check` gate**: run 1 aborted at parsedmarc-e2e; bind /~~ done — gate2.log EXIT:0, first new-pin verdicts for bind/migrate/relay (Appendix 2)
    migrate / relay VM tests got NO verdict at the new pin (their drvs built;
    the abort came first). Needs the rerun.
-3. **buildflow gate**: not run this session (must not run concurrently with
+~~3. **buildflow gate**: not run this session (must not run concurrently with~~ done — --fix run EXIT:0 (Appendix 3, incl. the SHA-verified action bump)
    the flake gate; queued after it).
 
 ## c) NOT STARTED
 
-1. CardDAV/contacts probe re-baseline (TODO row 104 — explicitly triggered by
+~~1. CardDAV/contacts probe re-baseline (TODO row 104 — explicitly triggered by~~ done — RUN 2026-10-28: 17/18 PASS on 0.16.26, baseline reproduced (Appendix 2/1); row 104 closed, re-arms at the next bump
    any stalwart bump; 17/18 PASS baseline is 0.16.22-era; needs a demo-VM
    boot; INBOXCLEAN note says claims stay 0.16.22-pinned until then).
-2. README STATUS banner flip (line 10 still carries the 2026-10-17 banner;
+~~2. README STATUS banner flip (line 10 still carries the 2026-10-17 banner;~~ done — flipped post-proof (Appendix 5)
    new banner written only after the gate is green).
-3. dprint pass over this session's markdown edits (buildflow format owns it).
-4. Session status report — this file (was c) item, now done).
-5. v0.5.0 release cut — deliberately NOT started: owner-gated (C43
+~~3. dprint pass over this session's markdown edits (buildflow format owns it).~~ done — read-back clean (Appendix 4)
+~~4. Session status report — this file (was c) item, now done).~~ done — this file (Appendix 24)
+~~5. v0.5.0 release cut — deliberately NOT started: owner-gated (C43~~ routed — C43 ANSWERED CUT 2026-10-28: v0.5.0 RELEASED same day (Appendix 2/3; decision-batch C43)
    ship-vendored vs wait-for-PR); C45's dissolution does not answer C43.
-6. SystemNix-side pull of our master to re-green their contract check
+~~6. SystemNix-side pull of our master to re-green their contract check~~ routed — their repo, their cadence; flagged to the owner (Appendix 11)
    (their repo, their cadence — noted here because the risk is live now).
 
 ## d) TOTALLY FUCKED UP (honest)
@@ -161,69 +161,69 @@
 
 ## f) NEXT (up to 50, ordered)
 
-1. Rerun `nix build .#checks.x86_64-linux.parsedmarc-e2e -L` (ReadWritePaths
+~~1. Rerun `nix build .#checks.x86_64-linux.parsedmarc-e2e -L` (ReadWritePaths~~ done — GREEN run 5 (Appendix 1)
    fix is in; expect machine maildir leg green, then full subtests).
-2. If green: full `nix flake check > /tmp/gate.log` (bind/migrate/relay get
+~~2. If green: full `nix flake check > /tmp/gate.log` (bind/migrate/relay get~~ done — gate2.log EXIT:0 (Appendix 2)
    their first new-pin verdicts).
-3. `buildflow --max-time 35m` (never concurrent with the flake gate).
-4. dprint pass + `git diff` read-back over prose (dprint rewrap trap).
-5. README STATUS banner flip to the 2026-10-28 pin-advance state.
-6. dmarc-eval: add the localMail/ReadWritePaths eval assertion (e/2).
-7. Consider the v2CpuPatches eval-time guard for VM nodes (e/5).
-8. CardDAV probe re-baseline on 0.16.26 (row 104): demo VM boot +
+~~3. `buildflow --max-time 35m` (never concurrent with the flake gate).~~ done — Appendix 3
+~~4. dprint pass + `git diff` read-back over prose (dprint rewrap trap).~~ done — Appendix 4
+~~5. README STATUS banner flip to the 2026-10-28 pin-advance state.~~ done — Appendix 5
+~~6. dmarc-eval: add the localMail/ReadWritePaths eval assertion (e/2).~~ done — Appendix 6
+~~7. Consider the v2CpuPatches eval-time guard for VM nodes (e/5).~~ done — assertion approach PROVEN IMPOSSIBLE (recursion + qemu-vm options everywhere); structural fix = test-level `defaults` (Appendix 7)
+~~8. CardDAV probe re-baseline on 0.16.26 (row 104): demo VM boot +~~ done — RUN: 17/18 PASS reproduced (Appendix 2/1)
    `docs/probes/2026-10-19-carddav-demo-vm/carddav_probe.py`, expect 17/18;
    diff the README "Contacts surface" dialect notes.
-9. Update TODO row 104 with the probe outcome; INBOXCLEAN banner re-pin to
+~~9. Update TODO row 104 with the probe outcome; INBOXCLEAN banner re-pin to~~ done — row closed, re-arms at the next stalwart bump (Appendix 9)
    0.16.26 (or keep the pending note if probes not run).
-10. Verify the dovecot2.protocols warning actually disappeared in the new
+~~10. Verify the dovecot2.protocols warning actually disappeared in the new~~ done — warning GONE in the run-5 log (Appendix 10)
     gate log (runbook predicted it; confirm and strike the note).
-11. Notify/verify SystemNix pulls our master (their contract check re-greens;
+~~11. Notify/verify SystemNix pulls our master (their contract check re-greens;~~ routed — their repo, their cadence (Appendix 11)
     their repo — flag only).
-12. Consumer-side x86-64-v2 CPU check reminder for real hosts (pbx, evo-x2,
+~~12. Consumer-side x86-64-v2 CPU check reminder for real hosts (pbx, evo-x2,~~ done — stalwart-cpu-preflight.service shipped in the wrapper (Appendix 2/2)
     VPS) before their next rebuild ships 0.16.26 (their follows already
     carries the rev).
-13. Add a CHANGELOG "Fixed" bullet for the ReadWritePaths/localMail wrapper
+~~13. Add a CHANGELOG "Fixed" bullet for the ReadWritePaths/localMail wrapper~~ done — Appendix 13
     gap once proven by the rerun.
-14. Sweep remaining `0.16.22`-as-current mentions in corridor LIVE docs
+~~14. Sweep remaining `0.16.22`-as-current mentions in corridor LIVE docs~~ done — Appendix 14
     (dated evidence stays; only current-tense claims change) — CONTRIBUTING
     - TELEMETRY spot-check.
-15. If parsedmarc-e2e still red: read the new traceback FIRST (the two prior
+~~15. If parsedmarc-e2e still red: read the new traceback FIRST (the two prior~~ NOT-DO — green path taken (Appendix 15)
     reds were both precisely diagnosable from the journal; no guessing).
-16. Update FEATURES.md parsedmarc-e2e row to the new two-shape architecture
+~~16. Update FEATURES.md parsedmarc-e2e row to the new two-shape architecture~~ done — Appendix 16
     (maildir + test-owned IMAPS) after green.
-17. Check whether dmarc-eval's `execStartPreCount >= 2` still holds under
+~~17. Check whether dmarc-eval's `execStartPreCount >= 2` still holds under~~ done — strip-last pinned by NAME (Appendix 17)
     the maildir flow (no [imap] secret on machine — strip-guard still last).
-18. Confirm the machine node's spool delivery semantics (mbox file vs
+~~18. Confirm the machine node's spool delivery semantics (mbox file vs~~ done — maildir TREE, pinned in the test comment (Appendix 18)
     maildir tree at /var/spool/mail/dmarc) from the green run's journal and
     pin the finding in the test comment (currently riding upstream-CI-green).
-19. Run `scripts/check-md-table-pipes.sh` + `annotate.go check-rows` if any
+~~19. Run `scripts/check-md-table-pipes.sh` + `annotate.go check-rows` if any~~ done — pipe lint green; check-rows n/a then (Appendix 19)
     corridor tables were touched by dprint.
-20. Owner-sitting backlog is unchanged: C43 (v0.5.0 doctrine), C44 (secrets),
+~~20. Owner-sitting backlog is unchanged: C43 (v0.5.0 doctrine), C44 (secrets),~~ routed — C43 answered 2026-10-28 (Appendix 2/3); C44/C39/C41/C46 remain on the sitting sheet
     C39/C41/C46, D1/D2 — this session dissolved only C45 + row 78's premise.
-21. After gates green + probes done: consider whether the 2026-10-26
+~~21. After gates green + probes done: consider whether the 2026-10-26~~ done — z-gen banner updated (Appendix 21)
     z-generation plan's A-lane (v0.5.0 cut) precondition set shrank further
     (C45 gone) and annotate the plan's O2 row accordingly (owner-facing).
-22. Re-check nixpkgs #563651 follow-up comment draft (docs/drafts/) — the
+~~22. Re-check nixpkgs #563651 follow-up comment draft (docs/drafts/) — the~~ routed — ON HOLD per owner 2026-10-28, draft review before posting (Appendix 2/4; TODO_LIST upstream-watch row)
     port evidence (fe132422 transcript) strengthens the filing; still
     gh-auth-blocked per row 94/102.
-23. Optional: pin the fixture CA cert SANs against the tls node's
+~~23. Optional: pin the fixture CA cert SANs against the tls node's~~ done — Appendix 23
     `host = "127.0.0.1"` (cert has IP:127.0.0.1 SAN — the login proof
     passed, so hostname verification against the IP worked; note it).
-24. Housekeeping: /tmp parse-*.json + fixture paths are throwaway; the
+~~24. Housekeeping: /tmp parse-*.json + fixture paths are throwaway; the~~ done — Appendix 24
     presence-list evals are recorded in flake.nix comments (done).
 
 ## g) QUESTIONS (cannot figure out myself)
 
-1. **C43 / v0.5.0**: the pin advance dissolved C45, but C43 (cut v0.5.0 with
+~~1. **C43 / v0.5.0**: the pin advance dissolved C45, but C43 (cut v0.5.0 with~~ routed — ANSWERED CUT: v0.5.0 RELEASED 2026-10-28 (Appendix 2/3; decision-batch C43 verdict)
    the VENDORED 0.16 module, vs wait for nixpkgs PR #552103) is still your
    call. SystemNix already consumes master directly, so the tag is now
    traceability, not a deployment gate. Ratify C43 = cut, or keep waiting?
-2. **Real-host x86-64-v2 exposure**: SystemNix's `follows` already forces
+~~2. **Real-host x86-64-v2 exposure**: SystemNix's `follows` already forces~~ routed — HANDLED: stalwart-cpu-preflight.service shipped in the wrapper (Appendix 2/2)
    fe132422 (Stalwart 0.16.26, v2-only on x86_64) onto their evals — their
    next rebuild deploys it to pbx/evo-x2/VPS. Do you want that CPU check
    raised/handled in SystemNix now (their repo, but the risk is live
    today), and is any of that fleet pre-v2?
-3. **CardDAV probe re-baseline (row 104)**: it needs a demo-VM boot
+~~3. **CardDAV probe re-baseline (row 104)**: it needs a demo-VM boot~~ routed — RUN: 17/18 PASS on 0.16.26, transcripts docs/probes/2026-10-28-carddav-01626/ (Appendix 2/1)
    (~30 min TCG) and gates the INBOXCLEAN/CRM dialect claims on 0.16.26.
    Run it at the end of THIS session, or leave it as the TODO row for a
    dedicated sitting?
