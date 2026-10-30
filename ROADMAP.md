@@ -215,6 +215,12 @@ ideas, all D1-gated:
   guest builds+boots but boot alone exceeds the driver timeout -
   documented-manual, not CI-worthy); residue is an occasional local
   `nix flake check --all-systems` to keep the eval posture honest
+- EventCatalog exporter hardening backlog (2026-10-24 session f-list,
+  pulled forward 2026-10-30): selftest assertions for absolute body-link
+  URLs, `--plain` byte-parity, and exact frontmatter line shapes; a
+  `--check` drift-guard mode; ADR cross-links; the ADR-id vs
+  ROADMAP-decision-id sync check. Pull on the next catalog-touching
+  session, not before
 
 ## Non-goals
 
@@ -308,3 +314,13 @@ are batched in `docs/planning/decision-batch.md` (2026-09-22) - answer there.
    the SystemNix pin advance (TODO_LIST).~~ RESOLVED 2026-09-17: `v0.3.1`
    cut (git tag exists; CHANGELOG updated). The SystemNix pin advance is
    now unblocked - actionable work item in TODO_LIST.
+9. **Store-doctrine trio (2026-10-25 advisory, unanswered):** (a) cluster
+   horizon - is multi-node Stalwart ever planned, or is single-host the
+   permanent shape (decides tracked cluster-store decision vs a one-line
+   doctrine note); (b) backup-doctrine ownership - do the store-backup
+   mechanics (subvolume layout, CoW flag, snapshot + restore-drill
+   procedure) belong in THIS flake's runbook or exclusively in SystemNix
+   consumer docs; (c) durability - should the advisory's store/cluster/
+   snapshot claims be verified against upstream docs and pinned (ledger
+   rows), or stay one-off Q&A? Full reasoning: the 2026-10-25 advisory
+   report (archived corridor).
