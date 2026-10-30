@@ -91,24 +91,24 @@ re-dated. One hard external blocker surfaced: **the `gh` token is expired**
 
 ## b) PARTIALLY DONE
 
-1. **Upstream filings** (W12.3/W12.4 remainder + #552103 comment +
+~~1. **Upstream filings** (W12.3/W12.4 remainder + #552103 comment +~~ **→ routed — filings owner-gated: #563651 ON HOLD per owner 2026-10-28; T13b resolved-no-filing 2026-10-26; gh live again 2026-10-28**
    #563651 follow-up): ALL verified and drafted where applicable, NONE
    filed - `gh` auth expired (see d). The T13b filing resolved as
    no-filing-needed (a.5).
-2. **Release scratch-tag dry-run (A3 sub-item of the v0.5.0 row)**:
+~~2. **Release scratch-tag dry-run (A3 sub-item of the v0.5.0 row)**:~~ **→ done — superseded by the real cut: v0.5.0 released 2026-10-28**
    deferred with rationale - the dry-run's entire value is watching
    tag-CI fire, and CI observation needs `gh`. The procedure itself is
    unchanged in CONTRIBUTING.
 
 ## c) NOT STARTED (owner-gated or out of this session's lane)
 
-1. Every owner-sitting row (C42-C46, C39-C41, pbx blessing, D1/D2,
+~~1. Every owner-sitting row (C42-C46, C39-C41, pbx blessing, D1/D2,~~ **→ routed — the 2026-10-28 sittings answered a subset; the sheet owns the rest**
    Resend, branch protection, Renovate, Discussions, qcow2 purge,
    ratifications) - the sheet at
    `docs/planning/2026-10-23_11-56_owner-sitting-ratification-verdict-sheet.md`
    is the vehicle; this session deliberately made no owner decisions.
-2. BuildFlow-repo follow-ups and SystemNix CI-debt (their repos).
-3. F6/F7 (README line-by-line pass, TELEMETRY key re-verify) - plan-level
+~~2. BuildFlow-repo follow-ups and SystemNix CI-debt (their repos).~~ **→ routed — TODO_LIST BuildFlow + SystemNix rows (their repos)**
+~~3. F6/F7 (README line-by-line pass, TELEMETRY key re-verify) - plan-level~~ **→ routed — routed with the 19-00 companion report (same verdicts)**
    lanes, not TODO rows; not attempted this session.
 
 ## d) TOTALLY FUCKED UP (honest)
@@ -161,18 +161,18 @@ re-dated. One hard external blocker surfaced: **the `gh` token is expired**
 
 ## f) Next Things
 
-1. `[owner]` `gh auth login -h github.com` - unblocks: the #552103
+~~1. `[owner]` `gh auth login -h github.com` - unblocks: the #552103~~ **→ routed — SATISFIED 2026-10-28: gh auth live (z-gen O1; re-verified 2026-10-30)**
    webui comment (draft ready), the #563651 follow-up, the mailsuite
    nudge (~11-05), CI watching, and the scratch-tag release dry-run.
-2. `[owner]` The sitting sheet (everything C39-C46 + pbx + policy).
-3. Port-wait sweep: grep tests for `wait_for_open_port` on provisioned
+~~2. `[owner]` The sitting sheet (everything C39-C46 + pbx + policy).~~ **→ routed — partially held 2026-10-28; the remaining verdicts sit on the sheet**
+~~3. Port-wait sweep: grep tests for `wait_for_open_port` on provisioned~~ **→ done — EXECUTED same night (20-44 D1: 26 sites classified, VERDICT CLEAN)**
    ports with < 120 s budgets (the 587 lesson).
-4. Upstream watch next re-check rides the next session (~11-05 for the
+~~4. Upstream watch next re-check rides the next session (~11-05 for the~~ **→ routed — TODO watch row (~2026-11-05 cadence)**
    mailsuite nudge decision point).
 
 ## g) Questions I Cannot Figure Out Myself
 
-1. Whether the flood subtest's final still-gated probe should be
+~~1. Whether the flood subtest's final still-gated probe should be~~ **→ routed — TODO flood row (owner taste; sheet Batch 5)**
    HARDENED further (posture taste) or left as-is with the automated
    capture - owner call, low stakes.
 

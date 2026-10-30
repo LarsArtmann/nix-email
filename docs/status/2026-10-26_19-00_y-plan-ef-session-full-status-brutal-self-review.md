@@ -66,31 +66,31 @@
 
 ## b) PARTIALLY DONE
 
-1. **Upstream #552103 webui-resource comment:** verified against the
+~~1. **Upstream #552103 webui-resource comment:** verified against the~~ **→ routed — owner-review-gated (TODO_LIST admin-bundle row; the 2026-10-28 ON HOLD posture)**
    real PR head (same shape at 9b15e1f), drafted in
    `docs/drafts/552103-webui-resource-comment.md` - NOT filed (gh auth).
-2. **Upstream filings remainder:** T13b resolved-no-filing (a5); the
+~~2. **Upstream filings remainder:** T13b resolved-no-filing (a5); the~~ **→ routed — filings owner-gated: #563651 ON HOLD per owner 2026-10-28; dnsmasq venue open (TODO upstream-filings row)**
    dnsmasq-forward resolver note still lacks a venue decision AND gh
    auth; the #563651 follow-up comment also auth-blocked.
-3. **Flood posture:** capture-first half DONE (a4); the owner-taste call
+~~3. **Flood posture:** capture-first half DONE (a4); the owner-taste call~~ **→ routed — capture-first mechanized 2026-10-26; the taste call remains (TODO flood row)**
    (keep strict vs relax the final probe) remains (g1).
-4. **EventCatalog publish:** one of two preconditions proven (a8); push
+~~4. **EventCatalog publish:** one of two preconditions proven (a8); push~~ **→ routed — TODO EventCatalog publish row (external workstream pending)**
    still waits on the workstream.
-5. **Release scratch-tag dry-run (A3 sub-item):** deliberately deferred
+~~5. **Release scratch-tag dry-run (A3 sub-item):** deliberately deferred~~ **→ done — superseded by the real cut: v0.5.0 released 2026-10-28 with tag-CI watched**
    - its entire value is watching tag-CI, which needs gh. Procedure
      itself untouched in CONTRIBUTING.
 
 ## c) NOT STARTED
 
-1. Every owner-gated row (C42-C46, C39-C41, pbx blessing, D1/D2,
+~~1. Every owner-gated row (C42-C46, C39-C41, pbx blessing, D1/D2,~~ **→ routed — the 2026-10-28 sittings answered C43/C45 + contacts; C42/C44/C39-C41/C46 remain on the sheet**
    Resend, branch protection, Renovate, Discussions, qcow2 purge,
    [rec] ratifications) - the prepared sitting sheet is the vehicle; no
    owner decisions were made by this session, by design.
-2. Their-repo lanes (BuildFlow follow-ups, SystemNix CI-debt, pbx VM
+~~2. Their-repo lanes (BuildFlow follow-ups, SystemNix CI-debt, pbx VM~~ **→ routed — TODO_LIST BuildFlow + SystemNix rows (their repos)**
    validation run) - untouched.
-3. Y-plan F6 (README line-by-line verify) and F7 (TELEMETRY key
+~~3. Y-plan F6 (README line-by-line verify) and F7 (TELEMETRY key~~ **→ routed — no single end-to-end README read ever ran (successive passes spot-verify); TELEMETRY header re-pinned 0.16.26 on 2026-10-28**
    re-verify) - not attempted, not TODO rows.
-4. A full `buildflow` run on the final tree - see (e2): not run this
+~~4. A full `buildflow` run on the final tree - see (e2): not run this~~ **→ done — EXECUTED the same evening (the 20-44 D3 run: gate green)**
    session; the gate evidence is `nix flake check` + the CI floors I ran
    manually.
 
@@ -150,40 +150,40 @@
 
 ## f) Next Things (session-grounded; honest count, not padded to 50)
 
-1. `[owner]` `gh auth login -h github.com` - unblocks f3-f6 below.
-2. `[owner]` The sitting sheet
+~~1. `[owner]` `gh auth login -h github.com` - unblocks f3-f6 below.~~ **→ routed — SATISFIED 2026-10-28: gh auth live (z-gen O1; re-verified 2026-10-30)**
+~~2. `[owner]` The sitting sheet~~ **→ routed — partially held 2026-10-28; the remaining verdicts sit on the sheet**
    (`docs/planning/2026-10-23_11-56_owner-sitting-ratification-verdict-sheet.md`).
-3. Rename the mis-timestamped 20-15 report to its true time (git mv).
-4. Post the #552103 webui-resource comment (draft ready).
-5. Post the #563651 follow-up comment (draft exists in TODO history).
-6. mailsuite#65 nudge at ~11-05 (re-read their master first).
-7. dnsmasq-forward resolver note: decide venue, then file.
-8. Release scratch-tag dry-run once CI is watchable again.
-9. Port-wait sweep: `grep -rn "wait_for_open_port" tests/` vs
+~~3. Rename the mis-timestamped 20-15 report to its true time (git mv).~~ **→ routed — REPORT-RENAME verdict on the sheet (Batch 5); name kept meanwhile, the (d1) note carries the truth**
+~~4. Post the #552103 webui-resource comment (draft ready).~~ **→ routed — owner-review-gated (TODO admin-bundle row)**
+~~5. Post the #563651 follow-up comment (draft exists in TODO history).~~ **→ routed — ON HOLD per owner 2026-10-28 (draft review first)**
+~~6. mailsuite#65 nudge at ~11-05 (re-read their master first).~~ **→ routed — calendar item ~2026-11-05 (TODO watch row)**
+~~7. dnsmasq-forward resolver note: decide venue, then file.~~ **→ routed — TODO upstream-filings row (venue + gh)**
+~~8. Release scratch-tag dry-run once CI is watchable again.~~ **→ done — superseded by the real cut (v0.5.0, 2026-10-28): the tag-CI reds delivered the dry-run lessons**
+~~9. Port-wait sweep: `grep -rn "wait_for_open_port" tests/` vs~~ **→ done — EXECUTED same night (20-44 D1: 26 sites classified, VERDICT CLEAN)**
    provisioned ports; normalize budgets with the 587 rationale.
-10. Full `buildflow` run on the final tree (close the e2 gap).
-11. Push watch: origin CI on this session's commits - the ruff step's
+~~10. Full `buildflow` run on the final tree (close the e2 gap).~~ **→ done — EXECUTED same night (20-44 D3: full buildflow gate green)**
+~~11. Push watch: origin CI on this session's commits - the ruff step's~~ **→ done — superseded: origin runs green through 40861706874 (2026-10-29); the 2026-10-30 ruff-floor red (F841 x2, CalDAV probe) fixed this pass (14934ac)**
     first exercise of the probe file is the push run, not my local
     floor (floor is green; the run is the proof).
-12. `[owner]` Flood posture call (g1).
-13. README queue-series pass: MONITORING row 2 was corrected for
+~~12. `[owner]` Flood posture call (g1).~~ **→ routed — TODO flood row (owner taste; sheet Batch 5)**
+~~13. README queue-series pass: MONITORING row 2 was corrected for~~ **→ done — EXECUTED same night (20-44 D2: the claim lived in MONITORING §5.5, fixed 0318b7f)**
     `queue_rescheduled`; check whether the README telemetry notes
     carry the same now-stale "only queue series" claim (NOT verified
     this session - do not assume either way).
-14. EventCatalog publish + T8 live-verify once the workstream lands.
-15. Consider whether the pipe lint stays as-is under plugin 0.28.2
+~~14. EventCatalog publish + T8 live-verify once the workstream lands.~~ **→ routed — TODO EventCatalog publish row (workstream pending)**
+~~15. Consider whether the pipe lint stays as-is under plugin 0.28.2~~ **→ done — KEPT (GFM still splits on raw pipes; standing posture)**
     (recommendation: keep - GFM still splits on raw pipes regardless
     of what the formatter preserves).
 
 ## g) Questions I Cannot Figure Out Myself
 
-1. **Flood posture:** keep the M14 final still-gated probe strict (any
+~~1. **Flood posture:** keep the M14 final still-gated probe strict (any~~ **→ routed — TODO flood row (owner taste)**
    recurrence now self-captures diagnostics), or relax it to a soft
    warning? Pure owner taste; both defensible.
-2. **History hygiene:** rename the mis-timestamped 20-15 report file
+~~2. **History hygiene:** rename the mis-timestamped 20-15 report file~~ **→ routed — sheet Batch 5 (REPORT-RENAME); name kept meanwhile**
    (clean corridor, visible rename), or leave it and let this report's
    (d1) note carry the truth? I lean rename - but it is your corridor.
-3. **Report cadence:** when an execution session is followed
+~~3. **Report cadence:** when an execution session is followed~~ **→ routed — sheet Batch 5 (REPORT-CADENCE)**
    immediately by a forced self-review (like now), should the session
    write ONE combined report at close (self-review included) instead
    of two files? This session produced two; the combined form would

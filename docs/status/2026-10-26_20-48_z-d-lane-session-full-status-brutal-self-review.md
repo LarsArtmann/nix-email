@@ -130,34 +130,34 @@ in the Z-plan
 
 | #  | Item                                                                                            | Gate          |
 | -- | ----------------------------------------------------------------------------------------------- | ------------- |
-| 1  | O1: `gh auth login -h github.com` (owner, 5 min) - unblocks items 12-15, 19, CI watching        | owner         |
-| 2  | O2: THE SITTING (verdict sheet, ~65 min) - unblocks items 3-11, 16-18, 24-28                    | owner         |
-| 3  | O3: record verdicts into decision-batch + TODO re-row + README banner                           | O2            |
-| 4  | A1: CHANGELOG Unreleased link/date pass + duplicate-block merge (same-call commit)              | O3            |
-| 5  | A2: release-tree gate proof (full flake check + buildflow, logs archived)                       | A1            |
-| 6  | A3: scratch-tag dry-run of the CONTRIBUTING release procedure                                   | A2, O1        |
-| 7  | A4: CUT v0.5.0 (rename, SECURITY bump, annotated tag, push, tag-CI green, gh release)           | A3            |
-| 8  | A5: README/AGENTS/FEATURES release-state lines                                                  | A4            |
-| 9  | B1: pbx hermetic override landing (their repo, whole-key mkVMOverride per spec)                 | O2            |
-| 10 | B2: nix-email side of pbx landing (CHANGELOG + row close + issue #4 cross-link)                 | B1            |
-| 11 | B3: corridor closeout - the two kept-live reports' open arrows to verdicts, archive via git mv  | B1            |
-| 12 | F1: post the #552103 webui-resource comment (draft ready in docs/drafts/)                       | O1            |
-| 13 | F2: re-verify + post the nixpkgs#563651 follow-up (host-less `[opensearch]` persists on master) | O1            |
-| 14 | F3: mailsuite#65 nudge at ~11-05 (re-read their master imap.py first)                           | O1, calendar  |
-| 15 | F4: dnsmasq resolver-note: venue decision + github-voice draft + file + cross-ref               | O1            |
-| 16 | C1: pin advance + #566282 opensearch port (preflight grep, rename, strip guard, 2 checks green) | A4            |
-| 17 | C2: #552103 retirement OR C45 overlay execution per verdict                                     | C1, O2        |
-| 18 | C3: SystemNix contract-test fix + pin bump to v0.5.0 (their repo)                               | A4            |
-| 19 | C4: post-bump checks (aarch64 shape, dovecot warning gone, watch re-date, rename watch)         | C1            |
-| 20 | C5: C44 account-secrets doctrine implementation + THREAT_MODEL update                           | O2            |
-| 21 | C6: C39 MemoryMax ownership verdict landing                                                     | O2            |
-| 22 | C7: C42 dmarc-monitor retire-or-keep execution                                                  | O2            |
-| 23 | C8: D1-unlock prep pack (rotation runbook, vandelay-vs-imapsync plan, dmarc checklist, Resend)  | O2, C5        |
-| 24 | D4: CI python-lint doctrine landing (bandit/vulture scope) per V2.3 blessing                    | O2            |
-| 25 | D5: flood posture per taste verdict (close as-is or soften + rerun)                             | O2            |
-| 26 | G1: BuildFlow upstream batch (count gaps, identity parsing, detect-only, vulture policy)        | their cadence |
-| 27 | G2: SystemNix CI-debt lanes (credential, canary allowlist, 2 pin flips, divergence doc)         | their cadence |
-| 28 | G3-G7: qcow2 purge verdict, contacts probe re-run on bump, EventCatalog publish, watch cadence, | O2 / external |
+~~| 1  | O1: `gh auth login -h github.com` (owner, 5 min) - unblocks items 12-15, 19, CI watching        | owner         |~~ **→ routed — SATISFIED 2026-10-28: gh auth live (z-gen O1; re-verified 2026-10-30)**
+~~| 2  | O2: THE SITTING (verdict sheet, ~65 min) - unblocks items 3-11, 16-18, 24-28                    | owner         |~~ **→ routed — partially held 2026-10-28 (C43/C45/contacts); C42/C44/C39-C41/C46 remain on the sheet**
+~~| 3  | O3: record verdicts into decision-batch + TODO re-row + README banner                           | O2            |~~ **→ done — verdicts recorded 2026-10-28 (decision-batch banners)**
+~~| 4  | A1: CHANGELOG Unreleased link/date pass + duplicate-block merge (same-call commit)              | O3            |~~ **→ done — v0.5.0 cut commit 06ab701 (CHANGELOG rename + SECURITY bump, same-call)**
+~~| 5  | A2: release-tree gate proof (full flake check + buildflow, logs archived)                       | A1            |~~ **→ done — release-tree proof 2026-10-28 (flake check EXIT:0 + buildflow EXIT:0)**
+~~| 6  | A3: scratch-tag dry-run of the CONTRIBUTING release procedure                                   | A2, O1        |~~ **→ done — superseded: the real cut replaced the dry-run (z-gen banner)**
+~~| 7  | A4: CUT v0.5.0 (rename, SECURITY bump, annotated tag, push, tag-CI green, gh release)           | A3            |~~ **→ done — v0.5.0 RELEASED 2026-10-28 (tag-CI green, gh release)**
+~~| 8  | A5: README/AGENTS/FEATURES release-state lines                                                  | A4            |~~ **→ done — README banner flipped 2026-10-28 (10-28 report Appendix 5)**
+~~| 9  | B1: pbx hermetic override landing (their repo, whole-key mkVMOverride per spec)                 | O2            |~~ **→ routed — OPEN, owner-gated (TODO pbx row; sheet Batch 2)**
+~~| 10 | B2: nix-email side of pbx landing (CHANGELOG + row close + issue #4 cross-link)                 | B1            |~~ **→ routed — waits on B1 (TODO pbx row)**
+~~| 11 | B3: corridor closeout - the two kept-live reports' open arrows to verdicts, archive via git mv  | B1            |~~ **→ routed — the two kept-live reports close after the pbx blessing**
+~~| 12 | F1: post the #552103 webui-resource comment (draft ready in docs/drafts/)                       | O1            |~~ **→ routed — owner-review-gated (TODO admin-bundle row)**
+~~| 13 | F2: re-verify + post the nixpkgs#563651 follow-up (host-less `[opensearch]` persists on master) | O1            |~~ **→ routed — ON HOLD per owner 2026-10-28 (draft review)**
+~~| 14 | F3: mailsuite#65 nudge at ~11-05 (re-read their master imap.py first)                           | O1, calendar  |~~ **→ routed — calendar ~2026-11-05 (TODO watch row)**
+~~| 15 | F4: dnsmasq resolver-note: venue decision + github-voice draft + file + cross-ref               | O1            |~~ **→ routed — TODO upstream-filings row (venue + gh)**
+~~| 16 | C1: pin advance + #566282 opensearch port (preflight grep, rename, strip guard, 2 checks green) | A4            |~~ **→ done — fe132422 pin advance EXECUTED 2026-10-28 (opensearch port landed)**
+~~| 17 | C2: #552103 retirement OR C45 overlay execution per verdict                                     | C1, O2        |~~ **→ done — C45 SUPERSEDED: the pin ships 0.16.26; #552103 OPEN, vendored dir stays**
+~~| 18 | C3: SystemNix contract-test fix + pin bump to v0.5.0 (their repo)                               | A4            |~~ **→ done — premise superseded 2026-10-28: SystemNix floats this repo master**
+~~| 19 | C4: post-bump checks (aarch64 shape, dovecot warning gone, watch re-date, rename watch)         | C1            |~~ **→ done — aarch64 shape verified, dovecot warning GONE, watch re-dated at the advance**
+~~| 20 | C5: C44 account-secrets doctrine implementation + THREAT_MODEL update                           | O2            |~~ **→ routed — OPEN, owner verdict (sheet Batch 1)**
+~~| 21 | C6: C39 MemoryMax ownership verdict landing                                                     | O2            |~~ **→ routed — OPEN, owner verdict (sheet)**
+~~| 22 | C7: C42 dmarc-monitor retire-or-keep execution                                                  | O2            |~~ **→ routed — OPEN, pure owner call (TODO C42 row; sheet Batch 1)**
+~~| 23 | C8: D1-unlock prep pack (rotation runbook, vandelay-vs-imapsync plan, dmarc checklist, Resend)  | O2, C5        |~~ **→ routed — D1-gated (TODO D1 rows)**
+~~| 24 | D4: CI python-lint doctrine landing (bandit/vulture scope) per V2.3 blessing                    | O2            |~~ **→ routed — IN_PROGRESS (TODO CI python-lint row)**
+~~| 25 | D5: flood posture per taste verdict (close as-is or soften + rerun)                             | O2            |~~ **→ routed — TODO flood row (owner taste; sheet Batch 5)**
+~~| 26 | G1: BuildFlow upstream batch (count gaps, identity parsing, detect-only, vulture policy)        | their cadence |~~ **→ routed — TODO BuildFlow row (their repo)**
+~~| 27 | G2: SystemNix CI-debt lanes (credential, canary allowlist, 2 pin flips, divergence doc)         | their cadence |~~ **→ routed — TODO SystemNix CI-debt row**
+~~| 28 | G3-G7: qcow2 purge verdict, contacts probe re-run on bump, EventCatalog publish, watch cadence, | O2 / external |~~ **→ routed — qcow2 owner-gated (TODO row); contacts probe EXECUTED 2026-10-28; EventCatalog publish external-blocked; watch ~11-05; policy rows on the sheet**
 |    | policy executions - see Z-plan section 3                                                        |               |
 
 Session-surfaced micro-items to fold at the next TODO touch (NOT yet
@@ -166,13 +166,13 @@ harvested): the `missing_file=17` JSON-mode evidence enrichment (item
 
 ## g) Questions I cannot figure out myself
 
-1. **O1 timing**: when will you run `gh auth login -h github.com`? Four
+~~1. **O1 timing**: when will you run `gh auth login -h github.com`? Four~~ **→ routed — ANSWERED: gh auth live again 2026-10-28**
    drafted filings, the tag-CI watch, and the origin-CI observation of
    the pushed `373c30a` are all parked behind it.
-2. **O2 timing**: when is the sitting? The verdict sheet
+~~2. **O2 timing**: when is the sitting? The verdict sheet~~ **→ routed — sittings partially held 2026-10-28; the sheet still carries C42/C44/C39-C41/C46**
    (`docs/planning/2026-10-23_11-56_owner-sitting-ratification-verdict-sheet.md`)
    gates >51% of the remaining plan - every A/B/C/D4/D5/G-lane item.
-3. **Push decision**: this session added 3 local commits
+~~3. **Push decision**: this session added 3 local commits~~ **→ done — superseded: pushed and released as v0.5.0 2026-10-28**
    (`0318b7f`, `650d6c8`, `cc0e33c`) on top of the pushed `373c30a`.
    Push now, or hold and ride them into the v0.5.0 release push (A4)?
    (Held: no push instruction this session.)
