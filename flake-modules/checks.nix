@@ -123,6 +123,14 @@
         stalwart-migrate-e2e = import ../tests/stalwart-migrate-e2e.nix {inherit pkgs;};
         stalwart-relay-e2e = import ../tests/stalwart-relay-e2e.nix {inherit pkgs;};
         parsedmarc-e2e = import ../tests/parsedmarc-e2e.nix {inherit pkgs;};
+        # Continuous deliverability checks (services.mail-server.
+        # deliverabilityChecks): probe unit + timer green on a real
+        # Stalwart with a real local DNS zone (MX/SPF/DMARC/DKIM + a
+        # mock DNSBL), the round-trip canary, the emission contract
+        # (report JSON + Prometheus textfile + timer shape), and the
+        # negative paths (DNSBL listing, canary auth failure at the
+        # send phase).
+        deliverability-e2e = import ../tests/deliverability-e2e.nix {inherit pkgs;};
       };
   };
 }

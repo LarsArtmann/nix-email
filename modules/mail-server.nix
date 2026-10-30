@@ -785,7 +785,7 @@ in {
         }
         {
           assertion = deliverabilityChecks.canary.address == null || lib.hasInfix "@" deliverabilityChecks.canary.address;
-          message = "services.mail-server.deliverabilityChecks.canary.address must be a full address (got "${toString deliverabilityChecks.canary.address}") - 0.16 SMTP AUTH and IMAP LOGIN both resolve the synthesized name@domain form.";
+          message = "services.mail-server.deliverabilityChecks.canary.address must be a full address (got \"${toString deliverabilityChecks.canary.address}\") - 0.16 SMTP AUTH and IMAP LOGIN both resolve the synthesized name@domain form.";
         }
       ];
 

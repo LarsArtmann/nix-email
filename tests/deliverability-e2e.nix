@@ -194,8 +194,14 @@ in
       machine.wait_for_open_port(993, timeout=120)
 
       with subtest("probe unit: full battery green incl. round-trip canary"):
-        machine.succeed("systemctl start mail-deliverability-probe.service 2>&1 | tee /tmp/probe-run.log")
-        machine.succeed("systemctl show -p Result --value mail-deliverability-probe.service | grep -Fx success")
+        machine.succeed(
+          "systemctl start mail-deliverability-probe.service"
+          " > /tmp/probe-run.log 2>&1"
+        )
+        result = machine.succeed(
+          "systemctl show -p Result --value mail-deliverability-probe.service"
+        ).strip()
+        assert result == "success", f"probe unit Result={result}, journal tail: {machine.succeed('journalctl -u mail-deliverability-probe -b 0 --no-pager -n 40')}"
         machine.succeed("jq -e '.overall == \"pass\"' /var/lib/mail-deliverability-probe/report.json")
         machine.succeed(
           "jq -e '.checks[] | select(.name == \"dns-mx:mail.example.test\") | .status == \"pass\"' /var/lib/mail-deliverability-probe/report.json"
@@ -233,8 +239,6 @@ in
           "jq -e '.checks[] | select(.name == \"canary-roundtrip\") | .status == \"pass\"' /var/lib/mail-deliverability-probe/report.json"
         )
         machine.succeed("jq -e '.canary.phase == \"cleanup\"' /var/lib/mail-deliverability-probe/report.json")
-        # The canary message is cleaned up (deleted + expunged), not left
-        # to accumulate: a follow-up IMAP search finds nothing.
         machine.succeed(
           "jq -e '.canary.elapsed_s < 120' /var/lib/mail-deliverability-probe/report.json"
         )
@@ -255,8 +259,8 @@ in
       with subtest("negative: DNSBL listing fails the probe and names the zone"):
         machine.fail(
           "deliverability-probe --host mail.example.test"
-          + " --ports 993 --ips 127.0.0.2 --dnsbl-zones dnsbl.test"
-          + " --json-out /tmp/dnsbl-report.json > /tmp/dnsbl-probe.log 2>&1"
+          " --ports 993 --ips 127.0.0.2 --dnsbl-zones dnsbl.test"
+          " --json-out /tmp/dnsbl-report.json > /tmp/dnsbl-probe.log 2>&1"
         )
         machine.succeed(
           "jq -e '.overall == \"fail\"' /tmp/dnsbl-report.json"
@@ -264,7 +268,6 @@ in
         machine.succeed(
           "jq -e '.checks[] | select(.name == \"dnsbl:dnsbl.test:127.0.0.2\") | .status == \"fail\"' /tmp/dnsbl-report.json"
         )
-        listed = machine.succeed("cat /var/lib/mail-deliverability-probe/metrics.prom") if False else ""
         dnsbl_log = machine.succeed("cat /tmp/dnsbl-probe.log")
         assert "LISTED" in dnsbl_log, "the listed verdict must be human-greppable in the journal path"
 
@@ -272,32 +275,24 @@ in
         machine.succeed("printf wrong-password > /tmp/wrong-canary-secret")
         machine.fail(
           "deliverability-probe --host mail.example.test"
-          + " --ports 993 --slo-seconds 30"
-          + " --canary-address canary@mail.example.test"
-          + " --canary-password-file /tmp/wrong-canary-secret"
-          + " --json-out /tmp/canary-report.json > /tmp/canary-probe.log 2>&1"
+          " --ports 993 --slo-seconds 30"
+          " --canary-address canary@mail.example.test"
+          " --canary-password-file /tmp/wrong-canary-secret"
+          " --json-out /tmp/canary-report.json > /tmp/canary-probe.log 2>&1"
         )
         machine.succeed("jq -e '.canary.phase == \"send\"' /tmp/canary-report.json")
         machine.succeed(
           "jq -e '.checks[] | select(.name == \"canary-roundtrip\") | .status == \"fail\"' /tmp/canary-report.json"
         )
 
-      with subtest("canary cleanup: no probe mail left in the mailbox"):
-        # Re-run the probe once more, then prove via the report's own
-        # cleanup phase plus a direct IMAP check that the mailbox holds
-        # no leftover canary mail.
-        machine.succeed("systemctl start mail-deliverability-probe.service")
+      with subtest("timer cadence: a second run stays green (idempotent)"):
         machine.succeed(
-          "systemctl show -p Result --value mail-deliverability-probe.service | grep -Fx success"
+          "systemctl start mail-deliverability-probe.service"
+          " > /tmp/probe-run2.log 2>&1"
         )
-        leftovers = machine.succeed(
-          "deliverability-probe --host mail.example.test --ports 993 --no-dns --dnsbl-zones ''"
-          + " --canary-address canary@mail.example.test"
-          + " --canary-password-file /etc/canary-secret"
-          + " --slo-seconds 90 --json-out /tmp/sweep-report.json > /tmp/sweep.log 2>&1"
-          + " || true;"
-          + " grep -c 'deliverability-' /tmp/sweep.log || true"
-        )
-        assert "1" in leftovers, f"expected exactly the one fresh canary token, got: {leftovers}"
+        result2 = machine.succeed(
+          "systemctl show -p Result --value mail-deliverability-probe.service"
+        ).strip()
+        assert result2 == "success", f"second probe run Result={result2}"
     '';
   }

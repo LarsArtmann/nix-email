@@ -15,10 +15,7 @@
 # - the SAME one the wrapper's mail-deliverability-probe.service unit runs
 # in host mode, so vantage and host probes cannot drift apart.
 {
-  perSystem = {
-    pkgs,
-    ...
-  }: let
+  perSystem = {pkgs, ...}: let
     probe = import ../modules/deliverability-probe-bin.nix {inherit pkgs;};
   in {
     packages.deliverability-probe = probe;

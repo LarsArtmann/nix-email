@@ -8,10 +8,8 @@
 # configuration. Absolute store paths only - a unit's ExecStart PATH is
 # NOT the console PATH (CONTRIBUTING "unit-script PATH trap"), so dig
 # and openssl are baked in here rather than hoped for.
-{
-  pkgs,
-}:
-  pkgs.writeShellScriptBin "deliverability-probe" ''
-    export PATH="${pkgs.dnsutils}/bin:${pkgs.openssl}/bin:$PATH"
-    exec ${pkgs.python3}/bin/python3 ${./deliverability-probe.py} "$@"
-  ''
+{pkgs}:
+pkgs.writeShellScriptBin "deliverability-probe" ''
+  export PATH="${pkgs.dnsutils}/bin:${pkgs.openssl}/bin:$PATH"
+  exec ${pkgs.python3}/bin/python3 ${./deliverability-probe.py} "$@"
+''

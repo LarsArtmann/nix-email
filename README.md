@@ -195,6 +195,20 @@ and nothing else:
   exercising the production-shaped IMAPS 993 path with DEFAULT certificate
   verification (machine-trusted fixture CA, `ssl=True`, no
   skip-verification).
+- `deliverability-e2e`: the continuous deliverability checks
+  (`services.mail-server.deliverabilityChecks`): one VM running the real
+  stack + a real local DNS zone (dnsmasq: MX/SPF/DMARC/DKIM records, a PTR,
+  and a mock DNSBL with one listed + one clean IP). The probe unit runs the
+  full battery green (DNS records, 25/465/587/993 transport TLS, cert
+  expiry, self-signed tier = tls-verification WARN under opportunistic
+  mode), the round-trip canary delivers + cleans up within the SLO, the
+  emission contract holds (report.json, Prometheus textfile gauges incl.
+  the dead-man timestamp, timer enabled with `OnCalendar *:0/15` +
+  Persistent), and the negative paths fire: a DNSBL-listed IP fails the
+  run naming the zone, wrong canary credentials fail at phase=send (the
+  send-vs-delivery distinction MONITORING.md section 6 demands). The eval
+  half pins the unit shape: LoadCredential for the canary password, no
+  wrapper-side OnFailure (alert routing is consumer doctrine).
 - `dmarc-eval`: eval-time contract - enables parsedmarc, heavy sinks off,
   `general.output` lands, `_secret` password survives the option types AND
   the real ini generation (the unit's config render is forced, so a wrong
@@ -255,9 +269,10 @@ provisioning CLI's only auth path, so the wrapper refuses to eval without
 the secret), `stateVersion`, `relay` (outbound smarthost, see below),
 `metrics.enable` (`/metrics/prometheus` on the HTTP listener),
 `directoryCacheTtlNegative`, `certificate` (`self-signed | acme | manual`
-tier with completeness assertions), and the hardening options `rateLimits`
-(opt-in sustained inbound damper - see the sizing note below) and
-`spamFilter.dnsbl.servers` (typed DNS blocklist entries, default `{}`;
+tier with completeness assertions), `deliverabilityChecks` (continuous
+deliverability probes - see the next section), and the hardening options
+`rateLimits` (opt-in sustained inbound damper - see the sizing note below)
+and `spamFilter.dnsbl.servers` (typed DNS blocklist entries, default `{}`;
 the plan ALWAYS carries an empty-by-default reconcile set - the
 "DNSBL off by default" posture, mechanized; see the delta table below
 for the 0.16.22-era broken-defaults history).
@@ -370,6 +385,62 @@ referenced through the `%{file:/run/credentials/...}%` macro mechanism.
 Outbound smarthost relaying (Stalwart -> Resend) needs nothing beyond the
 `relay` option on 0.16 - the object rendering is wrapper-owned (verified
 in the two-node VM test, not guessed).
+
+### Continuous deliverability checks (`services.mail-server.deliverabilityChecks`)
+
+A systemd timer (default `OnCalendar *:0/15`, `Persistent`) runs the probe
+unit `mail-deliverability-probe.service` - DNS (MX/SPF/DMARC/DKIM
+selectors), DNSBL listing per outbound IP, transport health on
+25/465/587/993 (STARTTLS/implicit TLS, SASL login when canary credentials
+are set), certificate expiry, and the round-trip canary (submit a
+token-unique mail as the canary account on 587, assert IMAPS arrival
+within `sloSeconds`, delete it - send-failure and delivery-timeout are
+distinguished in the report, per MONITORING.md section 6). VM-e2e'd by
+`deliverability-e2e` (green battery + both negative paths).
+
+```nix
+services.mail-server.deliverabilityChecks = {
+  enable = true;
+  dkimSelectors = ["rs" "ed"];
+  dnsblZones = ["zen.spamhaus.org"]; # only where the host resolves recursively itself
+  canary = {
+    address = "canary@example.com";   # an EXISTING account (provision it yourself - C44 doctrine)
+    secretFile = "/run/secrets/mail-canary-password";
+  };
+};
+```
+
+EMISSION ONLY, by doctrine (docs/MONITORING.md owns the wiring specs):
+
+- **exit code** - any CRITICAL failure fails the unit: SystemNix's
+  `onFailure` layer alerts on the unit NAME
+  `mail-deliverability-probe.service` (Discord/ntfy push -> desktop);
+  the wrapper itself never sets OnFailure.
+- **`/var/lib/mail-deliverability-probe/report.json`** (+ pruned
+  `history/`) - the structured last-run report (jq-friendly).
+- **`/var/lib/mail-deliverability-probe/metrics.prom`** - Prometheus
+  textfile (`mail_deliverability_probe_success`, per-check
+  `mail_deliverability_check_success{check=...}` / `..._warn`,
+  `mail_deliverability_dnsbl_listed{zone=...,ip=...}`, and the dead-man
+  gauge `mail_deliverability_probe_timestamp_seconds` - scrape it and
+  alert on staleness; SigNoz consumes it like any Prometheus source).
+- **vantage runs** - the SAME probe is exported as the flake package/app
+  `deliverability-probe`, so evo-x2/SystemNix can run the outside-view
+  battery (plus Gatus's own TCP/TLS/DNS checks) without redeploying the
+  mail host:
+
+```console
+$ nix run github:LarsArtmann/nix-email#deliverability-probe -- \
+    --host mail.example.com --domains example.com \
+    --dnsbl-zones zen.spamhaus.org \
+    --canary-address canary@example.com \
+    --canary-password-file /run/secrets/mail-canary-password \
+    --prom-out /var/lib/mail-canary/metrics.prom
+```
+
+Self-signed-tier note: `tlsVerification = "opportunistic"` (default) WARNs
+on untrusted certificates instead of failing - switch to `"required"`
+together with `certificate.mode = "acme"`/`"manual"` on production hosts.
 
 ## Migrating from 0.15 (the store guard + `stalwart-migrate-from-015`)
 

@@ -8,6 +8,7 @@
   ],
   "x86_64-linux": [
     "check-set-lockstep",
+    "deliverability-e2e",
     "dmarc-eval",
     "demo-eval",
     "migrate-convert-eval",
