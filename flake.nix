@@ -64,6 +64,7 @@
         ./flake-modules/demo-vm.nix
         ./flake-modules/checks.nix
         ./flake-modules/devshells.nix
+        ./flake-modules/probe-package.nix
       ];
     };
 }

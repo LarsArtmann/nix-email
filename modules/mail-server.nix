@@ -162,6 +162,63 @@
   # The wrapper-owned Domain object id (documented: consumers reference it
   # as "#domain" in domainId fields).
   wrapperDomainId = "domain";
+
+  deliverabilityChecks = cfg.deliverabilityChecks;
+
+  # Single-source probe derivation (host mode unit, vantage package, VM
+  # test manual runs all import the same file - modules/deliverability-probe-bin.nix).
+  deliverabilityProbe = import ./deliverability-probe-bin.nix {inherit pkgs;};
+
+  # /var/lib home of the probe's report.json / metrics.prom / history/
+  # (StateDirectory basis - systemd creates and chowns it).
+  probeStateDir = "/var/lib/mail-deliverability-probe";
+  canaryCredential = "/run/credentials/mail-deliverability-probe.service/canary-password";
+
+  probeArgs =
+    [
+      "--host"
+      (lib.escapeShellArg cfg.hostname)
+      "--domains"
+      (lib.escapeShellArg (lib.concatStringsSep "," deliverabilityChecks.domains))
+      "--ports"
+      (lib.escapeShellArg (lib.concatStringsSep "," (map toString deliverabilityChecks.ports)))
+      "--tls-verify"
+      deliverabilityChecks.tlsVerification
+      "--cert-warn-days"
+      (toString deliverabilityChecks.certWarnDays)
+      "--slo-seconds"
+      (toString deliverabilityChecks.sloSeconds)
+      "--json-out"
+      "${probeStateDir}/report.json"
+      "--history-dir"
+      "${probeStateDir}/history"
+      "--history-keep"
+      (toString deliverabilityChecks.historyKeep)
+      "--prom-out"
+      "${probeStateDir}/metrics.prom"
+    ]
+    ++ lib.optionals (deliverabilityChecks.resolver != null) [
+      "--resolver"
+      (lib.escapeShellArg deliverabilityChecks.resolver)
+    ]
+    ++ lib.optionals (deliverabilityChecks.dkimSelectors != []) [
+      "--selectors"
+      (lib.escapeShellArg (lib.concatStringsSep "," deliverabilityChecks.dkimSelectors))
+    ]
+    ++ lib.optionals (deliverabilityChecks.dnsblZones != []) [
+      "--dnsbl-zones"
+      (lib.escapeShellArg (lib.concatStringsSep "," deliverabilityChecks.dnsblZones))
+    ]
+    ++ lib.optionals (deliverabilityChecks.ipAddresses != []) [
+      "--ips"
+      (lib.escapeShellArg (lib.concatStringsSep "," deliverabilityChecks.ipAddresses))
+    ]
+    ++ lib.optionals (deliverabilityChecks.canary.address != null) [
+      "--canary-address"
+      (lib.escapeShellArg deliverabilityChecks.canary.address)
+      "--canary-password-file"
+      (lib.escapeShellArg canaryCredential)
+    ];
 in {
   # Swap the pinned nixpkgs 0.15 module for the vendored 0.16 one in EVERY
   # evaluation that imports this wrapper (consumers, tests, demo). Both
@@ -720,6 +777,16 @@ in {
           assertion = cfg.certificate.manual.certFile != null && cfg.certificate.manual.keyFile != null;
           message = "services.mail-server.certificate.manual: both certFile and keyFile are required in manual mode - a certificate without its key (or vice versa) is silently unusable and implicit-TLS would serve nothing.";
         }
+      ]
+      ++ lib.optionals deliverabilityChecks.enable [
+        {
+          assertion = (deliverabilityChecks.canary.address == null) == (deliverabilityChecks.canary.secretFile == null);
+          message = "services.mail-server.deliverabilityChecks.canary: set address AND secretFile together (or neither) - a canary without credentials (or vice versa) cannot run the round-trip probe.";
+        }
+        {
+          assertion = deliverabilityChecks.canary.address == null || lib.hasInfix "@" deliverabilityChecks.canary.address;
+          message = "services.mail-server.deliverabilityChecks.canary.address must be a full address (got "${toString deliverabilityChecks.canary.address}") - 0.16 SMTP AUTH and IMAP LOGIN both resolve the synthesized name@domain form.";
+        }
       ];
 
     warnings =
@@ -1120,5 +1187,54 @@ in {
         993
       ]
       ++ lib.optionals (!httpBindIsLoopback && httpBindPort != null) [httpBindPort];
+
+    # Continuous deliverability probes (owner request 2026-10-30): a
+    # oneshot service + timer running the shared probe derivation. EMISSION
+    # ONLY by doctrine - no OnFailure here: SystemNix's onFailure layer
+    # (Discord/ntfy push -> desktop) keys off the unit NAME
+    # mail-deliverability-probe.service and its non-zero exit; SigNoz
+    # scrapes the textfile gauges; Gatus covers the external TCP/TLS view
+    # (docs/MONITORING.md owns the three wiring specs). The unit NEVER
+    # blocks boot or stalwart: it is ordered after, wanted by nobody but
+    # its timer.
+    systemd.services.mail-deliverability-probe = lib.mkIf deliverabilityChecks.enable {
+      description = "Deliverability probe (DNS/DNSBL/transport/cert/canary; report + Prometheus textfile)";
+      after = ["network-online.target" "${stalwartUnit}.service" "stalwart-provision.service"];
+      wants = ["network-online.target"];
+      serviceConfig = {
+        Type = "oneshot";
+        DynamicUser = true;
+        StateDirectory = "mail-deliverability-probe";
+        LoadCredential =
+          lib.optionals (deliverabilityChecks.canary.secretFile != null)
+          ["canary-password:${toString deliverabilityChecks.canary.secretFile}"];
+        # dig + openssl live on the probe wrapper's own PATH; this PATH is
+        # belt-and-suspenders for the python subprocess lookups.
+        Environment = ''PATH="${lib.makeBinPath [pkgs.dnsutils pkgs.openssl]}"'';
+        ExecStart = "${deliverabilityProbe}/bin/deliverability-probe ${lib.concatStringsSep " " probeArgs}";
+        # The parsedmarc wrapper's hardening set, mirrored (the unit writes
+        # nothing outside its StateDirectory, which ProtectSystem=strict +
+        # StateDirectory auto-whitelist covers).
+        ProtectSystem = "strict";
+        PrivateTmp = true;
+        NoNewPrivileges = true;
+        RestrictNamespaces = true;
+        RestrictRealtime = true;
+        RestrictSUIDSGID = true;
+        SystemCallArchitectures = "native";
+        RestrictAddressFamilies = ["AF_INET" "AF_INET6" "AF_UNIX"];
+        CapabilityBoundingSet = "";
+      };
+    };
+
+    systemd.timers.mail-deliverability-probe = lib.mkIf deliverabilityChecks.enable {
+      description = "Run the deliverability probe continuously";
+      wantedBy = ["timers.target"];
+      timerConfig = {
+        OnCalendar = deliverabilityChecks.frequency;
+        Persistent = true;
+        RandomizedDelaySec = 120;
+      };
+    };
   };
 }
