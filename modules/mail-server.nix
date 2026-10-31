@@ -39,6 +39,29 @@
 # as a MtaRoute (Relay variant) + MtaOutboundStrategy route expression, the
 # 0.16 replacement of the 0.15 `queue.route`/`queue.strategy.route` TOML.
 #
+# RETIRING `relay` (set it back to null): the plan is UPSERT-ONLY per set
+# (reconcile lives only on the sets that opt in), so stopping the emission
+# does NOT touch the store - the stale MtaRoute row AND the stale
+# MtaOutboundStrategy singleton (else -> 'smarthost') survive and keep
+# routing every non-local message at the dead smarthost. This bit the
+# 2026-10-26 pbx-artmann strand (3 stale MtaRoutes + a dead else-branch).
+# The one-shot consumer remedy on the SAME host after retiring the option:
+#   services.stalwart.provision.objects.MtaRoute.reconcile = true;
+#   services.stalwart.provision.objects.MtaRoute.match = ["name"];
+#   services.stalwart.provision.objects.MtaRoute.objects = {};
+#   services.stalwart.provision.objects.MtaRoute.scope.name = "smarthost";
+# (empty reconciled set + scope pinned to the wrapper's routeId: reconcile
+# deletes only rows matching the scope, so consumer-declared extra routes
+# are untouchable; apply ONCE, then remove - leaving an empty reconciled
+# set in place also forbids any future non-plan MtaRoute). The stale
+# strategy singleton needs its `route` field reset to the direct-MX
+# default once (admin CLI, or an update-op singleton with the default
+# expression). A guarded wrapper-automated path (opted-in empty reconciled
+# set + default-strategy update when `relay = null`) is DESIGNED, not
+# implemented (2026-10-31 evaluation, TODO row): it is a public option
+# surface + behavior change that wants its own VM proof - see the
+# "0.16-born wrapper options" backlog row.
+#
 # PASSTHROUGH: everything the wrapper does not own is provisioned by the
 # consumer through `services.stalwart.provision.singletons` /
 # `.objects` (merged into the wrapper's plan). Extending is the normal path
@@ -370,7 +393,9 @@ in {
         delivery is untouched. Generates a MtaRoute (Relay variant) and the
         MtaOutboundStrategy route expression (is_local_domain -> 'local',
         else -> relay) - the 0.16 shape of the 0.15 queue.route/strategy
-        pair.
+        pair. RETIRING (null) does NOT retire the store objects - read the
+        "RETIRING `relay`" note in this file's header for the one-shot
+        consumer remedy (reconcile-destroy pattern).
       '';
     };
 
