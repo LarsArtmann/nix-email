@@ -546,7 +546,13 @@ def ensure_writable(outdir: Path) -> None:
         )
 
 
-def export_tree(outdir: Path) -> None:
+def export_tree(outdir: Path, plain: bool = False) -> None:
+    # `plain` is the hub lint-tree parity flag: this tree has no versioned
+    # outgoing refs, so the bytes MUST be identical in both modes - the
+    # selftest asserts that parity, and any future render divergence
+    # between the modes fails there instead of silently forking the
+    # hub-side lint view from the publish view.
+    del plain
     ensure_writable(outdir)
     for svc in SERVICES:
         target = outdir / "services" / svc["id"] / "index.mdx"
@@ -574,6 +580,65 @@ def assert_table_rows_balanced(rel, lines):
             raise AssertionError(f"{rel}: odd pipe count in table row: {line}")
 
 
+MD_LINK = re.compile(r"\]\(([^)]+)\)")
+
+
+def assert_body_links_absolute(rel, text):
+    for m in MD_LINK.finditer(text):
+        target = m.group(1).strip()
+        if target.startswith("#"):
+            continue
+        if not (target.startswith("http://") or target.startswith("https://")):
+            raise AssertionError(
+                f"{rel}: body link target is not absolute (the REPO_BASE "
+                f"class of bug - the hub serves this tree at its own "
+                f"origin): {target}"
+            )
+
+
+def assert_exact_service_frontmatter(rel, fm, svc):
+    expected = [
+        f"id: {svc['id']}",
+        f"name: {yaml_str(svc['name'])}",
+        f"version: {RESOURCE_VERSION}",
+        f"summary: {yaml_str(svc['summary'])}",
+        "owners:",
+        f"    - {OWNER}",
+    ]
+    assert fm == expected, (
+        f"{rel}: frontmatter shape drift\n got:      {fm}\n expected: {expected}"
+    )
+
+
+def assert_exact_adr_frontmatter(rel, fm, adr):
+    expected = [
+        f"id: {adr['id']}",
+        f"name: {yaml_str(adr['name'])}",
+        f"summary: {yaml_str(adr['summary'])}",
+        f"version: {RESOURCE_VERSION}",
+        f"status: {adr['status']}",
+        f"date: {adr['date']}",
+        "owners:",
+        f"    - {OWNER}",
+        "appliesTo:",
+    ]
+    for kind, rid in adr["applies"]:
+        expected += [f"  - type: {kind}", f"    id: {rid}"]
+    assert fm == expected, (
+        f"{rel}: frontmatter shape drift\n got:      {fm}\n expected: {expected}"
+    )
+
+
+def assert_adr_crosslinks(rel, text, adr_ids):
+    for m in MD_LINK.finditer(text):
+        target = m.group(1).strip()
+        mref = re.match(r"(?:https?://[^/]+)?/?adrs/([a-z0-9-]+)", target)
+        if mref:
+            assert mref.group(1) in adr_ids, (
+                f"{rel}: ADR cross-link points at a non-exported id: {target}"
+            )
+
+
 def selftest() -> None:
     expected = expected_paths()
     service_ids = {s["id"] for s in SERVICES}
@@ -584,8 +649,10 @@ def selftest() -> None:
     with tempfile.TemporaryDirectory() as tmp:
         first = Path(tmp) / "a"
         second = Path(tmp) / "b"
+        plain = Path(tmp) / "c"
         export_tree(first)
         export_tree(second)
+        export_tree(plain, plain=True)
 
         walked = sorted(
             str(p.relative_to(first)) for p in first.rglob("*") if p.is_file()
@@ -596,28 +663,23 @@ def selftest() -> None:
             rel = f"services/{svc['id']}/index.mdx"
             text = (first / rel).read_text()
             fm = frontmatter_of(text)
-            keys = [ln.split(":")[0] for ln in fm if not ln.startswith(" ")]
-            for key in ("id", "name", "version", "summary", "owners"):
-                assert key in keys, f"{rel}: missing frontmatter key {key}"
-            assert "badges" not in keys, (
+            assert_exact_service_frontmatter(rel, fm, svc)
+            assert "badges" not in fm, (
                 f"{rel}: sources must not emit badges (deployment chips "
                 "union in from the SystemNix inventory tree)"
             )
-            assert f"version: {RESOURCE_VERSION}" in fm, (
-                f"{rel}: version must stay lockstep {RESOURCE_VERSION} "
-                "with hub render-inventory.py"
-            )
+            assert_body_links_absolute(rel, text)
             assert_table_rows_balanced(rel, text.split("\n"))
 
         for adr in ADRS:
             rel = f"adrs/{adr['id']}/index.mdx"
             text = (first / rel).read_text()
             fm = frontmatter_of(text)
-            keys = [ln.split(":")[0] for ln in fm if not ln.startswith(" ")]
-            for key in ("id", "name", "version", "status", "date"):
-                assert key in keys, f"{rel}: missing frontmatter key {key}"
+            assert_exact_adr_frontmatter(rel, fm, adr)
             assert adr["status"] in ADR_STATUSES, f"{rel}: bad status"
             assert DATE_RE.match(adr["date"]), f"{rel}: bad date {adr['date']}"
+            assert_body_links_absolute(rel, text)
+            assert_adr_crosslinks(rel, text, adr_ids)
             # appliesTo gate mirror (merge.py validate_adr_refs): every
             # pointer must resolve in-union by construction.
             for kind, rid in adr["applies"]:
@@ -630,15 +692,36 @@ def selftest() -> None:
             assert (first / rel).read_bytes() == (second / rel).read_bytes(), (
                 f"{rel}: export is not byte-deterministic"
             )
+            assert (first / rel).read_bytes() == (plain / rel).read_bytes(), (
+                f"{rel}: --plain parity broken (hub lint view diverged "
+                "from the publish view)"
+            )
 
         user_fm = frontmatter_of((first / "users/lars.mdx").read_text())
         assert f"id: {OWNER}" in user_fm, "user resource must match OWNER"
 
     print(
         f"selftest PASS: {len(SERVICES)} services, {len(ADRS)} adrs, "
-        f"1 user, {len(expected)} files, deterministic, appliesTo and "
-        "owner resolve in-tree"
+        f"1 user, {len(expected)} files, deterministic, --plain parity, "
+        "absolute body links, exact frontmatter shapes, appliesTo, "
+        "ADR cross-links and owner resolve in-tree"
     )
+
+
+def check_drift(outdir: Path):
+    """Re-render to a temp dir; return [(rel, reason)] vs the -o tree."""
+    drift = []
+    with tempfile.TemporaryDirectory() as tmp:
+        fresh = Path(tmp) / "fresh"
+        export_tree(fresh)
+        for rel in expected_paths():
+            got = outdir / rel
+            want = fresh / rel
+            if not got.is_file():
+                drift.append((rel, "missing from the target tree"))
+            elif got.read_bytes() != want.read_bytes():
+                drift.append((rel, "bytes differ from the current render"))
+    return drift
 
 
 def main() -> None:
@@ -659,6 +742,14 @@ def main() -> None:
         action="store_true",
         help="run the golden selftest (no -o needed) and exit",
     )
+    ap.add_argument(
+        "--check",
+        action="store_true",
+        help=(
+            "drift guard: re-export to a temp dir and byte-compare "
+            "against the -o tree; exit 1 listing drifted files (CI mode)"
+        ),
+    )
     args = ap.parse_args()
 
     if args.selftest:
@@ -666,6 +757,18 @@ def main() -> None:
         return
     if not args.out:
         ap.error("-o/--out is required unless --selftest is given")
+    if args.check:
+        drifted = check_drift(args.out)
+        if drifted:
+            print(
+                "--check: %d file(s) drifted from the exporter's current "
+                "render:" % len(drifted)
+            )
+            for rel, why in drifted:
+                print(f"  {rel}: {why}")
+            raise SystemExit(1)
+        print(f"--check OK: {len(expected_paths())} files byte-identical")
+        return
     export_tree(args.out)
     print(f"exported {len(expected_paths())} files to {args.out}")
 

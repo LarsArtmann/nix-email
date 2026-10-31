@@ -196,11 +196,14 @@ ideas, all D1-gated:
   provisioning vocabulary (plan, reconcile set, match property, singleton,
   object, datastore descriptor) - the README ledger holds the facts, this
   would hold the LANGUAGE; write when the terms stabilize post-v0.5.0
-- Arch-diagram content-freshness audit (routed 2026-09-22 from the
-  16_19-16 report): `docs/architecture-understanding/*.d2` renders are
-  label-verified but the CONTENT vs module reality (relay, DKIM
-  dual-sign, flood node) has no standing re-check - audit on the next
-  diagram session
+- Arch-diagram content-freshness audit - **DONE 2026-10-31 (E7)**: both
+  `.d2` sources re-baselined to the 0.16.26 surface (provision node,
+  dual declarative DKIM, MtaRoute/MtaOutboundStrategy vocabulary in the
+  improved/target diagram, the 2026-10-30 deliverability probe, the
+  opt-in rate limiter, the metrics singleton) and both SVGs re-rendered
+  with the pinned `--layout=elk` command; the v2-CPU requirement is a
+  TEST-level concern (v2CpuPatches), correctly absent from the runtime
+  diagrams
 - Split `modules/mail-server.nix` options into a `mail-server/options.nix`
   ONLY if the file keeps growing (verdict 2026-10-05: acceptable at ~667
   documented lines; re-check on the next option addition)

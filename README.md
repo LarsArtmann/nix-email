@@ -73,9 +73,12 @@ stalwart: Stalwart 0.16.26 (services.mail-server wrapper) {
   queue: Queue + routing strategy (is_local_domain -> local, else -> relay)
   spam: Spam filter (GTUBE, rules)
   provision: declarative plans via stalwart-cli apply (accounts, Domain, DKIM, routes)
-  dkim: DKIM signer (signature.<id>)
+  dkim: DKIM signer (declarative DkimSignature: rsa + ed25519)
+  flood: Inbound rate limiter (opt-in, MtaInboundThrottle)
+  probe: Deliverability probe timer (DNS/DNSBL/transport/canary)
   directory: Internal directory (negative-cache TTL option)
   acme: ACME client (self-signed | acme | manual tiers)
+  metrics: Metrics singleton (/metrics/prometheus)
   store: RocksDB mail store {shape: cylinder}
 }
 
@@ -105,7 +108,9 @@ stalwart.smtp_in -> stalwart.store: local delivery
 stalwart.directory -> stalwart.store: principal/domain lookups
 stalwart.spam -> stalwart.store: tags X-Spam-Status (GTUBE/rules); no auto-Junk filing - 0.16 re-verified by the e2e GTUBE subtest (INBOX-select probe green on 0.16.22 2026-10-17 and 0.16.26 2026-10-28; filing would be consumer sieve territory)
 stalwart.provision -> stalwart.store: declarative Domain/Account/DkimSignature/MtaRoute objects
-stalwart.dkim -> stalwart.queue: signs outbound
+stalwart.dkim -> stalwart.queue: signs outbound (dual rsa+ed25519)
+stalwart.probe -> stalwart.smtp_in: transport health + round-trip canary
+stalwart.probe -> dns: MX/SPF/DMARC/DKIM/DNSBL battery
 stalwart.acme -> letsencrypt: issues certificates
 stalwart.smtp_in -> dns: SPF/DNSBL/DKIM lookups
 stalwart.queue -> dns: MX resolution

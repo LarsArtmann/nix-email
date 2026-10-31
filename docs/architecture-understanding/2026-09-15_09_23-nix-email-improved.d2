@@ -12,11 +12,11 @@ systemnix: SystemNix consumer host (out of this repo's scope, wrapper layer) {
   stalwart: nix-email flake input -> services.mail-server + services.dmarc-monitor
 }
 
-stalwart: Stalwart 0.15.5 {
+stalwart: Stalwart 0.16.26 {
   listeners: 25 / 587 / 465 / 993 (public) + 8080 (loopback)
   store: RocksDB mail store {shape: cylinder}
   acme: ACME (dns-01 wildcard) + manual cert fallback
-  relay_route: queue.strategy.route -> smarthost
+  relay_route: MtaRoute + MtaOutboundStrategy (0.16 provision objects) -> smarthost
 }
 
 resend: smtp.resend.com (authenticated smarthost) {shape: cloud}

@@ -8,15 +8,19 @@ internet: Internet {
 
 proxy: Reverse proxy (Caddy on consumer host, TLS) {shape: rectangle}
 
-stalwart: Stalwart 0.15.5 (services.mail-server wrapper) {
+stalwart: Stalwart 0.16.26 (services.mail-server wrapper) {
   smtp_in: SMTP listeners (25 MX, 587 submission, 465 submissions)
   imaps: IMAPS listener (993, implicit TLS)
   http: HTTP listener (127.0.0.1:8080, loopback only)
   queue: Queue + routing strategy (is_local_domain -> local, else -> relay)
   spam: Spam filter (GTUBE, rules)
-  dkim: DKIM signer (signature.<id>)
+  provision: Declarative plans via stalwart-cli apply (accounts, Domain, DKIM, MtaRoute)
+  dkim: DKIM signer (declarative DkimSignature: rsa + ed25519)
+  flood: Inbound rate limiter (opt-in, MtaInboundThrottle)
+  probe: Deliverability probe timer (DNS/DNSBL/transport/canary, 2026-10-30)
   directory: Internal directory (negative-cache TTL option)
   acme: ACME client (self-signed | acme | manual tiers)
+  metrics: Metrics singleton (/metrics/prometheus)
   store: RocksDB mail store {shape: cylinder}
 }
 
@@ -47,7 +51,10 @@ stalwart.smtp_in -> stalwart.store: local delivery
 stalwart.directory -> stalwart.store: principal/domain lookups
 stalwart.spam -> stalwart.store: tags X-Spam-Status (GTUBE/rules)
 INBOX by default, no auto-Junk filing
-stalwart.dkim -> stalwart.queue: signs outbound
+stalwart.provision -> stalwart.store: applies the merged plan (upsert/reconcile)
+stalwart.dkim -> stalwart.queue: signs outbound (dual rsa+ed25519)
+stalwart.probe -> stalwart.smtp_in: transport health + round-trip canary
+stalwart.probe -> dns: MX/SPF/DMARC/DKIM/DNSBL battery
 stalwart.acme -> letsencrypt: issues certificates
 stalwart.smtp_in -> dns: SPF/DNSBL/DKIM lookups
 stalwart.queue -> dns: MX resolution
