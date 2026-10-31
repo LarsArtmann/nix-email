@@ -837,9 +837,11 @@ curl -fsS -u demo@mail.demo.test:demo-nixemail-2026 http://127.0.0.1:18080/jmap/
 ```
 
 Push is SSE (`/jmap/eventsource/?types=Email`); the 0.15-era
-`{closeafter}`/`{ping}` rejection verdict needs re-verification on 0.16.
-The InboxClean contract (`docs/INBOXCLEAN.md`) describes the 0.15 probes
-and carries the 0.16 re-verification banner; transcripts in
+`{closeafter}`/`{ping}` rejection verdict is RETIRED - 0.16 re-verified
+2026-10-26 (probe `docs/probes/2026-10-26-es-ping/`: `closeafter=no`
+accepted, the 0.15.5 `400 Invalid parameters` quirk gone; numeric `ping`
+accepted but inert, non-numeric rejected). The InboxClean contract
+(`docs/INBOXCLEAN.md`) is the 0.16-verified authority; transcripts in
 `docs/probes/2026-10-05-jmap-demo-vm/` are 0.15-historical.
 
 #### Contacts quickstart (CardDAV + JMAP contacts; probe-pinned 2026-10-19/20)
