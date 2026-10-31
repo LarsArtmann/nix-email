@@ -234,4 +234,8 @@ open, the D2 is the source of truth.
 - `ROADMAP.md` - long-term themes and open user decisions.
 - `CHANGELOG.md` - what changed.
 - `docs/{status,planning,reviews}/` - point-in-time session snapshots
-  (historical; annotated as work resolves).
+  (historical; annotated as work resolves). Annotation mechanics: the
+  docs-health skill's `annotate` toolkit driven end-to-end by
+  `scripts/annotate-corridor.py` (verdict map by line number ->
+  emit-keys -> spec -> `--verify` -> apply -> check-rows; refuses prose
+  lines with the manual house-grammar recipe; `--self-test` built in).
