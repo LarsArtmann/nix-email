@@ -96,7 +96,7 @@ stalwart.queue -> internet.mx_senders: direct-to-MX when relay = null
 stalwart.queue -> relay: non-local mail when services.mail-server.relay set
 stalwart.smtp_in -> stalwart.store: local delivery
 stalwart.directory -> stalwart.store: principal/domain lookups
-stalwart.spam -> stalwart.store: tags X-Spam-Status (GTUBE/rules); 0.16 Junk-filing behavior re-verification pending (0.15 auto-moved spam to Junk)
+stalwart.spam -> stalwart.store: tags X-Spam-Status (GTUBE/rules); no auto-Junk filing - 0.16 re-verified by the e2e GTUBE subtest (INBOX-select probe green on 0.16.22 2026-10-17 and 0.16.26 2026-10-28; filing would be consumer sieve territory)
 stalwart.provision -> stalwart.store: declarative Domain/Account/DkimSignature/MtaRoute objects
 stalwart.dkim -> stalwart.queue: signs outbound
 stalwart.acme -> letsencrypt: issues certificates
@@ -522,7 +522,7 @@ wrapper deliberately does NOT default the singleton: DNS policy
 
 ## Module: `services.dmarc-monitor`
 
-Enables nixpkgs `services.parsedmarc` (11.0.1) with the heavy sinks OFF:
+Enables nixpkgs `services.parsedmarc` (11.0.2 at the fe132422 pin) with the heavy sinks OFF:
 parsedmarc polls the `rua` mailboxes over IMAP and writes JSON+CSV reports to
 `outputDirectory` (default `/var/lib/parsedmarc/reports`). Options: `enable`,
 `outputDirectory`, `settings` (passthrough). Closes domains-repo findings
@@ -750,6 +750,11 @@ inside nixpkgs are invisible to it, so the checks below are manual):
    rev stays locked in flake.lock).
 
 ## Development
+
+Language note: the project vocabulary (plan, reconcile set, match
+property, singleton, datastore descriptor, ...) is defined in
+[docs/DOMAIN_LANGUAGE.md](docs/DOMAIN_LANGUAGE.md) - read it before the
+module docs if the provisioning terms are new.
 
 The devShell carries the tooling (`nix develop`): alejandra, actionlint +
 shellcheck (actionlint without shellcheck on PATH is blind to shell
