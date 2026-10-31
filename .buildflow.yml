@@ -21,15 +21,14 @@ default_step_timeout: 25m
 exclude:
   - docs/probes/**
 skip_steps:
-  # jscpd has NO per-tool path exclusion (a `tool_options: {jscpd: ...}`
-  # guess was silently inert, 2026-10-30) and does not honor the global
-  # `exclude:` - its only findings here are the frozen probe-transcript
-  # harness overlap under docs/probes/ (the 58-line carddav/caldav ERROR
-  # that redened the 2026-10-30 gate). Maintained-code duplication stays
-  # owned by the deduplicate-code doctrine via art-dupl. Re-enable when
-  # BuildFlow ships per-tool excludes or jscpd respects `exclude:`
-  # (their-repo follow-up, TODO_LIST BuildFlow row).
-  - jscpd
+  # jscpd is NOT skipped (decision 2026-10-31, D5): BuildFlow's global
+  # `exclude:` is invisible to it, but jscpd honors its OWN native config
+  # file - the committed .jscpd.json ignores docs/probes/** (verified:
+  # 11 clones before, all inside frozen probe evidence; 0 after, with
+  # scripts/ + modules/ + tests/ still scanned). A `tool_options: {jscpd:
+  # ...}` guess was silently inert (2026-10-30). Maintained-code
+  # duplication is scanned again; the deduplicate-code doctrine (art-dupl)
+  # stays the judgment layer on top.
   # vulnix crashes fleet-wide updating the NVD feed: HTTP 404 on
   # nvdcve-2.0-modified.json.gz (NVD retired the legacy JSON 2.0 feeds;
   # vulnix 1.12.5 is unmaintained upstream). BuildFlow's "unscannable
