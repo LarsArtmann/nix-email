@@ -568,8 +568,10 @@ verified) instead of the earlier `?ref=v0.4.0` tag pin (C17a): their
 stated mitigation is upstream master's own CI + the E2E suites and the
 `nixpkgs.follows`-forced contract check (`checks.nix-email-contract`),
 which is why the lockstep catch-up here was urgent - a trailing wrapper
-lock breaks THEIR gate. The v0.5.0 tag remains the wanted pin point for
-the 0.16 world (owner-gated, C43). InboxClean's `?ref=master` is fine
+lock breaks THEIR gate. The v0.5.0 tag SHIPPED 2026-10-28 (C43
+answered CUT); the pin-point remains available for consumers wanting a
+hard rev, while SystemNix stays on the float by their own choice.
+InboxClean's `?ref=master` is fine
 there because it has no
 nixpkgs-version-sensitive contract; this repo does.
 
@@ -597,8 +599,10 @@ badges union through - merge.py contract). The exporter is stdlib-only,
 byte-deterministic, and `--selftest`-guarded (version lockstep 1.0.0
 with the hub's inventory renderer, appliesTo resolution, no badges, no
 catalog.index.json manifest). ADR statuses are honest: C42
-(parsedmarc keep-or-retire) and C45 (stalwart pin vs overlay) ship
-`proposed` until the owner decides. Content edits happen in the
+(parsedmarc keep-or-retire) ships `proposed` until the owner decides;
+C45 (stalwart pin vs overlay) flipped to `superseded` 2026-10-31 - it
+was resolved by events (the pin advance shipped 0.16.26), not by an
+owner call. Content edits happen in the
 exporter's data dicts, never in generated trees; details in AGENTS.md
 "EventCatalog integration".
 
@@ -662,9 +666,12 @@ exporter's data dicts, never in generated trees; details in AGENTS.md
      full backup (verified: mail intact after restart); schedule as a
      stop/copy/start unit or accept btrfs-snapshot fallback; pull
      results to the evo-x2 pool via backup-coordination.
-   - **Per-account mail**: Vandelay is NOT in the pinned nixpkgs
-     (eval-verified) - per-account export rides imapsync or a
-     source-built vandelay; unverified here.
+   - **Per-account mail**: `stalwart-vandelay` (Stalwart's own export
+     tool) IS in the pin since at least fe132422 (1.0.12, eval-verified
+     2026-10-31 - the older "not in nixpkgs" note is dead), but it is
+     UNVERIFIED against a live store here; per-account export rides
+     imapsync (2.314 in the pin) until the migration-tooling compare
+     (ROADMAP, plan E13) runs on scratch mailboxes.
      The wrapper wires none of this (thin-wrapper doctrine); SystemNix
      owns the scheduling + backup-coordination layer (their repo).
 7. DR: sops secrets for the VPS must also encrypt to a repo-level recovery
@@ -1018,9 +1025,9 @@ json/yaml/markdown.
   webadmin.zip; zero behavioral delta proven: 0.15 line identical, 0.16
   line dormant both sides); upstream #552103 (identical shape at head
   9b15e1f) has the fix drafted in
-  `docs/drafts/552103-webui-resource-comment.md` - filing pending gh
-  auth. User webmail remains a non-goal (C34): Bulwark on the consumer
-  host is the JMAP-native client.
+  `docs/drafts/552103-webui-resource-comment.md` - owner-review-gated
+  (gh auth LIVE since 2026-10-30). User webmail remains a non-goal (C34):
+  Bulwark on the consumer host is the JMAP-native client.
 
 ### Stalwart 0.15.5 era (historical facts; several are superseded above)
 

@@ -360,16 +360,22 @@ No CVEs in the window (CVE-2026-81036 affects through 0.16.19 only).
 
 ## Decision
 
-UNDECIDED - owner-gated decision C45: stay on the pin's 0.16.22 vs
-overlay a newer 0.16.x. The delta above is the decision input; any
-0.16.26+ overlay additionally needs a VM cpu-type change before the
-gate can boot it.
+SUPERSEDED 2026-10-28 - by events, not by an owner call (C45 in the
+original numbering): the consumer-driven pin advance to fe132422
+landed `stalwart_0_16` 0.16.26 via the PIN itself, so the overlay arm
+is moot. The delta above remains as the landed-change record. The
+x86-64-v2 requirement is absorbed in VMs by `tests/common.nix`
+`v2CpuPatches` (`-cpu max`); REAL hosts need a consumer-side v2 CPU
+check before deploying the advanced pin.
 
 ## Consequences
 
-- Until C45: the empty DNSBL reconcile set stays load-bearing on .22.
-- An overlay decision must bundle the VM cpu-type change and a re-check
-  of the vendored module against upstream.
+- The empty DNSBL reconcile set stays load-bearing as the STANDING
+  posture (0.16.24 made upstream rule updates insert-only for existing
+  installs - only a reconciled declarative set converges); it is no
+  longer a .22-specific workaround.
+- An overlay decision (any future one) must bundle the VM cpu-type
+  change and a re-check of the vendored module against upstream.
 """
 
 ADRS = [
@@ -451,10 +457,11 @@ ADRS = [
         "id": "stalwart-pin-vs-overlay",
         "name": "Stay on the pin's Stalwart 0.16.22 vs overlay newer (C45)",
         "summary": (
-            "0.16.23-26 delta recorded (bit_and fix to x86-64-v2 BREAKING"
-            " in .26); owner-gated whether to overlay"
+            "SUPERSEDED 2026-10-28: the pin advance shipped 0.16.26 via the"
+            " pin itself - the overlay arm is moot; delta kept as the"
+            " landed-change record"
         ),
-        "status": "proposed",
+        "status": "superseded",
         "date": "2026-10-18",
         "applies": [("service", "mail-server")],
         "body": ADR_PIN_VS_OVERLAY,

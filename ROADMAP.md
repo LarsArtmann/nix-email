@@ -65,7 +65,9 @@ Raw ideas:
 ### 3. Migration and cutover (gated on D1)
 
 - Migration tooling decision (stalwart-vandelay vs imapsync 2.314) on scratch
-  mailboxes - R6, the last unexecuted research task
+  mailboxes - R6, the last unexecuted research task (2026-10-31: vandelay
+  1.0.12 IS in the fe132422 pin, so no source build is needed; only the
+  behavior compare remains)
 - Full mailbox migration BEFORE the MX switch; Workspace alive ~2 weeks as
   rollback
 - Post-cutover checks: SPF/DKIM/DMARC alignment, mail-tester, parity per
