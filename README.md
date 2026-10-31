@@ -1492,6 +1492,12 @@ json/yaml/markdown.
 
 ## Non-goals
 
+Re-confirmed 2026-10-31 against the 0.16.26 wrapper (E15 pass): every entry
+below still stands, nothing overtaken by events - the listener contract is
+25/465/587/993 (POP3 provable absent, `modules/mail-server.nix` listener
+set), the relay stays the opt-in smarthost path, and no search-stack or
+archiving dependency has entered the tree.
+
 Piler (archiving - maildir snapshots + paperless cover personal use),
 Mailcow/Mailu (Docker-first, heavy), Elasticsearch for parsedmarc (a search
 stack to read 16 domains' DMARC mail), a wrapper around
@@ -1549,7 +1555,10 @@ conditions in the module comments and the Pin-advance runbook):
   upgrades when the server advertises STARTTLS (same trap as
   parsedmarc#534). Filed 2026-10-05 after the verify-before-filing gates
   (master `imap.py` byte-identical at the quoted lines, no duplicate
-  issue). Re-checked 2026-10-19: OPEN, zero comments - no maintainer
-  response. Wrapper impact today: none - the parsedmarc e2e runs TLS
-  IMAPS with DEFAULT verification; the ask is for future plaintext-hop
-  consumers.
+  issue). RESOLVED UPSTREAM 2026-10-27 without our involvement: CLOSED
+  COMPLETED, fixed by their PR #67 `feat/imap-starttls-opt-out` (a
+  `starttls` opt-out on IMAPClient/IMAPConnection and `send_email`;
+  releases 2.3.3/2.3.4) - the planned nudge is moot; residual = verify
+  their `starttls` opt-out satisfies parsedmarc at the next
+  mailsuite-advancing bump. Wrapper impact today: none - the parsedmarc
+  e2e runs TLS IMAPS with DEFAULT verification.

@@ -221,6 +221,19 @@ ideas, all D1-gated:
   `--check` drift-guard mode; ADR cross-links; the ADR-id vs
   ROADMAP-decision-id sync check. Pull on the next catalog-touching
   session, not before
+- CI/devtool parked ideas (2026-10-31 E16 session): (a) ruff-floor CI
+  cost - the CI floor step pays `nix run github:...#ruff` cold (~13 s/step
+  from CI logs; warm local is 0.14 s, so the cost is fresh-runner flake
+  eval + store download, NOT nix being slow). Ideas, cheapest first: pin
+  the floor to an app output of THIS flake (`.#ruff-floor`, lock-resolved,
+  no GitHub-ref eval walk) or run it inside the devShell CI already builds
+  for the fmt step (`nix develop -c ruff ...`) - instrument the CI step
+  timing first, then pick; (b) `scripts/vm-debug.sh` convenience modes:
+  `--script-only` (emit the generated starter script for hand-editing and
+  exit, no driver run) and `--check` (eval + driver-extract + script-gen
+  dry run, no GC-root build, no boot) - both are pure bash additions to
+  the existing extractor, worth one small session the next time a VM debug
+  loop actually hurts
 
 ## Non-goals
 
