@@ -33,6 +33,13 @@ DMARC/TLS-RPT monitor, packaged as a NixOS flake for consumption by
 > - live status in
 >   [TODO_LIST.md](TODO_LIST.md), the transcript-pinned fact set in the
 >   ledger's "Stalwart 0.16" section.
+>
+> **Line-by-line verify (D7, 2026-10-31):** every section claim re-checked
+> against the code/pin this day - option surface, firewall set, ms
+> conversion, check list vs `tests/check-expected.json`, runbook status
+> lines; fixes this pass: parsedmarc version (11.0.2), vandelay IS in the
+> pin (1.0.12), C43/C45 statuses, junk-filing pending note retired, SSE
+> verdict re-dated, 0.16 demo smoke landed, mailsuite#65 closure recorded.
 
 Architecture (design note: the internal
 `~/projects/reports/selfhosted-email-guide.md` study): self-hosted
@@ -798,9 +805,11 @@ is dead) - provisioning is the declarative plan applied by
 `stalwart-provision` at boot, and the account password is
 `demo-nixemail-2026` (0.16 enforces zxcvbn strength; `demo` is rejected).
 The domain is `mail.demo.test`, not `mail.demo.invalid` - 0.16 hostname
-validation rejects the special-use `.invalid` TLD. The 2026-09-22 host-side
-smoke (port table, Junk-vs-INBOX filing, IMAPS fetch) was run against the
-0.15 stack; a fresh 0.16 smoke is a TODO_LIST row.
+validation rejects the special-use `.invalid` TLD. **Fresh 0.16.26 smoke:
+DONE 2026-10-31** (anon JMAP session shape, AUTH submission -> IMAPS
+round-trip, catch-all SMTP-accept + strict rejection outside the
+provisioned domain; transcript
+`docs/probes/2026-10-31-demo-smoke-01626/`).
 
 Known cosmetic startup noise in the demo journal: `Spam classifier model
 not found` and `Resource error` lines (the spam-filter resource's ASN/GeoIP

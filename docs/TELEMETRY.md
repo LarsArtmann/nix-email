@@ -49,6 +49,35 @@ fit together, and a recommended baseline that avoids the known footguns.
 > `An error occurred with the webhook collector`. Still UNVERIFIED: the
 > exact TOML nesting for webhook/alert objects - transcribe from a live
 > config write (or the 0.15.5 source tarball) before wiring.
+>
+> **VERDICT 2026-10-31 (0.16.26 binary + live dump, plan task D8 - the
+> standing caveat above is RETIRED for the 0.16 path):** (1) the whole
+> object model is binary-verified present in the pinned 0.16.26
+> (`strings` over
+> `/nix/store/8y5cqra1w2jgk7pn3a52dhirw0a0i9qn-stalwart-0.16.26/bin/stalwart`):
+> `WebhookTracer`, `EventTracingLevel`, `TracingStore`, `MetricsStore`,
+> `DataRetention`, `telemetry.webhook-error`, `telemetry.alert`,
+> `spawn_webhook_tracer`, `prometheus`, `authUsername`/`authSecret`,
+> `eventsPolicy`, `holdTracesFor`/`holdMetricsFor`,
+> `metricsCollectionInterval` - and the webhook/alert FIELDS moved to
+> camelCase on 0.16 (`signatureKey`, `discardAfter`, `allowInvalidCerts`,
+> `httpAuth`, `enableSpanExporter` all present; the 0.15-era kebab-case
+> `signature-key`/`discard-after` tokens are GONE; the "An alert was
+> triggered" runtime string is gone too - `telemetry.alert` remains).
+> (2) The series surface is re-verified on 0.16.26 by a FRESH
+> `stalwart-e2e` rebuild (`--rebuild`, EXIT 0, build log 2026-10-31):
+> `/metrics/prometheus` answers with the SAME 37-series HELP set as the
+> 0.16.22 transcription in docs/MONITORING.md §5.5 - no additions, no
+> removals; `queue_rescheduled` is LAZILY REGISTERED (absent from the
+> dump until a message is actually deferred - consistent with the
+> 2026-10-26 relay-e2e amendment, whose deferral produced it within
+> seconds). (3) On 0.16 the wrapper path for Prometheus is the
+> `Metrics.prometheus` provision singleton (mail-server.nix renders
+> `Metrics.prometheus."@type" = "Enabled"` under `metrics.enable`) - the
+> raw `metrics.*` TOML keys in §3.2 remain 0.15-era history; wire 0.16
+> telemetry through provision objects/`services.stalwart.provision`
+> singletons, and transcribe series names only from docs/MONITORING.md
+> §5.5 or a live dump.
 
 ## 1. Mental model: one stream, many consumers
 
