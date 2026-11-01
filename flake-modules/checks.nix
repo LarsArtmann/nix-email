@@ -96,6 +96,22 @@
           inherit system;
           inherit (inputs) nixpkgs;
         };
+        # Deprecated nixpkgs aliases (2026-11-01): a `warnAlias` attr warns
+        # on EVERY force, so a wrapper default naming one prints on every
+        # consumer rebuild while both gate and deployment stay green (the
+        # `package = pkgs.stalwart` migration default behind the pbx-artmann
+        # switch noise). The check parses the warnAlias set out of the SAME
+        # pin the build uses (`pkgs.path`), scans repo code with comments
+        # and string bodies masked, and self-tests both directions first.
+        # Pure build of a python script, arch-independent.
+        deprecated-alias-lint = pkgs.runCommand "deprecated-alias-lint" {
+          nativeBuildInputs = [pkgs.python3];
+        } ''
+          python3 ${../scripts/check-deprecated-aliases.py} --self-test
+          python3 ${../scripts/check-deprecated-aliases.py} \
+            --aliases ${pkgs.path}/pkgs/top-level/aliases.nix ${../.}
+          touch $out
+        '';
       }
       // pkgs.lib.optionalAttrs (system == "x86_64-linux") {
         # Demo-host contract (2026-10-06): flake check already forces the

@@ -1,6 +1,7 @@
 {
   "aarch64-linux": [
     "check-set-lockstep",
+    "deprecated-alias-lint",
     "dmarc-eval",
     "migrate-convert-eval",
     "module-import-eval",
@@ -9,6 +10,7 @@
   "x86_64-linux": [
     "check-set-lockstep",
     "deliverability-e2e",
+    "deprecated-alias-lint",
     "dmarc-eval",
     "demo-eval",
     "migrate-convert-eval",

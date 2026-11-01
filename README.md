@@ -154,7 +154,7 @@ variants; see the go-live backup step and
 `docs/probes/2026-10-18-demo-smoke-backup/`.)
 
 `nix flake check` runs the full check set against the SAME nixpkgs pin as
-SystemNix (`6774f7bc`, NixOS 26.11). The canonical machine list is
+SystemNix (`fe132422`, NixOS 26.11). The canonical machine list is
 `tests/check-expected.json` - one file read by ci.yml's lockstep steps,
 `scripts/check-inventory.sh` (pre-push), and the `check-set-lockstep`
 check itself; a check add/remove edits that list plus the prose row here,
@@ -165,6 +165,15 @@ and nothing else:
   `nix flake check` with both sets spelled out (eval-time, so it fails
   before any VM build). Makes the 2026-09-23 missing-entry class fail
   locally regardless of pre-push hook state.
+- `deprecated-alias-lint`: pure-build guard (python, no VM) that parses
+  every `warnAlias` name out of the pinned `pkgs/top-level/aliases.nix`
+  and rejects code references to them, with comments and string bodies
+  masked (`${...}` interpolations stay visible). A `warnAlias` attribute
+  warns on every force, so a default naming one - `package =
+  pkgs.stalwart` in the 0.15 migration leg - printed on every consumer
+  rebuild while the gate and the deployment stayed green (2026-11-01
+  pbx-artmann switch noise); the fix is always the versioned attribute
+  (`stalwart_0_15`). Self-tests both directions before scanning.
 - `stalwart-e2e`: real Stalwart 0.16.26 in a VM (0.16.22 until the
   2026-10-28 fe132422 advance) - declarative provisioning
   plan applied clean (accounts incl. quota + alias, dual declarative DKIM
