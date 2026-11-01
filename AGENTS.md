@@ -50,10 +50,10 @@ transcript-pinned dialect).
 - Repo-tool traps: `rg -rln` is NOT "recursive + line-number" (`-r`
   REPLACES matches with the next arg and corrupts output; use `rg -l -n`); bare `nix fmt` forwards no paths and dies on
   STDIN (check-mode: `nix fmt -- . --check`; run before yielding on any
-  session that touched `.nix` - the daemon pushes mid-session). CAUTION:
-  the flake `nix fmt` is ALEJANDRA-ONLY (.nix); markdown/json/yaml belong
-  to dprint - `nix develop -c dprint fmt` (check: `--check`) - so a green
-  `nix fmt` proves NOTHING about .md (2026-11-01); extract
+  session that touched `.nix` - the daemon pushes mid-session). Since
+  2026-11-01 the flake `nix fmt` is a UNIFIED wrapper: alejandra (.nix)
+  + dprint (json/yaml/markdown/dockerfile) - a green `nix fmt` now
+  proves BOTH toolchains; extract
   cross-file identifiers mechanically (`grep -o`, `git diff` read-back),
   never from memory.
 - Adding/removing a flake check = TWO sites: edit

@@ -177,7 +177,7 @@ commit in the SAME tool call that edits them, before drafting anything else.
    logs, read the logs, EXIT:0 required.
 5. Annotated tag: `git tag -a vX.Y.Z -m "<key changes one-liner>"`, then
    verify the tagged tree: `git show vX.Y.Z:CHANGELOG.md | grep '<X.Y.Z>'`.
-6. Push master + tag (the pre-push alejandra hook runs).
+6. Push master + tag (the pre-push formatting hook runs).
 7. Verify tag CI goes green (`gh run list`, the tag push runs the full
    `nix flake check`).
 8. `gh release create vX.Y.Z --latest --title ... --notes-file ...` with a
@@ -188,7 +188,10 @@ commit in the SAME tool call that edits them, before drafting anything else.
 
 ## Formatting gate (pre-push)
 
-CI fail-closes on `nix fmt -- . --check` (alejandra). A local `pre-push`
+CI fail-closes on `nix fmt -- . --check`: the flake formatter is a
+UNIFIED wrapper (since 2026-11-01) - alejandra checks `.nix`, dprint
+checks json/yaml/markdown/dockerfile (dprint.json; archived corridors
+excluded). A local `pre-push`
 hook in `.githooks/` runs the same check before every push, plus the
 check-inventory lockstep (`scripts/check-inventory.sh` - the flake's
 declared checks must match CI's expected lists), so an unformatted tree or

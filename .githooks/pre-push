@@ -1,7 +1,8 @@
 #!/bin/sh
 # Pre-push guards, mirroring what CI enforces on master:
-# 1. nix fmt -- . --check (alejandra, fail-closed) - the "unformatted
-#    push, public red CI" class (2026-09-16, two reds, ~13 min).
+# 1. nix fmt -- . --check (unified wrapper: alejandra + dprint,
+#    fail-closed) - the "unformatted push, public red CI" class
+#    (2026-09-16, two reds, ~13 min).
 # 2. Check-inventory lockstep (scripts/check-inventory.sh) - the flake's
 #    declared checks must match CI's expected lists; a drift commit
 #    fails HERE instead of shipping unnoticed master reds (the
