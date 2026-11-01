@@ -97,6 +97,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   follow-ons line; open question 10 = A4 residuals; drift-alarm arm
   parked in theme 6), and the 02-29 h) addendum stamped with the final
   green CI run id.
+- `deprecated-alias-lint` flake check (2026-11-01): fails when repo code
+  names an attribute nixpkgs retires through `warnAlias`
+  (`pkgs/top-level/aliases.nix`), because such an alias prints an
+  evaluation warning on EVERY force - a bare alias in a wrapper default
+  is a per-rebuild tax on every consumer while gate and deployment stay
+  green. The checker (`scripts/check-deprecated-aliases.py`) parses the
+  alias set from the SAME pin the build uses (`pkgs.path`), masks
+  comments and string bodies while keeping `${...}` interpolations
+  visible, covers dotted (`gnome2.gtkglext`) and nested
+  (`intel-oneapi.base`) aliases, and self-tests both directions before
+  scanning. Registered in `tests/check-expected.json` (both arches) and
+  the README check list; run against the pre-fix tree it reports exactly
+  `migration.nix:64` and the migrate-e2e fixture.
 
 ### Changed
 
@@ -112,6 +125,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- Stalwart migration default warned on every consumer rebuild
+  (2026-11-01): `services.stalwart.migrateFrom015.package` defaulted to
+  `pkgs.stalwart`, which is a `warnAlias` on 0.16-era nixpkgs, so each
+  pbx-artmann `nixos-rebuild switch` printed "`stalwart` is currently
+  pinned to `0.15.5`" although the deployed server was already
+  `stalwart_0_16` (0.16.27 at the pbx pin) and both the gate and the
+  host were healthy. The default (and the migrate-e2e fixture) now name
+  the versioned `stalwart_0_15`; the migration script's derivation is
+  byte-identical, verified by evaluating the pbx toplevel before and
+  after.
 - `stalwart-bind-e2e` guarded-node flake (2026-10-28, caught by the
   v0.5.0 tag CI): the subtest shortened `stalwart-provision`'s
   `TimeoutStartSec` to 20 s, but on a loaded CI runner a mid-boot guest

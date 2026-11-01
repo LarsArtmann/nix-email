@@ -21,7 +21,11 @@ the fix is always to name the versioned attribute.
 
 Dotted aliases (`gnome2.gtkglext`) and aliases nested inside an attrset
 block (`intel-oneapi.base`) are both parsed; the parser is line-shape
-based, which is why it reads nixpkgs' own formatting.
+based, which is why it reads nixpkgs' own formatting. Only
+`pkgs.<name>` selections are matched: `with pkgs;`-scoped bare names and
+quoted selections (`pkgs."name"`, masked as string content) are out of
+scope - the wrapper uses neither, and a bare-name heuristic would flag
+prose and local variables.
 
 Usage:
     python3 scripts/check-deprecated-aliases.py --aliases PATH [ROOT ...]
