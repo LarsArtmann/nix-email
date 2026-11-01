@@ -46,6 +46,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   ROADMAP (open question 9) and the exporter-hardening backlog into
   ROADMAP theme 6, and the red ruff-floor CI run (F841 x2 in the
   2026-10-29 CalDAV probe, run 40991974714) fixed (14934ac).
+- Omega-execution pass (2026-10-31 -> 11-01): the do-now slice of the
+  Omega-generation plan landed with both gates green - full `nix flake
+  check` EXIT 0 (12-check x86_64 set, attrNames-verified against
+  tests/check-expected.json) and `buildflow` EXIT 0 including the jscpd
+  step UN-SKIPPED and green (jscpd honors its OWN `.jscpd.json` even
+  where BuildFlow-level excludes are invisible to it:
+  `ignore: ["**/docs/probes/**"]`, 11 frozen probe-transcript clones ->
+  0, maintained surface still scanned). New: docs/DOMAIN_LANGUAGE.md
+  (six bounded contexts, linked from README Development) and
+  scripts/annotate-corridor.py (line-number verdict map -> emit-keys ->
+  spec.tsv -> status-items, stream-sync asserted before zip, prose-line
+  refusal, --self-test green). Exporter hardened: selftest asserts
+  absolute body-link URLs, `--plain` byte-parity and exact frontmatter
+  shapes, plus a `--check` drift mode verified both ways; C45's ADR
+  flipped `proposed` -> `superseded` (resolved by events 2026-10-28).
+  Truth-ups: README line-by-line re-verification (parsedmarc 11.0.2
+  in-pin, stalwart-vandelay 1.0.12 IS in the pin - the old "not in
+  nixpkgs" note was dead, C43/C45 sentences, junk-filing re-verified by
+  the e2e GTUBE subtest, SSE verdict replaced with the 2026-10-26 probe
+  facts, D7 dated banner), TELEMETRY.md's 0.15-era caveat RETIRED on a
+  fresh 0.16.26 metrics re-verify (37-series HELP set identical to the
+  0.16.22 transcription, `queue_rescheduled` lazily registered), and
+  the relay/deliverability test headers now state the multi-node
+  driver truth (no user-net NIC, 10.0.2.3 instantly unreachable, dig
+  exit 9) with the three-run transcript in
+  docs/probes/2026-10-31-dnsmasq-forward/ and a fresh 0.16.26 demo-VM
+  smoke in docs/probes/2026-10-31-demo-smoke-01626/.
 
 ### Changed
 
