@@ -43,7 +43,9 @@ import sys
 import tempfile
 from pathlib import Path
 
-TOP_LEVEL_ALIAS = re.compile(r"^ {2}(?P<name>[A-Za-z0-9_.'-]+) = warnAlias (?P<rest>.*)$")
+TOP_LEVEL_ALIAS = re.compile(
+    r"^ {2}(?P<name>[A-Za-z0-9_.'-]+) = warnAlias (?P<rest>.*)$"
+)
 NESTED_ALIAS = re.compile(r"^ {4}(?P<name>[A-Za-z0-9_.'-]+) = warnAlias (?P<rest>.*)$")
 BLOCK_OPEN = re.compile(r"^ {2}(?P<name>[A-Za-z0-9_.'-]+) = \{\s*$")
 BLOCK_CLOSE = re.compile(r"^ {2}\};")
@@ -189,9 +191,7 @@ def reference_pattern(aliases: dict[str, str]) -> re.Pattern[str]:
     return re.compile(rf"\bpkgs\.({alternatives})(?![A-Za-z0-9_'-])")
 
 
-def scan(
-    root: Path, aliases: dict[str, str]
-) -> list[tuple[Path, int, str, str]]:
+def scan(root: Path, aliases: dict[str, str]) -> list[tuple[Path, int, str, str]]:
     """Return (file, line, attr, message) for every deprecated reference."""
     pattern = reference_pattern(aliases)
     findings: list[tuple[Path, int, str, str]] = []

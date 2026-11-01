@@ -104,14 +104,15 @@
         # pin the build uses (`pkgs.path`), scans repo code with comments
         # and string bodies masked, and self-tests both directions first.
         # Pure build of a python script, arch-independent.
-        deprecated-alias-lint = pkgs.runCommand "deprecated-alias-lint" {
-          nativeBuildInputs = [pkgs.python3];
-        } ''
-          python3 ${../scripts/check-deprecated-aliases.py} --self-test
-          python3 ${../scripts/check-deprecated-aliases.py} \
-            --aliases ${pkgs.path}/pkgs/top-level/aliases.nix ${../.}
-          touch $out
-        '';
+        deprecated-alias-lint =
+          pkgs.runCommand "deprecated-alias-lint" {
+            nativeBuildInputs = [pkgs.python3];
+          } ''
+            python3 ${../scripts/check-deprecated-aliases.py} --self-test
+            python3 ${../scripts/check-deprecated-aliases.py} \
+              --aliases ${pkgs.path}/pkgs/top-level/aliases.nix ${../.}
+            touch $out
+          '';
       }
       // pkgs.lib.optionalAttrs (system == "x86_64-linux") {
         # Demo-host contract (2026-10-06): flake check already forces the

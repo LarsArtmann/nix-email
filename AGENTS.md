@@ -229,6 +229,17 @@ transcript-pinned dialect).
 - Known gate noise: the gate log's "running N flake checks" count line
   can disagree with the defined set - trust the attrNames eval. Before
   creating a repo-root file, `ls` the WHOLE repo incl. `docs/` first.
+- Deprecated nixpkgs attrs are a per-rebuild TAX, not just lint: a
+  `warnAlias` entry in `pkgs/top-level/aliases.nix` warns on EVERY force
+  of ANY of its attributes, so a wrapper default naming a bare alias
+  prints on each consumer switch while gate and deployment stay green
+  (2026-11-01: `migrateFrom015.package = pkgs.stalwart` printed the
+  0.15.5 pin notice on every pbx-artmann switch although the deployed
+  server was `stalwart_0_16`; the fix is the versioned attr
+  `stalwart_0_15`). Never name an unversioned package attr in a default.
+  Mechanized by `deprecated-alias-lint`, which parses the alias set from
+  the SAME pin the build uses (`pkgs.path`) and masks comments/strings
+  before scanning, so a pin advance widens the net for free.
 - Session-start baseline ritual: `git status --short`, `pgrep -af crush`,
   scan EVERY corridor dir (`docs/status`, `docs/planning`, `docs/reviews`)
   for same-day reports BEFORE the first edit; never
