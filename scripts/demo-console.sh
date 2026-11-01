@@ -21,7 +21,10 @@ cd "$(git rev-parse --show-toplevel)"
 
 TIMEOUT="${1:-1800}"
 case "$TIMEOUT" in
-'' | *[!0-9]*) echo "usage: $0 [timeout-seconds]" >&2 ; exit 2 ;;
+'' | *[!0-9]*)
+	echo "usage: $0 [timeout-seconds]" >&2
+	exit 2
+	;;
 esac
 
 SESSION_DIR="$(mktemp -d "${TMPDIR:-/tmp}/nix-email-demo-console.XXXXXX")"

@@ -69,8 +69,7 @@ def round_trip():
         leg("AUTH submission", False, repr(exc))
         return
     try:
-        imap = imaplib.IMAP4_SSL(IMAPS[0], IMAPS[1], ssl_context=ctx,
-                                 timeout=60)
+        imap = imaplib.IMAP4_SSL(IMAPS[0], IMAPS[1], ssl_context=ctx, timeout=60)
         imap.login(USER, PASSWORD)
         imap.select("INBOX")
         for _ in range(12):
@@ -90,22 +89,31 @@ def catch_all_and_reject():
     local = "any-" + secrets.token_hex(4)
     try:
         with smtplib.SMTP(INBOUND[0], INBOUND[1], timeout=30) as smtp:
-            smtp.sendmail(f"probe@{DOMAIN}", [f"{local}@{DOMAIN}"],
-                          f"Subject: catchall\n\n{local}\n")
-        leg("catch-all accept", True,
-            f"unauthenticated send to {local}@{DOMAIN} accepted (250 path)")
+            smtp.sendmail(
+                f"probe@{DOMAIN}",
+                [f"{local}@{DOMAIN}"],
+                f"Subject: catchall\n\n{local}\n",
+            )
+        leg(
+            "catch-all accept",
+            True,
+            f"unauthenticated send to {local}@{DOMAIN} accepted (250 path)",
+        )
     except (smtplib.SMTPException, OSError) as exc:
         leg("catch-all accept", False, repr(exc))
     try:
         with smtplib.SMTP(INBOUND[0], INBOUND[1], timeout=30) as smtp:
-            smtp.sendmail(f"probe@{DOMAIN}", ["x@demo.test"],
-                          "Subject: reject\n\nx\n")
-        leg("strict domain reject", False,
-            "x@demo.test was ACCEPTED - strict rejection missing")
+            smtp.sendmail(f"probe@{DOMAIN}", ["x@demo.test"], "Subject: reject\n\nx\n")
+        leg(
+            "strict domain reject",
+            False,
+            "x@demo.test was ACCEPTED - strict rejection missing",
+        )
     except smtplib.SMTPRecipientsRefused as exc:
         code = list(exc.recipients.values())[0][0]
-        leg("strict domain reject", code == 550,
-            f"x@demo.test -> {code} (550 expected)")
+        leg(
+            "strict domain reject", code == 550, f"x@demo.test -> {code} (550 expected)"
+        )
     except (smtplib.SMTPException, OSError) as exc:
         leg("strict domain reject", False, repr(exc))
 

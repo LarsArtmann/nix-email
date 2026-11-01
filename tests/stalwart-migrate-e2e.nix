@@ -57,7 +57,7 @@ in
 
         services.stalwart = {
           enable = true;
-          package = pkgs.stalwart;
+          package = pkgs.stalwart_0_15;
           stateVersion = "26.05";
           provision.enable = false;
           settings = {

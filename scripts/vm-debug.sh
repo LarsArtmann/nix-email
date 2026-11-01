@@ -40,7 +40,10 @@ while [ "$#" -gt 0 ]; do
 	case "$1" in
 	--script-only) SCRIPT_ONLY=1 ;;
 	--check) LINT_ONLY=1 ;;
-	--) shift ; break ;;
+	--)
+		shift
+		break
+		;;
 	*) break ;;
 	esac
 	shift

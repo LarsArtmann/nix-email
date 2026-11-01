@@ -61,7 +61,7 @@ in {
   options.services.stalwart.migrateFrom015 = {
     package = lib.mkOption {
       type = lib.types.package;
-      default = pkgs.stalwart;
+      default = pkgs.stalwart_0_15;
       description = ''
         The 0.15.x server binary used for the dump leg of the migration
         (opens the old store and serves the management API the vendored
