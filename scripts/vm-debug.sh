@@ -21,8 +21,9 @@
 # Usage: scripts/vm-debug.sh [--script-only] [--check] [check-name] [existing-test-script]
 #   check-name defaults to stalwart-e2e (must be an x86_64 VM e2e check;
 #   pure-eval checks have no driver).
-#   --script-only  do everything EXCEPT exec the driver; prints the final
-#                  command line instead (compose it into your own loop).
+#   --script-only  no VM run at all: skips the GC-root build (which IS the
+#                  VM test run) and does not exec the driver; prints the
+#                  final command line instead (compose it into your own loop).
 #   --check        lint the test script before running: python syntax
 #                  (py_compile) plus the baked-in debug rules - (b) manual
 #                  stalwart-provision starts, (f) the errexit
