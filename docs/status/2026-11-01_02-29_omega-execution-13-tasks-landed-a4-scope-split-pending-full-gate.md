@@ -109,33 +109,33 @@ GREEN (run 41146208130). This file reports THAT session only.
 
 ## b) PARTIALLY DONE
 
-- **Gates**: `nix fmt -- . --check` EXIT 0; md table-pipe lint EXIT 0;
+~~- **Gates**: `nix fmt -- . --check` EXIT 0; md table-pipe lint EXIT 0;~~ **→ done 2026-11-01 (h) addendum: full gate + buildflow EXIT 0, jscpd green)**
   ruff floor clean on every working-tree script (the sweep's 2 errors
   are phantom index entries of the already-deleted probe scripts - they
   vanish with the final commit); exporter selftest + annotate
   self-test green. **NOT yet run: the FULL `nix flake check` (mandatory
   - the two test-file comment changes alter the test derivations) and
     `buildflow` (mandatory - the jscpd un-skip needs its gate evidence).**
-- **CHANGELOG [Unreleased] entry** - not yet written (same-call commit
+~~- **CHANGELOG [Unreleased] entry** - not yet written (same-call commit~~ **→ done 2026-11-01 (commit 0fa32c4)**
   discipline pending); final commit + push + CI watch pending.
-- **A3 residual** - upstream fixed the issue; verifying their new
+~~- **A3 residual** - upstream fixed the issue; verifying their new~~ **→ routed - TODO upstream-watch row: verify at the next mailsuite-advancing bump**
   `starttls` opt-out satisfies parsedmarc is parked to the next
   mailsuite-advancing bump.
-- **E1.2 upstream half** - the check-rows continuation-row strictness
+~~- **E1.2 upstream half** - the check-rows continuation-row strictness~~ **→ routed - upstream proposal parked (Omega E1 residue)**
   proposal (docs-health repo) parked; the repo-side driver + note are
   done.
-- **E3 ADR-id sync check** - parked: needs a decision-id source of
+~~- **E3 ADR-id sync check** - parked: needs a decision-id source of~~ **→ routed - parked (ROADMAP theme 6 'Remaining' line; needs an external id source)**
   truth outside the exporter.
-- **D9 stale-arrow hygiene in the kept-live reports** - the 12-17 /
+~~- **D9 stale-arrow hygiene in the kept-live reports** - the 12-17 /~~ **→ routed - Omega B3 archive-time conversion (12-17/14-19 stay frozen until the pbx blessing)**
   14-19 reports still carry open arrows that only B3's closeout may
   convert (deliberate: archive-time work).
 
 ## c) NOT STARTED (unchanged gates, no work attempted this session)
 
-- **O1 the owner sitting** (C42/C44/C39-C41/C46, pbx blessing, D1/D2,
+~~- **O1 the owner sitting** (C42/C44/C39-C41/C46, pbx blessing, D1/D2,~~ **→ routed - sitting sheet + TODO blocked rows (Omega O1)**
   Resend key, policy batch, REPORT-RENAME/CADENCE, AGENTS cap,
   C36/C37/Q5) - the 1% that gates >51%.
-- **O3 verdict recording** (O1-gated), **A1** (#552103 webui comment -
+~~- **O3 verdict recording** (O1-gated), **A1** (#552103 webui comment -~~ **→ routed - Omega-plan tasks O3/A1/A2/A5/B1-B3/C1-C10/D1-D4/D10/E4/E5/E8-E14/E17 (owner-gated, their-repo, and backlog lanes)**
   owner review), **A2** (#563651 follow-up - owner go), **A5.2-3**
   (their push + CI watch + live verify - external workstream),
   **B1-B3** (pbx blessing -> landing -> corridor tail),
@@ -197,87 +197,87 @@ GREEN (run 41146208130). This file reports THAT session only.
 
 ## f) NEXT (prioritized, ~50)
 
-1. Run the FULL `nix flake check` (redirect, never pipe; ~4-6 min).
-2. Run `buildflow --max-time 40m` (never concurrent with the flake gate).
-3. Write the CHANGELOG [Unreleased] entry - edit + commit in the SAME
+~~1. Run the FULL `nix flake check` (redirect, never pipe; ~4-6 min).~~ done 2026-11-01 (h) addendum: EXIT 0, 12-check set attrNames-verified)
+~~2. Run `buildflow --max-time 40m` (never concurrent with the flake gate).~~ done 2026-11-01 (h) addendum: EXIT 0, jscpd step GREEN, 0 clones)
+~~3. Write the CHANGELOG [Unreleased] entry - edit + commit in the SAME~~ done 2026-11-01 (commit 0fa32c4, same-call discipline held)
    tool call (daemon races it).
-4. Final commit (incl. the probe-script deletions), push, watch origin
+~~4. Final commit (incl. the probe-script deletions), push, watch origin~~ done 2026-11-01 (e09376f pushed, CI green 41262497225; hardened HEAD green 41265954894)
    CI by STEP name.
-5. **O1 - THE OWNER SITTING** (~70 min; unblocks >51% of everything).
-6. O3 record verdicts (decision-batch + TODO re-rows + sheet ANSWERED
+~~5. **O1 - THE OWNER SITTING** (~70 min; unblocks >51% of everything).~~ routed: sitting sheet (Omega O1; gates >51%)
+~~6. O3 record verdicts (decision-batch + TODO re-rows + sheet ANSWERED~~ routed: Omega O3 (O1-gated)
    prefixes + banner).
-7. A1: #552103 webui comment -> owner review -> re-verify at PR head ->
+~~7. A1: #552103 webui comment -> owner review -> re-verify at PR head ->~~ routed: TODO admin-bundle row (Omega A1; owner review gate)
    github-voice -> post + record id.
-8. A2: #563651 follow-up (owner go; re-verify the host-less
+~~8. A2: #563651 follow-up (owner go; re-verify the host-less~~ routed: TODO upstream-watch row (Omega A2; ON HOLD per owner)
    `[opensearch]` shape first).
-9. A3: at the next mailsuite-advancing bump, verify their `starttls`
+~~9. A3: at the next mailsuite-advancing bump, verify their `starttls`~~ routed: TODO upstream-watch row residual (next mailsuite-advancing bump)
    opt-out satisfies parsedmarc.
-10. A5: when the hub workstream lands - their push -> first full-9-source
+~~10. A5: when the hub workstream lands - their push -> first full-9-source~~ routed: TODO EventCatalog row (Omega A5; external workstream)
     run -> live-verify catalog.home.lan (T8 checklist).
-11. B1: pbx `mkVMOverride` landing (post-blessing) + their full gate.
-12. B2: nix-email CHANGELOG + TODO close + issue #4 cross-link.
-13. B3: corridor tail closeout (three deferred reports -> archived).
-14. C1: C42 execution (dmarc-monitor retire or keep).
-15. C2: C44 execution (account-secrets doctrine).
-16. C3: C39 MemoryMax landing. 17. C4: C41/C46 recording.
-17. C5: policy executions (branch protection, Renovate, Discussions).
-18. C6: REPORT-RENAME + REPORT-CADENCE encoding.
-19. C7: AGENTS cap resolution (accept-as-floor or the 220 trim).
-20. C8: qcow2 purge-or-accept verdict.
-21. C9: Resend SASL verify + real smoke (proves `relay.secretFile`).
-22. C10: flood posture execution.
-23. D1: SystemNix deliverability wiring (their repo).
-24. D2: SystemNix CI-debt lanes. 26. D3: BuildFlow upstream batch.
-25. D4: BuildFlow binary rebuild + state-DB purge.
-26. D5-follow-up: confirm the jscpd step green in the buildflow run
+~~11. B1: pbx `mkVMOverride` landing (post-blessing) + their full gate.~~ routed: TODO pbx row (Omega B1; owner blessing)
+~~12. B2: nix-email CHANGELOG + TODO close + issue #4 cross-link.~~ routed: Omega B2 (B1-gated)
+~~13. B3: corridor tail closeout (three deferred reports -> archived).~~ routed: Omega B3 (the pbx-deferred three; THIS pass archived the 10-30/31 corridor per E18 instead)
+~~14. C1: C42 execution (dmarc-monitor retire or keep).~~ routed: TODO C42 row (Omega C1)
+~~15. C2: C44 execution (account-secrets doctrine).~~ routed: TODO C44 row (Omega C2)
+~~16. C3: C39 MemoryMax landing. 17. C4: C41/C46 recording.~~ routed: TODO MemoryMax row (C3) + sheet (C4) - Omega C3/C4
+~~17. C5: policy executions (branch protection, Renovate, Discussions).~~ routed: TODO policy rows (Omega C5)
+~~18. C6: REPORT-RENAME + REPORT-CADENCE encoding.~~ routed: sitting sheet Batch 5 (Omega C6)
+~~19. C7: AGENTS cap resolution (accept-as-floor or the 220 trim).~~ routed: sitting sheet Batch 7 (Omega C7)
+~~20. C8: qcow2 purge-or-accept verdict.~~ routed: TODO qcow2 row (Omega C8)
+~~21. C9: Resend SASL verify + real smoke (proves `relay.secretFile`).~~ routed: TODO Resend row (Omega C9; owner key)
+~~22. C10: flood posture execution.~~ routed: TODO flood-posture row (Omega C10)
+~~23. D1: SystemNix deliverability wiring (their repo).~~ routed: TODO SystemNix wiring row (Omega D1)
+~~24. D2: SystemNix CI-debt lanes. 26. D3: BuildFlow upstream batch.~~ routed: TODO SystemNix CI-debt row + BuildFlow row (Omega D2/D3)
+~~25. D4: BuildFlow binary rebuild + state-DB purge.~~ routed: TODO BuildFlow row (Omega D4)
+~~26. D5-follow-up: confirm the jscpd step green in the buildflow run~~ done 2026-11-01 (buildflow EXIT 0, jscpd step GREEN - the 06-03 closeout evidence)
     (this session's gate evidence pending).
-27. D7-follow-up: the parked exporter ADR-id sync source-of-truth.
-28. E1.2: the check-rows continuation-row strictness proposal upstream
+~~27. D7-follow-up: the parked exporter ADR-id sync source-of-truth.~~ routed: parked (Omega E3 residue; ROADMAP theme 6 "Remaining" line)
+~~28. E1.2: the check-rows continuation-row strictness proposal upstream~~ routed: upstream proposal parked (Omega E1 residue; docs-health-repo session)
     (docs-health repo session).
-29. E2: sheet ANSWERED prefixes + arrow-freshness rule + ID diff script
+~~29. E2: sheet ANSWERED prefixes + arrow-freshness rule + ID diff script~~ routed: Omega E2/O3.3 (post-sitting)
     decision (O1-adjacent).
-30. E4: catalog content refresh + publish receipts (A5-gated).
-31. E5: report-ingestion test ideas (traced-verbosity ARF, subtests).
-32. E8: vulnix replacement once BuildFlow ships a scanner.
-33. E9: OIDC/Pocket ID wiring on the D1 host.
-34. E10: 0.16-born wrapper options (catch-all + typed credentials) -
+~~30. E4: catalog content refresh + publish receipts (A5-gated).~~ routed: Omega E4 (A5-gated)
+~~31. E5: report-ingestion test ideas (traced-verbosity ARF, subtests).~~ routed: Omega E5
+~~32. E8: vulnix replacement once BuildFlow ships a scanner.~~ routed: Omega E8 (external)
+~~33. E9: OIDC/Pocket ID wiring on the D1 host.~~ routed: Omega E9 (D1-gated)
+~~34. E10: 0.16-born wrapper options (catch-all + typed credentials) -~~ routed: Omega E10 (C2-gated; carries the D6 guarded reconcile-retire path)
     now also carries the D6 guarded reconcile-retire path as a designed
     candidate.
-35. E11: queue-depth surface re-verify + first `queue_rescheduled`
+~~35. E11: queue-depth surface re-verify + first `queue_rescheduled`~~ routed: Omega E11 (lazy registration now noted in MONITORING row 2)
     dashboard/alert row (note its LAZY registration when writing rules).
-36. E12: parsedmarc against the real 0.16 deployment (SystemNix).
-37. E13: vandelay-vs-imapsync compare on scratch mailboxes (vandelay
+~~36. E12: parsedmarc against the real 0.16 deployment (SystemNix).~~ routed: Omega E12 (D1-gated)
+~~37. E13: vandelay-vs-imapsync compare on scratch mailboxes (vandelay~~ routed: Omega E13 (D1 row; vandelay 1.0.12 in-pin)
     1.0.12 is IN the pin - no source build).
-38. E14: rotate the three SystemNix placeholder secrets.
-39. E15-follow-up: none owed (clean pass).
-40. E16 execution: actually build the `.#ruff-floor` app or the devShell
+~~38. E14: rotate the three SystemNix placeholder secrets.~~ routed: Omega E14 (D1 row)
+~~39. E15-follow-up: none owed (clean pass).~~ done 2026-10-31 (clean pass, no residue owed)
+~~40. E16 execution: actually build the `.#ruff-floor` app or the devShell~~ routed: ROADMAP theme 6 E16 parked ideas (recorded 2026-10-31)
     floor path + instrument CI timing.
-41. E17: pin-advance RIDE (module diff, contacts probe, rename watch,
+~~41. E17: pin-advance RIDE (module diff, contacts probe, rename watch,~~ routed: TODO contacts-probe + rename-watch rows (standing ride)
     delta table) at the next stalwart bump - now watching
     `stalwart_1_0`'s appearance on master.
-42. E18: next docs-health pass archives the 10-30/11-01 corridor.
-43. scripts/demo-console.sh mechanization (e/1).
-44. CONTRIBUTING: the test-driver errexit rule (e/2) + vm-debug /tmp
+~~42. E18: next docs-health pass archives the 10-30/11-01 corridor.~~ done 2026-11-01: THIS docs-health pass archived the 10-30 -> 11-01 corridor
+~~43. scripts/demo-console.sh mechanization (e/1).~~ routed: TODO VM/debug tooling batch row (2026-11-01)
+~~44. CONTRIBUTING: the test-driver errexit rule (e/2) + vm-debug /tmp~~ done 2026-11-01 (errexit rule landed in CONTRIBUTING VM-debug rules) + routed: TODO VM/debug tooling batch (/tmp guard half)
     guard (e/3).
-45. Check in the demo smoke probe script (e/10) + re-run the smoke
+~~45. Check in the demo smoke probe script (e/10) + re-run the smoke~~ routed: TODO VM/debug tooling batch row
     after the next demo-affecting change.
-46. MONITORING row 2: add the queue_rescheduled lazy-registration note
+~~46. MONITORING row 2: add the queue_rescheduled lazy-registration note~~ done 2026-11-01 (lazy-registration note added to MONITORING row 2 by this pass)
     (series absent until a deferral happened).
-47. TELEMETRY.md 0.15-era compression pass (e/9, low priority).
-48. BuildFlow skill note: "jscpd honors its native `.jscpd.json` even
+~~47. TELEMETRY.md 0.15-era compression pass (e/9, low priority).~~ routed: TODO TELEMETRY-compression row (2026-11-01)
+~~48. BuildFlow skill note: "jscpd honors its native `.jscpd.json` even~~ routed: TODO BuildFlow row (skill-note clause appended 2026-11-01)
     when `exclude:` is inert" (e/7, their repo).
 
 ## g) QUESTIONS FOR THE OWNER
 
-1. **When will you hold the O1 sitting?** It gates >51% of the plan
+~~1. **When will you hold the O1 sitting?** It gates >51% of the plan~~ routed: owner - the sitting sheet (standing; gates >51%)
    (C42/C44/C39-C41/C46, pbx blessing, D1/D2, Resend key, the policy
    batch, REPORT-RENAME/CADENCE, AGENTS cap, C36/C37/Q5); everything in
    c) is waiting on it.
-2. **A4 cleanup depth**: now that both test headers call
+~~2. **A4 cleanup depth**: now that both test headers call~~ routed: ROADMAP open question 10a (added 2026-11-01)
    `server = ["10.0.2.3"]` a dead end, do you want the lines REMOVED
    entirely (config change + full e2e re-run to prove dnsmasq behaves
    with zero upstreams), or kept as labelled dead ends (current state)?
-3. **A4 venue**: keep the framework datum local-only (current call), or
+~~3. **A4 venue**: keep the framework datum local-only (current call), or~~ routed: ROADMAP open question 10b (added 2026-11-01)
    should I prepare a minimal upstream repro (stock two-node nixpkgs VM
    test querying 10.0.2.3) for a nixpkgs/discourse note?
 
