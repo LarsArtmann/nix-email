@@ -297,3 +297,12 @@ live-corridor check-rows after; and the FIRST CI run failed on a NEW
 infra class - the cache-action substituter died with GitHub
 `ResourceExhausted: rate limit exceeded` mid store-path copy (every
 lint/eval step green), and `gh run rerun --failed` went green.
+
+Follow-up (same hour): the dbb4c75 CI run then failed THREE times -
+twice on the cache throttle, once for real: parsedmarc-e2e's
+IMAPS-993 report wait blew its 120 s cap on the un-cached,
+build-saturated runner (the bind-e2e TimeoutStartSec class). All five
+parsedmarc-e2e report-arrival waits are raised to 300 s (incident
+recorded in-test and in the CHANGELOG); local parsedmarc-e2e build
+EXIT 0 and full `nix flake check` EXIT 0 before landing. The CI
+verdict on the hardened HEAD rides its push.

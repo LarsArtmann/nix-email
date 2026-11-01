@@ -92,6 +92,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   test at 120 s. Included in the re-tagged v0.5.0 (the original tag was
   moved BEFORE the release was published - never after).
 
+- `parsedmarc-e2e` loaded-runner flake (2026-11-01, caught by CI on
+  the docs-corridor closeout): the five report-arrival
+  `wait_until_succeeds` waits bounded the parse pipeline at 120 s -
+  healthy parses take ~9 s, but on a runner whose Magic Nix Cache was
+  throttled by the GitHub cache API (ResourceExhausted -> the run
+  builds its closures un-cached) the IMAPS-993 variant's report blew
+  the cap. All five waits raised to 300 s with the incident recorded
+  at the first site - the same class as the `stalwart-bind-e2e`
+  TimeoutStartSec lesson: timeouts sized for a healthy runner are
+  latent flakes.
+
 ## [0.5.0] - 2026-10-28
 
 ### Added
