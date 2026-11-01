@@ -305,4 +305,6 @@ build-saturated runner (the bind-e2e TimeoutStartSec class). All five
 parsedmarc-e2e report-arrival waits are raised to 300 s (incident
 recorded in-test and in the CHANGELOG); local parsedmarc-e2e build
 EXIT 0 and full `nix flake check` EXIT 0 before landing. The CI
-verdict on the hardened HEAD rides its push.
+verdict on the hardened HEAD rides its push. **RESOLVED (stamped
+2026-11-01 docs-health pass): CI run 41265954894 on the pushed HEAD
+(2bdc395) = success, 9m12s, full VM E2E.**

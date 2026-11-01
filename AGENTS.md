@@ -50,7 +50,10 @@ transcript-pinned dialect).
 - Repo-tool traps: `rg -rln` is NOT "recursive + line-number" (`-r`
   REPLACES matches with the next arg and corrupts output; use `rg -l -n`); bare `nix fmt` forwards no paths and dies on
   STDIN (check-mode: `nix fmt -- . --check`; run before yielding on any
-  session that touched `.nix` - the daemon pushes mid-session); extract
+  session that touched `.nix` - the daemon pushes mid-session). CAUTION:
+  the flake `nix fmt` is ALEJANDRA-ONLY (.nix); markdown/json/yaml belong
+  to dprint - `nix develop -c dprint fmt` (check: `--check`) - so a green
+  `nix fmt` proves NOTHING about .md (2026-11-01); extract
   cross-file identifiers mechanically (`grep -o`, `git diff` read-back),
   never from memory.
 - Adding/removing a flake check = TWO sites: edit
@@ -62,7 +65,10 @@ transcript-pinned dialect).
   infra flake: GitHub cache-API `ResourceExhausted ... rate limit
   exceeded` kills `nix flake check` mid store-path copy ("substituter
   ... is disabled"; every lint/eval step green, 2026-11-01) - remedy
-  is `gh run rerun --failed`. A working-tree
+  is `gh run rerun --failed`, but GREP THE WHOLE FAILED LOG for non-
+  infra errors BEFORE rerunning (2026-11-01: a REAL parsedmarc-e2e
+  timeout hid under two throttle reds; cache signatures mask test
+  failures). A working-tree
   gate red may belong to ANOTHER session's in-flight fix: check
   `git status` for files you didn't touch, date outputs via
   `nix path-info --json registrationTime`, never edit the foreign file.

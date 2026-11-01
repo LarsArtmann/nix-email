@@ -133,6 +133,11 @@ manual RE-run's try-restart races the probe (535 on VALID creds). Wait for
 served-vs-pinned mismatches: dump the actual served cert/state with one
 vm-debug probe before any hypothesis work - the bind-e2e cert time bomb
 burned ~7 runs before a 1-minute fingerprint named the rcgen fallback.
+(f) test-driver scripts run with ERREXIT - `cmd; echo RC:$?` NEVER
+captures cmd's failure (the compound aborts at cmd; the failure surfaces
+as the compound's own exit code - the A4 v1/v2 lesson, 2026-10-31):
+capture via `> file 2>&1` + cat, or `|| true` wrappers around the
+command whose code you want.
 
 0.16-upgrade loop: (a) PROBE BEFORE RERUN - boot the FIFO console before
 rerunning a failed VM test; (b) NEVER trust a sibling report's "green" - read
