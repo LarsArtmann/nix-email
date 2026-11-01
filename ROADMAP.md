@@ -193,9 +193,11 @@ ideas, all D1-gated:
   - (the wrapper option-surface review idea CLOSED 2026-10-19: X6 traced
     all 34 options to consumption, zero dead/no-op options)
 - DOMAIN_LANGUAGE.md authoring: a DDD glossary for the mail/DMARC/
-  provisioning vocabulary (plan, reconcile set, match property, singleton,
-  object, datastore descriptor) - the README ledger holds the facts, this
-  would hold the LANGUAGE; write when the terms stabilize post-v0.5.0
+  provisioning vocabulary - **DONE 2026-10-31 (E6)**:
+  `docs/DOMAIN_LANGUAGE.md` drafted (plan dialect, wrapper/fleet,
+  outbound, inbound, DMARC, store lifecycle; linked from README
+  Development); the README ledger stays the fact source, the glossary
+  owns the language
 - Arch-diagram content-freshness audit - **DONE 2026-10-31 (E7)**: both
   `.d2` sources re-baselined to the 0.16.26 surface (provision node,
   dual declarative DKIM, MtaRoute/MtaOutboundStrategy vocabulary in the
@@ -220,12 +222,14 @@ ideas, all D1-gated:
   guest builds+boots but boot alone exceeds the driver timeout -
   documented-manual, not CI-worthy); residue is an occasional local
   `nix flake check --all-systems` to keep the eval posture honest
-- EventCatalog exporter hardening backlog (2026-10-24 session f-list,
-  pulled forward 2026-10-30): selftest assertions for absolute body-link
-  URLs, `--plain` byte-parity, and exact frontmatter line shapes; a
-  `--check` drift-guard mode; ADR cross-links; the ADR-id vs
-  ROADMAP-decision-id sync check. Pull on the next catalog-touching
-  session, not before
+- EventCatalog exporter hardening backlog - **DONE 2026-10-31 (E3)**:
+  selftest now asserts absolute body-link URLs (the REPO_BASE class),
+  `--plain` byte-parity between lint and publish views, and EXACT
+  frontmatter line shapes (not just key presence); `--check` drift mode
+  shipped (byte-compare vs a target tree, exit 1 with per-file drift);
+  ADR cross-links resolve in-tree. Remaining from the original list: the
+  ADR-id vs ROADMAP-decision-id SYNC check (needs a decision-id source
+  of truth outside the exporter) - parked
 - CI/devtool parked ideas (2026-10-31 E16 session): (a) ruff-floor CI
   cost - the CI floor step pays `nix run github:...#ruff` cold (~13 s/step
   from CI logs; warm local is 0.14 s, so the cost is fresh-runner flake
