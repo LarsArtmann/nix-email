@@ -172,7 +172,7 @@ the same blessing; its closed f-items were annotated this pass), and
 The 2026-10-30 -> 11-01 corridor (E18's pre-committed archive; the
 Omega D-lane evidence landed 11-01). Every b/c/f/g item carries an
 inline dated verdict (done / routed / done-by-events; 217 tool-applied
-+ 16 house-grammar bullet strikes); check-rows green per file BEFORE
+plus 16 house-grammar bullet strikes); check-rows green per file BEFORE
 and AFTER the dprint pass; `grep -L '~~'` silent over the moved set.
 Kept live ON PURPOSE (unchanged): 2026-10-19_12-17 + 2026-10-20_14-19
 (pbx owners; Omega B3 converts their arrows at the blessing),
