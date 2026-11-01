@@ -30,9 +30,7 @@ import subprocess
 import sys
 import tempfile
 
-DEFAULT_ANNOTATE = os.path.expanduser(
-    "~/.config/crush/skills/docs-health/annotate"
-)
+DEFAULT_ANNOTATE = os.path.expanduser("~/.config/crush/skills/docs-health/annotate")
 SKILL_SOURCE = os.path.expanduser(
     "~/.config/crush/skills/docs-health/assets/annotate.go"
 )
@@ -60,9 +58,7 @@ def die(msg, code=1):
 
 
 def run_annotate(argv, expect_ok=True):
-    proc = subprocess.run(
-        argv, capture_output=True, text=True
-    )
+    proc = subprocess.run(argv, capture_output=True, text=True)
     if expect_ok and proc.returncode != 0:
         die(
             "annotate %s failed (%d):\n%s%s"
@@ -107,7 +103,9 @@ def emit_keys(annotate, path, linenos):
         expect_ok=False,
     )
     if proc.returncode != 0:
-        die("emit-keys failed (%d):\n%s%s" % (proc.returncode, proc.stdout, proc.stderr))
+        die(
+            "emit-keys failed (%d):\n%s%s" % (proc.returncode, proc.stdout, proc.stderr)
+        )
     keys = [k for k in proc.stdout.splitlines() if k.strip()]
     keyed, unkeyed = [], []
     for serr in proc.stderr.splitlines():
@@ -121,14 +119,15 @@ def emit_keys(annotate, path, linenos):
     if len(keys) != len(keyed):
         die(
             "emit-keys stream desync: %d stdout keys vs %d keyed stderr"
-            " lines - refusing to zip (truncation hazard)"
-            % (len(keys), len(keyed))
+            " lines - refusing to zip (truncation hazard)" % (len(keys), len(keyed))
         )
     return dict(zip(keyed, keys)), sorted(unkeyed)
 
 
 def main():
-    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     ap.add_argument("file", help="corridor file to annotate")
     ap.add_argument("verdicts", help="LINENO<TAB>verdict spec")
     ap.add_argument("--dry-run", action="store_true", help="verify only, write nothing")
@@ -138,7 +137,9 @@ def main():
         help="proceed with keyable lines when some requested lines are prose (manual house-grammar strikes)",
     )
     ap.add_argument("--annotate", default=None, help="annotate binary override")
-    ap.add_argument("--skip-check-rows", action="store_true", help="skip the final check-rows gate")
+    ap.add_argument(
+        "--skip-check-rows", action="store_true", help="skip the final check-rows gate"
+    )
     args = ap.parse_args()
 
     annotate = find_annotate(args.annotate)
@@ -147,17 +148,18 @@ def main():
     keyed, unkeyed = emit_keys(annotate, args.file, sorted(verdicts))
     if unkeyed:
         recipe = "\n".join(
-            "  line %d: ~~<line text>~~ **-> <verdict>** (manual house grammar)"
-            % n for n in unkeyed
+            "  line %d: ~~<line text>~~ **-> <verdict>** (manual house grammar)" % n
+            for n in unkeyed
         )
         msg = (
             "%d requested line(s) are prose (no mechanical key):\n%s\n"
-            "strike those by hand, then re-run without them"
-            % (len(unkeyed), recipe)
+            "strike those by hand, then re-run without them" % (len(unkeyed), recipe)
         )
         if not args.allow_missing:
             die(msg)
-        print(msg + "\nproceeding with the %d keyable lines" % len(keyed), file=sys.stderr)
+        print(
+            msg + "\nproceeding with the %d keyable lines" % len(keyed), file=sys.stderr
+        )
 
     spec = tempfile.NamedTemporaryFile(
         "w", suffix=".tsv", prefix="annotate-spec-", delete=False
@@ -188,9 +190,7 @@ def main():
     print(apply_res.stdout.strip())
 
     if not args.skip_check_rows:
-        check = run_annotate(
-            annotate + ["check-rows", args.file], expect_ok=False
-        )
+        check = run_annotate(annotate + ["check-rows", args.file], expect_ok=False)
         if check.returncode != 0:
             die(f"check-rows gate failed:\n{check.stdout}{check.stderr}")
         print(check.stdout.strip() or "check-rows: OK")
@@ -215,7 +215,7 @@ def self_test():
     # Lines: 3,4 items; 5 prose; 7 item; 10,11 table; 14,15 checkboxes.
     with open(corridor, encoding="utf-8") as fh:
         lines = fh.read().splitlines()
-    first_table = next(i for i, ln in enumerate(lines, 1) if ln.startswith("| k1")) 
+    first_table = next(i for i, ln in enumerate(lines, 1) if ln.startswith("| k1"))
     first_box = next(i for i, ln in enumerate(lines, 1) if "checkbox one" in ln)
     vpath = os.path.join(tmp, "verdicts.tsv")
     with open(vpath, "w", encoding="utf-8") as fh:
@@ -225,8 +225,10 @@ def self_test():
     keys, unkeyed = None, None
 
     proc = subprocess.run(
-        annotate + ["emit-keys", corridor, "3", "4", "5", str(first_table), str(first_box)],
-        capture_output=True, text=True,
+        annotate
+        + ["emit-keys", corridor, "3", "4", "5", str(first_table), str(first_box)],
+        capture_output=True,
+        text=True,
     )
     keys = [k for k in proc.stdout.splitlines() if k.strip()]
     keyed_lines = [
@@ -245,18 +247,22 @@ def self_test():
     spec = os.path.join(tmp, "spec.tsv")
     with open(spec, "w", encoding="utf-8") as fh:
         for no, key in zip(keyed_lines, keys):
-            verdict = {3: "done", 4: "routed", first_table: "done", first_box: "done"}[no]
+            verdict = {3: "done", 4: "routed", first_table: "done", first_box: "done"}[
+                no
+            ]
             fh.write(f"{key}\t{verdict}\n")
 
     v = subprocess.run(
         annotate + ["status-items", "--verify", corridor, spec],
-        capture_output=True, text=True,
+        capture_output=True,
+        text=True,
     )
     assert v.returncode == 0 and "VERIFY OK" in v.stdout, (v.stdout, v.stderr)
 
     a = subprocess.run(
         annotate + ["status-items", corridor, spec],
-        capture_output=True, text=True,
+        capture_output=True,
+        text=True,
     )
     assert a.returncode == 0 and "annotated 4 items" in a.stdout, (a.stdout, a.stderr)
 

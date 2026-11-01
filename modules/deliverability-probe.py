@@ -61,7 +61,9 @@ SKIP = "skip"
 # invalid IP) - a WARNING (probe config problem), never a "listed".
 DNSBL_ERROR_ANSWERS = {"127.255.255.252", "127.255.255.253", "127.255.255.254"}
 
-HOSTNAME_RE = re.compile(r"^[A-Za-z0-9]([A-Za-z0-9-]*[A-Za-z0-9])?(\.[A-Za-z0-9]([A-Za-z0-9-]*[A-Za-z0-9])?)+$")
+HOSTNAME_RE = re.compile(
+    r"^[A-Za-z0-9]([A-Za-z0-9-]*[A-Za-z0-9])?(\.[A-Za-z0-9]([A-Za-z0-9-]*[A-Za-z0-9])?)+$"
+)
 IP_RE = re.compile(r"^\d{1,3}(\.\d{1,3}){3}$")
 
 
@@ -97,7 +99,9 @@ def run_checks(config):
         try:
             check = fn()
         except Exception as exc:  # noqa: BLE001 - see docstring
-            check = Check(name, severity, FAIL, f"probe error: {type(exc).__name__}: {exc}")
+            check = Check(
+                name, severity, FAIL, f"probe error: {type(exc).__name__}: {exc}"
+            )
         check.name = name
         check.severity = severity
         check.duration_ms = int((time.monotonic() - started) * 1000)
@@ -105,9 +109,19 @@ def run_checks(config):
 
     if config.check_dns:
         for domain in config.domains:
-            record(f"dns-mx:{domain}", "critical", lambda d=domain: check_dns_mx(config, d))
-            record(f"dns-spf:{domain}", "critical", lambda d=domain: check_dns_spf(config, d))
-            record(f"dns-dmarc:{domain}", "critical", lambda d=domain: check_dns_dmarc(config, d))
+            record(
+                f"dns-mx:{domain}", "critical", lambda d=domain: check_dns_mx(config, d)
+            )
+            record(
+                f"dns-spf:{domain}",
+                "critical",
+                lambda d=domain: check_dns_spf(config, d),
+            )
+            record(
+                f"dns-dmarc:{domain}",
+                "critical",
+                lambda d=domain: check_dns_dmarc(config, d),
+            )
             for selector in config.selectors:
                 record(
                     f"dns-dkim:{selector}.{domain}",
@@ -125,7 +139,11 @@ def run_checks(config):
             )
 
     if 25 in config.ports:
-        record("smtp-starttls-25", "critical", lambda: check_smtp_starttls(config, 25, "smtp"))
+        record(
+            "smtp-starttls-25",
+            "critical",
+            lambda: check_smtp_starttls(config, 25, "smtp"),
+        )
     if 587 in config.ports:
         record(
             "submission-587",
@@ -133,17 +151,27 @@ def run_checks(config):
             lambda: check_submission(config, 587),
         )
     if 465 in config.ports:
-        record("submissions-465", "critical", lambda: check_imaps_like(config, 465, "smtp"))
+        record(
+            "submissions-465", "critical", lambda: check_imaps_like(config, 465, "smtp")
+        )
     if 993 in config.ports:
         record("imaps-993", "critical", lambda: check_imaps_like(config, 993, "imap"))
-        record("tls-cert-expiry", "warning", lambda: check_cert_expiry(config, config.host, 993))
+        record(
+            "tls-cert-expiry",
+            "warning",
+            lambda: check_cert_expiry(config, config.host, 993),
+        )
         record(
             "tls-verification",
             "critical" if config.tls_verify == "required" else "warning",
             lambda: check_tls_verification(config, config.host, 993),
         )
     if 465 in config.ports:
-        record("tls-cert-expiry-465", "warning", lambda: check_cert_expiry(config, config.host, 465))
+        record(
+            "tls-cert-expiry-465",
+            "warning",
+            lambda: check_cert_expiry(config, config.host, 465),
+        )
 
     canary = None
     if config.canary_address:
@@ -161,7 +189,9 @@ def dig(config, args):
     if config.resolver:
         cmd.append("@" + config.resolver)
     cmd += args
-    proc = subprocess.run(cmd, capture_output=True, text=True, timeout=config.timeout + 10)
+    proc = subprocess.run(
+        cmd, capture_output=True, text=True, timeout=config.timeout + 10
+    )
     if proc.returncode != 0:
         raise RuntimeError(f"dig exited {proc.returncode}: {proc.stderr.strip()[:200]}")
     return [line.strip() for line in proc.stdout.splitlines() if line.strip()]
@@ -201,17 +231,26 @@ def check_dns_mx(config, domain):
 
 
 def check_dns_spf(config, domain):
-    records = [txt for txt in dig_txt(config, domain) if txt.lower().startswith("v=spf1")]
+    records = [
+        txt for txt in dig_txt(config, domain) if txt.lower().startswith("v=spf1")
+    ]
     if not records:
         return Check("", "", FAIL, f"no SPF (v=spf1) TXT record for {domain}")
     if len(records) > 1:
-        return Check("", "", WARN, f"multiple SPF records for {domain} (RFC 7208 permits exactly one)")
+        return Check(
+            "",
+            "",
+            WARN,
+            f"multiple SPF records for {domain} (RFC 7208 permits exactly one)",
+        )
     return Check("", "", PASS, f"SPF for {domain}: {records[0][:120]}")
 
 
 def check_dns_dmarc(config, domain):
     records = [
-        txt for txt in dig_txt(config, f"_dmarc.{domain}") if txt.lower().startswith("v=dmarc1")
+        txt
+        for txt in dig_txt(config, f"_dmarc.{domain}")
+        if txt.lower().startswith("v=dmarc1")
     ]
     if not records:
         return Check("", "", FAIL, f"no DMARC (v=DMARC1) TXT record at _dmarc.{domain}")
@@ -228,13 +267,20 @@ def check_dns_dkim(config, domain, selector):
             f"no DKIM public key at {selector}._domainkey.{domain} - signed mail from "
             f"this selector is unverifiable and will fail DMARC at receivers",
         )
-    return Check("", "", PASS, f"DKIM {selector}.{domain} present ({records[0][:80]}...)")
+    return Check(
+        "", "", PASS, f"DKIM {selector}.{domain} present ({records[0][:80]}...)"
+    )
 
 
 def check_dns_ptr(config, ip):
     answers = dig(config, ["-x", ip])
     if not answers:
-        return Check("", "", WARN, f"no PTR record for {ip} - some receivers reject rDNS-less senders")
+        return Check(
+            "",
+            "",
+            WARN,
+            f"no PTR record for {ip} - some receivers reject rDNS-less senders",
+        )
     names = [a.rstrip(".").lower() for a in answers]
     if config.host.lower() not in names:
         return Check(
@@ -251,7 +297,9 @@ def check_dnsbl(config, ip, zone):
     octets = ip.split(".")
     query = ".".join(reversed(octets)) + "." + zone
     answers = dig(config, ["A", query])
-    listed = [a for a in answers if a.startswith("127.") and a not in DNSBL_ERROR_ANSWERS]
+    listed = [
+        a for a in answers if a.startswith("127.") and a not in DNSBL_ERROR_ANSWERS
+    ]
     errors = [a for a in answers if a in DNSBL_ERROR_ANSWERS]
     if listed:
         return Check(
@@ -292,7 +340,12 @@ def check_smtp_starttls(config, port, expect_banner):
     with smtplib.SMTP(config.host, port, timeout=config.timeout) as client:
         code, banner = client.ehlo(ehlo_domain(config))
         if code != 250:
-            return Check("", "", FAIL, f"{expect_banner} on :{port} answered EHLO {code} {banner.decode(errors='replace')[:120]}")
+            return Check(
+                "",
+                "",
+                FAIL,
+                f"{expect_banner} on :{port} answered EHLO {code} {banner.decode(errors='replace')[:120]}",
+            )
         features = client.esmtp_features
         if "starttls" not in features:
             return Check(
@@ -311,11 +364,18 @@ def check_submission(config, port):
     with smtplib.SMTP(config.host, port, timeout=config.timeout) as client:
         client.ehlo(ehlo_domain(config))
         if "starttls" not in client.esmtp_features:
-            return Check("", "", FAIL, f"submission :{port} does not advertise STARTTLS")
+            return Check(
+                "", "", FAIL, f"submission :{port} does not advertise STARTTLS"
+            )
         client.starttls(context=smtp_starttls_context(config))
         client.ehlo("deliverability-probe")
         if not (config.canary_address and config.canary_password):
-            return Check("", "", PASS, f"submission :{port} STARTTLS OK (no credentials: SASL untested)")
+            return Check(
+                "",
+                "",
+                PASS,
+                f"submission :{port} STARTTLS OK (no credentials: SASL untested)",
+            )
         try:
             client.login(config.canary_address, config.canary_password)
         except smtplib.SMTPAuthenticationError as exc:
@@ -334,19 +394,35 @@ def check_imaps_like(config, port, protocol):
         with imaplib.IMAP4_SSL(config.host, port, timeout=config.timeout) as client:
             greeting = client.welcome.decode(errors="replace") if client.welcome else ""
             if "OK" not in greeting.upper():
-                return Check("", "", FAIL, f"IMAPS :{port} greeting not OK: {greeting[:120]}")
+                return Check(
+                    "", "", FAIL, f"IMAPS :{port} greeting not OK: {greeting[:120]}"
+                )
             if not (config.canary_address and config.canary_password):
-                return Check("", "", PASS, f"IMAPS :{port} TLS + greeting OK (no credentials: LOGIN untested)")
+                return Check(
+                    "",
+                    "",
+                    PASS,
+                    f"IMAPS :{port} TLS + greeting OK (no credentials: LOGIN untested)",
+                )
             try:
                 client.login(config.canary_address, config.canary_password)
             except imaplib.IMAP4.error as exc:
-                return Check("", "", FAIL, f"IMAPS :{port} LOGIN rejected the canary credentials: {exc}")
+                return Check(
+                    "",
+                    "",
+                    FAIL,
+                    f"IMAPS :{port} LOGIN rejected the canary credentials: {exc}",
+                )
             client.logout()
         return Check("", "", PASS, f"IMAPS :{port} TLS + LOGIN OK")
-    with smtplib.SMTP_SSL(config.host, port, timeout=config.timeout, context=smtp_starttls_context(config)) as client:
+    with smtplib.SMTP_SSL(
+        config.host, port, timeout=config.timeout, context=smtp_starttls_context(config)
+    ) as client:
         code, message = client.noop()
         if code != 250:
-            return Check("", "", FAIL, f"submissions :{port} implicit-TLS NOOP answered {code}")
+            return Check(
+                "", "", FAIL, f"submissions :{port} implicit-TLS NOOP answered {code}"
+            )
     return Check("", "", PASS, f"submissions :{port} implicit TLS + banner OK")
 
 
@@ -377,9 +453,9 @@ def cert_not_after(config, host, port):
             f"no certificate served on :{port} (s_client rc={sclient.returncode}, "
             f"x509 stderr={x509.stderr.strip()[:120]})"
         )
-    return datetime.datetime.strptime(match.group(1).strip(), "%b %d %H:%M:%S %Y %Z").replace(
-        tzinfo=datetime.UTC
-    )
+    return datetime.datetime.strptime(
+        match.group(1).strip(), "%b %d %H:%M:%S %Y %Z"
+    ).replace(tzinfo=datetime.UTC)
 
 
 def check_cert_expiry(config, host, port):
@@ -387,7 +463,12 @@ def check_cert_expiry(config, host, port):
     remaining = not_after - datetime.datetime.now(datetime.UTC)
     days = remaining.days
     if remaining.total_seconds() <= 0:
-        return Check("", "", FAIL, f"certificate on :{port} EXPIRED {abs(days)} day(s) ago ({not_after})")
+        return Check(
+            "",
+            "",
+            FAIL,
+            f"certificate on :{port} EXPIRED {abs(days)} day(s) ago ({not_after})",
+        )
     if days < config.cert_warn_days:
         return Check(
             "",
@@ -451,9 +532,13 @@ def check_canary(config):
             client.login(config.canary_address, config.canary_password)
             client.send_message(message)
     except smtplib.SMTPAuthenticationError as exc:
-        return _canary_fail(result, started, "send", f"SASL rejected canary credentials: {exc}")
+        return _canary_fail(
+            result, started, "send", f"SASL rejected canary credentials: {exc}"
+        )
     except (smtplib.SMTPException, OSError) as exc:
-        return _canary_fail(result, started, "send", f"submission failed: {type(exc).__name__}: {exc}")
+        return _canary_fail(
+            result, started, "send", f"submission failed: {type(exc).__name__}: {exc}"
+        )
     result["phase"] = "deliver"
 
     deadline = time.monotonic() + config.slo_seconds
@@ -484,9 +569,7 @@ def check_canary(config):
                             if status != "OK":
                                 continue
                             raw = b"".join(
-                                part[1]
-                                for part in fetched
-                                if isinstance(part, tuple)
+                                part[1] for part in fetched if isinstance(part, tuple)
                             )
                             if token_bytes in raw:
                                 matches.append(seq)
@@ -576,9 +659,7 @@ def without_check(canary):
 
 
 def prune_history(directory, keep):
-    entries = sorted(
-        f for f in os.listdir(directory) if f.endswith(".json")
-    )
+    entries = sorted(f for f in os.listdir(directory) if f.endswith(".json"))
     for stale in entries[:-keep] if keep > 0 else []:
         try:
             os.unlink(os.path.join(directory, stale))
@@ -620,7 +701,9 @@ def write_prometheus(config, checks, report):
         if check.name.startswith("dnsbl:"):
             _, zone, ip = check.name.split(":", 2)
             listed = 1 if check.status == FAIL else 0
-            lines.append(f'mail_deliverability_dnsbl_listed{{zone="{zone}",ip="{ip}"}} {listed}')
+            lines.append(
+                f'mail_deliverability_dnsbl_listed{{zone="{zone}",ip="{ip}"}} {listed}'
+            )
     write_atomic(config.prom_out, "\n".join(lines) + "\n")
 
 
@@ -636,43 +719,93 @@ def main(argv=None):
         prog=PROBE_NAME,
         description="Deliverability probe for the nix-email stack (see docs/MONITORING.md).",
     )
-    parser.add_argument("--host", required=True, help="mail host FQDN probed over the network")
+    parser.add_argument(
+        "--host", required=True, help="mail host FQDN probed over the network"
+    )
     parser.add_argument(
         "--domains",
         default="",
         help="comma-separated mail DOMAINS checked for MX/SPF/DMARC (default: the host itself)",
     )
-    parser.add_argument("--no-dns", action="store_true", help="skip the DNS record checks")
-    parser.add_argument("--resolver", default=None, help="DNS server for dig (default: system resolver)")
-    parser.add_argument("--selectors", default="", help="comma-separated DKIM selectors to verify")
-    parser.add_argument("--dnsbl-zones", default="", help="comma-separated DNSBL zones (default: none)")
+    parser.add_argument(
+        "--no-dns", action="store_true", help="skip the DNS record checks"
+    )
+    parser.add_argument(
+        "--resolver", default=None, help="DNS server for dig (default: system resolver)"
+    )
+    parser.add_argument(
+        "--selectors", default="", help="comma-separated DKIM selectors to verify"
+    )
+    parser.add_argument(
+        "--dnsbl-zones", default="", help="comma-separated DNSBL zones (default: none)"
+    )
     parser.add_argument(
         "--ips",
         default="",
         help="comma-separated outbound IPs for PTR/DNSBL (default: resolved from --host)",
     )
-    parser.add_argument("--ports", default="25,465,587,993", help="comma-separated ports to probe")
-    parser.add_argument("--canary-address", default=None, help="canary mailbox address (round-trip SLO probe)")
-    parser.add_argument("--canary-password-file", default=None, help="file with the canary password (one line)")
-    parser.add_argument("--slo-seconds", type=int, default=600, help="delivery SLO for the round-trip canary")
-    parser.add_argument("--poll-interval", type=float, default=10.0, help="IMAP poll interval during the canary")
+    parser.add_argument(
+        "--ports", default="25,465,587,993", help="comma-separated ports to probe"
+    )
+    parser.add_argument(
+        "--canary-address",
+        default=None,
+        help="canary mailbox address (round-trip SLO probe)",
+    )
+    parser.add_argument(
+        "--canary-password-file",
+        default=None,
+        help="file with the canary password (one line)",
+    )
+    parser.add_argument(
+        "--slo-seconds",
+        type=int,
+        default=600,
+        help="delivery SLO for the round-trip canary",
+    )
+    parser.add_argument(
+        "--poll-interval",
+        type=float,
+        default=10.0,
+        help="IMAP poll interval during the canary",
+    )
     parser.add_argument(
         "--tls-verify",
         choices=["required", "opportunistic"],
         default="opportunistic",
         help="required: untrusted certs FAIL (acme/manual tiers); opportunistic: they WARN (self-signed bootstrap)",
     )
-    parser.add_argument("--cert-warn-days", type=int, default=14, help="warn when the certificate expires within N days")
-    parser.add_argument("--timeout", type=int, default=15, help="per-connection/lookup timeout in seconds")
-    parser.add_argument("--json-out", default=None, help="write the JSON report here (latest run)")
-    parser.add_argument("--history-dir", default=None, help="keep timestamped report copies here")
-    parser.add_argument("--history-keep", type=int, default=48, help="history files to retain")
-    parser.add_argument("--prom-out", default=None, help="write the Prometheus textfile here")
+    parser.add_argument(
+        "--cert-warn-days",
+        type=int,
+        default=14,
+        help="warn when the certificate expires within N days",
+    )
+    parser.add_argument(
+        "--timeout",
+        type=int,
+        default=15,
+        help="per-connection/lookup timeout in seconds",
+    )
+    parser.add_argument(
+        "--json-out", default=None, help="write the JSON report here (latest run)"
+    )
+    parser.add_argument(
+        "--history-dir", default=None, help="keep timestamped report copies here"
+    )
+    parser.add_argument(
+        "--history-keep", type=int, default=48, help="history files to retain"
+    )
+    parser.add_argument(
+        "--prom-out", default=None, help="write the Prometheus textfile here"
+    )
     config = parser.parse_args(argv)
 
     if not HOSTNAME_RE.match(config.host):
         parser.error(f"--host must be a hostname (got {config.host!r})")
-    config.domains = [d for d in (config.domains or config.host).split(",") if d] or [config.host]
+    config.domains = [d for d in (config.domains or config.host).split(",") if d] or [
+        config.host
+    ]
     config.selectors = [s for s in config.selectors.split(",") if s]
     config.dnsbl_zones = [z for z in config.dnsbl_zones.split(",") if z]
     config.ips = [i for i in config.ips.split(",") if i]
@@ -696,8 +829,12 @@ def main(argv=None):
     write_prometheus(config, checks, report)
 
     for check in checks:
-        symbol = {"pass": "PASS", "warn": "WARN", "fail": "FAIL", "skip": "SKIP"}[check.status]
-        print(f"{symbol} {check.name} ({check.duration_ms}ms): {check.detail}", flush=True)
+        symbol = {"pass": "PASS", "warn": "WARN", "fail": "FAIL", "skip": "SKIP"}[
+            check.status
+        ]
+        print(
+            f"{symbol} {check.name} ({check.duration_ms}ms): {check.detail}", flush=True
+        )
     print(
         f"overall {report['overall'].upper()} in {report['duration_s']}s "
         f"({len(checks)} checks, host {config.host})",
