@@ -464,10 +464,12 @@ in
           # fixed filenames (save_output writes aggregate.json/csv, verified
           # against parsedmarc 11.0.1 __init__.py save_output).
           machine.wait_until_succeeds(
-              # Healthy parse is ~9 s; 120 s bounds a hang 13x over
+              # Healthy parse is ~9 s; 300 s rides out a cache-throttled,
+              # build-saturated CI runner (2026-11-01: 120 s died there,
+              # same class as the bind-e2e TimeoutStartSec lesson)
               # without making a slow-but-working parse flaky.
               "test -s /var/lib/parsedmarc/reports/aggregate.json",
-              timeout=120,
+              timeout=300,
           )
 
       with subtest("parsed aggregate JSON carries the report's identity"):
@@ -511,7 +513,7 @@ in
           # go-live runbook).
           machine.wait_until_succeeds(
               "test -s /var/lib/parsedmarc/reports/smtp_tls.json",
-              timeout=120,
+              timeout=300,
           )
           machine.succeed(
               "jq -e '.[] | select(.organization_name == \"Company-X\")' "
@@ -540,7 +542,7 @@ in
           try:
               machine.wait_until_succeeds(
                   "test -s /var/lib/parsedmarc/reports/failure.json",
-                  timeout=120,
+                  timeout=300,
               )
           except Exception:
               # Diagnosability: a parse refusal logs only a warning and
@@ -658,7 +660,7 @@ in
           tls.succeed("send-email >&2")
           tls.wait_until_succeeds(
               "test -s /var/lib/parsedmarc/reports/aggregate.json",
-              timeout=120,
+              timeout=300,
           )
           tls.succeed(
               "jq -e '.[] | select(.report_metadata.report_id == \"2940\")' "
@@ -697,7 +699,7 @@ in
           try:
               tls.wait_until_succeeds(
                   "test -s /var/lib/parsedmarc/reports/failure.json",
-                  timeout=120,
+                  timeout=300,
               )
           except Exception:
               tls.succeed("journalctl -u parsedmarc -b 0 -o cat >&2")
