@@ -18,14 +18,38 @@
 # itself owns (e). Driver python runs on the HOST - VM-port work must be
 # packaged scripts or machine.succeed, never host socket code.
 #
-# Usage: scripts/vm-debug.sh [check-name] [existing-test-script]
+# Usage: scripts/vm-debug.sh [--script-only] [--check] [check-name] [existing-test-script]
 #   check-name defaults to stalwart-e2e (must be an x86_64 VM e2e check;
 #   pure-eval checks have no driver).
+#   --script-only  do everything EXCEPT exec the driver; prints the final
+#                  command line instead (compose it into your own loop).
+#   --check        lint the test script before running: python syntax
+#                  (py_compile) plus the baked-in debug rules - (b) manual
+#                  stalwart-provision starts, (f) the errexit
+#                  `cmd; echo RC:$?` trap, host-side socket code against
+#                  VM ports.
+#   Scripts passed from under /tmp are COPIED into the cache dir first:
+#   a /tmp sweeper broke a run mid-session once (2026-10-31) - the driver
+#   reads the script at start, so the copy is what runs.
 set -euo pipefail
 cd "$(git rev-parse --show-toplevel)"
 
+SCRIPT_ONLY=0
+LINT_ONLY=0
+while [ "$#" -gt 0 ]; do
+	case "$1" in
+	--script-only) SCRIPT_ONLY=1 ;;
+	--check) LINT_ONLY=1 ;;
+	--) shift ; break ;;
+	*) break ;;
+	esac
+	shift
+done
+
 CHECK="${1:-stalwart-e2e}"
 SCRIPT="${2:-}"
+CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/nix-email/vm-debug"
+mkdir -p "$CACHE_DIR"
 
 if ! nix eval ".#checks.x86_64-linux.$CHECK" --apply 'd: d.outPath' >/dev/null 2>&1; then
 	echo "error: no such check: checks.x86_64-linux.$CHECK" >&2
@@ -66,7 +90,7 @@ OUTDIR="/tmp/nix-email-vm-debug-$CHECK-out"
 mkdir -p "$OUTDIR" # the driver's -o needs an EXISTING dir
 
 if [ -z "$SCRIPT" ]; then
-	SCRIPT="/tmp/vm-debug-$CHECK.py"
+	SCRIPT="$CACHE_DIR/$CHECK.py"
 	if [ ! -f "$SCRIPT" ]; then
 		cat >"$SCRIPT" <<'PYEOF'
 # Starter debug script - rules (a)/(b)/(d) from CONTRIBUTING baked in.
@@ -93,10 +117,43 @@ machine.succeed("ip -br addr >&2; ip route >&2 || true")
 PYEOF
 		echo ">>> wrote starter script $SCRIPT (edit it for your probe)"
 	fi
+else
+	case "$SCRIPT" in
+	/tmp/* | "${TMPDIR:-/tmp}"/*)
+		RELOCATED="$CACHE_DIR/$(basename "$SCRIPT")"
+		cp "$SCRIPT" "$RELOCATED"
+		echo ">>> NOTE: $SCRIPT lives under /tmp (a sweeper broke a run mid-session once); running the copy: $RELOCATED" >&2
+		SCRIPT="$RELOCATED"
+		;;
+	esac
 fi
 
 echo ">>> driver: $DRIVER"
 echo ">>> script: $SCRIPT    out-dir: $OUTDIR"
 echo ">>> GC root keeps the closure alive; clean up with: rm $ROOT"
 echo ">>> (d) BrokenPipeError driver death = rerun; REPL: quit"
+
+if [ "$LINT_ONLY" = 1 ]; then
+	echo ">>> --check: python syntax (py_compile)"
+	python3 -m py_compile "$SCRIPT"
+	echo ">>> --check: baked-in rules (b), (f), host-socket"
+	if grep -n 'systemctl start stalwart-provision' "$SCRIPT"; then
+		echo "error: rule (b): NEVER start stalwart-provision manually mid-test (try-restart races the probe)" >&2
+		exit 1
+	fi
+	if grep -nE ';[[:space:]]*echo RC:' "$SCRIPT"; then
+		echo "error: rule (f): errexit aborts at cmd - 'cmd; echo RC:'\$?' never captures (the A4 v1/v2 lesson)" >&2
+		exit 1
+	fi
+	if grep -nE 'import socket|socket\.create_connection' "$SCRIPT"; then
+		echo "warning: host-side socket code - VM-port work must be packaged scripts or machine.succeed, never host sockets" >&2
+	fi
+	echo ">>> --check: clean"
+fi
+
+if [ "$SCRIPT_ONLY" = 1 ]; then
+	echo ">>> --script-only: driver NOT started; command line:"
+	echo "\"$DRIVER\" --test-script \"$SCRIPT\" -o \"$OUTDIR\""
+	exit 0
+fi
 exec "$DRIVER" --test-script "$SCRIPT" -o "$OUTDIR"
