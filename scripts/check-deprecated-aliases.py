@@ -21,7 +21,10 @@ the fix is always to name the versioned attribute.
 
 Dotted aliases (`gnome2.gtkglext`) and aliases nested inside an attrset
 block (`intel-oneapi.base`) are both parsed; the parser is line-shape
-based, which is why it reads nixpkgs' own formatting. Only
+based, which is why it reads nixpkgs' own formatting. A parse-yield
+floor (MIN_ALIASES) turns the reformat hazard - nixpkgs reindenting
+`aliases.nix` and the parser silently yielding nothing - into a loud
+failure instead of a vacuous green. Only
 `pkgs.<name>` selections are matched: `with pkgs;`-scoped bare names and
 quoted selections (`pkgs."name"`, masked as string content) are out of
 scope - the wrapper uses neither, and a bare-name heuristic would flag
@@ -54,6 +57,29 @@ NESTED_ALIAS = re.compile(r"^ {4}(?P<name>[A-Za-z0-9_.'-]+) = warnAlias (?P<rest
 BLOCK_OPEN = re.compile(r"^ {2}(?P<name>[A-Za-z0-9_.'-]+) = \{\s*$")
 BLOCK_CLOSE = re.compile(r"^ {2}\};")
 QUOTED_MESSAGE = re.compile(r'"((?:[^"\\]|\\.)*)"')
+
+# The parse-yield floor: pin fe132422 ships 215 warnAliases (a 2026-10
+# pbx pin 227), so anything far below that means the parser went blind,
+# not that nixpkgs retired the aliases. If a pin advance ever pushes the
+# real count near this floor, RAISE the floor - never delete it.
+MIN_ALIASES = 150
+
+
+def check_alias_floor(aliases: dict[str, str]) -> str | None:
+    """Return an error message when the parse yield is implausibly low.
+
+    The parser is line-shape based: if nixpkgs reformats aliases.nix
+    (reindent, warnAlias onto its own line), the parse can yield 0
+    aliases and the scan would pass VACUOUSLY. The floor makes that a
+    loud failure (the silent-green class this repo keeps killing).
+    """
+    if len(aliases) < MIN_ALIASES:
+        return (
+            f"parsed only {len(aliases)} aliases (floor {MIN_ALIASES}):"
+            " nixpkgs likely reformatted aliases.nix - fix the parser,"
+            " do not lower the floor"
+        )
+    return None
 
 
 def deprecation_message(rest: str) -> str:
@@ -293,6 +319,22 @@ def self_test() -> int:
             print(f"self-test FAIL: found {sorted(found)}")
             print(f"self-test FAIL: want  {sorted(expected_violations)}")
             return 1
+        # The reformat hazard (f/12): warnAlias moved onto its own line
+        # is the shape the line-based parser cannot see. However many it
+        # yields there, the floor must turn the vacuous scan loud.
+        reformatted = root / "reformatted.nix"
+        reformatted.write_text(
+            "{\n"
+            "  stalwart =\n"
+            '    warnAlias "moved to its own line" stalwart_0_15;\n'
+            "}\n"
+        )
+        if check_alias_floor(parse_warn_aliases(reformatted)) is None:
+            print("self-test FAIL: reformat scenario must trip the floor")
+            return 1
+        if check_alias_floor({f"a{i}": "" for i in range(MIN_ALIASES)}) is not None:
+            print("self-test FAIL: floor fired at the boundary")
+            return 1
     print(f"self-test PASS: {len(expected_violations)} offenders, {len(cases)} cases")
     return 0
 
@@ -319,6 +361,10 @@ def main(argv: list[str]) -> int:
         parser.error(f"--aliases not found: {args.aliases}")
 
     aliases = parse_warn_aliases(args.aliases)
+    floor_error = check_alias_floor(aliases)
+    if floor_error is not None:
+        print(f"error: {floor_error}", file=sys.stderr)
+        return 1
     roots = args.roots or [Path(".")]
     findings = [finding for root in roots for finding in scan(root, aliases)]
     if findings:
