@@ -90,6 +90,12 @@ passes). Run it before rerunning an expensive VM test:
 python3 scripts/check-testscript-shell.py
 ```
 
+Any repo tool that carries a `--self-test` gets that self-test re-run in
+the SAME session that mutates the tool: a mutated checker that is never
+re-verified silently changes semantics on its next consumer (the
+2026-11-01 annotate-driver reformat rode unverified; caught by review,
+not by the tool).
+
 ## VM debug loops
 
 Distilled from the FIFO-console and 0.16-upgrade sessions (2026-10).
