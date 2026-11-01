@@ -66,6 +66,14 @@ in {
         The 0.15.x server binary used for the dump leg of the migration
         (opens the old store and serves the management API the vendored
         upstream migrate_v016.py dumps through). Must be >= 0.15, < 0.16.
+
+        Defaults to the versioned `stalwart_0_15` attribute: the bare
+        `stalwart` attribute is a nixpkgs warnAlias on 0.16-era pins, so
+        referencing it prints an evaluation warning on every rebuild of
+        every consumer that forces this option (the 2026-11-01
+        pbx-artmann switch noise, where the deployed server was already
+        `stalwart_0_16`). Both versioned attrs ship in the same nixpkgs
+        era, so there is no older pin to fall back for.
       '';
     };
 
