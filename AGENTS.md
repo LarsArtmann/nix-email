@@ -52,10 +52,10 @@ transcript-pinned dialect).
   STDIN (check-mode: `nix fmt -- . --check`; run before yielding on any
   session that touched `.nix` - the daemon pushes mid-session). Since
   2026-11-01 the flake `nix fmt` is a UNIFIED wrapper: alejandra (.nix)
-  + dprint (json/yaml/markdown/dockerfile) - a green `nix fmt` now
-  proves BOTH toolchains; extract
-  cross-file identifiers mechanically (`grep -o`, `git diff` read-back),
-  never from memory.
+  - dprint (json/yaml/markdown/dockerfile) - a green `nix fmt` now
+    proves BOTH toolchains; extract
+    cross-file identifiers mechanically (`grep -o`, `git diff` read-back),
+    never from memory.
 - Adding/removing a flake check = TWO sites: edit
   `tests/check-expected.json` AND the README check list (CI-enforced
   anti-drift); a missed site ships red master (daemon pushes bypass the
@@ -298,7 +298,8 @@ transcript-pinned dialect).
 - `docs/{status,planning,reviews}/` - snapshots; `archived/` holds
   resolved ones (archive policy + strike form:
   `docs/status/archived/README.md`; dprint BEFORE the `git mv`).
-- `docs/TELEMETRY.md` (0.15.5-era caveat: verify keys against the pin);
+- `docs/TELEMETRY.md` (0.16.26 binary-verified baseline leads; series
+  names come only from MONITORING §5.5 or a live dump);
   `docs/THREAT_MODEL.md`; `SECURITY.md`; `CONTRIBUTING.md` (ledger rules,
   wrapper-change rules, the gate, the release procedure, the pre-push
   hook, the arch-diagram regen).

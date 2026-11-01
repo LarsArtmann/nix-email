@@ -11,13 +11,24 @@
      and appeared on no sheet; the three 2026-10-26 session g-questions
      (flood posture, report rename, report cadence) and the AGENTS.md
      line-cap lint were answered nowhere either. All seven are ADDED below
-     (Batch 5 + Batch 7) so ONE sitting can still clear the board. -->
+     (Batch 5 + Batch 7) so ONE sitting can still clear the board.
+
+     2026-11-01 COVERAGE RE-PROOF (Alpha-plan O1.1): Batch 8 adds the four
+     calls born since (CI cache-throttle policy g/2, e2e timeout
+     sweep-vs-per-flake g/3, and the two A4 residuals = ROADMAP Q10 a/b).
+     C43 (CUT, shipped v0.5.0) and C45 (SUPERSEDED, pin ships 0.16.26)
+     are SETTLED - the executor prefixes them ANSWERED at O3.3; they are
+     NOT re-asked. Cross-checked open-call inventory: decision-batch.md
+     open items (C39-C42, C44, C46, C52/C53, D1/D2, C14, C18/C19/C22/
+     C24/C29/C34, C36/C37, Q4/Q5/Q6, CI scope) + PBX + Resend + FLOOD +
+     REPORT-RENAME/CADENCE + AGENTS cap + Batch 8 = every row on this
+     sheet; no open TODO_LIST owner row sits outside it. -->
 
 # Owner sitting - ratification + verdict sheet (2026-10-23)
 
-> **Time budget:** ~70 min (60 as drafted + the 2026-10-26 coverage
-> additions in Batch 5 and Batch 7). Answer with IDs only
-> (`C43: cut`, `C19: drop`).
+> **Time budget:** ~75 min (60 as drafted + the 2026-10-26 additions in
+> Batch 5 and Batch 7 + Batch 8's four 2026-11-01 calls). Answer with
+> IDs only (`C43: cut`, `C19: drop`).
 > **Unanswered = still BLOCKED** (no silent defaults, Y-plan kill-switch).
 > Verdicts get written into `docs/planning/decision-batch.md` and the
 > TODO_LIST re-rowed in the same session (O3).
@@ -99,6 +110,22 @@ sheet before the 2026-10-26 audit.
 | REPORT-RENAME    | The line-mis-timestamped report `docs/status/2026-10-26_20-15_y-plan-ef-lanes-execution-bounce-ping-tls-dprint.md` - rename to its real hour, or leave it? | **Rename** - the filename is a citation key in TODO rows and CHANGELOG; a wrong hour is a real (if small) split brain            | Every future citation repeats the wrong hour                          |
 | REPORT-CADENCE   | Status-report cadence: keep the per-session full status + brutal self-review default, or move to on-demand only?                                           | **Keep per-session** - the two kept-live reports and the TODO harvest both depend on it                                          | Ad-hoc reporting loses the harvest trail that made these sweeps cheap |
 
+## Batch 8 - the four 2026-11-01 calls (Alpha-plan O1.1)
+
+Born after the 10-26 re-proof: the two CI/VM-stability policy calls
+(from the 2026-11-01 06-03 report, g/2 + g/3) and the two A4 taste
+residuals (ROADMAP open question 10).
+
+| ID      | The call                                                                                                                                                                                                                                                                                                                         | Recommendation                                                                                                                                     | Cost of delay                                                                              |
+| ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| g/2     | CI cache-throttle policy: the GitHub cache-API `ResourceExhausted` class killed 3 of 5 runs on 2026-11-01 (5-min rerun spacing worked once, 7-min did not - not respectfully waitable). Workflow-level retry / cache-disable fallback (slower cold builds), or keep manual `gh run rerun --failed` (current posture, AGENTS.md)? | **Keep manual rerun** - the class is intermittent (~3/5 on one bad day, green since), a retry adds CI complexity that bites forever                | Every bad cluster costs one manual rerun + the flake-triage discipline it already enforces |
+| g/3     | Loaded-runner e2e timeout policy: SWEEP every wait/timeout budget across the six e2e suites up to the 300 s parsedmarc template (one full-gate pass), or PER-FLAKE evidence-driven raises only (current posture; two bites so far: bind-e2e TimeoutStartSec at the v0.5.0 tag, parsedmarc IMAPS-993 report wait)?                | **SWEEP** - the class has bitten twice in 9 days and each bite costs a full red CI cycle; one deliberate sweep pass is cheaper than the third bite | One 45-90 min sweep session vs recurring red CI runs on loaded runners                     |
+| Q10 (a) | The two test headers call `server = ["10.0.2.3"]` a dead end - REMOVE the lines entirely (config change + full e2e re-run to prove dnsmasq behaves with zero upstreams), or keep them labelled (current state)?                                                                                                                  | **Keep labelled** - the lines carry the transcript citation; removal buys a config change plus two VM runs to prove a negative                     | None: labels are accurate and the datum stays cited                                        |
+| Q10 (b) | The multi-node-VM DNS framework datum (no user-net NIC in test-driver nets, dig exit 9 in ~60 ms): keep LOCAL-ONLY (current call), or prepare a minimal upstream repro (stock two-node nixpkgs VM test querying 10.0.2.3) for a nixpkgs/discourse note?                                                                          | **Keep local-only** - framework-by-design with no measured victim; an upstream note without a victim is noise                                      | None; re-arms if a future suite hits it fresh                                              |
+
+Transcripts: g/2 + g/3 - 2026-11-01 06-03 report (archived) + AGENTS.md
+CI-flake rule; Q10 - `docs/probes/2026-10-31-dnsmasq-forward/`.
+
 ## Batch 6 - ratify the agent-executed adoptions (reversible, 2026-10-05)
 
 | ID       | Adoption                                              | Status                                                                                                   |
@@ -138,6 +165,9 @@ No CVEs in the window; the pin's 0.16.22 is past the one that mattered.
 | PBX blessing  | B1-B3 (their gate + the corridor closeout)                         |
 | D1/D2         | C8 (rotation runbook, vandelay-vs-imapsync, dmarc live poll) + G7  |
 | Resend key    | C8.3 (the one live smoke)                                          |
+| g/2 verdict   | CI retry/fallback work or a closed TODO row (current posture kept) |
+| g/3 verdict   | R1: the timeout SWEEP pass, or the row closed as per-flake         |
+| Q10 a/b       | the header-line removal run or two closed local notes              |
 | CI lint scope | D4 (ci.yml/.buildflow.yml scope landing + negative test)           |
 | C36/C37/Q5    | the InboxClean/M22 lanes (topology, build order, declarative plan) |
 | C18/C19/C22   | settings micros (branch protection, app install/drop, Discussions) |

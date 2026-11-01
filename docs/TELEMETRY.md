@@ -3,81 +3,54 @@
 How to run Stalwart's telemetry stack properly: what exists, how the pieces
 fit together, and a recommended baseline that avoids the known footguns.
 
-> **Provenance & version caveat.** Every fact below was taken from the
-> official docs at https://stalw.art/docs/telemetry/ (all subpages) fetched
-> on **2026-09-15**. Those pages describe the _current upstream_ object
-> model (WebUI `Settings › Telemetry` objects: `Tracer`, `Metrics`,
-> `WebHook`, `Alert`, `TracingStore`, `MetricsStore`, `DataRetention`,
-> `EventTracingLevel`). **This repo ran Stalwart 0.15.5 when this was
-> written; 0.16.22 landed in tree 2026-10-17** (vendored module; the pin
-> has shipped **0.16.26** since the 2026-10-28 fe132422 advance) - the
-> version-skew caveat below still applies and the 0.16 keys need a
-> binary spot-check before wiring (TODO_LIST row — see README ledger).
-> Exact TOML key paths under `services.stalwart.settings` must be verified
-> against the pinned binary before any wiring; do not re-derive keys from
-> this document. Ledger doctrine applies.
+> **Provenance.** Written 2026-09-15 from the official docs at
+> https://stalw.art/docs/telemetry/ (all subpages) against the then-pinned
+> Stalwart 0.15.5; the repo has run 0.16.x since 2026-10-17 and the pin
+> (fe132422) ships **0.16.26**.
 >
-> **UPDATE 2026-09-22: the core keys ARE now source-verified** against the
-> pinned v0.15.5 tarball (README ledger entry "Monitoring/observability
-> config keys"): `metrics.prometheus.enable` (+ `.auth.username/.secret`),
-> `tracing.level.<event>`, `tracing.history.enable/.store` all exist in
-> 0.15.5 with the shapes this guide describes. What remains UNVERIFIED
-> here is the wider object-model surface (webhooks, alert objects,
-> retention stores) and any series names - transcribe those from a live
-> `/metrics/prometheus` dump (the stalwart-e2e build log carries one)
-> before writing rules.
+> **OPERATIVE TRUTH - VERDICT 2026-10-31 (0.16.26 binary + live dump,
+> plan task D8; supersedes every earlier caveat in this doc):**
 >
-> **UPDATE 2026-10-19 (0.16.22 spot-check, first full gate):** the
-> endpoint side is re-verified on 0.16.22 through the WRAPPER path - the
-> e2e enables the wrapper's `services.mail-server.metrics.enable` and
-> `/metrics/prometheus` answers 200 (unauthenticated, loopback HTTP
-> listener) with the full 37-series payload transcribed in
-> docs/MONITORING.md §5.5. Series names for alert rules come from THERE,
-> never from this doc. The raw `metrics.*` settings keys below remain
-> 0.15.5-verified only - 0.16 renders telemetry through provision
-> objects/Settings; re-derive exact object shapes from the pinned binary
-> before wiring webhooks/alerts/retention.
+> 1. The whole object model is binary-verified present in the pinned
+>    0.16.26 (`strings` over the pinned
+>    `stalwart-0.16.26/bin/stalwart`): `WebhookTracer`,
+>    `EventTracingLevel`, `TracingStore`, `MetricsStore`,
+>    `DataRetention`, `telemetry.webhook-error`, `telemetry.alert`,
+>    `spawn_webhook_tracer`, `prometheus`, `authUsername`/`authSecret`,
+>    `eventsPolicy`, `holdTracesFor`/`holdMetricsFor`,
+>    `metricsCollectionInterval`. Webhook/alert FIELDS moved to
+>    camelCase on 0.16 (`signatureKey`, `discardAfter`,
+>    `allowInvalidCerts`, `httpAuth`, `enableSpanExporter`); the
+>    0.15-era kebab-case tokens (`signature-key`/`discard-after`) are
+>    GONE, and the "An alert was triggered" runtime string is gone
+>    (`telemetry.alert` remains).
+> 2. The series surface is re-verified on 0.16.26 by a fresh
+>    `stalwart-e2e` rebuild (EXIT 0, 2026-10-31):
+>    `/metrics/prometheus` answers with the SAME 37-series HELP set as
+>    the 0.16.22 transcription in docs/MONITORING.md §5.5 - no
+>    additions, no removals. `queue_rescheduled` is LAZILY REGISTERED
+>    (absent from the dump until a message is actually deferred;
+>    produced within seconds by the 2026-10-26 relay-e2e deferral).
+>    Series names for alert rules come from THERE or a live dump -
+>    never from this doc.
+> 3. On 0.16, wire telemetry through provision objects /
+>    `services.stalwart.provision` singletons. The wrapper path for
+>    Prometheus is the `Metrics.prometheus` singleton
+>    (`"@type" = "Enabled"`, rendered by mail-server.nix under
+>    `metrics.enable`); the raw `metrics.*` TOML keys are 0.15-era
+>    history kept below for reference.
 >
-> **UPDATE 2026-10-05: webhook + alert support is now binary-verified
-> present in 0.15.5** (`strings` over the pinned
-> `/nix/store/nzdwhgmch2d8xvrbab3418mh1gqmr4ff-stalwart-0.15.5/bin/stalwart`):
-> tracer type token `webhook`, webhook fields `signature-key` and
-> `discard-after`, config type `WebhookTracer`, symbols
-> `spawn_webhook_tracer`/`spawn_webhook_handler`/`post_webhook_events`,
-> event types `telemetry.webhook-error` + `telemetry.alert`, and runtime
-> strings `No events enabled for webhook` / `An alert was triggered` /
-> `An error occurred with the webhook collector`. Still UNVERIFIED: the
-> exact TOML nesting for webhook/alert objects - transcribe from a live
-> config write (or the 0.15.5 source tarball) before wiring.
->
-> **VERDICT 2026-10-31 (0.16.26 binary + live dump, plan task D8 - the
-> standing caveat above is RETIRED for the 0.16 path):** (1) the whole
-> object model is binary-verified present in the pinned 0.16.26
-> (`strings` over
-> `/nix/store/8y5cqra1w2jgk7pn3a52dhirw0a0i9qn-stalwart-0.16.26/bin/stalwart`):
-> `WebhookTracer`, `EventTracingLevel`, `TracingStore`, `MetricsStore`,
-> `DataRetention`, `telemetry.webhook-error`, `telemetry.alert`,
-> `spawn_webhook_tracer`, `prometheus`, `authUsername`/`authSecret`,
-> `eventsPolicy`, `holdTracesFor`/`holdMetricsFor`,
-> `metricsCollectionInterval` - and the webhook/alert FIELDS moved to
-> camelCase on 0.16 (`signatureKey`, `discardAfter`, `allowInvalidCerts`,
-> `httpAuth`, `enableSpanExporter` all present; the 0.15-era kebab-case
-> `signature-key`/`discard-after` tokens are GONE; the "An alert was
-> triggered" runtime string is gone too - `telemetry.alert` remains).
-> (2) The series surface is re-verified on 0.16.26 by a FRESH
-> `stalwart-e2e` rebuild (`--rebuild`, EXIT 0, build log 2026-10-31):
-> `/metrics/prometheus` answers with the SAME 37-series HELP set as the
-> 0.16.22 transcription in docs/MONITORING.md §5.5 - no additions, no
-> removals; `queue_rescheduled` is LAZILY REGISTERED (absent from the
-> dump until a message is actually deferred - consistent with the
-> 2026-10-26 relay-e2e amendment, whose deferral produced it within
-> seconds). (3) On 0.16 the wrapper path for Prometheus is the
-> `Metrics.prometheus` provision singleton (mail-server.nix renders
-> `Metrics.prometheus."@type" = "Enabled"` under `metrics.enable`) - the
-> raw `metrics.*` TOML keys in §3.2 remain 0.15-era history; wire 0.16
-> telemetry through provision objects/`services.stalwart.provision`
-> singletons, and transcribe series names only from docs/MONITORING.md
-> §5.5 or a live dump.
+> **History (superseded interim verifications, kept for provenance):**
+> 2026-09-22 - the core keys were source-verified in the 0.15.5 tarball
+> (`metrics.prometheus.enable` (+ auth keys), `tracing.level.<event>`,
+> `tracing.history.enable/.store`); 2026-10-05 - webhook + alert support
+> binary-verified in 0.15.5 (`webhook` tracer token, `signature-key`,
+> `discard-after`, `WebhookTracer` symbols, `telemetry.webhook-error` +
+> `telemetry.alert`); 2026-10-19 - `/metrics/prometheus` re-verified on
+> 0.16.22 through the wrapper path (200, loopback HTTP) with the
+> 37-series payload transcribed into docs/MONITORING.md §5.5. Ledger
+> doctrine applies: verify exact shapes against the pinned binary
+> before wiring; do not re-derive keys from this document.
 
 ## 1. Mental model: one stream, many consumers
 
@@ -330,10 +303,11 @@ by the live-SSE per-key filters and present in webhook/trace payloads):
 
 ## 8. Wiring into this flake (nix-email) — checklist
 
-1. **Version skew first:** pinned Stalwart is **0.15.5**; these docs
-   describe current upstream. Before wiring ANY key below into
-   `services.mail-server` defaults, dump the effective config from the
-   pinned binary and verify the key exists with the documented shape.
+1. **Version truth first:** the pin ships Stalwart **0.16.26** and the
+   object model is binary-verified at that version (see the verdict
+   above). Provision singletons still evolve between minors - before
+   wiring ANY key into `services.mail-server` defaults, verify the
+   exact object shape against the pinned binary.
 2. **Wrapper doctrine:** any defaults this repo ships must be `mkDefault`;
    consumers (SystemNix) override via `services.stalwart.settings`.
    Monitoring integrations (Prometheus scrape jobs, Gatus, alert routing)
@@ -351,9 +325,10 @@ by the live-SSE per-key filters and present in webhook/trace payloads):
 
 - Auth requirements of `/api/telemetry/traces/live` and
   `/api/telemetry/metrics/live` (docs silent; admin-API auth assumed).
-- Exact TOML paths for the object model on 0.15.5 vs the docs' current
-  object model (`Tracer` et al. may map to `telemetry.tracer.*`-style keys
-  on the pinned version — UNVERIFIED, do not copy blindly).
+- ~~Exact TOML paths for the object model on 0.15.5 vs the docs' current
+  object model~~ RESOLVED 2026-10-31 for the 0.16 path: wire through
+  provision singletons (verdict above); the 0.15-era TOML question died
+  with the 0.15 pin.
 - Whether `remote-ip` vs `remoteIp` casing in live-SSE per-key filters is
   literal (docs example uses `remote-ip=...` while the key catalogue says
   `remoteIp`).
