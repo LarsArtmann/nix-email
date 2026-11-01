@@ -100,7 +100,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
-- Nothing yet.
+- Unified the flake formatter (2026-11-01): `nix fmt` is now a wrapper
+  that runs alejandra on `.nix` and dprint on json/yaml/markdown/
+  dockerfile, so `nix fmt -- . --check` - the CI and pre-push gate
+  line - covers BOTH toolchains. Previously the gate was alejandra-only
+  and markdown shipped un-dprint-checked unless a session remembered
+  `nix develop -c dprint fmt` (nine files reflowed at the 2026-11-01
+  closeout). Negative-tested: a deliberately unformatted markdown file
+  fails the check and is fixed by `nix fmt`; alejandra behavior
+  unchanged.
 
 ### Fixed
 

@@ -85,7 +85,7 @@ jobs:
           git ls-files -z '*.py' > /tmp/py-files.list
           xargs -0 -r nix run "github:NixOS/nixpkgs/$rev#ruff" -- check --select E4,E7,E9,F --output-format concise < /tmp/py-files.list
 
-      - name: Enforce formatting: alejandra (.nix) + dprint (fail-closed)
+      - name: "Enforce formatting: alejandra (.nix) + dprint (fail-closed)"
         run: nix fmt -- . --check
 
       - name: Lint markdown tables for unescaped pipes (fail-closed, self-tested)
