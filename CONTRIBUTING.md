@@ -145,13 +145,16 @@ the stored log / `nix path-info --json registrationTime`; (c) NO SCHEMA CLAIM
 without an apply transcript (Rust doc comments lied once: `User.name`); (d)
 let provisioning settle before probing (port-open != server-ready; the
 ExecStartPost restart window eats connections); (e) logged artifacts dump on
-failure by default; (f) dnsmasq must FORWARD upstream (10.0.2.3) - 0.16
-reload validation resolves via the system resolver (the demo's 2026-10-18
-boot race was this class; the demo pins DnsResolver = Cloudflare) - scope
-note: TEST-DRIVER VMs have NO outbound AT ALL (valid DHCP default route,
-yet slirp DNS AND direct TCP both fail instantly - pbx run 16 transcript,
-2026-10-20), so a live fetch can never go green in `nix flake check` VMs -
-hermetic shapes only there; (g)
+failure by default; (f) VM nets split by SHAPE (A4 scope split, settled
+2026-10-31, transcript `docs/probes/2026-10-31-dnsmasq-forward/`):
+MULTI-NODE test-driver nets have NO user-net NIC at all (no default
+route - 10.0.2.3 is INSTANTLY unreachable, dig exit 9 in ~60 ms; dnsmasq
+REFUSES non-local forwards), so external-name deps in
+`nix flake check` VMs need a dnsmasq LOCAL zone - hermetic shapes only
+there; the SINGLE-VM demo DOES have live slirp DNS (10.0.2.3 answers,
+getent exit 0; the demo's 2026-10-18 boot race was the 0.16 reload
+validation resolving via the system resolver - the demo pins
+DnsResolver = Cloudflare); (g)
 serialize heavy VM builds ACROSS repos (concurrent builds OOM-killed a run
 once).
 
