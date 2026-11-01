@@ -104,54 +104,54 @@
 
 ## b) PARTIALLY DONE
 
-1. **The kept-live reports' arrows are now partially stale**: 12-17 and
+~~1. **The kept-live reports' arrows are now partially stale**: 12-17 and~~ routed: Omega B3 owns the conversion (archive-time; 12-17/14-19 stay frozen until the pbx blessing), 2026-11-01
    14-19 route several f-items at rows that have since LANDED and been
    deleted (ping x2, relay bounce, TLS breadth, runtime-trim, the v0.5.0
    row). Their dispositions live in CHANGELOG (dated 2026-10-26/28), but
    a reader following the arrow hits a missing row first. I deliberately
    did NOT re-annotate live files a second time this pass (archive is
    deferred anyway) - recorded as an open question (g/1).
-2. **README verification was spot-wise, not line-by-line** (the standing
+~~2. **README verification was spot-wise, not line-by-line** (the standing~~ done 2026-10-31 (Omega D7: full line-by-line pass, F6 CLOSED, dated banner in README)
    F6 residue): banner, check list (12 names), ARF ledger cluster, and
    the sections this pass touched were verified; the 10-23 pass's "never
    read end-to-end" caveat still stands, now with three consecutive
    spot-passes (10-23/28/30) on the drift-prone surfaces.
-3. **The TODO standing rows were kept on last-known evidence**: I
+~~3. **The TODO standing rows were kept on last-known evidence**: I~~ done 2026-10-31 (Omega D9: watch row re-dated from LIVE gh evidence)
    verified every kept row against recorded state, but did NOT re-check
    the upstream watch freshness today (#552103/#563651/#563777/
    mailsuite#65 last re-dated 2026-10-26/28; the ~11-05 nudge decision
    is four days out).
-4. **The 21-40 "two stale documents" fix is 2-of-2 only after this
+~~4. **The 21-40 "two stale documents" fix is 2-of-2 only after this~~ routed: Omega E2/O3.3 (sheet ANSWERED prefixes; instrument left owner-facing)
    pass**: TODO's sweep note was already updated 2026-10-26 21:07; the
    Z-plan O2 line was fixed here. The sheet's OWN header still says
    "answer with IDs only" for a decision set that shrank twice
    (C43/C45) - the sheet carries its own audit trail, so I left the
    instrument itself untouched (owner-facing file).
-5. **Daemon narrative recovery**: the 11-26 annotations, the Y-plan
+~~5. **Daemon narrative recovery**: the 11-26 annotations, the Y-plan~~ done by events: content verified byte-intact through the 11-01 landing lineage (e09376f..2bdc395)
    Appendix R, and the CHANGELOG entry landed via daemon heuristic
    commits (a31a8a2 and neighbors) after the daemon outran my explicit
    commit - content verified byte-intact, messages generic (d/3).
 
 ## c) NOT STARTED (all routed, none forgotten)
 
-1. Every owner-gated row (C42/C44/C39/C41/C46, pbx blessing, D1/D2,
+~~1. Every owner-gated row (C42/C44/C39/C41/C46, pbx blessing, D1/D2,~~ routed: sitting sheet + TODO blocked rows (Omega O1)
    Resend, Renovate, branch protection, Discussions, qcow2 purge,
    REPORT-RENAME, REPORT-CADENCE, AGENTS cap) - the sitting sheet owns
    them; this session deliberately consumed no owner decision.
-2. Their-repo lanes (BuildFlow upstream batch incl. the jscpd exclude
+~~2. Their-repo lanes (BuildFlow upstream batch incl. the jscpd exclude~~ routed: TODO BuildFlow + SystemNix CI-debt + wiring rows (Omega D1-D3); the jscpd half done 2026-10-31 (D5)
    question, SystemNix CI debt, SystemNix deliverability wiring) -
    TODO rows, their cadence.
-3. The filings queue (#552103 webui comment owner-review-gated;
+~~3. The filings queue (#552103 webui comment owner-review-gated;~~ routed: TODO filings + admin-bundle rows (Omega A1/A2; mailsuite MOOT per D9; dnsmasq done A4)
    #563651 follow-up ON HOLD per owner; mailsuite nudge ~11-05;
    dnsmasq venue + transcript) - TODO rows.
-4. TELEMETRY.md full key re-verify (standing caveat; header re-pinned
+~~4. TELEMETRY.md full key re-verify (standing caveat; header re-pinned~~ done 2026-10-31 (Omega D8: fresh rebuild, 37-series set identical, caveat RETIRED)
    0.16.26 on 10-28, keys not re-verified).
-5. The 21-23/21-40 test-idea fleet (traced-verbosity ARF event,
+~~5. The 21-23/21-40 test-idea fleet (traced-verbosity ARF event,~~ routed: Omega E5 (parked test ideas)
    aggregate control, combined report subtest) - routed as parked
    ideas, not built.
-6. Arch-diagram content-freshness audit (the 2026-09-15 d2/svg renders
+~~6. Arch-diagram content-freshness audit (the 2026-09-15 d2/svg renders~~ done 2026-10-31 (Omega E7: d2 re-baselined, SVGs re-rendered)
    again went unviewed - standing ROADMAP row).
-7. A drift-alarm arm for the TODO sweep-banner date (10-23 f/27, routed
+~~7. A drift-alarm arm for the TODO sweep-banner date (10-23 f/27, routed~~ routed: ROADMAP theme 6 parked line (added 2026-11-01)
    again, still not built).
 
 ## d) TOTALLY FUCKED UP (all caught; the regex bug recurred - own it)
@@ -225,112 +225,112 @@
 
 ## f) Up to 50 things to get done next (ranked; residues first)
 
-1. Owner: **hold the sitting** (sheet Batches 1-7; C42/C44/C39/C41/C46,
+~~1. Owner: **hold the sitting** (sheet Batches 1-7; C42/C44/C39/C41/C46,~~ routed: sitting sheet (Omega O1 - the sitting)
    pbx blessing, D1/D2, Resend, policy batch, REPORT-RENAME/CADENCE,
    AGENTS cap) - it still gates >half the board.
-2. Owner: **bless the pbx hermetic override** (TODO pbx row; sheet
+~~2. Owner: **bless the pbx hermetic override** (TODO pbx row; sheet~~ routed: TODO pbx row (Omega B1)
    Batch 2) - the single highest-leverage open gate.
-3. On the blessing: land the override in pbx, green their gate, then
+~~3. On the blessing: land the override in pbx, green their gate, then~~ routed: Omega B1 -> B3 (corridor tail archives on the blessing; the 10-30/31 corridor archived 2026-11-01 instead)
    close the corridor tail (convert the two kept-live reports' open
    arrows, archive all three deferred reports incl. the 10-23
    docs-health one, whose f/50 pre-commits exactly this).
-4. Push master (owner/daemon): the ruff-floor fix `14934ac` + the
+~~4. Push master (owner/daemon): the ruff-floor fix `14934ac` + the~~ done by events 2026-11-01: pushed (9dc9477..e09376f, then 2bdc395), CI green 41265954894
    archive commits are local; origin CI is red until they land (24+
    commits ahead).
-5. EventCatalog publish (TODO row): watch the hub demo-flagging
+~~5. EventCatalog publish (TODO row): watch the hub demo-flagging~~ routed: TODO EventCatalog row (Omega A5; external workstream)
    workstream, push hub master, live-verify catalog.home.lan (T8).
-6. mailsuite#65 nudge at ~2026-11-05 after re-reading their `imap.py`.
-7. #552103 webui-resource comment once the owner reviews the draft
+~~6. mailsuite#65 nudge at ~2026-11-05 after re-reading their `imap.py`.~~ done 2026-10-31 (Omega D9: mailsuite#65 CLOSED upstream via their PR #67; nudge MOOT)
+~~7. #552103 webui-resource comment once the owner reviews the draft~~ routed: TODO admin-bundle row (Omega A1; owner review gate)
    (admin-bundle TODO row).
-8. #563651 follow-up comment (ON HOLD per owner 2026-10-28 - draft
+~~8. #563651 follow-up comment (ON HOLD per owner 2026-10-28 - draft~~ routed: TODO upstream-watch row (Omega A2; ON HOLD per owner)
    review first).
-9. dnsmasq forward-vs-blackhole transcript, then venue + filing (TODO
+~~9. dnsmasq forward-vs-blackhole transcript, then venue + filing (TODO~~ done 2026-10-31 (Omega A4: transcript + headers + venue = local note)
    upstream-filings row).
-10. Re-date the upstream watch row (#552103/#563651/#563777/
+~~10. Re-date the upstream watch row (#552103/#563651/#563777/~~ done 2026-10-31 (Omega D9)
     mailsuite#65) at the next session - last evidence 2026-10-26/28.
-11. Full README line-by-line verify (F6 residue; three spot-passes
+~~11. Full README line-by-line verify (F6 residue; three spot-passes~~ done 2026-10-31 (Omega D7, F6 CLOSED)
     done, the end-to-end read still never happened).
-12. TELEMETRY.md full key re-verify against the pin (standing caveat).
-13. Flood posture verdict execution (TODO flood row; owner taste).
-14. C42 retire-or-keep execution (pure owner call; evidence complete).
-15. C44 account-secrets doctrine implementation (sheet Batch 1).
-16. C39 MemoryMax verdict landing (sheet).
-17. C41/C46 verdicts landing (sheet).
-18. D1-unlock prep pack (rotation runbook, vandelay compare plan,
+~~12. TELEMETRY.md full key re-verify against the pin (standing caveat).~~ done 2026-10-31 (Omega D8)
+~~13. Flood posture verdict execution (TODO flood row; owner taste).~~ routed: TODO flood-posture row (Omega C10; owner taste)
+~~14. C42 retire-or-keep execution (pure owner call; evidence complete).~~ routed: TODO C42 row (Omega C1; owner verdict)
+~~15. C44 account-secrets doctrine implementation (sheet Batch 1).~~ routed: TODO C44 row (Omega C2)
+~~16. C39 MemoryMax verdict landing (sheet).~~ routed: TODO MemoryMax row (Omega C3)
+~~17. C41/C46 verdicts landing (sheet).~~ routed: sitting sheet (Omega C4)
+~~18. D1-unlock prep pack (rotation runbook, vandelay compare plan,~~ routed: Omega D10 (O1-gated prep pack)
     dmarc poll checklist, Resend smoke) - D1-gated.
-19. qcow2 purge-or-accept verdict (TODO row; history rewrite, owner
+~~19. qcow2 purge-or-accept verdict (TODO row; history rewrite, owner~~ routed: TODO qcow2 row (Omega C8)
     call).
-20. Branch-protection verdict execution (C18; bypass vs strict).
-21. Renovate install-or-drop (C19; config dead since 2026-09-16).
-22. Discussions enable-or-keep (C22).
-23. AGENTS.md cap verdict (sheet Batch 7; file at 279 lines).
-24. REPORT-RENAME verdict (the mis-timestamped 20-15 report is now in
+~~20. Branch-protection verdict execution (C18; bypass vs strict).~~ routed: TODO branch-protection row (Omega C5)
+~~21. Renovate install-or-drop (C19; config dead since 2026-09-16).~~ routed: TODO Renovate row (Omega C5)
+~~22. Discussions enable-or-keep (C22).~~ routed: TODO Discussions row (Omega C5)
+~~23. AGENTS.md cap verdict (sheet Batch 7; file at 279 lines).~~ routed: sitting sheet Batch 7 (Omega C7)
+~~24. REPORT-RENAME verdict (the mis-timestamped 20-15 report is now in~~ routed: sitting sheet Batch 5 (Omega C6)
     the archive with the name kept; renaming an archived file is
     trivial if the owner says so).
-25. REPORT-CADENCE verdict (one combined report per session vs two).
-26. BuildFlow upstream batch (TODO row; their repo - count gaps, ruff
+~~25. REPORT-CADENCE verdict (one combined report per session vs two).~~ routed: sitting sheet Batch 5 (Omega C6)
+~~26. BuildFlow upstream batch (TODO row; their repo - count gaps, ruff~~ routed: TODO BuildFlow row (Omega D3)
     identity parsing in BOTH modes, detect-only, vulture policy).
-27. BuildFlow binary rebuild + delta review + rev-stamping cadence
+~~27. BuildFlow binary rebuild + delta review + rev-stamping cadence~~ routed: TODO BuildFlow row (Omega D4)
     (TODO row).
-28. BuildFlow state-DB purge (0.63 GB; their tool, their repo).
-29. SystemNix CI-debt lanes (credential, canary allowlist, pin flips,
+~~28. BuildFlow state-DB purge (0.63 GB; their tool, their repo).~~ routed: TODO BuildFlow row (Omega D4)
+~~29. SystemNix CI-debt lanes (credential, canary allowlist, pin flips,~~ routed: TODO SystemNix CI-debt row (Omega D2)
     divergence doc - TODO row).
-30. SystemNix deliverability-alert wiring (their half of the 10-30
+~~30. SystemNix deliverability-alert wiring (their half of the 10-30~~ routed: TODO SystemNix wiring row (Omega D1)
     machinery; MONITORING section 8 copy-paste specs).
-31. SystemNix description-sync refresh at the next material wrapper
+~~31. SystemNix description-sync refresh at the next material wrapper~~ routed: TODO SystemNix description-sync row
     change (TODO row).
     32.contacts probe re-run at the NEXT stalwart bump (row re-armed
     2026-10-28).
-32. Watch nixpkgs `stalwart` rename past 0.16 (standing TODO row).
-33. Vendored-module retirement when #552103 merges into the pin
+~~32. Watch nixpkgs `stalwart` rename past 0.16 (standing TODO row).~~ routed: TODO rename-watch row (standing; Omega E17 ride)
+~~33. Vendored-module retirement when #552103 merges into the pin~~ routed: TODO upstream-watch row (retires when #552103 merges into the pin)
     (checklist in the module header).
-34. Extract the annotate driver into `scripts/` (e/1) or upstream the
+~~34. Extract the annotate driver into `scripts/` (e/1) or upstream the~~ done 2026-10-31 (Omega E1: scripts/annotate-corridor.py shipped, self-test green)
     bullet grammar into annotate.go.
-35. check-rows continuation-row strictness (e/4; upstream note or
+~~35. check-rows continuation-row strictness (e/4; upstream note or~~ routed: upstream proposal parked (Omega E1 residue; docs-health-repo session)
     `--strict`).
-36. Sheet hygiene: prefix ANSWERED rows (e/6) so a sitting cannot
+~~36. Sheet hygiene: prefix ANSWERED rows (e/6) so a sitting cannot~~ routed: Omega E2/O3.3 (post-sitting)
     re-answer settled calls.
-37. Arrow-freshness rule for kept-live reports (e/5; g/1 decides).
-38. Drift-alarm arm for the TODO sweep-banner date (10-23 f/27,
+~~37. Arrow-freshness rule for kept-live reports (e/5; g/1 decides).~~ done 2026-11-01: practice settled refresh-at-archive-time only (the lean); B3 converts the 12-17/14-19 arrows
+~~38. Drift-alarm arm for the TODO sweep-banner date (10-23 f/27,~~ routed: ROADMAP theme 6 parked line (added 2026-11-01)
     re-routed this pass, still unbuilt).
-39. Sheet-vs-decision-batch ID diff script (21-23 f/4; "not worth a
+~~39. Sheet-vs-decision-batch ID diff script (21-23 f/4; "not worth a~~ routed: Omega E2.2 (standing "not worth a check yet")
     check yet" - revisit if a sitting slip ever repeats).
-40. Exporter hardening backlog (ROADMAP theme 6: absolute-URL selftest,
+~~40. Exporter hardening backlog (ROADMAP theme 6: absolute-URL selftest,~~ done 2026-10-31 (Omega E3; ADR-id sync parked)
     `--plain` parity, `--check` drift guard, ADR cross-links).
-41. Catalog content refresh at the next catalog session (exporter
+~~41. Catalog content refresh at the next catalog session (exporter~~ routed: Omega E4 (A5-gated)
     bodies predate the v0.5.0 cut; Consumers section).
-42. EventCatalog publisher receipt loop: live URL verifies + screenshots
+~~42. EventCatalog publisher receipt loop: live URL verifies + screenshots~~ routed: Omega E4 (publish receipts)
     appended to the 18-40 report (rides item 5).
-43. Traced-verbosity ARF variant (pins `incoming-report.*` event names;
+~~43. Traced-verbosity ARF variant (pins `incoming-report.*` event names;~~ routed: Omega E5
     parked test idea).
-44. Aggregate-subtest delivery control (parked idea, defense in depth).
-45. Combined report-ingestion subtest (parked runtime optimization).
-46. Arch-diagram content-freshness audit (standing ROADMAP row; the
+~~44. Aggregate-subtest delivery control (parked idea, defense in depth).~~ routed: Omega E5
+~~45. Combined report-ingestion subtest (parked runtime optimization).~~ routed: Omega E5
+~~46. Arch-diagram content-freshness audit (standing ROADMAP row; the~~ done 2026-10-31 (Omega E7)
     2026-09-15 renders were not re-viewed again).
-47. vulnix replacement once BuildFlow ships a working scanner (standing
+~~47. vulnix replacement once BuildFlow ships a working scanner (standing~~ routed: Omega E8 (external)
     ROADMAP row).
-48. DOMAIN_LANGUAGE.md authoring post-v0.5.0 (standing ROADMAP row; the
+~~48. DOMAIN_LANGUAGE.md authoring post-v0.5.0 (standing ROADMAP row; the~~ done 2026-10-31 (Omega E6: docs/DOMAIN_LANGUAGE.md shipped)
     release has now shipped, so the "terms stabilize" precondition is
     met - first candidate to graduate).
-49. THIS report: annotate + archive when the pbx blessing lands
+~~49. THIS report: annotate + archive when the pbx blessing lands~~ done 2026-11-01: THIS docs-health pass annotated + archived it (open threads routed above)
     (f/2-3 close every open thread in it except the standing rows).
 
 ## g) Questions I cannot figure out myself
 
-1. **Arrow freshness in the kept-live reports**: the 12-17 + 14-19
+~~1. **Arrow freshness in the kept-live reports**: the 12-17 + 14-19~~ done 2026-11-01: settled refresh-at-archive-time only (see f/37)
    reports route f-items at rows that have since landed and been
    deleted from TODO_LIST (ping, relay bounce, TLS breadth, the v0.5.0
    row). Refresh those arrows now (a second annotation pass over live
    files), or leave them frozen and archive as-is when the pbx blessing
    lands? I lean refresh-at-archive-time only.
-2. **Glob semantics for future sweeps**: the literal `2026-0*` pattern
+~~2. **Glob semantics for future sweeps**: the literal `2026-0*` pattern~~ settled 2026-11-01: standing interpretation (live corridor + mechanical archive verify; the skill's closed-history rule owns the rest)
    matched zero live files this pass - I treated it as
    intent-to-sweep-the-live-corridor (October files) and verified the
    2026-0\* archives mechanically instead. Is that the standing
    interpretation, or do you want literal-glob reports (listing every
    archived file as "viewed") even when it burns context on closed
    history?
-3. **Push posture**: master is ~24 commits ahead of origin and origin
+~~3. **Push posture**: master is ~24 commits ahead of origin and origin~~ done by events 2026-11-01: pushed + green (41265954894); standing rule unchanged (assistants never push)
    CI is RED (the ruff-floor fix `14934ac` that greens it is local).
    Assistants never push unasked - do you want the fix pushed now, or
    does the daemon's push cadence own it?
