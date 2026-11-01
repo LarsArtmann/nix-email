@@ -73,6 +73,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   exit 9) with the three-run transcript in
   docs/probes/2026-10-31-dnsmasq-forward/ and a fresh 0.16.26 demo-VM
   smoke in docs/probes/2026-10-31-demo-smoke-01626/.
+- Docs-health corridor pass (2026-11-01, the Omega plan's pre-committed
+  E18): the 2026-10-30 -> 11-01 corridor annotated inline (233 verdicts:
+  217 tool-applied via annotate-corridor.py + 16 house-grammar bullet
+  strikes; check-rows green per file BEFORE and AFTER the dprint pass)
+  and archived with manifests - the two 10-30 reports, the two 11-01
+  reports, the exhausted Z-generation plan (closure banner + Appendix R
+  dispositions), and the mailsuite STARTTLS draft (issue CLOSED
+  upstream 2026-10-27 by their PR #67; C20 resolved by events in
+  decision-batch). Kept live BY DESIGN: the pbx owners (12-17 + 14-19),
+  the pbx-deferred 10-23 docs-health report, the sitting sheet, the
+  EventCatalog publish plan, decision-batch, and the active Omega plan.
+  Living docs truth-up: TODO_LIST re-dated (DONE reconcile-destroy row
+  deleted; NEW rows: loaded-runner timeout audit + CI cache-throttle
+  owner questions, dprint coverage gap, VM/debug tooling batch,
+  deliverability probe backlog, TELEMETRY compression), AGENTS.md
+  gained the rerun-triage clause (grep the whole failed log for
+  non-infra errors before rerunning) and the alejandra-only `nix fmt`
+  caution, CONTRIBUTING's VM-debug rules gained the test-driver
+  errexit rule + the A4 shape-split truth-up, MONITORING row 2 gained
+  the `queue_rescheduled` lazy-registration note, FEATURES/ROADMAP
+  currency updated (CI green through run 41265954894; probe parked
+  follow-ons line; open question 10 = A4 residuals; drift-alarm arm
+  parked in theme 6), and the 02-29 h) addendum stamped with the final
+  green CI run id.
 
 ### Changed
 
