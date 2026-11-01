@@ -78,5 +78,17 @@
       fi
       exit $status
     '';
+
+    # `nix run .#ruff-floor` - the CI ruff floor without the 10 s
+    # `github:NixOS/nixpkgs/<rev>#ruff` eval walk (measured at the
+    # 2026-11-01 CI runner, run 41265954894: the step spent its whole
+    # 10 s budget on resolving ruff from the registry ref before any
+    # linting). The app pins this flake's nixpkgs ruff, so the floor is
+    # one eval hop and identical to what the devShell resolves.
+    apps.ruff-floor = {
+      type = "app";
+      program = "${pkgs.ruff}/bin/ruff";
+      meta.description = "Pinned ruff for the CI error-floor lint (E4,E7,E9,F) - no registry eval walk";
+    };
   };
 }
