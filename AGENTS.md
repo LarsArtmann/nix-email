@@ -58,7 +58,11 @@ transcript-pinned dialect).
   anti-drift); a missed site ships red master (daemon pushes bypass the
   hook). Pre-flight: `grep -rn '<name>' .github scripts tests README.md`.
 - A red CI run is NEVER "the known one" without reading the failing STEP
-  name (`gh run view --log-failed`); two causes can stack. A working-tree
+  name (`gh run view --log-failed`); two causes can stack, plus the
+  infra flake: GitHub cache-API `ResourceExhausted ... rate limit
+  exceeded` kills `nix flake check` mid store-path copy ("substituter
+  ... is disabled"; every lint/eval step green, 2026-11-01) - remedy
+  is `gh run rerun --failed`. A working-tree
   gate red may belong to ANOTHER session's in-flight fix: check
   `git status` for files you didn't touch, date outputs via
   `nix path-info --json registrationTime`, never edit the foreign file.

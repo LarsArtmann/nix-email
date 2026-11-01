@@ -280,3 +280,20 @@ GREEN (run 41146208130). This file reports THAT session only.
 3. **A4 venue**: keep the framework datum local-only (current call), or
    should I prepare a minimal upstream repro (stock two-node nixpkgs VM
    test querying 10.0.2.3) for a nixpkgs/discourse note?
+
+## h) COMPLETION ADDENDUM (2026-11-01 03:04 CET, same-corridor continuation)
+
+The b)-residuals are DONE: full `nix flake check` EXIT 0 (12-check
+x86_64 set, attrNames-verified against tests/check-expected.json),
+`buildflow` EXIT 0 with the jscpd step GREEN (0 clones - the D5 gate
+evidence), the CHANGELOG entry committed same-call (0fa32c4), landing
+commit e09376f (sweeps the .a4 probe-script deletions, the probe
+transcripts, and this report), pushed, origin CI GREEN (run
+41262497225, 10m). Incidents en route, all mechanized: BuildFlow's own
+ruff autofix converted the annotate driver's %-formatting to
+.format() mid-gate (self-test re-verified green, kept); a 9-file
+dprint pass over never-before-dprint-checked prose re-verified both
+live-corridor check-rows after; and the FIRST CI run failed on a NEW
+infra class - the cache-action substituter died with GitHub
+`ResourceExhausted: rate limit exceeded` mid store-path copy (every
+lint/eval step green), and `gh run rerun --failed` went green.
