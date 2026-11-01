@@ -30,7 +30,10 @@ LOG="$SESSION_DIR/console.log"
 mkfifo "$FIFO"
 
 echo ">>> building demo VM closure (instant when cached)"
-VM="$(nix build --no-link --print-out-paths .#vm)"
+# `nix run .#vm` is an app; the closure behind it is the demo system's
+# vm build (bin/run-demo-vm) - build THAT so we can exec it directly.
+VM="$(nix build --no-link --print-out-paths \
+	'.#nixosConfigurations.demo.config.system.build.vm')"
 
 HOLDER_PID=""
 VM_JOB=""
