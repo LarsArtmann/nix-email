@@ -97,6 +97,17 @@ the verified-source work (what the wrapper OWNS) is done or specified in
   2026-10-30 - `deliverabilityChecks.dnsblZones`; consumer wiring remains)
 - Gatus freshness check over the parsedmarc `aggregate.json` sink (verify it
   does not duplicate the consumer registry's `backup.maxAgeHours` coverage)
+- Deliverability-probe parked follow-ons (2026-10-30 report f/36-50, raw
+  ideas - revisit on demand): MTA-STS / TLS-RPT DNS record checks, a
+  DNSSEC-posture option for the dig lookups, rate-limit documentation for
+  tiny hosts, digesting the parsedmarc sinks into the report as INFO
+  checks, an opt-in `--notify` webhook (BREAKS emission-only doctrine -
+  only on owner demand), a pushgateway/tiny-httpd textfile alternative
+  where node_exporter is absent, WARN-vs-CRITICAL routing trees and
+  duration-trend dashboards (consumer art), List-Id/Precedence headers on
+  the canary mail, a stable `CHECK name status detail` journald prefix,
+  and property tests for the dig parsers against multi-string TXT
+  chunking (the timer-actually-firing VM test is a known low-value gap)
 
 **Alert** (consumer-owned routing, `docs/MONITORING.md` taxonomy):
 
@@ -243,6 +254,9 @@ ideas, all D1-gated:
   dry run, no GC-root build, no boot) - both are pure bash additions to
   the existing extractor, worth one small session the next time a VM debug
   loop actually hurts
+- A drift-alarm arm for the TODO sweep-banner date (routed 2026-10-23
+  f/27, re-routed 2026-10-30, still unbuilt - parked until a stale sweep
+  banner actually costs a session)
 
 ## Non-goals
 
@@ -346,3 +360,11 @@ are batched in `docs/planning/decision-batch.md` (2026-09-22) - answer there.
    snapshot claims be verified against upstream docs and pinned (ledger
    rows), or stay one-off Q&A? Full reasoning: the 2026-10-25 advisory
    report (archived corridor).
+10. **A4 residuals (2026-10-31 dnsmasq scope-split transcript, owner
+    taste):** (a) both test headers now call `server = ["10.0.2.3"]` a
+    dead end - REMOVE the lines entirely (config change + full e2e
+    re-run to prove dnsmasq behaves with zero upstreams) or keep them
+    labelled (current state)? (b) keep the framework datum local-only
+    (current call) or prepare a minimal upstream repro (stock two-node
+    nixpkgs VM test querying 10.0.2.3) for a nixpkgs/discourse note?
+    Transcript: `docs/probes/2026-10-31-dnsmasq-forward/`.
