@@ -5,11 +5,11 @@ fresh `scripts/demo-console.sh` boot of the demo VM (0.16.26 pin).
 
 ## Results
 
-| Leg                                            | Result                                                            |
-| ---------------------------------------------- | ----------------------------------------------------------------- |
-| `scripts/demo-console.sh` boot                  | VM reached login prompt; `sleep infinity` holder kept the FIFO open; 900 s timeout killed the whole process group (cat + run-demo-vm + QEMU); NO orphan QEMU left holding the demo-disk write lock |
-| `scripts/vm-debug.sh --script-only --check`     | exit 0: check evaled, GC root built (cached), driver discovered from the derivation buildCommand, starter generated under `~/.cache/nix-email/vm-debug/`, lint clean, driver command line printed without executing |
-| `python3 scripts/demo-smoke.py` (5 legs)        | ALL PASS: anon JMAP session (200, apiUrl); AUTH submission 2587 STARTTLS+LOGIN; IMAPS 2593 round-trip (needle `smoke-fb9d1a8f095351a1` delivered); catch-all accept on 2525 (`any-6dbea4f0@mail.demo.test`); strict reject `x@demo.test` -> 550 |
+| Leg                                         | Result                                                                                                                                                                                                                                          |
+| ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `scripts/demo-console.sh` boot              | VM reached login prompt; `sleep infinity` holder kept the FIFO open; 900 s timeout killed the whole process group (cat + run-demo-vm + QEMU); NO orphan QEMU left holding the demo-disk write lock                                              |
+| `scripts/vm-debug.sh --script-only --check` | exit 0: check evaled, GC root built (cached), driver discovered from the derivation buildCommand, starter generated under `~/.cache/nix-email/vm-debug/`, lint clean, driver command line printed without executing                             |
+| `python3 scripts/demo-smoke.py` (5 legs)    | ALL PASS: anon JMAP session (200, apiUrl); AUTH submission 2587 STARTTLS+LOGIN; IMAPS 2593 round-trip (needle `smoke-fb9d1a8f095351a1` delivered); catch-all accept on 2525 (`any-6dbea4f0@mail.demo.test`); strict reject `x@demo.test` -> 550 |
 
 Raw probe output of the green run (console session dir of the boot:
 `/tmp/nix-email-demo-console.*/console.log`, swept with the session):
