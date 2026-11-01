@@ -43,3 +43,10 @@ BEFORE the `git mv`.
 | File (date prefix)                                                            | Classification | Deciding reason                                                                                    |
 | ----------------------------------------------------------------------------- | -------------- | --------------------------------------------------------------------------------------------------- |
 | 2026-10-23_11-49_SUPERB-pareto-y-generation-release-train-owner-gates-full-backlog | ARCHIVE        | Appendix R reads all 46 L1 tasks: 24 DONE (release train, pin advance, D/E lanes, F1/F4/F5/F8, G5/G6), rest SPLIT/ROUTED to the Z plan, the sitting sheet, and TODO_LIST |
+
+## Manifest — 2026-11-01 docs-health pass (2 files)
+
+| File (date prefix)                                                       | Classification | Deciding reason                                                                                                                                   |
+| ------------------------------------------------------------------------ | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-10-26_19-54_SUPERB-pareto-z-generation-owner-unblock-release-train… | ARCHIVE        | CLOSED banner + Appendix R (25 disposition rows): A/C1-C4 executed 2026-10-28, the unexecuted remainder absorbed by the Omega plan (its header says so); check-rows green |
+| mailsuite-starttls-issue-draft                                           | ARCHIVE        | filed draft; the issue CLOSED upstream 2026-10-27 (their PR #67 shipped the starttls opt-out - Omega D9 re-check); residual verify rides the TODO upstream-watch row |

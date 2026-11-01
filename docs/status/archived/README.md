@@ -166,3 +166,22 @@ the same blessing; its closed f-items were annotated this pass), and
 | 2026-10-26_21-23_z-corridor-completeness-and-arf-runtime-proof | ARCHIVE        | superseded by 21-40 (its own header says so); c/f/g routed                                                                      |
 | 2026-10-26_21-40_z-arf-runtime-proof-and-sheet-coverage-session-status | ARCHIVE        | 59 verdicts: A/C-lanes executed 10-28; the rest routed (sheet + TODO rows)                                                      |
 | 2026-10-28_11-33_pin-advance-fe132422-opensearch-port-stalwart-01626 | ARCHIVE        | its own Appendix 1+2 dispositioned every f-item and answered all g-questions (C43 CUT, v2 guard, CardDAV re-baseline); inline strikes added this pass |
+
+## Manifest — 2026-11-01 docs-health pass (4 files)
+
+The 2026-10-30 -> 11-01 corridor (E18's pre-committed archive; the
+Omega D-lane evidence landed 11-01). Every b/c/f/g item carries an
+inline dated verdict (done / routed / done-by-events; 217 tool-applied
++ 16 house-grammar bullet strikes); check-rows green per file BEFORE
+and AFTER the dprint pass; `grep -L '~~'` silent over the moved set.
+Kept live ON PURPOSE (unchanged): 2026-10-19_12-17 + 2026-10-20_14-19
+(pbx owners; Omega B3 converts their arrows at the blessing),
+2026-10-23_11-26 (pbx-deferred docs-health), the sitting sheet, the
+EventCatalog publish plan, decision-batch, and the Omega plan.
+
+| File (date prefix)                                                       | Classification | Deciding reason                                                                                                                                     |
+| ------------------------------------------------------------------------ | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-10-30_18-26_continuous-deliverability-checks-shipped                | ARCHIVE        | 63 verdicts: c/1+f/5+f/31-35 done by events (CI green 41262497225/41265954894), f/21 jscpd done (D5), f/24 done (AGENTS clause); probe backlog harvested to a TODO row, consumer halves to the SystemNix row, raw ideas to ROADMAP |
+| 2026-10-30_20-29_docs-health-pass-12-archived-ci-red-fixed-living-docs…  | ARCHIVE        | 64 verdicts: its b-residues closed by the 10-31 Omega D-lane (D7/D8/D9) + this pass (f/37 arrow rule settled, f/38 ROADMAP line added); the rest routed to sheet/TODO/Omega tasks |
+| 2026-11-01_02-29_omega-execution-13-tasks-landed-a4-scope-split…         | ARCHIVE        | 59 verdicts: b-residuals done per its own h) addendum (gates, 0fa32c4, e09376f, CI green stamped); carries routed to Omega tasks + the new TODO rows |
+| 2026-11-01_06-03_gate-closeout-two-ci-flake-classes-parsedmarc-timeout…  | ARCHIVE        | 47 verdicts: its own f/1-5 residuals executed BY this pass (timeout-audit row, cache-throttle row, run-id stamp, AGENTS clauses, dprint-gap row); carries routed |
