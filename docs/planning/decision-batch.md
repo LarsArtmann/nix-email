@@ -64,9 +64,9 @@ Install the GitHub app or drop `renovate.json`? App NEVER ran on this repo (veri
 
 ### C20 — mailsuite STARTTLS issue
 
-File the prepared draft (`docs/planning/mailsuite-starttls-issue-draft.md`, all 5 verify-before-filing gates PASSED) or skip?
+~~File the prepared draft (`docs/planning/mailsuite-starttls-issue-draft.md`, all 5 verify-before-filing gates PASSED) or skip?~~ RESOLVED BY EVENTS: filed 2026-10-05 (mailsuite#65); CLOSED upstream 2026-10-27 by their PR #67 (`starttls` opt-out shipped; re-checked live 2026-10-31). Draft archived at `docs/planning/archived/mailsuite-starttls-issue-draft.md`; residual verification rides the TODO upstream-watch row.
 
-- **[rec] File it.**
+- **[rec] File it.** (executed as recommended)
 
 ### C22 — GitHub Discussions
 

@@ -1,11 +1,11 @@
 # Continuous deliverability checks — shipped, gate-green, honest self-review
 
-| Field   | Value                                                                                                                          |
-| ------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| Created | 2026-10-30 18:26 CET (single session, ~2.5 h)                                                                                  |
-| Owner   | Lars (request: "fully automated continuous deliverability checks!!! with alerts e.g. Desktop, SigNoz, Gatus")                  |
-| Scope   | THIS session only: the deliverability-probe feature work + gate triage it dragged in                                           |
-| Verdict | SHIPPED and gate-green locally (flake check + buildflow both EXIT 0); ~~origin CI NOT yet exercised (13 commits ahead, unpushed)~~ RESOLVED 2026-11-01: pushed, origin CI green (runs 41262497225 + 41265954894) |
+| Field   | Value                                                                                                                                                                                                          |
+| ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Created | 2026-10-30 18:26 CET (single session, ~2.5 h)                                                                                                                                                                  |
+| Owner   | Lars (request: "fully automated continuous deliverability checks!!! with alerts e.g. Desktop, SigNoz, Gatus")                                                                                                  |
+| Scope   | THIS session only: the deliverability-probe feature work + gate triage it dragged in                                                                                                                           |
+| Verdict | SHIPPED and gate-green locally (flake check + buildflow both EXIT 0); origin CI NOT yet exercised (13 commits ahead, unpushed) - RESOLVED 2026-11-01: pushed, origin CI green (runs 41262497225 + 41265954894) |
 
 ## What shipped (short version)
 

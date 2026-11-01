@@ -3,6 +3,13 @@
 > The text below is the filed draft, kept for the record. Gates were
 > re-verified same day (master `imap.py` byte-identical at the quoted
 > lines; no duplicate issue). The canonical thread is upstream.
+>
+> **CLOSED UPSTREAM 2026-10-27** (re-checked live 2026-10-31, Omega D9):
+> mailsuite#65 was completed by their PR #67 (`feat/imap-starttls-opt-out`,
+> releases 2.3.3/2.3.4) - the `starttls` opt-out this draft proposed
+> shipped. Residual: verify the new opt-out satisfies parsedmarc at the
+> next mailsuite-advancing bump (TODO upstream-watch row). Archived
+> 2026-11-01 by the docs-health pass.
 
 Repo: seanthegeek/mailsuite
 Title: `ssl=False` cannot opt out of automatic STARTTLS
@@ -39,7 +46,7 @@ def __init__(self, ..., ssl: bool = True, starttls: bool | None = None, ...):
 
 A dedicated parameter avoids breaking anyone who relies on the current auto-upgrade; strictly reinterpreting `ssl=False` would also work but changes semantics.
 
-I can send a PR for this if the approach sounds good.
+~~I can send a PR for this if the approach sounds good.~~ done upstream - their PR #67 shipped the opt-out (2026-10-27)
 
 Verified on mailsuite 2.3.1 (installed via parsedmarc) and current master (diffed `imap.py`, byte-identical).
 

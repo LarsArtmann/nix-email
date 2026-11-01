@@ -322,30 +322,30 @@ DONE = executed and in CHANGELOG; **→ routed** = lives in the named
 Omega-plan task or TODO_LIST row (still open there, owner/externally
 gated); the sitting sheet owns every owner verdict.
 
-| ID       | Disposition                                                                                                     |
-| -------- | --------------------------------------------------------------------------------------------------------------- |
-| ~~O1~~   | ~~owner gh-auth gate~~ done - restored 2026-10-28 (banner)                                                      |
-| O2       | **→ routed - Omega O1 (the sitting; the sheet is unchanged)**                                                     |
-| O3       | **→ routed - Omega O3 (O1-gated verdict recording)**                                                              |
-| ~~A1-A5~~ | ~~v0.5.0 release lane~~ done - CUT 2026-10-28 (A3 scratch-dry-run skipped for the real thing; banner)          |
-| B1-B3    | **→ routed - Omega B1-B3 (pbx blessing gates the flip + corridor tail)**                                          |
-| F1       | **→ routed - Omega A1 (#552103 comment; owner review gate)**                                                      |
-| F2       | **→ routed - Omega A2 (#563651 follow-up; ON HOLD per owner)**                                                    |
-| ~~F3~~   | ~~mailsuite nudge~~ done - MOOT: #65 CLOSED upstream 2026-10-27 (Omega D9 re-check)                              |
-| ~~F4~~   | ~~dnsmasq note~~ done - Omega A4 2026-10-31 (scope-split transcript; venue = local note only)                     |
-| ~~C1~~   | ~~#566282 opensearch port~~ done - landed with the fe132422 advance (banner)                                      |
-| C2       | **→ routed - Omega A1 / the #552103 retirement ride (merges into the pin = trigger)**                             |
-| ~~C3~~   | ~~SystemNix v0.5.0 pin bump~~ done-by-doctrine - they float master via `nixpkgs.follows` (superseded 2026-10-28)  |
-| ~~C4~~   | ~~post-bump checks~~ done at the advance + Omega D9 re-date (2026-10-31); the rename watch rides the TODO row     |
-| C5-C8    | **→ routed - Omega C2/C3/C1/D10 (owner verdicts gate C5-C7; the D10 prep pack is O1-gated)**                      |
-| D1       | **→ routed - TODO 'Loaded-runner timeout audit' row (2026-11-01; parsedmarc-e2e is the second existence proof)**   |
-| ~~D2~~   | ~~queue-series README claim~~ done - MONITORING row-2 correction (2026-10-26) + the D7 README pass (2026-10-31)    |
-| ~~D3~~   | ~~full buildflow run~~ done - EXIT 0 on 2026-11-01, jscpd step green (0 clones)                                   |
-| D4       | **→ routed - TODO 'CI python-lint gate' row (owner blessing pending)**                                            |
-| D5       | **→ routed - TODO flood-posture row (Omega C10; owner taste)**                                                     |
-| G1/G2    | **→ routed - TODO BuildFlow + SystemNix CI-debt rows (Omega D3/D2, their repos)**                                  |
-| G3       | **→ routed - TODO qcow2 row (Omega C8)**                                                                           |
-| G4       | **→ routed - TODO contacts-probe row (standing ride, re-armed at the next bump)**                                  |
-| G5       | **→ routed - TODO EventCatalog row (Omega A5; external workstream)**                                               |
-| G6       | **→ routed - TODO upstream-watch row (re-dated from live gh evidence 2026-10-31)**                                 |
-| G7       | **→ routed - TODO policy rows + D1-gated rows (Omega C5/E13/E14)**                                                 |
+| ID        | Disposition                                                                                                      |
+| --------- | ---------------------------------------------------------------------------------------------------------------- |
+| ~~O1~~    | ~~owner gh-auth gate~~ done - restored 2026-10-28 (banner)                                                       |
+| O2        | **→ routed - Omega O1 (the sitting; the sheet is unchanged)**                                                    |
+| O3        | **→ routed - Omega O3 (O1-gated verdict recording)**                                                             |
+| ~~A1-A5~~ | ~~v0.5.0 release lane~~ done - CUT 2026-10-28 (A3 scratch-dry-run skipped for the real thing; banner)            |
+| B1-B3     | **→ routed - Omega B1-B3 (pbx blessing gates the flip + corridor tail)**                                         |
+| F1        | **→ routed - Omega A1 (#552103 comment; owner review gate)**                                                     |
+| F2        | **→ routed - Omega A2 (#563651 follow-up; ON HOLD per owner)**                                                   |
+| ~~F3~~    | ~~mailsuite nudge~~ done - MOOT: #65 CLOSED upstream 2026-10-27 (Omega D9 re-check)                              |
+| ~~F4~~    | ~~dnsmasq note~~ done - Omega A4 2026-10-31 (scope-split transcript; venue = local note only)                    |
+| ~~C1~~    | ~~#566282 opensearch port~~ done - landed with the fe132422 advance (banner)                                     |
+| C2        | **→ routed - Omega A1 / the #552103 retirement ride (merges into the pin = trigger)**                            |
+| ~~C3~~    | ~~SystemNix v0.5.0 pin bump~~ done-by-doctrine - they float master via `nixpkgs.follows` (superseded 2026-10-28) |
+| ~~C4~~    | ~~post-bump checks~~ done at the advance + Omega D9 re-date (2026-10-31); the rename watch rides the TODO row    |
+| C5-C8     | **→ routed - Omega C2/C3/C1/D10 (owner verdicts gate C5-C7; the D10 prep pack is O1-gated)**                     |
+| D1        | **→ routed - TODO 'Loaded-runner timeout audit' row (2026-11-01; parsedmarc-e2e is the second existence proof)** |
+| ~~D2~~    | ~~queue-series README claim~~ done - MONITORING row-2 correction (2026-10-26) + the D7 README pass (2026-10-31)  |
+| ~~D3~~    | ~~full buildflow run~~ done - EXIT 0 on 2026-11-01, jscpd step green (0 clones)                                  |
+| D4        | **→ routed - TODO 'CI python-lint gate' row (owner blessing pending)**                                           |
+| D5        | **→ routed - TODO flood-posture row (Omega C10; owner taste)**                                                   |
+| G1/G2     | **→ routed - TODO BuildFlow + SystemNix CI-debt rows (Omega D3/D2, their repos)**                                |
+| G3        | **→ routed - TODO qcow2 row (Omega C8)**                                                                         |
+| G4        | **→ routed - TODO contacts-probe row (standing ride, re-armed at the next bump)**                                |
+| G5        | **→ routed - TODO EventCatalog row (Omega A5; external workstream)**                                             |
+| G6        | **→ routed - TODO upstream-watch row (re-dated from live gh evidence 2026-10-31)**                               |
+| G7        | **→ routed - TODO policy rows + D1-gated rows (Omega C5/E13/E14)**                                               |

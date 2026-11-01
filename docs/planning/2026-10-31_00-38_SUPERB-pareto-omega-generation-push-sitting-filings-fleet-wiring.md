@@ -1,7 +1,7 @@
 <!-- Ω-generation master plan. Generated 2026-10-31 00:38 CET (`date` CLI).
      Sources: TODO_LIST.md (2026-10-30 docs-health truth-up: 4 dead rows
      deleted, 21 live rows verified), this pass's status report
-     (docs/status/2026-10-30_20-29_*), decision-batch.md (C43 ANSWERED CUT
+     (docs/status/archived/2026-10-30_20-29_*, archived 2026-11-01), decision-batch.md (C43 ANSWERED CUT
      + C45 SUPERSEDED 2026-10-28), the sitting sheet (Batches 1-7,
      coverage-re-proofed 2026-10-26), ROADMAP open questions 1-9, and the
      archived corridor (12 files, 2026-10-30 pass). Every open TODO_LIST

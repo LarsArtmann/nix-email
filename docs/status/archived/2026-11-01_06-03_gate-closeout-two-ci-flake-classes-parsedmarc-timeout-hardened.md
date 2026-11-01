@@ -85,32 +85,32 @@ the parent report owns the Ω-do-now landing itself.
 ## b) PARTIALLY DONE
 
 ~~- **Loaded-runner timeout hardening covers parsedmarc-e2e only** - the~~ **→ routed - TODO 'Loaded-runner timeout audit' row (owner question g/3; row added 2026-11-01)**
-  other e2e tests (relay, deliverability, bind, stalwart-e2e, migrate)
-  carry their own wait/timeout budgets sized on healthy runners and
-  were never audited for this class. Evidence-driven fixing is
-  defensible (two greens today on the same code); a sweep is the
-  alternative (owner question, g/3).
+other e2e tests (relay, deliverability, bind, stalwart-e2e, migrate)
+carry their own wait/timeout budgets sized on healthy runners and
+were never audited for this class. Evidence-driven fixing is
+defensible (two greens today on the same code); a sweep is the
+alternative (owner question, g/3).
 ~~- **TODO_LIST hand-off row not added** - the timeout-audit residual~~ **→ done 2026-11-01 - the TODO hand-off row was added by the docs-health pass**
-  lives only in this report's f-list; the doctrine says bounded work
-  gets a TODO_LIST row. One-liner, next docs touch.
+lives only in this report's f-list; the doctrine says bounded work
+gets a TODO_LIST row. One-liner, next docs touch.
 ~~- **The 02-29 report's h) addendum says the CI verdict "rides its~~ **→ done 2026-11-01 - run id 41265954894 stamped into the 02-29 h) addendum**
-  push"** - the final green run id (41265954894) is recorded HERE, not
-  stamped back into that file. Trivial; next docs touch.
+push"** - the final green run id (41265954894) is recorded HERE, not
+stamped back into that file. Trivial; next docs touch.
 
 ## c) NOT STARTED (unchanged from the parent report's c-list)
 
 ~~- **O1 the owner sitting** (C42/C44/C39-C41/C46, pbx blessing, D1/D2,~~ **→ routed - sitting sheet + TODO blocked rows (Omega O1)**
-  Resend key, policy batch, REPORT-RENAME/CADENCE, AGENTS cap,
-  C36/C37/Q5) - still the 1% gating >51%.
+Resend key, policy batch, REPORT-RENAME/CADENCE, AGENTS cap,
+C36/C37/Q5) - still the 1% gating >51%.
 ~~- **O3 verdict recording** (O1-gated), **A1** (#552103 webui comment,~~ **→ routed - Omega-plan tasks O3/A1/A2/A5/B1-B3/C1-C10/D1-D4/D10/E4/E5/E8-E14/E17/E18 (owner-gated, their-repo, and backlog lanes)**
-  owner review), **A2** (#563651 follow-up, owner go), **A5.2-3**
-  (their push + CI watch + live verify), **B1-B3** (pbx lanes),
-  **C1-C10** (verdict executions), **D1-D4** (SystemNix/BuildFlow
-  repos), **D10**, **E4/E5/E8-E14** (backlog/external/standing),
-  **E17/E18** (rides).
+owner review), **A2** (#563651 follow-up, owner go), **A5.2-3**
+(their push + CI watch + live verify), **B1-B3** (pbx lanes),
+**C1-C10** (verdict executions), **D1-D4** (SystemNix/BuildFlow
+repos), **D10**, **E4/E5/E8-E14** (backlog/external/standing),
+**E17/E18** (rides).
 ~~- **A4 owner questions still open** (parent g/2-3): keep vs remove the~~ **→ routed - ROADMAP open question 10a/10b (added 2026-11-01)**
-  labelled dead-end `server = ["10.0.2.3"]` lines; local-only vs
-  upstream repro for the framework datum.
+labelled dead-end `server = ["10.0.2.3"]` lines; local-only vs
+upstream repro for the framework datum.
 
 ## d) TOTALLY FUCKED UP
 
@@ -177,85 +177,85 @@ the parent report owns the Ω-do-now landing itself.
 ## f) NEXT (consolidated: NEW items first, then the parent's still-open list)
 
 ~~1. **NEW - TODO_LIST row**: loaded-runner timeout audit across all e2e~~ done 2026-11-01 (TODO row added by the docs-health pass)
-   tests (b-item; the parsedmarc fix is the template).
+tests (b-item; the parsedmarc fix is the template).
 ~~2. **NEW - owner decision g/2**: CI cache-throttle policy (rerun-only~~ routed: TODO "CI cache-throttle policy" row (added 2026-11-01)
-   vs workflow mitigation).
+vs workflow mitigation).
 ~~3. **NEW - owner decision g/3**: timeout-hardening sweep now vs~~ routed: TODO "Loaded-runner timeout audit" row (added 2026-11-01)
-   evidence-driven per-flake.
+evidence-driven per-flake.
 ~~4. **NEW**: stamp the final green run id (41265954894) into the 02-29~~ done 2026-11-01 (run id 41265954894 stamped into the 02-29 h) addendum; both AGENTS.md clauses added)
-   report's h) addendum; add the AGENTS.md rerun-triage clause (e/1,
-   e/7 one-liners).
+report's h) addendum; add the AGENTS.md rerun-triage clause (e/1,
+e/7 one-liners).
 ~~5. **NEW**: dprint coverage gap fix (e/3; repo or BuildFlow lane).~~ routed: TODO "dprint coverage gap" row (added 2026-11-01)
 ~~6. Carry: **O1 the owner sitting** (~70 min, unblocks >51%).~~ routed: sitting sheet (Omega O1)
 ~~7. Carry: **O3** verdict recording (decision-batch lines, TODO re-rows,~~ routed: Omega O3 (O1-gated)
-   sheet ANSWERED prefixes, banner; same-call CHANGELOG).
+sheet ANSWERED prefixes, banner; same-call CHANGELOG).
 ~~8. Carry: **A1** #552103 webui comment -> owner review -> re-verify at~~ routed: TODO admin-bundle row (Omega A1; owner review)
-   PR head -> github-voice -> post.
+PR head -> github-voice -> post.
 ~~9. Carry: **A2** #563651 follow-up (re-verify the host-less~~ routed: TODO upstream-watch row (Omega A2; ON HOLD per owner)
-   `[opensearch]` shape first).
+`[opensearch]` shape first).
 ~~10. Carry: **A3** verify mailsuite's new `starttls` opt-out at the~~ routed: TODO upstream-watch row residual (next mailsuite-advancing bump)
-    next mailsuite-advancing bump.
+next mailsuite-advancing bump.
 ~~11. Carry: **A4 depth** (parent g/2): remove the dead-end~~ routed: ROADMAP open question 10a (added 2026-11-01)
-    `server = ["10.0.2.3"]` lines (config change + full e2e re-run) or
-    keep labelled (current).
+`server = ["10.0.2.3"]` lines (config change + full e2e re-run) or
+keep labelled (current).
 ~~12. Carry: **A4 venue** (parent g/3): local-only (current) vs minimal~~ routed: ROADMAP open question 10b (added 2026-11-01)
-    upstream repro.
+upstream repro.
 ~~13. Carry: **A5** when the hub workstream lands: their push -> first~~ routed: TODO EventCatalog row (Omega A5; external workstream)
-    full-9-source run -> live-verify catalog.home.lan (T8 checklist).
+full-9-source run -> live-verify catalog.home.lan (T8 checklist).
 ~~14. Carry: **B1** pbx `mkVMOverride` landing (post-blessing) + their~~ routed: TODO pbx row (Omega B1; owner blessing)
-    full gate.
+full gate.
 ~~15. Carry: **B2** nix-email CHANGELOG + TODO close + issue #4~~ routed: Omega B2 (B1-gated)
-    cross-link.
+cross-link.
 ~~16. Carry: **B3** corridor tail closeout (three deferred reports ->~~ routed: Omega B3 (the pbx-deferred three)
-    archived).
-~~    17-26. Carry: **C1-C10** verdict executions (C42 dmarc-monitor,~~ **→ routed - TODO + sitting-sheet rows (Omega C1-C10, post-sitting verdict executions)**
-    C44 account-secrets, C39 MemoryMax, C41/C46 recording, policy
-    batch, REPORT-RENAME/CADENCE, AGENTS cap, qcow2 verdict, Resend
-    SASL verify, flood posture).
-~~    27-30. Carry: **D1-D4** (SystemNix deliverability wiring, SystemNix~~ **→ routed - TODO SystemNix + BuildFlow rows (Omega D1-D4, their repos)**
-    CI-debt, BuildFlow upstream batch, BuildFlow binary rebuild +
-    state-DB purge).
+archived).
+~~ 17-26. Carry: **C1-C10** verdict executions (C42 dmarc-monitor,~~ **→ routed - TODO + sitting-sheet rows (Omega C1-C10, post-sitting verdict executions)**
+C44 account-secrets, C39 MemoryMax, C41/C46 recording, policy
+batch, REPORT-RENAME/CADENCE, AGENTS cap, qcow2 verdict, Resend
+SASL verify, flood posture).
+~~ 27-30. Carry: **D1-D4** (SystemNix deliverability wiring, SystemNix~~ **→ routed - TODO SystemNix + BuildFlow rows (Omega D1-D4, their repos)**
+CI-debt, BuildFlow upstream batch, BuildFlow binary rebuild +
+state-DB purge).
 ~~17. Carry: **E4** catalog content refresh + publish receipts~~ routed: Omega E4 (A5-gated)
-    (A5-gated).
+(A5-gated).
 ~~18. Carry: **E5** report-ingestion test ideas.~~ routed: Omega E5
 ~~19. Carry: **E8** vulnix replacement once BuildFlow ships a scanner.~~ routed: Omega E8 (external)
 ~~20. Carry: **E9** OIDC/Pocket ID wiring on the D1 host.~~ routed: Omega E9 (D1-gated)
 ~~21. Carry: **E10** 0.16-born wrapper options (catch-all + typed~~ routed: Omega E10 (C2-gated)
-    credentials) incl. the D6 guarded reconcile-retire path.
+credentials) incl. the D6 guarded reconcile-retire path.
 ~~22. Carry: **E11** queue-depth surface + first `queue_rescheduled`~~ routed: Omega E11 (lazy registration now noted in MONITORING row 2)
-    dashboard/alert row (LAZY registration noted).
+dashboard/alert row (LAZY registration noted).
 ~~23. Carry: **E12** parsedmarc against the real 0.16 deployment.~~ routed: Omega E12 (D1-gated)
 ~~24. Carry: **E13** vandelay-vs-imapsync compare (1.0.12 in-pin).~~ routed: Omega E13 (D1-gated)
 ~~25. Carry: **E14** rotate the three SystemNix placeholder secrets.~~ routed: Omega E14 (D1-gated)
-~~26. Carry: **E16** build the `.#ruff-floor` app or devShell floor path~~ routed: ROADMAP theme 6 E16 parked ideas
-    - instrument CI timing.
+~~26. Carry: **E16** build the `.#ruff-floor` app or devShell floor path~~ routed: ROADMAP theme 6 E16 parked ideas - instrument CI timing.
 ~~27. Carry: **E17** pin-advance RIDE at the next stalwart bump (now~~ routed: TODO contacts-probe + rename-watch rows (standing ride)
-    also watching `stalwart_1_0` on master).
+also watching `stalwart_1_0` on master).
 ~~28. Carry: **E18** next docs-health pass archives the 10-30 -> 11-01~~ done 2026-11-01: THIS docs-health pass archived the corridor (this report included)
-    corridor (this report included).
+corridor (this report included).
 ~~29. Carry: scripts/demo-console.sh mechanization (parent e/1).~~ routed: TODO VM/debug tooling batch row (2026-11-01)
 ~~30. Carry: CONTRIBUTING test-driver errexit rule + vm-debug /tmp guard~~ done 2026-11-01 (errexit rule landed in CONTRIBUTING) + routed: TODO VM/debug tooling batch (the /tmp guard half)
-    (parent e/2-3).
+(parent e/2-3).
 ~~31. Carry: check in the demo smoke probe script (parent e/10).~~ routed: TODO VM/debug tooling batch row
 ~~32. Carry: MONITORING row-2 `queue_rescheduled` lazy-registration note~~ done 2026-11-01 (lazy-registration note added to MONITORING row 2)
-    (parent f/48).
+(parent f/48).
 ~~33. Carry: TELEMETRY.md 0.15-era compression pass (parent f/49).~~ routed: TODO TELEMETRY-compression row (2026-11-01)
 ~~34. Carry: BuildFlow skill note "jscpd honors its native~~ routed: TODO BuildFlow row (skill-note clause appended 2026-11-01)
-    `.jscpd.json`" (parent f/50, their repo).
+`.jscpd.json`" (parent f/50, their repo).
 ~~35. Carry: background-job self-timeout defaults (parent e/4).~~ routed: the mechanizable half rides the TODO VM/debug tooling row (hard timeouts in demo-console); the rest is session discipline
 ~~36. Carry: Ω-plan auto-absorb of fresh discoveries (parent e/6).~~ routed: standing practice - the Omega-plan coverage appendix + TODO watch rows absorbed the discoveries (stalwart_1_0 watch, lazy queue series)
 
 ## g) QUESTIONS FOR THE OWNER
 
 ~~1. **When will you hold the O1 sitting?** (unchanged - it still gates~~ routed: owner - the sitting sheet (standing)
-   > 51% of everything in c).)
-~~2. **CI cache-throttle policy**: today's pattern was fail -> manual~~ routed: TODO "CI cache-throttle policy" row (added 2026-11-01)
-   `gh run rerun --failed` -> green (3 of 5 runs today needed it, and
-   the throttle's second-order effect caused the one REAL failure).
-   Want a workflow-level mitigation (retry step, or cache-disable
-   fallback that eats a slower cold build), or is manual rerun
-   acceptable for a solo-maintainer repo?
-~~3. **Timeout-hardening policy**: harden ALL e2e wait budgets to the~~ routed: TODO "Loaded-runner timeout audit" row (added 2026-11-01)
-   parsedmarc 300 s template in one sweep (one full-gate cost, class
-   closed), or fix per real flake as observed (evidence-driven, but
-   each flake costs a CI cycle + triage)?
+
+> 51% of everything in c).)
+> ~~2. **CI cache-throttle policy**: today's pattern was fail -> manual~~ routed: TODO "CI cache-throttle policy" row (added 2026-11-01)
+> `gh run rerun --failed` -> green (3 of 5 runs today needed it, and
+> the throttle's second-order effect caused the one REAL failure).
+> Want a workflow-level mitigation (retry step, or cache-disable
+> fallback that eats a slower cold build), or is manual rerun
+> acceptable for a solo-maintainer repo?
+> ~~3. **Timeout-hardening policy**: harden ALL e2e wait budgets to the~~ routed: TODO "Loaded-runner timeout audit" row (added 2026-11-01)
+> parsedmarc 300 s template in one sweep (one full-gate cost, class
+> closed), or fix per real flake as observed (evidence-driven, but
+> each flake costs a CI cycle + triage)?
