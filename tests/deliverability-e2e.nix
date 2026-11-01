@@ -5,10 +5,15 @@
 # canary auth failure) - the classes a green-path-only test cannot see.
 #
 # DNS shape (the relay-e2e lesson, adapted): the node runs dnsmasq on
-# 127.0.0.1 forwarding upstream to the QEMU resolver (10.0.2.3 - REQUIRED:
-# 0.16's reload validation resolves SpamPyzor through the system resolver,
-# and pyzor is disabled anyway per the relay-e2e transcript lesson), and
-# serves a REAL zone for the provisioned mail domain:
+# 127.0.0.1 serving a REAL zone for the provisioned mail domain. The
+# `server = ["10.0.2.3"]` entry below is a DEAD END in the test-driver
+# network (the QEMU user-net resolver is instantly unreachable there -
+# dig exit 9 in ~60 ms; docs/probes/2026-10-31-dnsmasq-forward/), NOT a
+# working upstream - it is kept because nothing here needs it: pyzor is
+# disabled (below), the probe's DNS inventory is the local zone + the
+# DNSBL mock, and the `local = [...]` lines force authoritative local
+# answers. Scope split: single-VM contexts DO have live slirp DNS at
+# 10.0.2.3; the multi-node test-driver network does not.
 #   mail.example.test.   MX 10 mail.example.test.   (points at the host)
 #   mail.example.test.   TXT "v=spf1 mx -all"
 #   _dmarc.mail.example.test. TXT "v=DMARC1; p=reject"

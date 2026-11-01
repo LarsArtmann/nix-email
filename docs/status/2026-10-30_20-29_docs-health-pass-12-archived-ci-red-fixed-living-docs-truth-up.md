@@ -13,13 +13,13 @@
 
 ## 0. TL;DR
 
-| Area              | Verdict                                                                                                                                             |
-| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| CI                | Found origin RED on master (run 40991974714), root-caused to the failing STEP (ruff F841 x2, 10-29 CalDAV probe), fixed (14934ac), floor re-run green |
-| ANNOTATE          | ~370 inline verdicts across 13 corridor files (status-items / repair / house prose grammar), check-rows green per file                                 |
-| ARCHIVE           | 12 files moved with manifests (11 status reports 2026-10-23 -> 10-28 + the exhausted Y-plan); completeness gate silent; 4 reports kept live BY DESIGN  |
-| Living docs       | TODO_LIST: 4 dead rows deleted + structural repairs; FEATURES: 4 rows corrected; ROADMAP: +1 open question, +1 backlog line; CHANGELOG: pass entry      |
-| Gates             | All green at yield (see header)                                                                                                                        |
+| Area        | Verdict                                                                                                                                               |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| CI          | Found origin RED on master (run 40991974714), root-caused to the failing STEP (ruff F841 x2, 10-29 CalDAV probe), fixed (14934ac), floor re-run green |
+| ANNOTATE    | ~370 inline verdicts across 13 corridor files (status-items / repair / house prose grammar), check-rows green per file                                |
+| ARCHIVE     | 12 files moved with manifests (11 status reports 2026-10-23 -> 10-28 + the exhausted Y-plan); completeness gate silent; 4 reports kept live BY DESIGN |
+| Living docs | TODO_LIST: 4 dead rows deleted + structural repairs; FEATURES: 4 rows corrected; ROADMAP: +1 open question, +1 backlog line; CHANGELOG: pass entry    |
+| Gates       | All green at yield (see header)                                                                                                                       |
 
 ## a) FULLY DONE (verified this session, evidence cited)
 
@@ -279,40 +279,40 @@
     machinery; MONITORING section 8 copy-paste specs).
 31. SystemNix description-sync refresh at the next material wrapper
     change (TODO row).
-32.contacts probe re-run at the NEXT stalwart bump (row re-armed
+    32.contacts probe re-run at the NEXT stalwart bump (row re-armed
     2026-10-28).
-33. Watch nixpkgs `stalwart` rename past 0.16 (standing TODO row).
-34. Vendored-module retirement when #552103 merges into the pin
+32. Watch nixpkgs `stalwart` rename past 0.16 (standing TODO row).
+33. Vendored-module retirement when #552103 merges into the pin
     (checklist in the module header).
-35. Extract the annotate driver into `scripts/` (e/1) or upstream the
+34. Extract the annotate driver into `scripts/` (e/1) or upstream the
     bullet grammar into annotate.go.
-36. check-rows continuation-row strictness (e/4; upstream note or
+35. check-rows continuation-row strictness (e/4; upstream note or
     `--strict`).
-37. Sheet hygiene: prefix ANSWERED rows (e/6) so a sitting cannot
+36. Sheet hygiene: prefix ANSWERED rows (e/6) so a sitting cannot
     re-answer settled calls.
-38. Arrow-freshness rule for kept-live reports (e/5; g/1 decides).
-39. Drift-alarm arm for the TODO sweep-banner date (10-23 f/27,
+37. Arrow-freshness rule for kept-live reports (e/5; g/1 decides).
+38. Drift-alarm arm for the TODO sweep-banner date (10-23 f/27,
     re-routed this pass, still unbuilt).
-40. Sheet-vs-decision-batch ID diff script (21-23 f/4; "not worth a
+39. Sheet-vs-decision-batch ID diff script (21-23 f/4; "not worth a
     check yet" - revisit if a sitting slip ever repeats).
-41. Exporter hardening backlog (ROADMAP theme 6: absolute-URL selftest,
+40. Exporter hardening backlog (ROADMAP theme 6: absolute-URL selftest,
     `--plain` parity, `--check` drift guard, ADR cross-links).
-42. Catalog content refresh at the next catalog session (exporter
+41. Catalog content refresh at the next catalog session (exporter
     bodies predate the v0.5.0 cut; Consumers section).
-43. EventCatalog publisher receipt loop: live URL verifies + screenshots
+42. EventCatalog publisher receipt loop: live URL verifies + screenshots
     appended to the 18-40 report (rides item 5).
-44. Traced-verbosity ARF variant (pins `incoming-report.*` event names;
+43. Traced-verbosity ARF variant (pins `incoming-report.*` event names;
     parked test idea).
-45. Aggregate-subtest delivery control (parked idea, defense in depth).
-46. Combined report-ingestion subtest (parked runtime optimization).
-47. Arch-diagram content-freshness audit (standing ROADMAP row; the
+44. Aggregate-subtest delivery control (parked idea, defense in depth).
+45. Combined report-ingestion subtest (parked runtime optimization).
+46. Arch-diagram content-freshness audit (standing ROADMAP row; the
     2026-09-15 renders were not re-viewed again).
-48. vulnix replacement once BuildFlow ships a working scanner (standing
+47. vulnix replacement once BuildFlow ships a working scanner (standing
     ROADMAP row).
-49. DOMAIN_LANGUAGE.md authoring post-v0.5.0 (standing ROADMAP row; the
+48. DOMAIN_LANGUAGE.md authoring post-v0.5.0 (standing ROADMAP row; the
     release has now shipped, so the "terms stabilize" precondition is
     met - first candidate to graduate).
-50. THIS report: annotate + archive when the pbx blessing lands
+49. THIS report: annotate + archive when the pbx blessing lands
     (f/2-3 close every open thread in it except the standing rows).
 
 ## g) Questions I cannot figure out myself

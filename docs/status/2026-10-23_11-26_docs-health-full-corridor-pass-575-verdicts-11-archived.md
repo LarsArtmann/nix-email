@@ -265,33 +265,33 @@
 ## f) Up to 50 things to get done next (ranked; this session's residues first)
 
 ~~1. **Annotate + archive the W-plan and X-plan** (docs/planning~~ **→ done — DONE same day (Y-plan F1): all five plans archived with Appendix R + manifest**
-   2026-10-19_02-34 and _07-35): first check whether they are already
-   fully struck (09-29 precedent), else verdict per task; then git mv to
-   docs/planning/archived/ + manifest row. The V/P plans are annotated
-   (W15) but also still unarchived - same pass can move all four.
+2026-10-19_02-34 and _07-35): first check whether they are already
+fully struck (09-29 precedent), else verdict per task; then git mv to
+docs/planning/archived/ + manifest row. The V/P plans are annotated
+(W15) but also still unarchived - same pass can move all four.
 ~~2. Add the corridor-scope line to AGENTS.md (edit an existing bullet -~~ **→ done — DONE same day (a/9): the ritual now sweeps docs/{status,planning,reviews}**
-   the 220 cap holds; candidate: the session-start ritual bullet).
+the 220 cap holds; candidate: the session-start ritual bullet).
 ~~3. Run `buildflow --max-time 30m` once over the final tree (the~~ **→ done — DONE (Y D5, a/16); re-run green 2026-10-26 (20-44 D3)**
-   half-honored gate; the md lints already ran standalone).
+half-honored gate; the md lints already ran standalone).
 4. Owner: **bless the pbx hermetic override** (TODO pbx row) - the single
-   highest-leverage open gate; it unlocks items 5-6.
+highest-leverage open gate; it unlocks items 5-6.
 5. On blessing: land the override in pbx's test, run their gate green,
-   then CLOSE the corridor tail - convert the ~24 open arrows in the two
-   kept-live reports to done-verdicts and archive both (the 12-17 report
-   pre-committed to exactly this).
+then CLOSE the corridor tail - convert the ~24 open arrows in the two
+kept-live reports to done-verdicts and archive both (the 12-17 report
+pre-committed to exactly this).
 6. Same landing: the nix-email-side CHANGELOG entry for the pbx flip
-   (12-17 f/49 - deliberately not pre-logged).
+(12-17 f/49 - deliberately not pre-logged).
 ~~7. Cut **v0.5.0** (C43): Unreleased date/link pass -> gates -> scratch-tag~~ **→ done — v0.5.0 RELEASED 2026-10-28 (cut commit 06ab701; tag-CI green after two diagnosed reds; gh release)**
-   dry-run -> annotated tag -> gh release -> SECURITY.md bump ->
-   SystemNix pin advance (runbook step 3).
+dry-run -> annotated tag -> gh release -> SECURITY.md bump ->
+SystemNix pin advance (runbook step 3).
 8. Owner sittings: C42/C44/C45 + C39/C41/C46 + the [rec] ratifications +
-   policy batch (C18/C19/C22/C24/C29/C34, Q4, demo g1/g2, qcow2, D1/D2
-   timeline, Resend key) - one sitting clears ~10 blocked rows.
+policy batch (C18/C19/C22/C24/C29/C34, Q4, demo g1/g2, qcow2, D1/D2
+timeline, Resend key) - one sitting clears ~10 blocked rows.
 ~~9. File the **#563651 follow-up comment** (watch row; your go + the two~~ **→ routed — ON HOLD per owner 2026-10-28 (draft review before posting; TODO watch row)**
-   filing gates) - the last un-informed upstream surface.
+filing gates) - the last un-informed upstream surface.
 ~~10. Probe-lint residue batch (new row): SIM115 x4 context managers,~~ **→ done — DONE (Y D4, a/7-a/8)**
-    FURB167 x2 re-flag aliases, PLW1510 x3 check= + the doctrine
-    decision (per-file-ignores vs chmod convention).
+FURB167 x2 re-flag aliases, PLW1510 x3 check= + the doctrine
+decision (per-file-ignores vs chmod convention).
 ~~11. Bake the `.buildflow.yml` step-timeout (new row; owner eyes).~~ **→ done — DONE (Y D2, a/6)**
 ~~12. bash -n lint over testScript fragments (new row).~~ **→ done — DONE (Y D1, a/3-a/5)**
 ~~13. migrate-e2e NO-backup-dir flow coverage (new row).~~ **→ done — DONE (Y E5, a/14)**
@@ -301,57 +301,57 @@
 ~~17. W6.7 EventSource ping probe (standing row).~~ **→ done — LANDED 2026-10-26 (docs/probes/2026-10-26-es-ping/)**
 ~~18. X15 TLS-node fixture breadth (standing row).~~ **→ done — LANDED 2026-10-26 (CHANGELOG)**
 19. X12.2 dnsmasq forward-vs-blackhole transcript BEFORE any filing
-    (standing row; scope split driver-vs-demo VM per 10-20).
+(standing row; scope split driver-vs-demo VM per 10-20).
 ~~20. X12.4 T13b dprint pipe-cell filing (standing row).~~ **→ done — RESOLVED-NO-FILING 2026-10-26: the bug is fixed upstream (markdown 0.28.2); plugin bumped**
 21. X13 BuildFlow upstream batch (standing row; their binary still stale).
 22. X18 SystemNix CI-debt lanes (standing row).
 23. X19 D1-unlock prep docs (standing rows; D1-gated).
 24. When the next BuildFlow binary lands: rebuild + ef32fa0..HEAD delta +
-    `buildflow -d` re-run (standing row).
+`buildflow -d` re-run (standing row).
 25. TELEMETRY.md full key re-verify against the pin on the next
-    telemetry-adjacent session (standing caveat; W7 banner was a spot-check).
+telemetry-adjacent session (standing caveat; W7 banner was a spot-check).
 26. Full README line-by-line read at the next docs-health pass (b/1
-    residue; low risk, nonzero).
+residue; low risk, nonzero).
 ~~27. Consider a docs-health drift-alarm arm for the TODO_LIST sweep-banner~~ **→ routed — idea stands, not built (the sweep banner is re-dated manually each pass)**
-    date (a stale "Last verification sweep" is exactly the class this
-    pass fixed; mechanical, cheap).
+date (a stale "Last verification sweep" is exactly the class this
+pass fixed; mechanical, cheap).
 28. Upstream watch cadence (standing row): #563651/#563652/#563777 +
-    mailsuite#65 re-check + the ~2026-11-05 mailsuite nudge decision.
+mailsuite#65 re-check + the ~2026-11-05 mailsuite nudge decision.
 29. Pin-advance contacts probe set (standing row) - rides any stalwart bump.
 30. Vendored-module retirement when #552103 merges into the pin
-    (standing row + module header checklist).
+(standing row + module header checklist).
 31. The stalwart rename watch past 0.16 (standing row).
 32. Demo banner ports/credentials re-verify on the next demo boot
-    (standing ritual note; demo-eval covers the contract mechanically).
+(standing ritual note; demo-eval covers the contract mechanically).
 33. When the wrapper option surface next changes: re-run the X6 audit
-    (standing ROADMAP note; consider the eval lint pairing idea).
+(standing ROADMAP note; consider the eval lint pairing idea).
 34. DOMAIN_LANGUAGE.md authoring when terms stabilize post-v0.5.0
-    (new ROADMAP row).
+(new ROADMAP row).
 35. Arch-diagram content-freshness audit (standing ROADMAP row; the four
-    2026-09-15 renders were not re-viewed this session).
+2026-09-15 renders were not re-viewed this session).
 36. vulnix replacement once BuildFlow ships a working scanner
-    (standing ROADMAP row).
+(standing ROADMAP row).
 37. aarch64: occasional local `nix flake check --all-systems` eval run
-    (standing ROADMAP posture).
+(standing ROADMAP posture).
 38. Queue-depth observability surface (standing ROADMAP row).
 39. Declarative catch-all option + typed secrets option (post-C44 ROADMAP
-    rows).
+rows).
 40. parsedmarc against a REAL 0.16 deployment (standing ROADMAP row).
 41. OIDC wiring (standing ROADMAP theme-6 row).
 42. Non-goals confirmation pass (standing ROADMAP row).
 43. Confirm the aarch64 lockstep shape at the next nixpkgs pin advance
-    (standing runbook item).
+(standing runbook item).
 ~~44. Parsedmarc fixture-cert note next to the bind-e2e cert comment~~ **→ done — DONE (Y E7, a/15)**
-    (14-19 f/32, one sentence).
+(14-19 f/32, one sentence).
 ~~45. Bind-e2e probe SAN comment (14-19 f/34, one line).~~ **→ done — DONE (Y E7, a/15)**
 46. CI ruff binary caching idea (14-19 f/36, parked).
 47. vm-debug.sh `--script-only` / `--check` ideas (parked).
 48. `--keep-machine-state` guidance for vm-debug.sh (parked).
 49. When the owner answers the cross-repo red-master tolerance question
-    (12-17 g/3, 14-19 g/3), encode the verdict where cross-repo lanes
-    read it.
+(12-17 g/3, 14-19 g/3), encode the verdict where cross-repo lanes
+read it.
 ~~50. Delete this report's own annotate-candidate marker: when items 1-7~~ **→ routed — items 4-6 (the pbx blessing) are still open, so THIS report stays live; its closed f-items were annotated 2026-10-30**
-    close, THIS report gets the same annotate -> archive treatment.
+close, THIS report gets the same annotate -> archive treatment.
 
 ## g) Questions I cannot figure out myself
 

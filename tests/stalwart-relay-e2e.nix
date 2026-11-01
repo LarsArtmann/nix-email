@@ -159,14 +159,19 @@ in
 
           # Bridge DNS for the relay hostname: stalwart's resolver is a
           # pure-DNS path that IGNORES /etc/hosts, so dnsmasq serves the
-          # test driver's node names while FORWARDING everything else to
-          # the QEMU user-net resolver (10.0.2.3 -> host DNS). The upstream
-          # forward is REQUIRED, not cosmetic: 0.16's reload validation
-          # resolves the SpamPyzor address through the system resolver, and
-          # the earlier black-hole upstream (192.0.2.1) failed the whole
-          # apply with "Invalid address: failed to lookup address
-          # information" (transcript 2026-10-16) - listeners never spawned
-          # and every subsequent subtest starved.
+          # test driver's node names. The `server = ["10.0.2.3"]` forward
+          # below is a DEAD END in this network, kept because green here
+          # never needs it: the QEMU user-net resolver is INSTANTLY
+          # unreachable in the test-driver net (dig exit 9, "no servers
+          # could be reached", in ~60 ms - transcript
+          # docs/probes/2026-10-31-dnsmasq-forward/), and SpamPyzor -
+          # the one reload-validation lookup that made a dead upstream
+          # fatal on 2026-10-16 - is explicitly DISABLED below, so every
+          # name the test resolves comes from dnsmasq's LOCAL zone.
+          # SCOPE SPLIT (the 10-19 report ask, settled 2026-10-31):
+          # single-VM contexts (`nix run .#vm`, build-vm) DO have live
+          # slirp DNS at 10.0.2.3 (demo transcript in the same probe
+          # dir); the multi-node test-driver network does not.
           dnsmasq = {
             enable = true;
             settings = {

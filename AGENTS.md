@@ -77,7 +77,11 @@ transcript-pinned dialect).
   use the `<path` prefix (read-from-file syntax inlines file CONTENTS
   into dovecot.conf); parsedmarc ini bools render Python-style
   (`ssl=True`); `arrival_date_utc` assertions are timezone-normalization
-  proofs (keep fixtures in >=1 non-UTC offset).
+  proofs (keep fixtures in >=1 non-UTC offset); multi-node VM tests have
+  NO 10.0.2.3 (no user-net NIC in the test-driver net - dig exit 9 in
+  ~60 ms, dnsmasq forwards are dead ends, single-VM demos DO have live
+  slirp DNS; probe 2026-10-31-dnsmasq-forward) - external-name deps
+  need a dnsmasq local zone.
 
 ## Conventions
 

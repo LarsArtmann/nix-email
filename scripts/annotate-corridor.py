@@ -164,7 +164,7 @@ def main():
     )
     with spec:
         for no in sorted(keyed):
-            spec.write("%s\t%s\n" % (keyed[no], verdicts[no]))
+            spec.write(f"{keyed[no]}\t{verdicts[no]}\n")
     spec_path = spec.name
 
     verify = run_annotate(
@@ -172,7 +172,7 @@ def main():
         expect_ok=False,
     )
     if verify.returncode != 0:
-        die("verify failed:\n%s%s" % (verify.stdout, verify.stderr))
+        die(f"verify failed:\n{verify.stdout}{verify.stderr}")
     print(verify.stdout.strip())
 
     if args.dry_run:
@@ -184,7 +184,7 @@ def main():
         annotate + ["status-items", args.file, spec_path], expect_ok=False
     )
     if apply_res.returncode != 0:
-        die("apply failed:\n%s%s" % (apply_res.stdout, apply_res.stderr))
+        die(f"apply failed:\n{apply_res.stdout}{apply_res.stderr}")
     print(apply_res.stdout.strip())
 
     if not args.skip_check_rows:
@@ -192,7 +192,7 @@ def main():
             annotate + ["check-rows", args.file], expect_ok=False
         )
         if check.returncode != 0:
-            die("check-rows gate failed:\n%s%s" % (check.stdout, check.stderr))
+            die(f"check-rows gate failed:\n{check.stdout}{check.stderr}")
         print(check.stdout.strip() or "check-rows: OK")
     os.unlink(spec_path)
 
@@ -246,7 +246,7 @@ def self_test():
     with open(spec, "w", encoding="utf-8") as fh:
         for no, key in zip(keyed_lines, keys):
             verdict = {3: "done", 4: "routed", first_table: "done", first_box: "done"}[no]
-            fh.write("%s\t%s\n" % (key, verdict))
+            fh.write(f"{key}\t{verdict}\n")
 
     v = subprocess.run(
         annotate + ["status-items", "--verify", corridor, spec],

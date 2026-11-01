@@ -7,14 +7,14 @@ stdlib (urllib/smtplib/imaplib); no in-guest commands.
 
 ## Results
 
-| Leg                                               | Result                                                                       |
-| ------------------------------------------------- | ----------------------------------------------------------------------------- |
-| Anon JMAP session `GET /.well-known/jmap`         | 200, `primaryAccounts: {}`, absolute `apiUrl` (`.../jmap/`), `downloadUrl` present - the documented 0.16 shape |
-| AUTH submission 2587 (STARTTLS + LOGIN)           | accepted; sender=recipient `demo@mail.demo.test`                              |
-| IMAPS round-trip 2593                             | DELIVERED within seconds (needle `d8-smoke-e2af063665a0`)                     |
-| Inbound 2525 to unknown local part `@mail.demo.test` | 250 accepted (catch-all contract)                                          |
-| Inbound 2525 to `@demo.test` (wrong domain)       | `550 5.1.2 Relay not allowed` - strict rejection OUTSIDE the provisioned domain (the negative leg) |
-| Catch-all mailbox delivery leg                    | NOT asserted: the target is the credential-less `catchall@mail.demo.test` account (by design, demo-eval pins it); the README's claim is SMTP-accept semantics, which the two legs above pin |
+| Leg                                                  | Result                                                                                                                                                                                      |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Anon JMAP session `GET /.well-known/jmap`            | 200, `primaryAccounts: {}`, absolute `apiUrl` (`.../jmap/`), `downloadUrl` present - the documented 0.16 shape                                                                              |
+| AUTH submission 2587 (STARTTLS + LOGIN)              | accepted; sender=recipient `demo@mail.demo.test`                                                                                                                                            |
+| IMAPS round-trip 2593                                | DELIVERED within seconds (needle `d8-smoke-e2af063665a0`)                                                                                                                                   |
+| Inbound 2525 to unknown local part `@mail.demo.test` | 250 accepted (catch-all contract)                                                                                                                                                           |
+| Inbound 2525 to `@demo.test` (wrong domain)          | `550 5.1.2 Relay not allowed` - strict rejection OUTSIDE the provisioned domain (the negative leg)                                                                                          |
+| Catch-all mailbox delivery leg                       | NOT asserted: the target is the credential-less `catchall@mail.demo.test` account (by design, demo-eval pins it); the README's claim is SMTP-accept semantics, which the two legs above pin |
 
 ## Notes
 
