@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- README version lockstep check (`readme-version-lockstep`,
+  2026-11-02): the status block's `Stalwart **x**` / `parsedmarc **y**`
+  anchors are compared against the versions the flake actually builds,
+  both taken from the same pinned `pkgs` (`stalwart_0_16` is the wrapper
+  default, `parsedmarc` the wrapped attrs) - no hand-written list. A pin
+  advance that forgets the front door now fails `nix flake check` instead
+  of shipping a README that advertises the previous pair. Scoped to the
+  status block on purpose: every other `0.16.x` mention is history and a
+  blanket textual check would fail on correct prose. Self-tested (drifted
+  literal fails, correct one passes, missing anchors fail closed), the
+  script is ruff-clean under the CI floor, and the check is registered in
+  `tests/check-expected.json` on both arches with a README prose row.
 - Markdown anchor/Contents lint (`scripts/check-md-anchors.sh`,
   2026-11-02): every in-file `#anchor` must resolve to a heading and every
   level-2 heading must appear exactly once in a file's `## Contents`

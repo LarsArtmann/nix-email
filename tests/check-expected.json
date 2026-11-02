@@ -5,18 +5,20 @@
     "dmarc-eval",
     "migrate-convert-eval",
     "module-import-eval",
-    "provision-plan-eval"
+    "provision-plan-eval",
+    "readme-version-lockstep"
   ],
   "x86_64-linux": [
     "check-set-lockstep",
     "deliverability-e2e",
+    "demo-eval",
     "deprecated-alias-lint",
     "dmarc-eval",
-    "demo-eval",
     "migrate-convert-eval",
     "module-import-eval",
     "parsedmarc-e2e",
     "provision-plan-eval",
+    "readme-version-lockstep",
     "stalwart-bind-e2e",
     "stalwart-e2e",
     "stalwart-migrate-e2e",

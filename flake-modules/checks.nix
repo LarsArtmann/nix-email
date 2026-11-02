@@ -113,6 +113,29 @@
               --aliases ${pkgs.path}/pkgs/top-level/aliases.nix ${../.}
             touch $out
           '';
+        # README version lockstep (2026-11-02): the status block is the ONE
+        # canonical place stating which versions this flake ships, and it
+        # used to be hand-maintained prose - a pin advance could move
+        # flake.lock and the module defaults while the front door kept
+        # claiming the old pair. Both values come from the SAME pkgs the
+        # build uses (`stalwart_0_16` is the wrapper default in
+        # modules/mail-server.nix, `parsedmarc` the attr the dmarc module
+        # wraps), so an advance that forgets the README fails HERE.
+        # Deliberately scoped to the status block: every other 0.16.x
+        # mention is history ("0.16.22 until the 2026-10-28 advance", the
+        # delta table) and a blanket textual check would fail on correct
+        # prose. Self-tested both directions first.
+        readme-version-lockstep =
+          pkgs.runCommand "readme-version-lockstep" {
+            nativeBuildInputs = [pkgs.python3];
+          } ''
+            python3 ${../scripts/check-readme-versions.py} --self-test
+            python3 ${../scripts/check-readme-versions.py} \
+              --readme ${../README.md} \
+              --stalwart ${pkgs.stalwart_0_16.version} \
+              --parsedmarc ${pkgs.parsedmarc.version}
+            touch $out
+          '';
       }
       // pkgs.lib.optionalAttrs (system == "x86_64-linux") {
         # Demo-host contract (2026-10-06): flake check already forces the
