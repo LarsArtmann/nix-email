@@ -198,6 +198,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- Living-docs truth pass (2026-11-02): FEATURES.md's backup row claimed
+  `stalwart-vandelay` is absent from the pinned nixpkgs (it has been in
+  since fe132422 at 1.0.12, eval-verified 2026-10-31 - only the live-store
+  compare remains), its check-gate row restated a check count that had
+  already rotted (13) and now names the checks and points at
+  `tests/check-expected.json` as the single count source, and both CI rows
+  now list the new anchor/Contents lint step and the latest verified green
+  run. The 2026-11-02 05-44 status report's README line references were
+  replaced with section names - the numbers rotted within the hour they
+  were written, which is the report's own lesson applied.
 - README claim hygiene (2026-11-02): the Non-goals paragraph's competitor
   judgement (Mailcow/Mailu "Docker-first, heavy") now carries its
   assessment date and says it was not re-measured, instead of reading like

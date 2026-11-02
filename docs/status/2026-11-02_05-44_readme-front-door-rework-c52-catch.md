@@ -18,25 +18,26 @@
 
 ## a) FULLY DONE
 
-1. **Hero + status** - README:1-30. Pitch keeps the concrete design basis
+1. **Hero + status** - the README hero + status blockquote. Pitch keeps the concrete design basis
    (Hetzner VPS inbound, Resend relay, evo-x2 parsing, the internal
    selfhosted-email-guide study), then `nix run github:LarsArtmann/nix-email#vm`,
    then a five-line status block whose detail already lives in CHANGELOG
    (`fe132422` ride-alongs at CHANGELOG.md:252/545/820) and
    [0.5.0] (CHANGELOG.md:243).
-2. **`## Contents`** - README:32-50, 18 rows. Anchors generated from the
+2. **`## Contents`** - the README Contents block, one row per section. Anchors generated from the
    headings with a GitHub slugger and then verified: every `#anchor`
    resolves to a real heading (0 broken).
 3. **Quickstart hoisted** - the demo VM section moved out of
-   `## Development` to README:53; first runnable command is line 19
-   (was ~825). JMAP/contacts quickstarts moved with it and were demoted one
+   `## Development` to its own `## Quickstart` section near the top; the first
+   runnable command sat within the first 20 lines (it was ~825).
+   JMAP/contacts quickstarts moved with it and were demoted one
    level. `tests/demo-eval.nix` comment updated to the new heading name
    (comments only; no assertion touched).
 4. **Install snippet** - `## SystemNix integration (planned shape)` lost
    the stale label (the consumer wrapper EXISTS, per the paragraphs below
    it) and gained a real flake-input + `nixosModules.default` + required
-   `hostname`/`admin.secretFile` snippet (option names checked against the
-   module assertions, `modules/mail-server.nix:820`).
+   `hostname`/`admin.secretFile` snippet (option names checked against
+   the module's `admin.secretFile` assertion).
 5. **Footer sections** - License (MIT), Security (links
    docs/THREAT_MODEL.md + SECURITY.md), Contributing (links CONTRIBUTING,
    CHANGELOG, TODO_LIST, FEATURES). CONTRIBUTING was previously named in
