@@ -8,14 +8,14 @@
 
 ## 0. TL;DR
 
-| Area                | Verdict                                                                                                                                                                                          |
-| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| nix-email master    | GREEN through `3b4286e` (run 41372640022): the full 15-commit tail pushed; one intermediate red (dprint on the raw TODO row - the daemon raced my fmt fix out of the push; root-caused by STEP NAME, fixed, re-pushed green) |
-| Full gate           | `nix flake check` EXIT:0 WITH builds on the final tree (4 eval-class derivations rebuilt; VM e2e cache-valid from this session's executed runs)                                                   |
-| Report e/1-e/3      | ALL CLOSED: DnsResolver Custom dialect ledgered in README 0.16; vm-debug `--check` rejects path-like check names (guard proven, shellcheck clean); probe connection-pacing rowed                  |
-| Hub A5.2/A5.3       | A5.2 EXECUTED (hub master `97d0223..cdfb512` pushed to the Forgejo; build.yml fires on push); A5.3 T8 VERIFIED live (bodies, chips, ADR routes - receipts in a/6) - but against the STALE 10-28 build |
-| Hub freshness       | BROKEN since 2026-10-28T03:38Z: four 03:23 nightlies missed, the stale-sources OVERDUE self-heal is not landing, and the push-triggered run stayed unpublished after ~2 h - owner eyes on evo-x2 needed (b/1) |
-| Still owner-gated   | O1 sitting (the >51% unlock), all C/B/D/R lanes unchanged; H1.3 (f12ed24 report) still absent                                                                                                    |
+| Area              | Verdict                                                                                                                                                                                                                      |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| nix-email master  | GREEN through `3b4286e` (run 41372640022): the full 15-commit tail pushed; one intermediate red (dprint on the raw TODO row - the daemon raced my fmt fix out of the push; root-caused by STEP NAME, fixed, re-pushed green) |
+| Full gate         | `nix flake check` EXIT:0 WITH builds on the final tree (4 eval-class derivations rebuilt; VM e2e cache-valid from this session's executed runs)                                                                              |
+| Report e/1-e/3    | ALL CLOSED: DnsResolver Custom dialect ledgered in README 0.16; vm-debug `--check` rejects path-like check names (guard proven, shellcheck clean); probe connection-pacing rowed                                             |
+| Hub A5.2/A5.3     | A5.2 EXECUTED (hub master `97d0223..cdfb512` pushed to the Forgejo; build.yml fires on push); A5.3 T8 VERIFIED live (bodies, chips, ADR routes - receipts in a/6) - but against the STALE 10-28 build                        |
+| Hub freshness     | BROKEN since 2026-10-28T03:38Z: four 03:23 nightlies missed, the stale-sources OVERDUE self-heal is not landing, and the push-triggered run stayed unpublished after ~2 h - owner eyes on evo-x2 needed (b/1)                |
+| Still owner-gated | O1 sitting (the >51% unlock), all C/B/D/R lanes unchanged; H1.3 (f12ed24 report) still absent                                                                                                                                |
 
 ## a) FULLY DONE (this session; evidence inside)
 

@@ -278,6 +278,18 @@ transcript-pinned dialect).
 
 ## EventCatalog integration (catalog.home.lan)
 
+- Hub publish-chain observables (verified 2026-11-02): the hub repo is
+  CANONICAL on the evo-x2 Forgejo (`origin` = forgejo@evo-x2.home.lan;
+  the GitHub twin is a no-push downstream mirror); build.yml fires on
+  master push and publishes dist/ to the SEPARATE repo
+  `lars/eventcatalog-hub-dist` (branch `dist`), which SystemNix's
+  architecture-catalog-sync unit serves at catalog.home.lan. Watch chain
+  from a session: `git ls-remote forgejo@evo-x2.home.lan:lars/eventcatalog-hub-dist.git`
+  for the dist tip + `https://catalog.home.lan/build-stamp.json` for
+  builtAt; the Forgejo UI/API is closed to anonymous (run state itself
+  is NOT observable without host access). nix-email content reaches the
+  site only via the Forgejo mirror of the GitHub repo (<=6 h pull) ->
+  next build; a source push is NOT live until that whole chain lands.
 - `scripts/export-catalog.py` is the ONLY content source for the
   eventcatalog-hub adoption; edit its data dicts, never a generated tree.
   Adoption lives in the HUB's `sources.manual.json` (depgraph discovers
