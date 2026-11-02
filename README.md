@@ -293,14 +293,21 @@ and nothing else:
   (`mkPackageOption pkgs "name"`, `pkgs.${name}`) are invisible to it.
 - `readme-version-lockstep`: pure-build guard (python, no VM) asserting
   that the status block at the top of this README names the versions the
-  flake actually builds - `stalwart_0_16` (the wrapper default) and
-  `parsedmarc` (both derived from the SAME pinned `pkgs`, not from a
-  hand-written list). The block used to be hand-maintained prose, so a pin
-  advance could move `flake.lock` and the module defaults while the front
-  door kept advertising the old pair. Deliberately scoped: other `0.16.x`
-  mentions are history ("0.16.22 until the 2026-10-28 advance", the delta
-  table) and stay prose. Self-tested both directions (a drifted literal
-  fails, a correct one passes, missing anchors fail closed).
+  flake actually builds. The Stalwart value is DERIVED from the wrapper
+  module's own default (`services.stalwart.package` in
+  `modules/mail-server.nix`, evaluated with `services.mail-server` on),
+  never retyped into the check, so a pin that renames the package attr
+  cannot leave the guard comparing a stale one; `parsedmarc` is the attr
+  the dmarc module wraps. The block used to be hand-maintained prose, so a
+  pin advance could move `flake.lock` and the module defaults while the
+  front door kept advertising the old pair. Deliberately scoped to the
+  status block's first paragraph: other `0.16.x` mentions are history
+  ("0.16.22 until the 2026-10-28 advance", the delta table) and stay
+  prose. Self-tested both directions (a drifted literal fails, a correct
+  one passes, missing anchors fail closed), and its sibling
+  `readme-version-lockstep-fires` plants a wrong version in a copy of this
+  README and fails if the guard accepts it - the drift class is proven
+  caught, not assumed.
 - `stalwart-e2e`: real Stalwart 0.16.26 in a VM (0.16.22 until the
   2026-10-28 fe132422 advance) - declarative provisioning
   plan applied clean (accounts incl. quota + alias, dual declarative DKIM
