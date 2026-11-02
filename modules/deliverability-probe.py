@@ -779,6 +779,7 @@ def check_canary_inbound(config):
             started,
             "send",
             f"unauthenticated :25 submission failed: {type(exc).__name__}: {exc}",
+            name="canary-inbound",
         )
     result["phase"] = "deliver"
 
@@ -810,12 +811,12 @@ def check_canary_inbound(config):
     return {"check": _inbound_check(result, PASS, detail), **result}
 
 
-def _canary_fail(result, started, phase, detail):
+def _canary_fail(result, started, phase, detail, name="canary-roundtrip"):
     result["phase"] = phase
     result["elapsed_s"] = round(time.monotonic() - started, 1)
     return {
         "check": Check(
-            "canary-roundtrip",
+            name,
             "critical",
             FAIL,
             f"{detail} (phase: {phase})",

@@ -182,8 +182,19 @@ in
             # dnsbl.test is LOCAL too: an unlisted IP must get an
             # authoritative NXDOMAIN from dnsmasq, never a forwarded
             # query into the QEMU resolver's black hole (the first run's
-            # dig exit-9 timeout lesson, 2026-10-30).
-            local = ["/mail.example.test/" "/dnsbl.test/"];
+            # dig exit-9 timeout lesson, 2026-10-30). Same lesson for
+            # the REVERSE zone (2026-11-02, the inbound-canary leg):
+            # stalwart's inbound RCPT policy resolves the connecting
+            # client's PTR; 127.in-addr.arpa forwarded upstream = the
+            # dead 10.0.2.3 = a ~15 s stall that eats the probe's socket
+            # timeout at RCPT time (first inbound-canary run, send-phase
+            # disconnect). Every name the probe or the server resolves
+            # mid-dialog must be answered LOCALLY.
+            local = [
+              "/mail.example.test/"
+              "/dnsbl.test/"
+              "/127.in-addr.arpa/"
+            ];
             host-record = ["mail.example.test,127.0.0.1"];
             mx-host = ["mail.example.test,mail.example.test,10"];
             txt-record = [
@@ -192,7 +203,12 @@ in
               "rs._domainkey.mail.example.test,v=DKIM1; k=rsa; p=testpublickey"
             ];
             address = ["/2.0.0.127.dnsbl.test/127.0.0.2"];
-            ptr-record = ["3.0.0.127.in-addr.arpa,mail.example.test"];
+            ptr-record = [
+              "3.0.0.127.in-addr.arpa,mail.example.test"
+              # the loopback client's own reverse (the probe connects to
+              # the host-record 127.0.0.1): answer it authoritatively
+              "1.0.0.127.in-addr.arpa,mail.example.test"
+            ];
           };
         };
       };
