@@ -43,6 +43,16 @@ the ini generator renders booleans Python-style (`True`/`False`, not
 - All wrapper defaults are `mkDefault`; consumers override through
   `services.stalwart.settings` / `services.parsedmarc.settings`. Exceptions
   (e.g. the firewall port list) carry a comment explaining why.
+- Never name an unversioned package attribute in a default or fixture:
+  deprecated nixpkgs attrs ride `warnAlias` and print an evaluation
+  warning on EVERY force (a per-rebuild tax on every consumer while the
+  gate stays green). Write `pkgs.stalwart_0_16`, not `pkgs.stalwart`.
+  `deprecated-alias-lint` catches `pkgs.<name>` selections; to run it by
+  hand: `nix build .#checks.x86_64-linux.deprecated-alias-lint -L` (the
+  check itself self-tests first), or
+  `python3 scripts/check-deprecated-aliases.py --aliases "$(nix eval
+  --impure --raw --expr 'let f = builtins.getFlake (toString ./.); in
+  f.inputs.nixpkgs.outPath')/pkgs/top-level/aliases.nix" .`
 - Every config key emitted by the wrapper needs either a ledger bullet or a
   source comment naming the verified origin. No guessed keys.
 - Behavior changes need test coverage: VM E2E for behavior

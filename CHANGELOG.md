@@ -109,10 +109,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   (`intel-oneapi.base`) aliases, and self-tests both directions before
   scanning. Registered in `tests/check-expected.json` (both arches) and
   the README check list; run against the pre-fix tree it reports exactly
-  `migration.nix:64` and the migrate-e2e fixture.
+  `migration.nix:64` and the migrate-e2e fixture. Hardened 2026-11-02: a
+  parse-yield floor (>= 150 aliases; the current pins ship 215/227) turns
+  the reformat hazard - nixpkgs reindenting `aliases.nix` so the
+  line-shape parser silently yields nothing - into a loud failure
+  instead of a vacuous green; the floor is self-tested with a
+  warnAlias-moved-to-its-own-line fixture.
+- VM/debug tooling batch (2026-11-01/02): `scripts/demo-console.sh`
+  mechanizes the FIFO-console recipe for the demo VM (session dir under
+  /tmp, `sleep infinity` holder, hard timeout defaulting to 1800 s that
+  kills the whole process group, orphan-QEMU sweep - the recipe is one
+  wrong redirection away from a hung QEMU holding the demo-disk write
+  lock); `scripts/demo-smoke.py` runs the 5-leg demo smoke in one
+  command (anon JMAP, AUTH submission 587 STARTTLS+LOGIN, IMAPS needle
+  round-trip, catch-all accept on 2525, strict 550 reject; creds/ports
+  per the README quickstart); `scripts/vm-debug.sh` gained
+  `--script-only` (prints the driver command line and SKIPS the GC-root
+  build, which IS the VM test run) and `--check` (py_compile + the
+  baked-in debug-rule lint), relocates /tmp script paths into the cache
+  dir, and generates its starter under `~/.cache/nix-email/vm-debug/`.
+  Transcript: docs/probes/2026-11-01_demo-smoke-tooling/.
+- `.#ruff-floor` flake app (2026-11-02): the CI ruff error-floor step
+  now evals straight to this flake's pinned ruff instead of
+  `github:NixOS/nixpkgs/<rev>#ruff`, whose registry eval walk consumed
+  the whole measured 10 s step budget (run 41265954894). Same rule
+  floor (E4,E7,E9,F), identical binary to the devShell; the
+  never-firing self-test fixture is kept.
 
 ### Changed
 
+- docs/TELEMETRY.md 0.15-era compression (2026-11-01): the operative
+  truth now leads - the 2026-10-31 D8 re-verify of the 0.16.26 binary
+  (37-series HELP set identical to the 0.16.22 transcription,
+  `queue_rescheduled` lazily registered) - with the four dated
+  0.15-era update notes collapsed into one History paragraph; the
+  section-8 checklist item fixed (was "pinned 0.15.5") and the
+  section-9 caveat resolved.
 - Unified the flake formatter (2026-11-01): `nix fmt` is now a wrapper
   that runs alejandra on `.nix` and dprint on json/yaml/markdown/
   dockerfile, so `nix fmt -- . --check` - the CI and pre-push gate

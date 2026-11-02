@@ -173,7 +173,13 @@ and nothing else:
   pkgs.stalwart` in the 0.15 migration leg - printed on every consumer
   rebuild while the gate and the deployment stayed green (2026-11-01
   pbx-artmann switch noise); the fix is always the versioned attribute
-  (`stalwart_0_15`). Self-tests both directions before scanning.
+  (`stalwart_0_15`). Self-tests both directions before scanning, and a
+  parse-yield floor (>= 150 aliases) fails loudly if nixpkgs ever
+  reformats `aliases.nix` instead of scanning vacuously. Known blind
+  spots (deliberate, see the checker docstring): only `pkgs.<name>`
+  selections are matched - `with pkgs;`-scoped bare names, quoted
+  selections (`pkgs."name"`), and programmatic construction
+  (`mkPackageOption pkgs "name"`, `pkgs.${name}`) are invisible to it.
 - `stalwart-e2e`: real Stalwart 0.16.26 in a VM (0.16.22 until the
   2026-10-28 fe132422 advance) - declarative provisioning
   plan applied clean (accounts incl. quota + alias, dual declarative DKIM
