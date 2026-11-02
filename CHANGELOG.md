@@ -127,7 +127,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   `--script-only` (prints the driver command line and SKIPS the GC-root
   build, which IS the VM test run) and `--check` (py_compile + the
   baked-in debug-rule lint), relocates /tmp script paths into the cache
-  dir, and generates its starter under `~/.cache/nix-email/vm-debug/`.
+  dir, rejects a path-like check name with a usage hint (flags before
+  positionals - the arg-order faceplant class), and generates its
+  starter under `~/.cache/nix-email/vm-debug/`.
   Transcript: docs/probes/2026-11-01_demo-smoke-tooling/.
 - `.#ruff-floor` flake app (2026-11-02): the CI ruff error-floor step
   now evals straight to this flake's pinned ruff instead of

@@ -1206,6 +1206,19 @@ json/yaml/markdown.
   /etc/hosts made `relay` resolvable; the NixOS test driver's /etc/hosts
   injection alone did not). Same mechanism any VM test needs for hostname
   relay targets.
+- Stalwart's OWN resolver is NOT the system resolver by default (VERIFIED
+  2026-11-02, deliverability-e2e take-4 transcript): inbound sender-auth
+  (SPF/iprev) post-DATA lookups ignored the node's local dnsmasq
+  (`/etc/resolv.conf` pointed at it) and went to an external resolver the
+  driver network black-holes - EHLO/MAIL/RCPT/DATA-354 all 0.0 s, post-DATA
+  reply > 25 s, inbound canary dead at socket timeout. Pointing stalwart at
+  a local resolver is the `DnsResolver` provision singleton in the 0.16
+  object dialect, discovered through the Lua typecheck ladder (`unknown key
+  resolver` -> `expected object DnsCustomResolver` -> `unknown key @type` on
+  the array element -> accepted): `DnsResolver."@type" = "Custom";
+  DnsResolver.servers = [{address = "127.0.0.1";}]` - array elements carry
+  NO `@type`. Contrast the DNS-less-VM `Cloudflare` singleton (module
+  verdict above): same singleton id, different `@type` payload.
 - The nixpkgs parsedmarc unit runs as a DynamicUser and prepares NO writable
   state; parsedmarc 11.0.1 os.makedirs()es its output directory on first
   write, which fails on root-owned /var/lib without `StateDirectory`

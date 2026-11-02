@@ -52,6 +52,18 @@ done
 
 CHECK="${1:-stalwart-e2e}"
 SCRIPT="${2:-}"
+
+# Guard (2026-11-02 report d/1 faceplant class): a path in the CHECK slot
+# means flags ate the positionals - fail fast with the fix instead of a
+# slow "no such check" eval walk.
+case "$CHECK" in
+*/* | .*)
+	echo "error: check name '$CHECK' looks like a path - flags must come BEFORE the positionals" >&2
+	echo "usage: $0 [--script-only] [--check] <check-name> [test-script]" >&2
+	exit 1
+	;;
+esac
+
 CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/nix-email/vm-debug"
 mkdir -p "$CACHE_DIR"
 
