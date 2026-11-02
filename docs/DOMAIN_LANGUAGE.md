@@ -11,6 +11,11 @@ Bounded contexts: the wrapper and its fleet (consumption), the Stalwart
 provisioning plan dialect (the core model), outbound delivery, inbound
 protection, DMARC monitoring, and the store lifecycle.
 
+Scope: this is the MAIL domain's vocabulary. Repo-meta terms ("front
+door", "text gate", "lockstep check", "Contents") deliberately live in
+CONTRIBUTING's gate sections instead, so a reader of the mail model never
+has to wade through linting jargon.
+
 ## The wrapper and the fleet
 
 - **Wrapper** - this flake's two NixOS modules, `services.mail-server`

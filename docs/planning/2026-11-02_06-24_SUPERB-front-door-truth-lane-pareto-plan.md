@@ -428,3 +428,32 @@ Two disclosures rather than silent claims:
   not boot the demo VM (the 2026-10-31 smoke is the last boot transcript).
 - The status-report skill edit landed in the SKILLS repo, not here; this repo
   only records it (the fan-out symlink resolves to the edited file).
+
+---
+
+## 11. Follow-up pass (2026-11-02, same day, second sitting)
+
+The 07-44 self-review (§d/§f of
+`docs/status/2026-11-02_07-44_front-door-lane-executed-gaps-and-defects.md`)
+convicted the lane's own gates: the anchor lint failed CORRECT markdown on
+any unicode heading, and it never looked at reference-style or HTML anchors.
+This pass closes that list rather than queueing it.
+
+| Item | State | Evidence |
+| ---- | ----- | -------- |
+| Unicode slugger | FIXED | awk replaced by `scripts/check-md-anchors.py` (the awk class strips non-ASCII; CI's awk is mawk and has no multibyte classes). `Grüße & Maß` resolves to `#grüße--maß` (EXIT 0) and rejects `#grüße--ma` (EXIT 1) |
+| Anchor forms | FIXED | inline, `[label]: #slug` definitions and `href="#slug"` all inspected, percent-encoded destinations decoded; probes on temp files each exit 1 |
+| Fixture matrix | DONE | 17 self-test cases (unicode both ways, reference/HTML, duplicate suffixes, table cells, fences, percent-encoding); six seeded-defect probes on copies of the real README |
+| Archived corridors | DECIDED | linted like everything else (all 146 tracked files pass); if a future rule breaks a frozen snapshot, the append-only policy wins - note or exclude with the reason written down |
+| Claims | CORRECTED | script header, CHANGELOG entry, CI step comment, CONTRIBUTING, AGENTS all describe the true coverage |
+| Wrapper-derived version | FIXED | `readme-version-lockstep` reads `services.stalwart.package` out of a `nixosSystem` eval of `modules/mail-server.nix` (0.7 s), so a renamed package attr cannot leave it comparing a stale one |
+| Negative test | ADDED | `readme-version-lockstep-fires` copies the real README, plants `Stalwart **0.0.0**` and fails if the lint accepts it; registered in `tests/check-expected.json` (both arches) + the README check list |
+| Scope of the version check | HARDENED | only the FIRST blockquote paragraph is canonical, so a dated verification paragraph cannot smuggle a second version; self-tested |
+| Text-gate map | DONE | CONTRIBUTING "Text gates" table (seven scripts, one failure class each) + `scripts/selftest-docs-gates.sh` so the map is executable |
+| Docs truth sweep | DONE | AGENTS text-gate command list, FEATURES rows for both lints, CI row freed of run ids, TODO_LIST row-change notes merged, ADR count re-read (8), `docs/probes/README.md` index, DOMAIN_LANGUAGE scope note, CONTRIBUTING daemon/branch-protection honesty |
+
+Gate for this pass: both flake checks build green (cache-cold), their aarch64
+derivations eval, `check-inventory.sh` 0, the full `nix flake check` 0,
+`nix fmt -- . --check` 0, every text gate 0, ruff floor 0, shellcheck 0,
+actionlint 0. Pushed with the pre-push guards green; CI `ci.yml` green on the
+resulting head on 2026-11-02 (run ids stay in status reports, not here).

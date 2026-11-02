@@ -301,6 +301,12 @@ the hook fires, run `nix fmt -- .` and re-push. Fresh clones must re-set
 `git config core.hooksPath .githooks` - hooksPath is repo-LOCAL config and
 the hook directory dangles silently without it (CI is the real gate).
 
+What this hook does NOT cover: the auto-commit daemon on this workstation
+pushes WITHOUT running git hooks, and branch protection does not block it
+(decision C18). A green `pre-push` therefore says nothing about what the
+daemon already shipped - `ci.yml` is the only guarantee, and a red run is
+never dismissed as "the known one" without reading the failing step name.
+
 ## Probe scripts (docs/probes)
 
 Probe/bench/forensic scripts are first-class Python and stay **ruff-clean

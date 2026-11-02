@@ -921,7 +921,16 @@ inside nixpkgs are invisible to it, so the checks below are manual):
      without KVM); REAL hosts need a v2-capable CPU check on the
      consumer side. The 0.16.26-overlay question (C45) is superseded -
      the pin itself now ships 0.16.26.
-3. **Advance the SystemNix consumer pin**: update the `nix-email` input rev
+3. **Update the front door in the same commit**: the status blockquote's
+   `Stalwart **x.y.z**` / `parsedmarc **x.y.z**` pair must name what the new
+   pin builds - `readme-version-lockstep` fails the gate otherwise, and its
+   `-fires` sibling proves that failure really fires. Re-run the dated
+   verification pass while you are there (the FD4 surface: every module
+   option name, the migration marker/port/dump paths, the runbook package
+   claims, the demo port table, every cited `docs/probes/` path), rewrite
+   the `**Verified <date>**` paragraph with what you re-checked and what
+   you did NOT, and advance the pin rev named in the status line.
+4. **Advance the SystemNix consumer pin**: update the `nix-email` input rev
    (hard rev or release tag - see PIN DISCIPLINE above), `nix flake update
    nix-email`, restore any option-gated test cases the old pin forced out
    (the relay-credential assertions were the first instance), delete dead
@@ -933,7 +942,7 @@ inside nixpkgs are invisible to it, so the checks below are manual):
    flake-parts node) or accept a second lock node; nix-email floats
    flake-parts (lock-pinned), so `nix flake update flake-parts` moves it
    independently of nixpkgs.
-4. Tag a release here when the modules changed; SystemNix's pin should
+5. Tag a release here when the modules changed; SystemNix's pin should
    reference it (the consumer contract is versioned by the tag, the exact
    rev stays locked in flake.lock).
 
