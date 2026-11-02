@@ -310,3 +310,22 @@ items this report had to leave open.
    expected classes: `.config/`, `.crush`, `__pycache__/`, `*.log` probe
    transcripts and the python caches. No unignored stray build output, no
    untracked artifact at the repo root.
+6. **f/16 - the demo port table is contract-pinned and the check is
+   green.** `nix build .#checks.x86_64-linux.demo-eval` EXIT 0;
+   `tests/demo-eval.nix` asserts `forwardPairs =
+   "127.0.0.1:18080->8080,127.0.0.1:2525->25,127.0.0.1:2587->587,
+   127.0.0.1:2593->993"`, which is exactly the README quickstart table.
+7. **f/22 - the consumer snippet matches the real wrapper.** Read
+   `SystemNix/modules/nixos/services/nix-email.nix`: it imports
+   `inputs.nix-email.nixosModules.default` and sets
+   `services.mail-server.*` / `services.dmarc-monitor.*`; this flake
+   exports `nixosModules.default` (mail-server + dmarc-monitor) as the
+   README claims, and the required `hostname` / `admin.secretFile` pair is
+   the module's own eval assertion. No drift, no snippet change needed.
+8. **f/7 - the remote flake really resolves.** `nix flake metadata
+   github:LarsArtmann/nix-email` locks rev `8d70c9d` (lastModified
+   2026-11-02) and `nix eval github:LarsArtmann/nix-email#apps.x86_64-linux`
+   lists `deliverability-probe host-parse-fixture ruff-floor vm`, so the
+   README's `nix run github:LarsArtmann/nix-email#vm` one-liner names a
+   real app. The VM itself was not booted in this pass (a full demo boot
+   is its own 10-minute ride and it was smoke-tested 2026-10-31).
