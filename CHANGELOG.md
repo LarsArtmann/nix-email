@@ -12,26 +12,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - README version lockstep check (`readme-version-lockstep`,
   2026-11-02): the status block's `Stalwart **x**` / `parsedmarc **y**`
   anchors are compared against the versions the flake actually builds,
-  both taken from the same pinned `pkgs` (`stalwart_0_16` is the wrapper
-  default, `parsedmarc` the wrapped attrs) - no hand-written list. A pin
-  advance that forgets the front door now fails `nix flake check` instead
-  of shipping a README that advertises the previous pair. Scoped to the
-  status block on purpose: every other `0.16.x` mention is history and a
-  blanket textual check would fail on correct prose. Self-tested (drifted
-  literal fails, correct one passes, missing anchors fail closed), the
-  script is ruff-clean under the CI floor, and the check is registered in
-  `tests/check-expected.json` on both arches with a README prose row.
+  with the Stalwart value DERIVED from the wrapper module's own
+  `services.stalwart.package` default (evaluated out of
+  `modules/mail-server.nix`, so renaming the package attr cannot leave the
+  check comparing a stale one) and `parsedmarc` from the wrapped attrs - no
+  hand-written list. A pin advance that forgets the front door now fails
+  `nix flake check` instead of shipping a README that advertises the
+  previous pair. Scoped twice over: only the status block matters, and
+  inside it only the first blockquote paragraph, so a dated verification
+  note cannot smuggle a second version; every other `0.16.x` mention is
+  history and a blanket textual check would fail on correct prose.
+  Self-tested, ruff-clean under both the CI floor and ruff's default rules,
+  and backed by `readme-version-lockstep-fires`, which plants a wrong
+  version in a copy of the real README and fails if the check accepts it -
+  both registered in `tests/check-expected.json` on both arches with README
+  prose rows.
 - Markdown anchor/Contents lint (`scripts/check-md-anchors.py`,
   2026-11-02): every in-file anchor must resolve to a heading and every
   level-2 heading must appear exactly once in a file's `## Contents`
   section. Anchors are recognised in all three markdown forms - inline
   `[x](#slug)`, reference definitions `[label]: #slug`, HTML
-  `href="#slug"` - with percent-encoded destinations decoded. Slugs follow
+  `href="#slug"` - with percent-encoded destinations decoded and `## Contents`
+  rows accepted as bulleted or ordered lists. Slugs follow
   the GitHub slugger including Unicode letters, marks and numbers
   (`Grüße & Maß` is `#grüße--maß`), with `-1`/`-2` duplicate suffixes; code
-  fences and inline code spans ignored. Self-tested with 17 negative and
-  positive cases (unicode both directions, reference and HTML anchors,
-  duplicate headings, table cells, fenced blocks, percent-encoding), wired
+  fences and inline code spans ignored. Self-tested with a matrix of
+  negative and positive cases (unicode in both directions, reference and
+  HTML anchors, ordered-list TOCs, duplicate headings, table cells, fenced
+  blocks, percent-encoding), wired
   into the CI markdown leg and the pre-push hook, because the README's TOC
   is the only navigation for a 1600-line file whose ledger stays put (C52)
   and the audit used to be an ad-hoc snippet that ran by hand. Seeded-defect
@@ -201,6 +209,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   the probe's canary connects retry once on an instant disconnect -
   five rapid connections OK, the sixth closed, healthy again in 2 s).
 
+- Text-gate fixtures, single-sourced (`scripts/selftest-docs-gates.sh`,
+  2026-11-02): one script plants the defect each of the five text gates
+  (table pipes, list markers, check-set drift, anchors/Contents, README
+  versions) must reject and the clean input it must accept, and CI replays
+  it with one `--only <gate>` selector per lint step instead of carrying
+  four diverging copies of the same fixtures. 0.7 s, and it is what makes
+  "the gate fires" a reproducible claim rather than a session memory.
+- `docs/probes/README.md` (2026-11-02): an index of the ten probe
+  directories with date, pin and verdict, because a transcript whose
+  verdict lives only in a status report is one archive move away from
+  being unfindable.
+- CONTRIBUTING "Text gates" (2026-11-02): a table naming the failure class
+  each of the seven text scripts owns, plus the python convention for new
+  repo scripts, so "which lint fired" no longer needs archaeology.
+
 ### Changed
 
 - Documentation truth sweep (2026-11-02): SECURITY.md claimed "all changes
@@ -282,6 +305,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- `nix fmt` died outside the repository root (2026-11-02): the unified
+  wrapper hands its non-`.nix` paths to dprint, which discovers
+  `dprint.json` from the CWD, so BuildFlow's `nix-fmt` step - which copies
+  the `.nix` files into a temp dir and calls `nix fmt` there - failed with
+  "No config file found ..." and a follow-up "path ... does not exist"
+  when the wrapper tried to pin the config by store path. The wrapper now
+  skips the dprint half with a note when the CWD has no `dprint.json`
+  (those runs are alejandra-only by construction; the repo-root gate line
+  always has the config) and BuildFlow passes again.
 - Stalwart migration default warned on every consumer rebuild
   (2026-11-01): `services.stalwart.migrateFrom015.package` defaulted to
   `pkgs.stalwart`, which is a `warnAlias` on 0.16-era nixpkgs, so each

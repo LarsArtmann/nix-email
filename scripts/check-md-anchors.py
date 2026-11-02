@@ -63,7 +63,7 @@ INLINE_ANCHOR_RE = re.compile(r"\]\(\s*(#[^)\s]*)")
 REF_DEF_ANCHOR_RE = re.compile(r"^\s{0,3}\[[^\]]+\]:\s*(#[^\s]*)")
 HTML_ANCHOR_RE = re.compile(r"""href\s*=\s*["'](#[^"']*)["']""")
 CODE_SPAN_RE = re.compile(r"`[^`]*`")
-LIST_ROW_RE = re.compile(r"^\s*[-*][ \t]+")
+LIST_ROW_RE = re.compile(r"^\s*(?:[-*]|[0-9]+[.)])[ \t]+")
 CLOSING_HASHES_RE = re.compile(r"[ \t]+#+[ \t]*$")
 
 TOC_HEADING = "Contents"
@@ -206,8 +206,7 @@ def tracked_markdown() -> list[str]:
 SELF_TEST_CASES: list[tuple[str, str, list[str]]] = [
     (
         "broken inline anchor",
-        "# T\n\n## Contents\n\n- [Alpha](#alpha)\n\n## Alpha\n\n"
-        "See [Beta](#beta).\n",
+        ("# T\n\n## Contents\n\n- [Alpha](#alpha)\n\n## Alpha\n\nSee [Beta](#beta).\n"),
         ["anchor #beta does not resolve"],
     ),
     (
@@ -222,23 +221,29 @@ SELF_TEST_CASES: list[tuple[str, str, list[str]]] = [
     ),
     (
         "clean ascii file with literal link in code",
-        "# T\n\n## Contents\n\n- [Alpha](#alpha)\n"
-        "- [Module: `services.x`](#module-servicesx)\n\n"
-        "## Alpha\n\nSee [the module](#module-servicesx) and the literal "
-        "`](#not-a-link)`.\n\n```\n[ignored](#inside-a-fence)\n```\n\n"
-        "## Module: `services.x`\n\nbody\n",
+        (
+            "# T\n\n## Contents\n\n- [Alpha](#alpha)\n"
+            "- [Module: `services.x`](#module-servicesx)\n\n"
+            "## Alpha\n\nSee [the module](#module-servicesx) and the literal "
+            "`](#not-a-link)`.\n\n```\n[ignored](#inside-a-fence)\n```\n\n"
+            "## Module: `services.x`\n\nbody\n"
+        ),
         [],
     ),
     (
         "unicode heading resolves against the GitHub slug",
-        "# T\n\n## Contents\n\n- [Grüße & Maß](#grüße--maß)\n\n"
-        "## Grüße & Maß\n\nbody\n",
+        (
+            "# T\n\n## Contents\n\n- [Grüße & Maß](#grüße--maß)\n\n"
+            "## Grüße & Maß\n\nbody\n"
+        ),
         [],
     ),
     (
         "unicode heading rejects the ascii-stripped slug",
-        "# T\n\n## Contents\n\n- [Grüße & Maß](#grüße--ma)\n\n"
-        "## Grüße & Maß\n\nbody\n",
+        (
+            "# T\n\n## Contents\n\n- [Grüße & Maß](#grüße--ma)\n\n"
+            "## Grüße & Maß\n\nbody\n"
+        ),
         ["anchor #grüße--ma does not resolve"],
     ),
     (
@@ -248,8 +253,10 @@ SELF_TEST_CASES: list[tuple[str, str, list[str]]] = [
     ),
     (
         "reference-style definition that resolves",
-        "# T\n\n## Contents\n\n- [Alpha](#alpha)\n\n"
-        "See [it][a].\n\n[a]: #alpha\n\n## Alpha\n\nbody\n",
+        (
+            "# T\n\n## Contents\n\n- [Alpha](#alpha)\n\n"
+            "See [it][a].\n\n[a]: #alpha\n\n## Alpha\n\nbody\n"
+        ),
         [],
     ),
     (
@@ -259,21 +266,35 @@ SELF_TEST_CASES: list[tuple[str, str, list[str]]] = [
     ),
     (
         "html href that resolves",
-        "# T\n\n## Contents\n\n- [Alpha](#alpha)\n\n"
-        '<a href="#alpha">x</a>\n\n## Alpha\n\nbody\n',
+        (
+            "# T\n\n## Contents\n\n- [Alpha](#alpha)\n\n"
+            '<a href="#alpha">x</a>\n\n## Alpha\n\nbody\n'
+        ),
         [],
     ),
     (
         "duplicate headings get numeric suffixes",
-        "# T\n\n## Contents\n\n- [Alpha](#alpha)\n- [Alpha](#alpha-1)\n\n"
-        "## Alpha\n\nbody\n\n## Alpha\n\nbody\n",
+        (
+            "# T\n\n## Contents\n\n- [Alpha](#alpha)\n- [Alpha](#alpha-1)\n\n"
+            "## Alpha\n\nbody\n\n## Alpha\n\nbody\n"
+        ),
         [],
     ),
     (
         "duplicate heading linked without its suffix",
-        "# T\n\n## Contents\n\n- [Alpha](#alpha)\n- [Alpha](#alpha)\n\n"
-        "## Alpha\n\nbody\n\n## Alpha\n\nbody\n",
+        (
+            "# T\n\n## Contents\n\n- [Alpha](#alpha)\n- [Alpha](#alpha)\n\n"
+            "## Alpha\n\nbody\n\n## Alpha\n\nbody\n"
+        ),
         ['heading "Alpha" (#alpha-1) is missing from Contents'],
+    ),
+    (
+        "ordered-list Contents rows",
+        (
+            "# T\n\n## Contents\n\n1. [Alpha](#alpha)\n2. [Beta](#beta)\n\n"
+            "## Alpha\n\nbody\n\n## Beta\n\nbody\n"
+        ),
+        [],
     ),
     (
         "anchor in a table cell",
@@ -297,8 +318,10 @@ SELF_TEST_CASES: list[tuple[str, str, list[str]]] = [
     ),
     (
         "fenced block hides both headings and links",
-        "# T\n\n## Contents\n\n- [Alpha](#alpha)\n\n## Alpha\n\nbody\n\n"
-        "~~~\n## Not a heading\n[not a link](#nowhere)\n~~~\n",
+        (
+            "# T\n\n## Contents\n\n- [Alpha](#alpha)\n\n## Alpha\n\nbody\n\n"
+            "~~~\n## Not a heading\n[not a link](#nowhere)\n~~~\n"
+        ),
         [],
     ),
 ]
@@ -309,7 +332,11 @@ def self_test() -> int:
     for name, text, expected in SELF_TEST_CASES:
         findings = scan("<fixture>", text.splitlines())
         if expected:
-            missing = [fragment for fragment in expected if not any(fragment in f for f in findings)]
+            missing = [
+                fragment
+                for fragment in expected
+                if not any(fragment in f for f in findings)
+            ]
             if missing or not findings:
                 print(
                     f"FATAL: self-test case {name!r}: expected {expected!r}, got {findings!r}"
@@ -332,8 +359,12 @@ def main(argv: list[str]) -> int:
         description="Lint in-file markdown anchors and Contents completeness.",
         epilog="Exit codes: 0 clean, 1 offenders, 2 usage/IO error.",
     )
-    parser.add_argument("files", nargs="*", help="markdown files (default: git-tracked)")
-    parser.add_argument("--self-test", action="store_true", help="prove the lint can fail")
+    parser.add_argument(
+        "files", nargs="*", help="markdown files (default: git-tracked)"
+    )
+    parser.add_argument(
+        "--self-test", action="store_true", help="prove the lint can fail"
+    )
     parser.add_argument("--quiet", action="store_true", help="no success summary line")
     args = parser.parse_args(argv)
 

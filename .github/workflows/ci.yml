@@ -97,42 +97,11 @@ jobs:
           # DROPS overflow cells when a row has more than its header - two
           # status-report rows were silently eaten that way. Every row must
           # match its header's unescaped-pipe count; literal pipes in a
-          # cell MUST be escaped as `\|`. The step self-tests the lint on
-          # planted fixtures first (the gawk \b lesson: a never-firing
-          # lint is a false green - negative tests are mandatory).
+          # cell MUST be escaped. The fixtures live in ONE place
+          # (scripts/selftest-docs-gates.sh, the gawk-\b lesson: a
+          # never-firing lint is a false green) and are replayed here.
           set -eu
-          fixture="$(mktemp /tmp/pipe-lint-XXXXXX.md)"
-          # Deferred expansion is intentional (fixture path fixed at set
-          # time anyway); shellcheck's SC2016 fires on the quoted form.
-          # shellcheck disable=SC2016
-          trap 'rm -f "$fixture"' EXIT
-          # 1) fewer cells than header -> must FAIL
-          printf '| a | b | c |\n| --- | --- | --- |\n| 1 | 2 |\n' > "$fixture"
-          if bash scripts/check-md-table-pipes.sh "$fixture" > /dev/null 2>&1; then
-            echo "FATAL: lint accepted a row with fewer cells than its header"; exit 1
-          fi
-          # 2) the eaten-rows class: more cells than header -> must FAIL
-          printf '| a | b | c |\n| --- | --- | --- |\n| 1 | 2 | 3 | 4 |\n' > "$fixture"
-          if bash scripts/check-md-table-pipes.sh "$fixture" > /dev/null 2>&1; then
-            echo "FATAL: lint accepted a row with more cells than its header"; exit 1
-          fi
-          # 3) escaped pipe -> must PASS
-          printf '| a | b | c |\n| --- | --- | --- |\n| 1 \\| x | 2 | 3 |\n' > "$fixture"
-          if ! bash scripts/check-md-table-pipes.sh "$fixture" > /dev/null 2>&1; then
-            echo "FATAL: lint flagged an escaped pipe"; exit 1
-          fi
-          # 4) pipes inside a code fence -> must PASS
-          cat > "$fixture" <<'FENCEEOF'
-          text
-          ```sh
-          | not | a | table |
-          ```
-          | a | b | c |
-          | 1 | 2 | 3 |
-          FENCEEOF
-          if ! bash scripts/check-md-table-pipes.sh "$fixture" > /dev/null 2>&1; then
-            echo "FATAL: lint flagged pipes inside a code fence"; exit 1
-          fi
+          sh scripts/selftest-docs-gates.sh --only pipes
           git ls-files -z '*.md' > /tmp/md-files.list
           xargs -0 bash scripts/check-md-table-pipes.sh < /tmp/md-files.list
 
@@ -144,19 +113,10 @@ jobs:
           # normalizes (it inserts the blank line itself) - in a formatted
           # tree that means unfresh formatting or a mistyped wrap. Wrapped
           # items, siblings, and nested lists are dprint-stable shapes and
-          # are NOT flagged (verified against dprint behavior). Negative
-          # fixtures first: a never-firing lint is a false green.
+          # are NOT flagged (verified against dprint behavior). Fixtures
+          # live in scripts/selftest-docs-gates.sh.
           set -eu
-          fixture="$(mktemp /tmp/marker-lint-XXXXXX.md)"
-          trap 'rm -f "$fixture"' EXIT
-          printf 'prose line that wraps\n- and the wrap lands on a marker\n' > "$fixture"
-          if bash scripts/check-md-list-markers.sh "$fixture" > /dev/null 2>&1; then
-            echo "FATAL: lint accepted a marker directly after prose"; exit 1
-          fi
-          printf 'prose\n\n- item\n  - nested\n- sibling after wrap\n  continues\n- next\n' > "$fixture"
-          if ! bash scripts/check-md-list-markers.sh "$fixture" > /dev/null 2>&1; then
-            echo "FATAL: lint flagged a deliberate list shape"; exit 1
-          fi
+          sh scripts/selftest-docs-gates.sh --only list
           git ls-files -z '*.md' > /tmp/md-files2.list
           xargs -0 bash scripts/check-md-list-markers.sh < /tmp/md-files2.list
 
@@ -170,10 +130,10 @@ jobs:
           # fail a build instead of waiting for a session to notice.
           # Anchors are recognised in all three markdown forms (inline,
           # reference definitions, HTML href) and slugs are unicode-aware.
-          # The self-test runs 17 negative and positive cases before the
-          # tree-wide pass (a never-firing lint is a false green).
+          # The self-test matrix runs before the tree-wide pass (a
+          # never-firing lint is a false green).
           set -eu
-          python3 scripts/check-md-anchors.py --self-test
+          sh scripts/selftest-docs-gates.sh --only anchors
           python3 scripts/check-md-anchors.py
 
       - name: Check-set drift alarm (fail-closed, self-tested)
@@ -183,17 +143,9 @@ jobs:
           # set", "the 7 checks") - counts rot within hours. The canonical
           # set lives in the ci.yml lockstep lists + scripts/check-inventory.sh;
           # README "What is built and verified" names checks individually.
+          # Fixtures live in scripts/selftest-docs-gates.sh.
           set -eu
-          fixture="$(mktemp /tmp/drift-lint-XXXXXX.md)"
-          trap 'rm -f "$fixture"' EXIT
-          printf 'the 9-check set is green\n' > "$fixture"
-          if bash scripts/check-check-set-drift.sh "$fixture" > /dev/null 2>&1; then
-            echo "FATAL: drift alarm accepted a numeric check-set claim"; exit 1
-          fi
-          printf 'the canonical check list lives in ci.yml\n' > "$fixture"
-          if ! bash scripts/check-check-set-drift.sh "$fixture" > /dev/null 2>&1; then
-            echo "FATAL: drift alarm flagged a clean line"; exit 1
-          fi
+          sh scripts/selftest-docs-gates.sh --only drift
           bash scripts/check-check-set-drift.sh AGENTS.md README.md
 
       - name: Assert README names every flake check (anti-drift)

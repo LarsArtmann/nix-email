@@ -57,14 +57,22 @@ def status_block(text: str) -> list[str]:
     return []
 
 
-def anchor(block: list[str], pattern: re.Pattern[str], label: str) -> tuple[str | None, str | None]:
+def anchor(
+    block: list[str], pattern: re.Pattern[str], label: str
+) -> tuple[str | None, str | None]:
     """Return (version, error) for one canonical version anchor."""
     joined = "\n".join(block)
     matches = pattern.findall(joined)
     if not matches:
-        return None, f"status block does not state {label} (no `{label} **x.y.z**` anchor)"
+        return (
+            None,
+            f"status block does not state {label} (no `{label} **x.y.z**` anchor)",
+        )
     if len(set(matches)) > 1:
-        return None, f"status block states {label} more than once with different values: {sorted(set(matches))}"
+        return (
+            None,
+            f"status block states {label} more than once with different values: {sorted(set(matches))}",
+        )
     return matches[0], None
 
 
@@ -72,7 +80,9 @@ def check(text: str, stalwart: str, parsedmarc: str) -> list[str]:
     """Return the list of findings for one README body."""
     block = status_block(text)
     if not block:
-        return ["no status blockquote (`> **Status (`...) found - the version anchors are gone"]
+        return [
+            "no status blockquote (`> **Status (`...) found - the version anchors are gone"
+        ]
     findings = []
     for pattern, label, expected in (
         (STALWART_RE, "Stalwart", stalwart),
@@ -82,7 +92,9 @@ def check(text: str, stalwart: str, parsedmarc: str) -> list[str]:
         if error:
             findings.append(error)
         elif found != expected:
-            findings.append(f"README says {label} {found}, the flake builds {label} {expected}")
+            findings.append(
+                f"README says {label} {found}, the flake builds {label} {expected}"
+            )
     return findings
 
 
@@ -123,7 +135,9 @@ def self_test() -> int:
             "# T\n\n> **Status (2026-10-28):** Stalwart **0.16.26** only.\n",
             "0.16.26",
             "11.0.2",
-            ["status block does not state parsedmarc (no `parsedmarc **x.y.z**` anchor)"],
+            [
+                "status block does not state parsedmarc (no `parsedmarc **x.y.z**` anchor)"
+            ],
         ),
         (
             "marker outside a blockquote is not a status block",
@@ -144,13 +158,17 @@ def self_test() -> int:
         ),
         (
             "version named twice with different values",
-            "# T\n\n> **Status (2026-10-28):** Stalwart **0.16.26**, Stalwart **0.16.27**, "
-            "parsedmarc **11.0.2**.\n",
+            (
+                "# T\n\n> **Status (2026-10-28):** Stalwart **0.16.26**, Stalwart **0.16.27**, "
+                "parsedmarc **11.0.2**.\n"
+            ),
             "0.16.26",
             "11.0.2",
             [
-                "status block states Stalwart more than once with different values: "
-                "['0.16.26', '0.16.27']"
+                (
+                    "status block states Stalwart more than once with different values: "
+                    "['0.16.26', '0.16.27']"
+                )
             ],
         ),
     ]
@@ -158,7 +176,9 @@ def self_test() -> int:
     for name, text, stalwart, parsedmarc, expected in cases:
         actual = check(text, stalwart, parsedmarc)
         if actual != expected:
-            print(f"FATAL: self-test case {name!r} produced {actual!r}, expected {expected!r}")
+            print(
+                f"FATAL: self-test case {name!r} produced {actual!r}, expected {expected!r}"
+            )
             failed = 1
     if failed:
         return 1
@@ -171,7 +191,9 @@ def main(argv: list[str]) -> int:
     parser.add_argument("--readme", help="README to check")
     parser.add_argument("--stalwart", help="Stalwart version the flake builds")
     parser.add_argument("--parsedmarc", help="parsedmarc version the flake builds")
-    parser.add_argument("--self-test", action="store_true", help="prove the check can fail")
+    parser.add_argument(
+        "--self-test", action="store_true", help="prove the check can fail"
+    )
     parser.add_argument("--quiet", action="store_true", help="no success summary line")
     args = parser.parse_args(argv)
 
@@ -188,7 +210,10 @@ def main(argv: list[str]) -> int:
         if not value
     ]
     if missing:
-        print(f"check-readme-versions: missing required {', '.join(missing)}", file=sys.stderr)
+        print(
+            f"check-readme-versions: missing required {', '.join(missing)}",
+            file=sys.stderr,
+        )
         return 2
 
     with open(args.readme, encoding="utf-8") as handle:
@@ -205,6 +230,7 @@ def main(argv: list[str]) -> int:
             f"(Stalwart {args.stalwart}, parsedmarc {args.parsedmarc})"
         )
     return 0
+
 
 if __name__ == "__main__":
     sys.exit(main(sys.argv[1:]))

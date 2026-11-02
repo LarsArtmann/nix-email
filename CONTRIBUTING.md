@@ -53,8 +53,8 @@ test comments) is load-bearing. Discoverability instead rests on the
   (a) any in-file anchor that resolves to no heading - inline `[x](#slug)`,
   reference `[label]: #slug` and HTML `href="#slug"` forms alike - and
   (b) any level-2 heading missing from (or duplicated in) `## Contents`.
-  `--self-test` runs 17 negative and positive cases; CI and the pre-push
-  hook run both.
+  `--self-test` runs the whole negative/positive matrix; CI and the
+  pre-push hook run both.
 - Anchors are GitHub slugs: lowercase, everything but Unicode
   letters/marks/numbers, space, hyphen and underscore stripped, each space
   to a hyphen (`Module: services.mail-server` becomes
@@ -160,19 +160,29 @@ not by the tool).
 Seven scripts guard the text side of the tree. Knowing which one fired is
 the difference between a one-line fix and an afternoon.
 
-| Script | Owns | Fails on |
-| --- | --- | --- |
-| `scripts/check-md-table-pipes.sh` | table integrity | an unescaped pipe character inside a cell (GFM splits the row and silently drops columns) |
-| `scripts/check-md-list-markers.sh` | list integrity | a `-`/`*` marker that starts a line because a prose line wrapped |
-| `scripts/check-check-set-drift.sh` | count rot | a numeric check-set claim ("the 7 checks") in `README.md`/`AGENTS.md` |
-| `scripts/check-md-anchors.py` | front door | an in-file anchor with no heading; a level-2 heading missing from or duplicated in `## Contents` |
-| `scripts/check-readme-versions.py` | version truth | the README status block naming a Stalwart/parsedmarc version the flake does not build (a flake check, not a CI step) |
-| `scripts/check-testscript-shell.py` | test scripts | a bash syntax error inside a `testScript` string literal |
-| `scripts/check-deprecated-aliases.py` | eval noise | a `warnAlias` nixpkgs attribute named in a default or fixture (a per-switch warning for every consumer) |
+| Script                                | Owns            | Fails on                                                                                                             |
+| ------------------------------------- | --------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `scripts/check-md-table-pipes.sh`     | table integrity | an unescaped pipe character inside a cell (GFM splits the row and silently drops columns)                            |
+| `scripts/check-md-list-markers.sh`    | list integrity  | a `-`/`*` marker that starts a line because a prose line wrapped                                                     |
+| `scripts/check-check-set-drift.sh`    | count rot       | a numeric check-set claim ("the 7 checks") in `README.md`/`AGENTS.md`                                                |
+| `scripts/check-md-anchors.py`         | front door      | an in-file anchor with no heading; a level-2 heading missing from or duplicated in `## Contents`                     |
+| `scripts/check-readme-versions.py`    | version truth   | the README status block naming a Stalwart/parsedmarc version the flake does not build (a flake check, not a CI step) |
+| `scripts/check-testscript-shell.py`   | test scripts    | a bash syntax error inside a `testScript` string literal                                                             |
+| `scripts/check-deprecated-aliases.py` | eval noise      | a `warnAlias` nixpkgs attribute named in a default or fixture (a per-switch warning for every consumer)              |
 
 Every one of them carries `--self-test` and every self-test is re-run in
 the session that mutates the tool (see "The gate"). The anchor lint is the
-one to reach for first when a heading edit "looks fine" but CI disagrees.
+one to reach for first when a heading edit "looks fine" but CI disagrees,
+and `sh scripts/selftest-docs-gates.sh` proves all five text gates at once
+(0.7 s) - CI replays it with one `--only <gate>` selector per lint step, so
+the fixtures live in that ONE file.
+
+Convention for new repo python: `#!/usr/bin/env python3`, `from __future__
+import annotations`, typed signatures on the helpers, `check=False` where
+the return code is inspected rather than raised, and a `--self-test` that
+proves both directions. The lint scripts follow it; the older scripts
+predate it and are not retrofitted mid-change (ruff's `E4,E7,E9,F` floor is
+the hard rule for all of them).
 
 ## VM debug loops
 

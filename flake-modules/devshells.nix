@@ -69,6 +69,19 @@
           ${pkgs.alejandra}/bin/alejandra $nix_paths || status=1
         fi
       fi
+      # dprint finds its configuration by walking up from the CWD, so the
+      # dprint half only runs where dprint.json exists - the repo root, or
+      # a subdirectory of it that carries its own config. Anywhere else
+      # (BuildFlow's nix-fmt roundtrip copies the .nix files into a temp
+      # dir and calls `nix fmt` there) the dprint half is SKIPPED with a
+      # note instead of dying on discovery: those runs are alejandra-only
+      # by construction, and the repo-root gate line always has the config
+      # (dprint.json is tracked, so its absence there is a broken checkout
+      # that CI reports as an unformatted tree).
+      if [ -n "''${dprint_paths# }" ] && [ ! -f dprint.json ]; then
+        echo "fmt: no dprint.json in $PWD - checking .nix only" >&2
+        dprint_paths=""
+      fi
       if [ -n "''${dprint_paths# }" ]; then
         if [ "$check" = 1 ]; then
           ${pkgs.dprint}/bin/dprint check $dprint_paths || status=1

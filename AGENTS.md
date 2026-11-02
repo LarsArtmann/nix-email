@@ -28,6 +28,13 @@ transcript-pinned dialect).
   host); host loops are fine for client-side forensics only (swaks + a
   python SMTP sink; swaks attachments take `@path`, not `<path>` - that
   sends the path STRING).
+- `buildflow`'s `nix-fmt` step copies the `.nix` files into a temp dir and
+  runs `nix fmt` THERE, so the unified wrapper must tolerate a CWD without
+  `dprint.json` (it skips the dprint half with a note since 2026-11-02;
+  before, it died on config discovery and failed the step). Do NOT "fix"
+  that by pinning the config inside the wrapper: BuildFlow's copy does not
+  carry `dprint.json`, and `${../dprint.json}` then resolves to a store
+  path that does not exist at eval time (tried, broke the step differently).
 - `nix run .#vm` (x86_64) - throwaway demo VM; ports/credentials live in
   the README quickstart + login banner (single source); demo disk at
   ~/.cache/nix-email-demo/ (app pins NIX_DISK_IMAGE; no CWD pollution).

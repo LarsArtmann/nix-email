@@ -48,16 +48,23 @@ else
   echo "pre-push: actionlint/shellcheck unavailable - skipping (CI enforces)" >&2
 fi
 
-# 4. Markdown lints (CI parity, fast + nix-free): pipes + list markers +
-#    check-set drift alarm + anchor/Contents integrity. The daemon pushes
+# 4. Text gates (CI parity, fast + nix-free): pipes + list markers +
+#    check-set drift alarm + anchor/Contents integrity. The FIXTURES run
+#    first (scripts/selftest-docs-gates.sh replays every planted defect a
+#    lint must reject) because a green lint that can no longer fire is the
+#    failure mode this whole leg exists to prevent. The daemon pushes
 #    bypass this hook entirely - CI is the hard gate; this front-runs it
 #    for human pushes.
-echo "pre-push: markdown lints (pipes, list markers, drift, anchors)"
+echo "pre-push: text gates (fixture self-tests, then the tree)"
+if command -v python3 >/dev/null 2>&1; then
+  sh scripts/selftest-docs-gates.sh
+else
+  echo "pre-push: python3 unavailable - skipping gate fixtures (CI enforces)" >&2
+fi
 bash scripts/check-md-table-pipes.sh
 bash scripts/check-md-list-markers.sh
 bash scripts/check-check-set-drift.sh
 if command -v python3 >/dev/null 2>&1; then
-  python3 scripts/check-md-anchors.py --self-test
   python3 scripts/check-md-anchors.py
 else
   echo "pre-push: python3 unavailable - skipping anchor lint (CI enforces)" >&2
