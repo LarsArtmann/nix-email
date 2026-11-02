@@ -176,6 +176,12 @@ ideas, all D1-gated:
 
 ### 6. Repo excellence
 
+- Docs structure pack (priced 2026-11-02, decision C54): a
+  `docs/status/` corridor index (add vs document the intentional absence
+  of one) and moving the verified-facts ledger BELOW the footer sections
+  (order only - C52 keeps its home in the README). Both are ~30-40 min
+  each and currently [rec] "do the cheap one" (document the absence,
+  reorder the ledger) pending an owner nod.
 - Stalwart OIDC (Pocket ID) for the admin UI - verified
   present in the 0.15.5 source (`common/src/auth/oauth/{openid,oidc}.rs`,
   master plan §10 06c); re-verify on the 0.16 source before wiring;
@@ -294,6 +300,11 @@ are batched in `docs/planning/decision-batch.md` (2026-09-22) - answer there.
 4. **README ops-detail level:** the public README carries go-live runbook
    detail (migration window, DR design) with recon value. Keep as-is, trim to
    outline, or move detail into a private consumer doc?
+   PRICED 2026-11-02 (decision C54 in `docs/planning/decision-batch.md`):
+   keep = 0 min; trim-to-outline ~45 min but the detail must still live
+   somewhere; move to `docs/RUNBOOKS.md` + README summary ~2 h including the
+   pointer web. [rec] keep until D1 lands, then decide with the runbook
+   exercised.
 5. **Declarative provisioning philosophy:** should `services.mail-server` grow
    `domains`/`accounts` options (idempotent systemd oneshot against the
    management API), or does account state stay imperative/webadmin per

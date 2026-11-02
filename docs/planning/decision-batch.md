@@ -412,3 +412,56 @@ a wedge) for non-8080 httpBind users.
   silent); add the eval-time port-set pin (folded into the provision-plan-eval
   TODO row) only if the fleet grows non-8080 httpBind consumers.
 - Cost of delay: none (the failure mode is visible by construction).
+
+### C54 — README structure pack: runbook detail, corridor index, ledger order (new 2026-11-02, from the 06-04 report)
+
+Three README/corridor questions are cheap to answer now and expensive to
+defer (every new session re-asks them). Each is priced with its ACTUAL
+change cost in this tree, not in the abstract.
+
+1. **Q4 - the go-live + pin-advance runbooks (150 public lines).**
+   - **Keep as-is** (status quo, `[rec]`): cost 0; the recon value stays
+     public and the runbooks are the only end-to-end procedure; risk = the
+     public README keeps describing the VPS, the migration window and the
+     DR design, and 150 lines is a third of what a visitor reads after the
+     quickstart.
+   - **Trim to outline**: ~45 min (cut the command transcripts, keep the
+     numbered steps + links into `docs/probes/`); risk = a reader loses the
+     verified command shapes, which is exactly what the ledger discipline
+     exists to preserve; the detail would have to live somewhere, so this
+     is really "move".
+   - **Move to `docs/RUNBOOKS.md` with a README summary**: ~2 h (move, add
+     a 10-line README summary, update the pointer web: AGENTS doc map,
+     CONTRIBUTING, README's own two links, `scripts/export-catalog.py`
+     service bodies, plus the anchor lint's Contents row); risk = the same
+     pointer-web churn that made C52 reject the ledger move, at a smaller
+     scale (the runbooks are not cited by code).
+   - **Recommendation: keep until D1 lands**, then decide with the runbook
+     actually exercised (the standing decision-batch rec).
+2. **Status-corridor index (`docs/status/` has no README.md).**
+   - **Add an index** (~40 min): a dated list of live reports + what each
+     still owns. Risk: it is a second ledger of the same facts and will rot
+     exactly like a status report does.
+   - **Document intentional absence** (~10 min, `[rec]`): a line in
+     CONTRIBUTING's corridor policy saying the archive manifests plus the
+     `docs/status/archived/README.md` archive policy ARE the index, and a
+     live report is found by date/sort. Risk: a reader must know the
+     convention.
+3. **Ledger ORDER (not home - C52 forbids moving it).**
+   - **Current order** (all narrative sections, ledger, Non-goals,
+     upstream issues, license/security/contributing): 0 cost; a reader who
+     wants the license scrolls past 644 lines of ledger.
+   - **Move the ledger below the footer sections** (~30 min, `[rec]`): the
+     reference material lands last, so the front door and the normative
+     sections read uninterrupted. Risk: 54 ledger anchors are cited by
+     module/test comments as "README ledger (x)" (section names, not line
+     numbers) so nothing breaks; only the TOC order changes.
+   - Cost of delay: each option is cheap now and re-litigated every
+     docs pass.
+
+### C55 — "Contents" vs "Table of contents" (asked as 06-04 f/32)
+
+- **[decided in session 2026-11-02] Keep `## Contents`**: GitHub/Sphinx
+  convention, the section is machine-checked by
+  `scripts/check-md-anchors.sh`, and renaming buys nothing a reader misses.
+  No change applied, so nothing to re-do.
