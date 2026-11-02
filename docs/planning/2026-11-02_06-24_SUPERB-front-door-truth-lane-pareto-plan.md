@@ -388,3 +388,43 @@ a separate grave.
   in AGENTS.
 - A batch whose gate is red is reverted or fixed inside the same session; a
   red batch is never "the known one" without reading the failing step name.
+
+---
+
+## 10. Execution record (2026-11-02, same session)
+
+Every batch was executed. FD2 was written as blocked on the concurrency
+answer; it went ahead because the owner ordered the whole list, the edits
+were additive (three rows appended, nothing rewritten) and every one was
+read back after `nix fmt`. No foreign file was touched: `git status` was
+clean at the start and each commit was diffed before landing. Evidence
+below is the command and its exit status, not a narrative.
+
+| Batch | State | Evidence                                                                                                                                                                                                                                                                                                                   |
+| ----- | ----- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| FD1   | DONE  | `scripts/check-md-anchors.sh` (self-test 3 negative + 1 positive, EXIT 0); seeded defects on README copies fail with `file:line` (added `##` heading, typo'd anchor); tree-wide EXIT 0; wired into `.githooks/pre-push` + ci.yml markdown leg; CONTRIBUTING rule; shellcheck 0, actionlint 0                               |
+| FD2   | DONE  | 3 residue rows in TODO_LIST (C54 nod, mechanization taste, SKILLS mirror) + header note; pipe/marker/anchor lints EXIT 0. Deliberately NOT 34 rows: the rest was closed in-session, and queuing finished work is backlog rot                                                                                               |
+| FD3   | DONE  | CI run `41394557333` success on `8d70c9d`; `core.hooksPath=.githooks` + executable hook; `result{,-1,-2,-vm}` trashed; `/tmp` scratch trashed; `git status --ignored` only expected classes; report §h items 1-5                                                                                                           |
+| FD4   | DONE  | Six blocks re-read vs module/tests/pin; versions via `nix eval` on the lock (`stalwart_0_16` 0.16.26, `parsedmarc` 11.0.2, `imapsync` 2.314, `stalwart-vandelay` 1.0.12); catalog selftest EXIT 0 (found "seven ADRs" vs 8 - count removed); all cited `docs/probes/` paths exist; dated verify line with named gaps added |
+| FD11  | DONE  | Decision entries C54 (three priced options) + C55 (TOC naming, decided keep); ROADMAP Q4 + theme 6 carry the prices                                                                                                                                                                                                        |
+| FD5   | DONE  | `readme-version-lockstep` flake check builds green; `--stalwart 0.16.27` fails naming both values; 5-case self-test; registered in `tests/check-expected.json` (both arches), named in README; `check-inventory.sh` EXIT 0                                                                                                 |
+| FD6   | DONE  | Competitor judgement dated + "not re-measured"; upstream issue states re-read live (`#563651`/`#563777` open 0 comments, `#563652` open last comment 2026-09-18, imapclient#662 CLOSED / #663 MERGED); external-link checker NO-GO recorded                                                                                |
+| FD7   | DONE  | AGENTS: C52 gotcha, front-door rule, markdown-lints-read-the-INDEX trap; README doctrine note points at the archived study; AGENTS 22.4 KB; lints EXIT 0                                                                                                                                                                   |
+| FD8   | DONE  | FEATURES: vandelay row corrected, rotted check count removed, CI rows gained the anchor step + latest green run; 05-44 report line refs replaced with section names                                                                                                                                                        |
+| FD9   | DONE  | `nix build .#checks.x86_64-linux.demo-eval` EXIT 0 (port table contract); SystemNix wrapper read - snippet matches (`nixosModules.default`, `hostname`/`admin.secretFile`); remote flake locks `8d70c9d` with app `vm`                                                                                                     |
+| FD12  | DONE  | `docs/planning/2026-11-02_06-55_mechanization-queue.md` (6 priced proposals: 3 landed, 1 closed, 2 recommended against); SECURITY.md's false claims corrected; topics +`jmap` +`carddav`; status-report skill scope line landed in the SKILLS repo (`8f01c1f`)                                                             |
+
+Final gate (after the last commit): `nix flake check` EXIT 0 - "all checks
+passed!", 14 declared x86_64 checks, 5 built (the rest cache hits with
+unchanged inputs), aarch64 omitted as expected; `nix fmt -- . --check` 0;
+anchors (self-test + tree) 0; pipes 0; list markers 0; check-set drift 0;
+inventory lockstep 0; ruff floor 0; shellcheck 0; actionlint 0; testScript
+shell 0 (287 fragments). Pushed `8d70c9d..9343193` with every pre-push guard
+green; CI run `41397305768` on `9343193` concluded **success**.
+
+Two disclosures rather than silent claims:
+
+- The FD9 ride proved the remote flake RESOLVES and names a `vm` app; it did
+  not boot the demo VM (the 2026-10-31 smoke is the last boot transcript).
+- The status-report skill edit landed in the SKILLS repo, not here; this repo
+  only records it (the fan-out symlink resolves to the edited file).
