@@ -146,7 +146,20 @@ in
         # boot). The node KEEPS the system-resolver path (no Cloudflare
         # DnsResolver pin): it runs a real local resolver, the exact
         # posture deliverabilityChecks assumes on a real host.
-        stalwart.provision.singletons.SpamPyzor.enable = false;
+        stalwart.provision.singletons = {
+          SpamPyzor.enable = false;
+          # Stalwart's OWN resolver is NOT the system resolver by default:
+          # inbound sender-auth (SPF/iprev) post-DATA lookups went to a
+          # black-holed external resolver in the driver network and the
+          # inbound canary died at its socket timeout (take-4 transcript:
+          # EHLO/MAIL/RCPT/DATA-354 all 0.0 s, post-DATA reply > 25 s).
+          # This node RUNS a real resolver (dnsmasq with the local zone);
+          # point stalwart at it so its lookups are answered locally.
+          DnsResolver = {
+            "@type" = "Custom";
+            servers = [{address = "127.0.0.1";}];
+          };
+        };
         stalwart.provision.objects = {
           # match ["name"]: without it a re-apply value-matches the
           # server-hashed secret and trips the unique-email index (the
