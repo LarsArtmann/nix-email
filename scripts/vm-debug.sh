@@ -18,9 +18,11 @@
 # itself owns (e). Driver python runs on the HOST - VM-port work must be
 # packaged scripts or machine.succeed, never host socket code.
 #
-# Usage: scripts/vm-debug.sh [--script-only] [--check] [check-name] [existing-test-script]
+# Usage: scripts/vm-debug.sh [--script-only] [--check] [--self-test] [check-name] [existing-test-script]
 #   check-name defaults to stalwart-e2e (must be an x86_64 VM e2e check;
 #   pure-eval checks have no driver).
+#   --self-test   instant, no nix eval: proves the path-like check-name
+#                 guard classifies good and bad names correctly.
 #   --script-only  no VM run at all: skips the GC-root build (which IS the
 #                  VM test run) and does not exec the driver; prints the
 #                  final command line instead (compose it into your own loop).
@@ -37,10 +39,12 @@ cd "$(git rev-parse --show-toplevel)"
 
 SCRIPT_ONLY=0
 LINT_ONLY=0
+SELF_TEST=0
 while [ "$#" -gt 0 ]; do
 	case "$1" in
 	--script-only) SCRIPT_ONLY=1 ;;
 	--check) LINT_ONLY=1 ;;
+	--self-test) SELF_TEST=1 ;;
 	--)
 		shift
 		break
@@ -50,19 +54,41 @@ while [ "$#" -gt 0 ]; do
 	shift
 done
 
+# True when the check name looks like a path: flags ate the positionals
+# (the 02-07 report d/1 faceplant class). Single source of truth - the
+# self-test calls the same function.
+check_name_looks_like_path() {
+	case "$1" in
+	*/* | .*) return 0 ;;
+	*) return 1 ;;
+	esac
+}
+
+if [ "$SELF_TEST" = 1 ]; then
+	for name in "./tests/foo.nix" "scripts/x.sh" ".hidden"; do
+		if ! check_name_looks_like_path "$name"; then
+			echo "self-test FAIL: '$name' should be flagged as path-like" >&2
+			exit 1
+		fi
+	done
+	if check_name_looks_like_path "stalwart-e2e"; then
+		echo "self-test FAIL: 'stalwart-e2e' should pass the guard" >&2
+		exit 1
+	fi
+	echo "vm-debug self-test PASS: path guard classifies 3 bad + 1 good name(s)"
+	exit 0
+fi
+
 CHECK="${1:-stalwart-e2e}"
 SCRIPT="${2:-}"
 
-# Guard (2026-11-02 report d/1 faceplant class): a path in the CHECK slot
-# means flags ate the positionals - fail fast with the fix instead of a
-# slow "no such check" eval walk.
-case "$CHECK" in
-*/* | .*)
+# Guard: a path in the CHECK slot means flags ate the positionals - fail
+# fast with the fix instead of a slow "no such check" eval walk.
+if check_name_looks_like_path "$CHECK"; then
 	echo "error: check name '$CHECK' looks like a path - flags must come BEFORE the positionals" >&2
 	echo "usage: $0 [--script-only] [--check] <check-name> [test-script]" >&2
 	exit 1
-	;;
-esac
+fi
 
 CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/nix-email/vm-debug"
 mkdir -p "$CACHE_DIR"

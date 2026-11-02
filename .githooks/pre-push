@@ -1,5 +1,10 @@
 #!/bin/sh
 # Pre-push guards, mirroring what CI enforces on master:
+# 0. Clean working tree FIRST: every guard below verifies the WORKING
+#    TREE, but git pushes the COMMITS - a tracked-file difference means
+#    the verified tree and the pushed tip diverge. The 2026-11-02
+#    daemon race shipped a red master exactly this way (the dprint fix
+#    sat uncommitted while the raw-row commit pushed; run 41372119515).
 # 1. nix fmt -- . --check (unified wrapper: alejandra + dprint,
 #    fail-closed) - the "unformatted push, public red CI" class
 #    (2026-09-16, two reds, ~13 min).
@@ -14,6 +19,15 @@
 # runs (it dangles silently by design; CI is the real gate).
 
 set -eu
+
+# 0. Clean working tree (see header). git diff-index --quiet exits 0
+# only when no tracked file differs from HEAD (staged or unstaged).
+if ! git diff-index --quiet HEAD --; then
+  echo "pre-push: working tree differs from HEAD - the guards below would verify the WRONG tree" >&2
+  git status --short >&2
+  echo "commit or stash first (the daemon sweeps within seconds), then push again" >&2
+  exit 1
+fi
 
 echo "pre-push: nix fmt -- . --check"
 nix fmt -- . --check
