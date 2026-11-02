@@ -33,15 +33,19 @@ Design contract (MONITORING.md "Routing table"):
 import argparse
 import datetime
 import imaplib
+import ipaddress
 import json
 import os
 import re
+import signal
 import smtplib
 import socket
 import ssl
 import subprocess
 import sys
 import time
+import urllib.error
+import urllib.request
 import uuid
 from email.message import EmailMessage
 from email.utils import formatdate
@@ -50,7 +54,7 @@ PROBE_NAME = "deliverability-probe"
 # Stalwart's inbound :25 REJECTS a bare single-label EHLO argument
 # ("550 5.5.0 Invalid EHLO domain", VM transcript 2026-10-30) - greet
 # with an FQDN under the probed domain instead.
-PROBE_VERSION = 1
+PROBE_VERSION = 2
 
 PASS = "pass"
 WARN = "warn"
@@ -64,7 +68,14 @@ DNSBL_ERROR_ANSWERS = {"127.255.255.252", "127.255.255.253", "127.255.255.254"}
 HOSTNAME_RE = re.compile(
     r"^[A-Za-z0-9]([A-Za-z0-9-]*[A-Za-z0-9])?(\.[A-Za-z0-9]([A-Za-z0-9-]*[A-Za-z0-9])?)+$"
 )
-IP_RE = re.compile(r"^\d{1,3}(\.\d{1,3}){3}$")
+
+
+def _is_ip(value):
+    try:
+        ipaddress.ip_address(value)
+    except ValueError:
+        return False
+    return True
 
 
 class Check:
@@ -91,17 +102,31 @@ class Check:
 def run_checks(config):
     """Sequential check battery. A check may raise anything; the failure
     is captured as that check's FAIL verdict instead of killing the run
-    (one broken check must never blind the whole probe)."""
+    (one broken check must never blind the whole probe). Every check also
+    runs under a SIGALRM wall-clock budget (config.check_timeout, or a
+    per-call override): connection timeouts bound individual sockets,
+    but only the alarm bounds the whole check - a wedged library call
+    becomes that check's FAIL, never a probe that never finishes."""
     checks = []
 
-    def record(name, severity, fn):
+    def record(name, severity, fn, budget_s=None):
         started = time.monotonic()
+        limit = int(budget_s if budget_s is not None else config.check_timeout)
+
+        def on_alarm(signum, frame):  # noqa: ARG001 - signal signature
+            raise TimeoutError(f"check exceeded its {limit}s wall-clock budget")
+
+        old_handler = signal.signal(signal.SIGALRM, on_alarm)
+        signal.alarm(max(1, limit))
         try:
             check = fn()
         except Exception as exc:  # noqa: BLE001 - see docstring
             check = Check(
                 name, severity, FAIL, f"probe error: {type(exc).__name__}: {exc}"
             )
+        finally:
+            signal.alarm(0)
+            signal.signal(signal.SIGALRM, old_handler)
         check.name = name
         check.severity = severity
         check.duration_ms = int((time.monotonic() - started) * 1000)
@@ -144,11 +169,21 @@ def run_checks(config):
             "critical",
             lambda: check_smtp_starttls(config, 25, "smtp"),
         )
+        record(
+            "tls-cert-expiry-25",
+            "warning",
+            lambda: check_cert_expiry(config, config.host, 25, starttls=True),
+        )
     if 587 in config.ports:
         record(
             "submission-587",
             "critical",
             lambda: check_submission(config, 587),
+        )
+        record(
+            "tls-cert-expiry-587",
+            "warning",
+            lambda: check_cert_expiry(config, config.host, 587, starttls=True),
         )
     if 465 in config.ports:
         record(
@@ -173,12 +208,31 @@ def run_checks(config):
             lambda: check_cert_expiry(config, config.host, 465),
         )
 
+    if config.metrics_url:
+        record(
+            "metrics-endpoint",
+            "warning",
+            lambda: check_metrics_endpoint(config),
+        )
+
+    if config.dmarc_sink_dir:
+        record(
+            "dmarc-sink-freshness",
+            "warning",
+            lambda: check_dmarc_sink_freshness(config),
+        )
+
     canary = None
     if config.canary_address:
         canary = check_canary(config)
         checks.append(canary["check"])
 
-    return checks, canary
+    canary_inbound = None
+    if config.canary_inbound:
+        canary_inbound = check_canary_inbound(config)
+        checks.append(canary_inbound["check"])
+
+    return checks, canary, canary_inbound
 
 
 # --- DNS checks (dig) ------------------------------------------------------
@@ -293,9 +347,19 @@ def check_dns_ptr(config, ip):
     return Check("", "", PASS, f"PTR {ip} -> {', '.join(names)}")
 
 
+def dnsbl_query_name(ip, zone):
+    """Reverse-notation query name: v4 octets reversed, v6 expanded
+    nibbles reversed (RFC 5782 - both families use the zone's documented
+    convention; IPv6 zones must state they accept nibble format)."""
+    address = ipaddress.ip_address(ip)
+    if address.version == 4:
+        return ".".join(reversed(str(address).split("."))) + "." + zone
+    nibbles = address.exploded.replace(":", "")
+    return ".".join(reversed(nibbles)) + "." + zone
+
+
 def check_dnsbl(config, ip, zone):
-    octets = ip.split(".")
-    query = ".".join(reversed(octets)) + "." + zone
+    query = dnsbl_query_name(ip, zone)
     answers = dig(config, ["A", query])
     listed = [
         a for a in answers if a.startswith("127.") and a not in DNSBL_ERROR_ANSWERS
@@ -429,12 +493,17 @@ def check_imaps_like(config, port, protocol):
 # --- certificate checks (openssl) -------------------------------------------
 
 
-def cert_not_after(config, host, port):
+def cert_not_after(config, host, port, starttls=False):
     """PEM notAfter via openssl s_client | openssl x509. Binary pipeline
     (no shell): the host string is validated to be a hostname at arg
-    parse time, but avoiding shell=True keeps that a defense in depth."""
+    parse time, but avoiding shell=True keeps that a defense in depth.
+    STARTTLS ports (25/587) need `-starttls smtp` - a plain TLS handshake
+    there would hang until timeout (no implicit TLS on those listeners)."""
+    cmd = ["openssl", "s_client", "-connect", f"{host}:{port}", "-servername", host]
+    if starttls:
+        cmd += ["-starttls", "smtp"]
     sclient = subprocess.run(
-        ["openssl", "s_client", "-connect", f"{host}:{port}", "-servername", host],
+        cmd,
         stdin=subprocess.DEVNULL,
         capture_output=True,
         timeout=config.timeout + 10,
@@ -458,8 +527,8 @@ def cert_not_after(config, host, port):
     ).replace(tzinfo=datetime.UTC)
 
 
-def check_cert_expiry(config, host, port):
-    not_after = cert_not_after(config, host, port)
+def check_cert_expiry(config, host, port, starttls=False):
+    not_after = cert_not_after(config, host, port, starttls=starttls)
     remaining = not_after - datetime.datetime.now(datetime.UTC)
     days = remaining.days
     if remaining.total_seconds() <= 0:
@@ -502,7 +571,113 @@ def check_tls_verification(config, host, port):
     return Check("", "", PASS, f"certificate on :{port} verifies against system trust")
 
 
+def check_metrics_endpoint(config):
+    """The stalwart metrics endpoint (metrics.enable) must serve
+    Prometheus exposition format - the consumer's scrape target is dead
+    air otherwise (MONITORING: every checker is dead-man-monitored, and
+    this check is what makes the scrape target itself checkable)."""
+    request = urllib.request.Request(config.metrics_url, headers={"User-Agent": PROBE_NAME})
+    try:
+        with urllib.request.urlopen(request, timeout=config.timeout) as response:
+            body = response.read(4096).decode(errors="replace")
+    except urllib.error.HTTPError as exc:
+        return Check("", "", FAIL, f"metrics endpoint answered HTTP {exc.code}")
+    if "# HELP" not in body and "#HELP" not in body:
+        return Check(
+            "",
+            "",
+            FAIL,
+            f"{config.metrics_url} answered but the body is not Prometheus "
+            f"exposition format (no # HELP lines; first 80 bytes: {body[:80]!r})",
+        )
+    return Check("", "", PASS, f"{config.metrics_url} serves Prometheus exposition format")
+
+
+def check_dmarc_sink_freshness(config):
+    """parsedmarc sink liveness: the output directory's newest .json/.csv
+    must be younger than dmarc_sink_max_age_hours. Aggregate reports
+    arrive daily-ish; a silent parsedmarc (or a dead destination) is
+    otherwise invisible until someone needs the data. INFO-class by
+    design: warning severity - a stalled DMARC pipeline must not page at
+    dead-MX severity."""
+    directory = config.dmarc_sink_dir
+    try:
+        entries = [
+            entry
+            for entry in os.listdir(directory)
+            if entry.endswith((".json", ".csv"))
+        ]
+    except OSError as exc:
+        return Check("", "", FAIL, f"dmarc sink dir {directory} unreadable: {exc}")
+    if not entries:
+        return Check(
+            "",
+            "",
+            FAIL,
+            f"dmarc sink dir {directory} holds no .json/.csv output - the "
+            f"parsedmarc pipeline has never landed a report",
+        )
+    newest = max(os.path.getmtime(os.path.join(directory, e)) for e in entries)
+    age_hours = (time.time() - newest) / 3600
+    if age_hours > config.dmarc_sink_max_age_hours:
+        return Check(
+            "",
+            "",
+            FAIL,
+            f"newest parsedmarc sink output is {age_hours:.0f} h old "
+            f"(> {config.dmarc_sink_max_age_hours} h) - the DMARC pipeline looks stalled",
+        )
+    return Check(
+        "", "", PASS, f"newest parsedmarc sink output is {age_hours:.1f} h old"
+    )
+
+
 # --- round-trip canary -------------------------------------------------------
+
+
+def poll_for_token(config, token, deadline):
+    """Poll the canary mailbox over IMAPS for a token, INBOX first then
+    Junk, deleting matches. Returns (folder_or_None, last_error).
+
+    The match is client-side over fetched bodies: server-side HEADER
+    searches never matched on 0.16 (VM transcript 2026-10-30) - the
+    stalwart-e2e probe's proven pattern. Junk is searched only when
+    INBOX had no match, so the delivered-to-junk verdict is distinct
+    without costing the happy path a second SELECT."""
+    token_bytes = token.encode()
+    last_error = ""
+    while time.monotonic() < deadline:
+        try:
+            with imaplib.IMAP4_SSL(config.host, 993, timeout=config.timeout) as client:
+                client.login(config.canary_address, config.canary_password)
+                for folder in ("INBOX", "Junk"):
+                    # SEARCH/STORE/EXPUNGE are only legal in a SELECTED
+                    # state; an absent folder (Junk may not exist on a
+                    # fresh account) is a skip, not an error.
+                    status, _ = client.select(folder)
+                    if status != "OK":
+                        if folder == "INBOX":
+                            last_error = f"SELECT {folder}: {status}"
+                        continue
+                    status, data = client.search(None, "ALL")
+                    if status != "OK":
+                        last_error = f"SEARCH ALL ({folder}): {status}"
+                        continue
+                    for seq in data[0].split():
+                        status, fetched = client.fetch(seq, "(RFC822)")
+                        if status != "OK":
+                            continue
+                        raw = b"".join(
+                            part[1] for part in fetched if isinstance(part, tuple)
+                        )
+                        if token_bytes in raw:
+                            client.store(seq, "+FLAGS.SILENT", "\\Deleted")
+                            client.expunge()
+                            return folder, last_error
+        except (imaplib.IMAP4.error, OSError) as exc:
+            last_error = f"{type(exc).__name__}: {exc}"
+        time.sleep(config.poll_interval)
+    return None, last_error
 
 
 def check_canary(config):
@@ -511,7 +686,9 @@ def check_canary(config):
     its arrival in the same mailbox over IMAPS. Failure phases are
     distinguished on purpose - a SEND failure means the submission path
     (auth/TLS/queue-accept) is broken; a DELIVER timeout means the
-    queue/local-delivery path is broken; different on-call reactions."""
+    queue/local-delivery path is broken; different on-call reactions.
+    Arrival in Junk (not INBOX) is its own verdict: delivery works but
+    deliverability is degraded - the spam-scoring class."""
     token = f"deliverability-{uuid.uuid4().hex}"
     started = time.monotonic()
     result = {"enabled": True, "token": token, "phase": "send"}
@@ -541,51 +718,11 @@ def check_canary(config):
         )
     result["phase"] = "deliver"
 
-    deadline = time.monotonic() + config.slo_seconds
-    found = False
-    last_error = ""
-    token_bytes = token.encode()
-    while time.monotonic() < deadline:
-        try:
-            with imaplib.IMAP4_SSL(config.host, 993, timeout=config.timeout) as client:
-                client.login(config.canary_address, config.canary_password)
-                # SEARCH/STORE/EXPUNGE are only legal in a SELECTED state -
-                # select INBOX explicitly (caught live in the VM: "command
-                # SEARCH illegal in state AUTH"). The match itself is
-                # client-side over fetched bodies: server-side HEADER
-                # searches never matched on 0.16 (VM transcript
-                # 2026-10-30) - the stalwart-e2e probe's proven pattern.
-                status, _ = client.select("INBOX")
-                if status != "OK":
-                    last_error = f"SELECT INBOX: {status}"
-                else:
-                    status, data = client.search(None, "ALL")
-                    if status != "OK":
-                        last_error = f"SEARCH ALL: {status}"
-                    else:
-                        matches = []
-                        for seq in data[0].split():
-                            status, fetched = client.fetch(seq, "(RFC822)")
-                            if status != "OK":
-                                continue
-                            raw = b"".join(
-                                part[1] for part in fetched if isinstance(part, tuple)
-                            )
-                            if token_bytes in raw:
-                                matches.append(seq)
-                        if matches:
-                            found = True
-                            for seq in matches:
-                                client.store(seq, "+FLAGS.SILENT", "\\Deleted")
-                            client.expunge()
-            if found:
-                break
-        except (imaplib.IMAP4.error, OSError) as exc:
-            last_error = f"{type(exc).__name__}: {exc}"
-        time.sleep(config.poll_interval)
+    folder, last_error = poll_for_token(config, token, started + config.slo_seconds)
     elapsed = time.monotonic() - started
     result["elapsed_s"] = round(elapsed, 1)
-    if not found:
+    result["folder"] = folder
+    if folder is None:
         detail = (
             f"canary token {token} did not arrive within the {config.slo_seconds}s SLO"
             + (f" (last IMAP error: {last_error})" if last_error else "")
@@ -593,8 +730,84 @@ def check_canary(config):
         )
         return {"check": _canary_check(result, FAIL, detail), **result}
     result["phase"] = "cleanup"
-    detail = f"round-trip {config.canary_address} -> :587 -> mailbox -> IMAPS in {elapsed:.1f}s (SLO {config.slo_seconds}s)"
+    if folder != "INBOX":
+        detail = (
+            f"canary token {token} was DELIVERED-TO-JUNK ({folder}) in "
+            f"{elapsed:.1f}s - arrival works but deliverability is degraded: "
+            f"own-domain mail landing in Junk is the spam-scoring class "
+            f"(content rules, DNSBL tagging, or DKIM/SPF verification "
+            f"failures at this host)"
+        )
+        return {"check": _canary_check(result, WARN, detail), **result}
+    detail = (
+        f"round-trip {config.canary_address} -> :587 -> INBOX -> IMAPS in "
+        f"{elapsed:.1f}s (SLO {config.slo_seconds}s)"
+    )
     return {"check": _canary_check(result, PASS, detail), **result}
+
+
+def check_canary_inbound(config):
+    """Inbound-MX canary: submit a tokened mail through the INBOUND
+    listener (:25, UNAUTHENTICATED, plain SMTP) to the canary mailbox
+    and assert IMAPS arrival - the exact path the world's mail servers
+    use, which the authenticated :587 round-trip cannot see.
+
+    TRAP (README ledger): the recipient MUST exist before this check
+    ever runs. Stalwart caches an unknown-recipient rejection for 1 h
+    (directory negative cache), so probing before provisioning poisons
+    the address: legitimate mail keeps bouncing even after the account
+    appears. Provision first, probe second."""
+    token = f"inbound-canary-{uuid.uuid4().hex}"
+    started = time.monotonic()
+    result = {"enabled": True, "token": token, "phase": "send"}
+
+    message = EmailMessage()
+    message["From"] = config.canary_address
+    message["To"] = config.canary_address
+    message["Subject"] = f"inbound canary {token}"
+    message["Date"] = formatdate(localtime=False)
+    message["X-Deliverability-Token"] = token
+    message.set_content(f"Automated inbound canary token {token}.\n")
+
+    try:
+        with smtplib.SMTP(config.host, 25, timeout=config.timeout) as client:
+            client.ehlo(ehlo_domain(config))
+            client.send_message(message)
+    except (smtplib.SMTPException, OSError) as exc:
+        return _canary_fail(
+            result,
+            started,
+            "send",
+            f"unauthenticated :25 submission failed: {type(exc).__name__}: {exc}",
+        )
+    result["phase"] = "deliver"
+
+    folder, last_error = poll_for_token(config, token, started + config.slo_seconds)
+    elapsed = time.monotonic() - started
+    result["elapsed_s"] = round(elapsed, 1)
+    result["folder"] = folder
+    if folder is None:
+        detail = (
+            f"inbound canary token {token} did not arrive within the "
+            f"{config.slo_seconds}s SLO"
+            + (f" (last IMAP error: {last_error})" if last_error else "")
+            + " - :25 accepted the mail but delivery is broken (queue class)"
+        )
+        return {"check": _inbound_check(result, FAIL, detail), **result}
+    result["phase"] = "cleanup"
+    if folder != "INBOX":
+        detail = (
+            f"inbound canary token {token} was DELIVERED-TO-JUNK ({folder}) "
+            f"in {elapsed:.1f}s - inbound acceptance works but the "
+            f"spam-scoring verdict on this host's own domain is degrading "
+            f"deliverability"
+        )
+        return {"check": _inbound_check(result, WARN, detail), **result}
+    detail = (
+        f"inbound {config.canary_address} via :25 unauthenticated -> INBOX "
+        f"-> IMAPS in {elapsed:.1f}s"
+    )
+    return {"check": _inbound_check(result, PASS, detail), **result}
 
 
 def _canary_fail(result, started, phase, detail):
@@ -622,16 +835,30 @@ def _canary_check(result, status, detail):
     )
 
 
+def _inbound_check(result, status, detail):
+    return Check(
+        "canary-inbound",
+        "critical",
+        status,
+        detail,
+        int(result.get("elapsed_s", 0) * 1000),
+    )
+
+
 # --- output emitters ---------------------------------------------------------
 
 
 def overall_status(checks):
-    if any(c.status == FAIL for c in checks):
+    """FAIL iff a CRITICAL-severity check failed (the exit-code contract:
+    WARNING never fails the unit). A warning-severity check MAY carry a
+    fail STATUS (e.g. dmarc-sink-freshness stale) - it surfaces in the
+    JSON + per-check gauges without paging."""
+    if any(c.status == FAIL and c.severity == "critical" for c in checks):
         return "fail"
     return "pass"
 
 
-def write_json(config, checks, canary, started):
+def write_json(config, checks, canary, started, canary_inbound=None):
     report = {
         "probe": PROBE_NAME,
         "version": PROBE_VERSION,
@@ -642,6 +869,9 @@ def write_json(config, checks, canary, started):
         "duration_s": round(time.monotonic() - started, 1),
         "checks": [c.to_dict() for c in checks],
         "canary": without_check(canary) if canary else {"enabled": False},
+        "canary_inbound": (
+            without_check(canary_inbound) if canary_inbound else {"enabled": False}
+        ),
     }
     text = json.dumps(report, indent=2, sort_keys=True) + "\n"
     if config.json_out:
@@ -799,6 +1029,39 @@ def main(argv=None):
     parser.add_argument(
         "--prom-out", default=None, help="write the Prometheus textfile here"
     )
+    parser.add_argument(
+        "--canary-inbound",
+        action="store_true",
+        help="also run the INBOUND canary: unauthenticated :25 submission to the"
+        " canary mailbox + IMAPS arrival (the world-facing path; recipient must"
+        " exist first - the 1 h directory negative-cache trap)",
+    )
+    parser.add_argument(
+        "--metrics-url",
+        default=None,
+        help="GET this URL and verify it serves Prometheus exposition format"
+        " (the metrics.enable endpoint; warning-severity)",
+    )
+    parser.add_argument(
+        "--dmarc-sink-dir",
+        default=None,
+        help="parsedmarc output directory whose newest .json/.csv must be fresh"
+        " (with --dmarc-sink-max-age-hours; warning-severity)",
+    )
+    parser.add_argument(
+        "--dmarc-sink-max-age-hours",
+        type=int,
+        default=48,
+        help="dmarc sink freshness threshold in hours (default 48)",
+    )
+    parser.add_argument(
+        "--check-timeout",
+        type=int,
+        default=300,
+        help="per-check wall-clock budget in seconds (a wedged check fails as a"
+        " timeout instead of hanging the probe; the canary legs budget"
+        " themselves from --slo-seconds)",
+    )
     config = parser.parse_args(argv)
 
     if not HOSTNAME_RE.match(config.host):
@@ -810,22 +1073,35 @@ def main(argv=None):
     config.dnsbl_zones = [z for z in config.dnsbl_zones.split(",") if z]
     config.ips = [i for i in config.ips.split(",") if i]
     for ip in config.ips:
-        if not IP_RE.match(ip):
-            parser.error(f"--ips entry {ip!r} is not an IPv4 address (v6 unsupported)")
+        try:
+            ipaddress.ip_address(ip)
+        except ValueError:
+            parser.error(f"--ips entry {ip!r} is not an IPv4 or IPv6 address")
     config.ports = sorted({int(p) for p in config.ports.split(",") if p})
     config.check_dns = not config.no_dns
     if not config.ips and config.check_dns:
-        config.ips = [a for a in dig(config, ["A", config.host]) if IP_RE.match(a)]
+        config.ips = [
+            answer
+            for family in ("A", "AAAA")
+            for answer in dig(config, [family, config.host])
+            if _is_ip(answer)
+        ]
     config.canary_password = None
     if config.canary_address:
         if not config.canary_password_file:
             parser.error("--canary-address needs --canary-password-file")
         with open(config.canary_password_file, encoding="utf-8") as handle:
             config.canary_password = handle.read().strip()
+    if config.canary_inbound and not config.canary_address:
+        parser.error(
+            "--canary-inbound needs --canary-address/--canary-password-file"
+            " (the recipient must be an EXISTING mailbox - the 1 h directory"
+            " negative-cache trap)"
+        )
 
     started = time.monotonic()
-    checks, canary = run_checks(config)
-    report = write_json(config, checks, canary, started)
+    checks, canary, canary_inbound = run_checks(config)
+    report = write_json(config, checks, canary, started, canary_inbound)
     write_prometheus(config, checks, report)
 
     for check in checks:

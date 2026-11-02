@@ -241,6 +241,19 @@
       (lib.escapeShellArg deliverabilityChecks.canary.address)
       "--canary-password-file"
       (lib.escapeShellArg canaryCredential)
+    ]
+    ++ lib.optionals
+    (deliverabilityChecks.canaryInbound && deliverabilityChecks.canary.address != null)
+    ["--canary-inbound"]
+    ++ lib.optionals (deliverabilityChecks.metricsUrl != null) [
+      "--metrics-url"
+      (lib.escapeShellArg deliverabilityChecks.metricsUrl)
+    ]
+    ++ lib.optionals (deliverabilityChecks.dmarcSinkDirectory != null) [
+      "--dmarc-sink-dir"
+      (lib.escapeShellArg deliverabilityChecks.dmarcSinkDirectory)
+      "--dmarc-sink-max-age-hours"
+      (toString deliverabilityChecks.dmarcSinkMaxAgeHours)
     ];
 in {
   # Swap the pinned nixpkgs 0.15 module for the vendored 0.16 one in EVERY
@@ -515,7 +528,10 @@ in {
       enable = lib.mkEnableOption ''
         continuous deliverability probes (systemd timer): DNS
         (MX/SPF/DMARC/DKIM), DNSBL listing, transport (25/465/587/993 TLS),
-        certificate expiry, and an optional round-trip canary. EMISSION
+        certificate expiry (incl. the 25/587 STARTTLS legs), and an
+        optional round-trip canary (plus opt-in inbound-canary,
+        metrics-endpoint, and parsedmarc sink-freshness checks).
+        EMISSION
         ONLY - exit code, journal, /var/lib report JSON + Prometheus
         textfile; alert ROUTING (push/SigNoz/Gatus) stays on the consumer
         host (docs/MONITORING.md "Routing table": alerts never ride the
@@ -572,7 +588,12 @@ in {
       ipAddresses = lib.mkOption {
         type = lib.types.listOf lib.types.str;
         default = [];
-        description = "Outbound IPv4 addresses for PTR/DNSBL checks (empty = resolve from hostname).";
+        description = ''
+          Outbound IP addresses (IPv4 or IPv6) for PTR/DNSBL checks
+          (empty = resolve A+AAAA from the hostname). DNSBL reverse
+          notation is family-correct (v4 octets reversed, v6 expanded
+          nibbles reversed) - use an IPv6-aware zone for v6 entries.
+        '';
       };
 
       ports = lib.mkOption {
@@ -604,6 +625,55 @@ in {
             in the Nix store. Set together with address.
           '';
         };
+      };
+
+      canaryInbound = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = ''
+          Also run the INBOUND canary: submit unauthenticated via :25
+          to the canary mailbox and assert IMAPS arrival - the exact
+          world-facing path (inbound acceptance + queue delivery) the
+          authenticated :587 round-trip cannot see. Requires the canary
+          address/secretFile pair. The recipient MUST exist before the
+          first probe run: probing an unknown recipient poisons the
+          1 h directory negative cache and legitimate mail keeps
+          bouncing even after the account appears (README ledger).
+        '';
+      };
+
+      metricsUrl = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        example = "http://127.0.0.1:8080/metrics";
+        description = ''
+          When set, the probe GETs this URL and fails a warning-severity
+          check unless it serves Prometheus exposition format - the
+          metrics.enable endpoint becomes checkable itself (every
+          checker is dead-man-monitored; this makes the scrape target
+          honest too).
+        '';
+      };
+
+      dmarcSinkDirectory = lib.mkOption {
+        type = lib.types.nullOr lib.types.path;
+        default = null;
+        description = ''
+          parsedmarc output directory checked for freshness: its newest
+          .json/.csv must be younger than dmarcSinkMaxAgeHours. A silent
+          parsedmarc (or dead destination) is otherwise invisible until
+          someone needs the data. Warning severity by design - a stalled
+          DMARC pipeline must not page at dead-MX severity. The probe
+          runs as a DynamicUser; the directory must be readable by it
+          (the dmarc-monitor localMail/output paths qualify when shared
+          via the consumer's group).
+        '';
+      };
+
+      dmarcSinkMaxAgeHours = lib.mkOption {
+        type = lib.types.ints.positive;
+        default = 48;
+        description = "dmarcSinkDirectory freshness threshold in hours.";
       };
 
       tlsVerification = lib.mkOption {

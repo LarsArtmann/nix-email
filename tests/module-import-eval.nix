@@ -127,6 +127,10 @@
     stalwart016 = lib.versionAtLeast stalwart.package.version "0.16";
     parsedmarcEnabled = cfg.services.parsedmarc.enable;
     hostname = cfg.services.mail-server.hostname;
+    # Network-probing features default OFF (the dnsbl/metrics posture):
+    # the deliverability probe timer must not appear in a default eval.
+    deliverabilityDefaultOff =
+      !cfg.services.mail-server.deliverabilityChecks.enable;
     inherit hasMailServer hasDmarcMonitor vendoredModuleActive;
     inherit badKeyTrips emptyZoneTrips;
     # config.json shape: datastore descriptor only.
@@ -161,6 +165,7 @@ in
   assert !renderedAttrs.defaultHasMetrics || throw "module-import-eval: default plan must not carry the Metrics singleton - metrics.enable default OFF is broken.";
   assert !renderedAttrs.defaultHasCache || throw "module-import-eval: default plan must not carry the Cache singleton - directoryCacheTtlNegative default (upstream 3600s) is broken.";
   assert !renderedAttrs.defaultHasRelayStrategy || throw "module-import-eval: default plan must not carry MtaOutboundStrategy - direct-to-MX (relay=null) is broken.";
+  assert renderedAttrs.deliverabilityDefaultOff || throw "module-import-eval: deliverabilityChecks.enable must default to FALSE - a default-on network probe breaks the opt-in posture (and would surprise DNS-less consumers).";
   assert renderedAttrs.throttleRateCount == 100 || throw "module-import-eval: rateLimits.rate did not render into the throttle x:Rate count.";
   assert renderedAttrs.throttleRatePeriod == 3600000 || throw "module-import-eval: rateLimits.period must render as integer MILLISECONDS (0.16 duration encoding) - got ${toString renderedAttrs.throttleRatePeriod}.";
   assert renderedAttrs.throttleKeys == "senderDomain,remoteIp" || throw "module-import-eval: rateLimits.keys must translate to the MtaInboundThrottleKey enum (camelCase), order preserved.";
@@ -193,6 +198,7 @@ in
           grep -q '"defaultHasMetrics":false' "$renderedPath"
           grep -q '"defaultHasCache":false' "$renderedPath"
           grep -q '"defaultHasRelayStrategy":false' "$renderedPath"
+          grep -q '"deliverabilityDefaultOff":true' "$renderedPath"
           grep -q '"throttleRateCount":100' "$renderedPath"
           grep -q '"throttleRatePeriod":3600000' "$renderedPath"
           grep -q '"throttleKeys":"senderDomain,remoteIp"' "$renderedPath"

@@ -26,10 +26,12 @@
 #
 #   1.  Boot: provision applies (canary account declarative); the probe
 #       UNIT runs green: report.json overall=pass, every DNS check passes,
-#       transport (25 STARTTLS / 587 / 465 / 993) green, tls-verification
-#       correctly WARNS (self-signed tier, opportunistic mode - overall
-#       still pass), canary round-trip delivers within the SLO and the
-#       report shows phase=cleanup.
+#       transport (25 STARTTLS / 587 / 465 / 993) green, cert expiry on
+#       the 993 AND the 25/587 STARTTLS legs green, the metrics endpoint
+#       serves exposition format, tls-verification correctly WARNS
+#       (self-signed tier, opportunistic mode - overall still pass), the
+#       canary round-trip AND the unauthenticated :25 inbound canary
+#       deliver to INBOX within the SLO (phase=cleanup, folder=INBOX).
 #   2.  Emission contract: metrics.prom carries probe_success 1, the
 #       per-check gauges, the dead-man timestamp; the timer is enabled
 #       with the default cadence and Persistent.
@@ -37,7 +39,10 @@
 #       unit exit contract (non-zero) and the report names the zone.
 #   4.  NEGATIVE canary-auth: wrong password fails at phase=send - the
 #       send-vs-delivery distinction MONITORING.md section 6 demands.
-#   5.  Eval contract (let block below): ExecStart carries the host,
+#   5.  dmarc-sink freshness: a FRESH sink passes the check; a STALE one
+#       fails the CHECK but not the run (warning severity must not page
+#       at dead-MX level - the overall_status severity contract).
+#   6.  Eval contract (let block below): ExecStart carries the host,
 #       LoadCredential for the canary password, NO OnFailure in the
 #       wrapper (alert routing is consumer-side doctrine), timer shape.
 {pkgs}: let
@@ -126,7 +131,14 @@ in
               address = "canary@mail.example.test";
               secretFile = "/etc/canary-secret";
             };
+            # The world-facing inbound path rides the battery: :25
+            # unauthenticated submission -> INBOX (the recipient EXISTS
+            # from provisioning - the 1 h negative-cache trap is why the
+            # account is provisioned before any probe runs).
+            canaryInbound = true;
+            metricsUrl = "http://127.0.0.1:8080/metrics/prometheus";
           };
+          metrics.enable = true;
         };
 
         # pyzor off (relay-e2e lesson: its host is unresolvable even with
@@ -250,6 +262,18 @@ in
         machine.succeed(
           "jq -e '.checks[] | select(.name == \"imaps-993\") | .status == \"pass\"' /var/lib/mail-deliverability-probe/report.json"
         )
+        # Cert expiry now also covers the STARTTLS legs (openssl
+        # -starttls smtp): 25 + 587 carry their own warning-severity
+        # checks alongside the implicit-TLS 993/465 ones.
+        machine.succeed(
+          "jq -e '.checks[] | select(.name == \"tls-cert-expiry-25\") | .status == \"pass\"' /var/lib/mail-deliverability-probe/report.json"
+        )
+        machine.succeed(
+          "jq -e '.checks[] | select(.name == \"tls-cert-expiry-587\") | .status == \"pass\"' /var/lib/mail-deliverability-probe/report.json"
+        )
+        machine.succeed(
+          "jq -e '.checks[] | select(.name == \"metrics-endpoint\") | .status == \"pass\"' /var/lib/mail-deliverability-probe/report.json"
+        )
         # Self-signed tier + opportunistic mode: the WARN verdict is the
         # doctrine pin - degraded, never failed.
         machine.succeed(
@@ -261,6 +285,18 @@ in
         machine.succeed("jq -e '.canary.phase == \"cleanup\"' /var/lib/mail-deliverability-probe/report.json")
         machine.succeed(
           "jq -e '.canary.elapsed_s < 120' /var/lib/mail-deliverability-probe/report.json"
+        )
+        machine.succeed("jq -e '.canary.folder == \"INBOX\"' /var/lib/mail-deliverability-probe/report.json")
+
+      with subtest("inbound canary: :25 unauthenticated delivers to INBOX"):
+        machine.succeed(
+          "jq -e '.checks[] | select(.name == \"canary-inbound\") | .status == \"pass\"' /var/lib/mail-deliverability-probe/report.json"
+        )
+        machine.succeed(
+          "jq -e '.canary_inbound.phase == \"cleanup\"' /var/lib/mail-deliverability-probe/report.json"
+        )
+        machine.succeed(
+          "jq -e '.canary_inbound.folder == \"INBOX\"' /var/lib/mail-deliverability-probe/report.json"
         )
 
       with subtest("emission contract: prometheus textfile + timer"):
@@ -308,6 +344,30 @@ in
         machine.succeed(
           "jq -e '.checks[] | select(.name == \"canary-roundtrip\") | .status == \"fail\"' /tmp/canary-report.json"
         )
+
+      with subtest("dmarc-sink freshness: stale fails the check, not the run"):
+        machine.succeed("mkdir -p /tmp/dmarc-sink && touch /tmp/dmarc-sink/report.json")
+        machine.succeed(
+          "deliverability-probe --host mail.example.test --no-dns --ports 993"
+          " --dmarc-sink-dir /tmp/dmarc-sink"
+          " --json-out /tmp/sink-fresh.json > /tmp/sink-fresh.log 2>&1"
+        )
+        machine.succeed(
+          "jq -e '.checks[] | select(.name == \"dmarc-sink-freshness\") | .status == \"pass\"' /tmp/sink-fresh.json"
+        )
+        machine.succeed("touch -d '3 days ago' /tmp/dmarc-sink/report.json")
+        # Warning severity: the CHECK fails (gauge + JSON) but overall
+        # stays pass - a stalled DMARC pipeline must not page at dead-MX
+        # level (the overall_status severity contract).
+        machine.succeed(
+          "deliverability-probe --host mail.example.test --no-dns --ports 993"
+          " --dmarc-sink-dir /tmp/dmarc-sink"
+          " --json-out /tmp/sink-stale.json > /tmp/sink-stale.log 2>&1"
+        )
+        machine.succeed(
+          "jq -e '.checks[] | select(.name == \"dmarc-sink-freshness\") | .status == \"fail\"' /tmp/sink-stale.json"
+        )
+        machine.succeed("jq -e '.overall == \"pass\"' /tmp/sink-stale.json")
 
       with subtest("timer cadence: a second run stays green (idempotent)"):
         machine.succeed(
