@@ -278,3 +278,35 @@ a commitment list; HARVEST must dedupe before minting rows.
    `TODO_LIST.md`/`ROADMAP.md` for the HARVEST handoff now, or should the
    corridor stay untouched until those sessions are known-quiet? A
    conflicting writer would corrupt rows neither of us authored.
+
+## h) POST-REPORT UPDATES (append-only, 2026-11-02)
+
+Annotating instead of rewriting, per the corridor policy. These close the
+items this report had to leave open.
+
+1. **f/2 - the CI run for HEAD is green.** Run `41394557333` on
+   `8d70c9d2` ("docs: plan the README truth lane...") concluded `success`.
+   The run that was in flight when this report was written (`b291c625`,
+   `41391851903`) also concluded `success`. No infrastructure red, nothing
+   to re-run.
+2. **f/34 - `core.hooksPath` is set** to `.githooks` on this checkout and
+   `.githooks/pre-push` is present and executable (mode 100755). The hook
+   now also runs the new anchor/Contents lint (see 3).
+3. **f/1 - the anchor gate exists and is wired.** `scripts/check-md-anchors.sh`
+   landed (`4f0058d`): it fails closed on an in-file `#anchor` with no
+   matching heading and on a level-2 heading missing from (or duplicated
+   in) `## Contents`, using GitHub slug rules and skipping code fences.
+   `--self-test` runs three negative fixtures and one positive; seeded
+   defects on copies of the real README (an added `##` heading, a typo'd
+   anchor) each produce a `file:line` offender. Wired into the CI markdown
+   leg and the pre-push hook; CONTRIBUTING states that a heading edit owns
+   its TOC row.
+4. **f/17 - the four `result*` symlinks are gone** (`result`, `result-1`,
+   `result-2`, `result-vm`), along with this session's `/tmp` scratch
+   (`head-readme.md`, `ledger-body.md`, `orig-readme.md`, a screenshot).
+   All are reproducible via `nix build`; `.gitignore` already covers
+   `result` and `result-*`.
+5. **f/27 - workspace audit clean.** `git status --ignored` shows only the
+   expected classes: `.config/`, `.crush`, `__pycache__/`, `*.log` probe
+   transcripts and the python caches. No unignored stray build output, no
+   untracked artifact at the repo root.
