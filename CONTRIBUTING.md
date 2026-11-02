@@ -87,6 +87,30 @@ runs pipefail, so grep -q's early exit can EPIPE the producer (observed as
 curl exit 23 on a matching payload, 2026-09-15) - and `! producer | grep -q`
 can phantom-green. Dump the producer to a file, then grep the file.
 
+The canonical force-assert pattern wraps both rules plus one more: a
+forced command (systemctl start, a manual probe run) must land its
+output in a file, and the ASSERTION message must carry a context-free
+tail of that file - so a red test explains itself in the driver log
+instead of pointing at a file the CI sweeper already deleted:
+
+```python
+machine.succeed(
+    "systemctl start mail-deliverability-probe.service"
+    " > /tmp/probe-run.log 2>&1"
+)
+result = machine.succeed(
+    "systemctl show -p Result --value mail-deliverability-probe.service"
+).strip()
+assert result == "success", (
+    f"probe unit Result={result}, journal tail:"
+    f" {machine.succeed('journalctl -u mail-deliverability-probe -b 0 --no-pager -n 40')}"
+)
+```
+
+Force (start it), capture (> file), assert (on the unit Result), explain
+(the tail rides the assertion message). The deliverability-e2e battery
+subtest is the reference; copy it rather than re-deriving the dance.
+
 Shell fragments inside a `testScript` are string literals, so none of the
 above catches a bash syntax error. `scripts/check-testscript-shell.py`
 closes that hole: it extracts every `testScript = ''...'';` block, folds

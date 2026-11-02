@@ -417,13 +417,24 @@ in the two-node VM test, not guessed).
 
 A systemd timer (default `OnCalendar *:0/15`, `Persistent`) runs the probe
 unit `mail-deliverability-probe.service` - DNS (MX/SPF/DMARC/DKIM
-selectors), DNSBL listing per outbound IP, transport health on
-25/465/587/993 (STARTTLS/implicit TLS, SASL login when canary credentials
-are set), certificate expiry, and the round-trip canary (submit a
+selectors), DNSBL listing per outbound IP (IPv4 and IPv6,
+family-correct reverse notation), transport health on 25/465/587/993
+(STARTTLS/implicit TLS, SASL login when canary credentials are set),
+certificate expiry (implicit-TLS 993/465 legs AND the 25/587 STARTTLS
+legs via `openssl -starttls smtp`), and the round-trip canary (submit a
 token-unique mail as the canary account on 587, assert IMAPS arrival
 within `sloSeconds`, delete it - send-failure and delivery-timeout are
-distinguished in the report, per MONITORING.md section 6). VM-e2e'd by
-`deliverability-e2e` (green battery + both negative paths).
+distinguished in the report, per MONITORING.md section 6; arrival in
+Junk instead of INBOX is its own delivered-to-junk WARN verdict). Every
+check runs under a wall-clock budget (`--check-timeout`, 300 s default)
+so one wedged check fails as a timeout instead of hanging the probe.
+Optional legs: `canaryInbound` (submit UNAUTHENTICATED via :25 to the
+canary mailbox - the world-facing inbound path; the recipient must
+EXIST before the first run, the 1 h directory negative-cache trap),
+`metricsUrl` (assert the `metrics.enable` endpoint serves Prometheus
+exposition format), and `dmarcSinkDirectory` (parsedmarc output
+freshness, warning severity). VM-e2e'd by `deliverability-e2e` (green
+battery + the negative paths).
 
 ```nix
 services.mail-server.deliverabilityChecks = {
@@ -434,6 +445,9 @@ services.mail-server.deliverabilityChecks = {
     address = "canary@example.com";   # an EXISTING account (provision it yourself - C44 doctrine)
     secretFile = "/run/secrets/mail-canary-password";
   };
+  canaryInbound = true;               # also probe the unauthenticated :25 inbound path
+  metricsUrl = "http://127.0.0.1:8080/metrics/prometheus";  # with metrics.enable
+  dmarcSinkDirectory = "/var/lib/dmarc-monitor/reports";    # freshness check
 };
 ```
 
@@ -806,7 +820,7 @@ Gate commands never wear pipes (`cmd \| tail` can print PASSED on a failing
 run) - redirect to a file and read it. See CONTRIBUTING.md for the
 verified-facts ledger rules and the architecture-diagram regen command.
 
-### Try it in a VM (demo stack; reworked for 0.16, runtime smoke pending - see TODO_LIST)
+### Try it in a VM (demo stack; reworked for 0.16, runtime smoke verified)
 
 `nix run .#vm` (x86_64-linux) boots a throwaway QEMU VM with the full
 mail-server stack, a declaratively provisioned `demo@mail.demo.test`
@@ -829,7 +843,18 @@ validation rejects the special-use `.invalid` TLD. **Fresh 0.16.26 smoke:
 DONE 2026-10-31** (anon JMAP session shape, AUTH submission -> IMAPS
 round-trip, catch-all SMTP-accept + strict rejection outside the
 provisioned domain; transcript
-`docs/probes/2026-10-31-demo-smoke-01626/`).
+`docs/probes/2026-10-31-demo-smoke-01626/`); one-command re-smoke since
+2026-11-01: `scripts/demo-console.sh` boots + `scripts/demo-smoke.py`
+probes all five legs (transcript
+`docs/probes/2026-11-01_demo-smoke-tooling/`).
+
+The demo VM runs with `deliverabilityChecks` OFF on purpose: the probe
+needs real DNS (MX/SPF/DMARC/DKIM + DNSBL zones) and a provisioned
+canary account to be meaningful, and the slirp NAT demo has neither -
+the battery would run all-WARN/FAIL noise, not signal. The probe's own
+behavior is VM-e2e'd by `deliverability-e2e` against a real local DNS
+zone instead (that test node is the reference posture for a real
+host).
 
 Known cosmetic startup noise in the demo journal: `Spam classifier model
 not found` and `Resource error` lines (the spam-filter resource's ASN/GeoIP

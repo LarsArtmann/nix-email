@@ -378,6 +378,47 @@ check before deploying the advanced pin.
   change and a re-check of the vendored module against upstream.
 """
 
+ADR_EMISSION_ONLY = """
+## Context
+
+The continuous deliverability probe (services.mail-server
+.deliverabilityChecks) watches DNS records, DNSBL listings, transport
+TLS, certificate expiry, and canary round-trips. The obvious wiring -
+alert on failure right where the check runs - would put the monitoring
+channels (push/SigNoz/Gatus) on the SAME host, service, and systemd
+instance it watches. A hung Stalwart or a dead host then takes its own
+alarm down with it (the monitor-rides-the-monitored failure), and
+every consumer inherits alert routing they never chose.
+
+## Decision
+
+The probe is EMISSION ONLY. It emits everything a consumer needs to
+route alerts itself: a process exit code (0 iff no CRITICAL check
+failed - WARNING never fails the unit, so a stalled DMARC sink or a
+Junk-delivered canary degrades without paging), journald lines, a
+report.json + rolling history, and a Prometheus textfile with
+per-check gauges plus the dead-man timestamp. Alert ROUTING (channels,
+thresholds, escalation) is wired by the CONSUMER layer - copy-paste
+wirings for push, SigNoz, and Gatus live in docs/MONITORING.md
+section 8. The probe itself carries NO OnFailure, no notification
+code, and no channel credentials.
+
+## Consequences
+
+- Alerts never ride the mail stack they watch (MONITORING.md routing
+  table); a totally dead mail host is caught by the dead-man rule on
+  mail_deliverability_probe_timestamp_seconds, scraped from OUTSIDE.
+- Every checker is itself monitored: the timestamp gauge must be
+  scraped and dead-man'd by the consumer - an unmonitored emission
+  probe is silent green.
+- Severity is part of the contract: CRITICAL failure flips the exit
+  code (unit failure -> consumer push); WARNING-severity checks (PTR
+  mismatches, self-signed tiers, sink freshness) surface as degraded
+  gauges without paging.
+- Consumers decide cadence and dedup; the wrapper ships only the
+  timer (OnCalendar) and Persistent=true.
+"""
+
 ADRS = [
     {
         "id": "thin-wrapper-doctrine",
@@ -465,6 +506,19 @@ ADRS = [
         "date": "2026-10-18",
         "applies": [("service", "mail-server")],
         "body": ADR_PIN_VS_OVERLAY,
+    },
+    {
+        "id": "deliverability-probe-emission-only",
+        "name": "Deliverability probe emits, consumers route alerts",
+        "summary": (
+            "The probe ships exit code, journal, JSON, and Prometheus"
+            " gauges - never the alert channels; routing lives on the"
+            " consumer host so monitors never ride the stack they watch"
+        ),
+        "status": "accepted",
+        "date": "2026-11-02",
+        "applies": [("service", "mail-server")],
+        "body": ADR_EMISSION_ONLY,
     },
 ]
 
