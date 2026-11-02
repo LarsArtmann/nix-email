@@ -128,9 +128,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   build, which IS the VM test run) and `--check` (py_compile + the
   baked-in debug-rule lint), relocates /tmp script paths into the cache
   dir, rejects a path-like check name with a usage hint (flags before
-  positionals - the arg-order faceplant class), and generates its
+  positionals - the arg-order faceplant class; `--self-test` pins the
+  guard's classification), and generates its
   starter under `~/.cache/nix-email/vm-debug/`.
   Transcript: docs/probes/2026-11-01_demo-smoke-tooling/.
+- Pre-push hook clean-tree guard (2026-11-02): every pre-push check
+  verifies the WORKING TREE while `git push` ships the COMMITS - a
+  daemon-swept dirty tree shipped a red master exactly that way (the
+  dprint fix sat uncommitted while the raw-row commit pushed; run
+  41372119515). The hook now refuses to run its suite when tracked
+  files differ from HEAD (`git diff-index --quiet`), telling the
+  pusher to commit/stash first.
 - `.#ruff-floor` flake app (2026-11-02): the CI ruff error-floor step
   now evals straight to this flake's pinned ruff instead of
   `github:NixOS/nixpkgs/<rev>#ruff`, whose registry eval walk consumed
