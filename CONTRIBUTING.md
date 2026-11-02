@@ -49,13 +49,16 @@ test comments) is load-bearing. Discoverability instead rests on the
 
 - **Adding or removing an `##` heading means editing `## Contents` in the
   same commit.** One row per level-2 heading, exactly once.
-- Run `sh scripts/check-md-anchors.sh` before pushing. It fails on (a) any
-  in-file `#anchor` that resolves to no heading and (b) any level-2 heading
-  missing from (or duplicated in) `## Contents`. `--self-test` proves the
-  lint can fail. CI and the pre-push hook run both.
-- Anchors are GitHub slugs: lowercase, everything but letters/digits/
-  space/hyphen stripped, spaces to hyphens (`Module: services.mail-server`
-  becomes `#module-servicesmail-server`).
+- Run `python3 scripts/check-md-anchors.py` before pushing. It fails on
+  (a) any in-file anchor that resolves to no heading - inline `[x](#slug)`,
+  reference `[label]: #slug` and HTML `href="#slug"` forms alike - and
+  (b) any level-2 heading missing from (or duplicated in) `## Contents`.
+  `--self-test` runs 17 negative and positive cases; CI and the pre-push
+  hook run both.
+- Anchors are GitHub slugs: lowercase, everything but Unicode
+  letters/marks/numbers, space, hyphen and underscore stripped, each space
+  to a hyphen (`Module: services.mail-server` becomes
+  `#module-servicesmail-server`; `Grüße & Maß` becomes `#grüße--maß`).
 - Keep the two clocks honest: the top of the README is a front door (what
   this is, why, how to start in one command); dated pin facts live in the
   status block and `CHANGELOG.md`, not as a diary at the top.
@@ -151,6 +154,25 @@ the SAME session that mutates the tool: a mutated checker that is never
 re-verified silently changes semantics on its next consumer (the
 2026-11-01 annotate-driver reformat rode unverified; caught by review,
 not by the tool).
+
+## Text gates: which lint owns which failure class
+
+Seven scripts guard the text side of the tree. Knowing which one fired is
+the difference between a one-line fix and an afternoon.
+
+| Script | Owns | Fails on |
+| --- | --- | --- |
+| `scripts/check-md-table-pipes.sh` | table integrity | an unescaped pipe character inside a cell (GFM splits the row and silently drops columns) |
+| `scripts/check-md-list-markers.sh` | list integrity | a `-`/`*` marker that starts a line because a prose line wrapped |
+| `scripts/check-check-set-drift.sh` | count rot | a numeric check-set claim ("the 7 checks") in `README.md`/`AGENTS.md` |
+| `scripts/check-md-anchors.py` | front door | an in-file anchor with no heading; a level-2 heading missing from or duplicated in `## Contents` |
+| `scripts/check-readme-versions.py` | version truth | the README status block naming a Stalwart/parsedmarc version the flake does not build (a flake check, not a CI step) |
+| `scripts/check-testscript-shell.py` | test scripts | a bash syntax error inside a `testScript` string literal |
+| `scripts/check-deprecated-aliases.py` | eval noise | a `warnAlias` nixpkgs attribute named in a default or fixture (a per-switch warning for every consumer) |
+
+Every one of them carries `--self-test` and every self-test is re-run in
+the session that mutates the tool (see "The gate"). The anchor lint is the
+one to reach for first when a heading edit "looks fine" but CI disagrees.
 
 ## VM debug loops
 
@@ -269,8 +291,9 @@ checks json/yaml/markdown/dockerfile (dprint.json; archived corridors
 excluded). A local `pre-push`
 hook in `.githooks/` runs the same check before every push, plus the
 check-inventory lockstep (`scripts/check-inventory.sh` - the flake's
-declared checks must match CI's expected lists), so an unformatted tree or
-a drifted check inventory fails locally instead of going red on master
+declared checks must match CI's expected lists) and the four text lints
+below, so an unformatted tree, a drifted check inventory or a rotted
+`## Contents` row fails locally instead of going red on master
 (which happened twice on 2026-09-16 for formatting, and three unnoticed
 times on 2026-09-23 for inventory drift). Bypassing with
 `git push --no-verify` is discouraged - CI still enforces everything. If

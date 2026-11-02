@@ -162,18 +162,19 @@ jobs:
 
       - name: Lint markdown anchors + Contents completeness (fail-closed, self-tested)
         run: |
-          # FRONT-DOOR INTEGRITY LINT (2026-11-02): the README is 1600+
-          # lines with 39% of it the ledger (C52 keeps it there), so the
-          # `## Contents` table IS the navigation. Every in-file `#anchor`
-          # must resolve to a heading and every level-2 heading must be
-          # listed exactly once - link rot and TOC drift fail a build
-          # instead of waiting for a session to notice. The script
-          # self-tests three negative fixtures and one positive before
-          # the tree-wide pass (a never-firing lint is a false green).
+          # FRONT-DOOR INTEGRITY LINT (2026-11-02, hardened same day): the
+          # README is 1600+ lines with 39% of it the ledger (C52 keeps it
+          # there), so the `## Contents` table IS the navigation. Every
+          # in-file anchor must resolve to a heading and every level-2
+          # heading must be listed exactly once - link rot and TOC drift
+          # fail a build instead of waiting for a session to notice.
+          # Anchors are recognised in all three markdown forms (inline,
+          # reference definitions, HTML href) and slugs are unicode-aware.
+          # The self-test runs 17 negative and positive cases before the
+          # tree-wide pass (a never-firing lint is a false green).
           set -eu
-          sh scripts/check-md-anchors.sh --self-test
-          git ls-files -z '*.md' > /tmp/md-files3.list
-          xargs -0 sh scripts/check-md-anchors.sh < /tmp/md-files3.list
+          python3 scripts/check-md-anchors.py --self-test
+          python3 scripts/check-md-anchors.py
 
       - name: Check-set drift alarm (fail-closed, self-tested)
         run: |

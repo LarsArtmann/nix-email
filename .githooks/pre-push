@@ -56,8 +56,12 @@ echo "pre-push: markdown lints (pipes, list markers, drift, anchors)"
 bash scripts/check-md-table-pipes.sh
 bash scripts/check-md-list-markers.sh
 bash scripts/check-check-set-drift.sh
-sh scripts/check-md-anchors.sh --self-test
-sh scripts/check-md-anchors.sh
+if command -v python3 >/dev/null 2>&1; then
+  python3 scripts/check-md-anchors.py --self-test
+  python3 scripts/check-md-anchors.py
+else
+  echo "pre-push: python3 unavailable - skipping anchor lint (CI enforces)" >&2
+fi
 
 # 5. Statix (CI parity, the 4x-red W20 class): the PINNED statix, same
 #    rev CI uses, so local findings match CI exactly.
