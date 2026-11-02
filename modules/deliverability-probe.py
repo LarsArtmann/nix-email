@@ -113,7 +113,7 @@ def run_checks(config):
         started = time.monotonic()
         limit = int(budget_s if budget_s is not None else config.check_timeout)
 
-        def on_alarm(signum, frame):  # noqa: ARG001 - signal signature
+        def on_alarm(signum, frame):
             raise TimeoutError(f"check exceeded its {limit}s wall-clock budget")
 
         old_handler = signal.signal(signal.SIGALRM, on_alarm)
@@ -597,7 +597,9 @@ def check_metrics_endpoint(config):
     Prometheus exposition format - the consumer's scrape target is dead
     air otherwise (MONITORING: every checker is dead-man-monitored, and
     this check is what makes the scrape target itself checkable)."""
-    request = urllib.request.Request(config.metrics_url, headers={"User-Agent": PROBE_NAME})
+    request = urllib.request.Request(
+        config.metrics_url, headers={"User-Agent": PROBE_NAME}
+    )
     try:
         with urllib.request.urlopen(request, timeout=config.timeout) as response:
             body = response.read(4096).decode(errors="replace")
@@ -611,7 +613,9 @@ def check_metrics_endpoint(config):
             f"{config.metrics_url} answered but the body is not Prometheus "
             f"exposition format (no # HELP lines; first 80 bytes: {body[:80]!r})",
         )
-    return Check("", "", PASS, f"{config.metrics_url} serves Prometheus exposition format")
+    return Check(
+        "", "", PASS, f"{config.metrics_url} serves Prometheus exposition format"
+    )
 
 
 def check_dmarc_sink_freshness(config):
