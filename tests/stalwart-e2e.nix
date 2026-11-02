@@ -777,6 +777,21 @@ in
           machine.succeed(
               "imap-probe absent report-consumed-needle-9d2f reports@example.test '${testPass}' 30"
           )
+          # CONTROL (E5.2, mirrors the 16b shape): a message to the SAME
+          # report address carrying NO report part is delivered normally -
+          # the absence above is report-specific, not address-wide.
+          machine.succeed(
+              "swaks --timeout 120 --server 127.0.0.1:25 "
+              "--ehlo reporter.external.example "
+              "--from reporter@external.example --to reports@example.test "
+              "--header 'Subject: not a report' "
+              "--body 'aggregate-control-needle-7e3a' "
+              "> /tmp/swaks-agg-control.log 2>&1"
+          )
+          machine.succeed("cat /tmp/swaks-agg-control.log >&2")
+          machine.succeed(
+              "imap-probe wait aggregate-control-needle-7e3a reports@example.test '${testPass}'"
+          )
 
       with subtest("native ingestion: ARF auth-failure report consumed, not delivered"):
           # C42 evidence gap (decision-batch: "the remaining runtime gap is
