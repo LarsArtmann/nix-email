@@ -248,7 +248,10 @@ inventory in [FEATURES.md](FEATURES.md); long-term direction and the gating
 user decisions in [ROADMAP.md](ROADMAP.md).
 
 Doctrine note (nixos-mailserver lessons, from a deep study of
-simple-nixos-mailserver at the pinned era, 2026-09-14): that project
+simple-nixos-mailserver at the pinned era, 2026-09-14 - the study
+transcript is
+`docs/status/archived/2026-09-14_19-39_stalwart-e2e-full-path-and-source-verification.md`):
+that project
 historically SHIPPED backup and monitoring options and later REMOVED
 them - upstream mail software already has native/complementary answers
 (Stalwart: `--export`/`--import`, `/metrics/prometheus`), and wrapper

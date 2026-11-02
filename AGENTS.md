@@ -182,7 +182,6 @@ transcript-pinned dialect).
   facts belong in the status blockquote and CHANGELOG.md. Any heading
   change owns its `## Contents` row in the same commit
   (`sh scripts/check-md-anchors.sh`; CONTRIBUTING "Editing the README").
-
 - systemd namespace semantics (three VM runs, 2026-10-28):
   ReadWritePaths with the `-` prefix is evaluated ONCE at namespace
   setup - a path that appears LATER (e.g. postfix's localMail maildir
