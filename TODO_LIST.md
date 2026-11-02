@@ -29,6 +29,15 @@
 > (2026-11-01 23-38 report f)/g/3 residue, floor f/7+f/12 already
 > DONE). The deliverability-probe-backlog row gets the same treatment
 > once its lane lands.
+>
+> Last row change 2026-11-02 (front-door truth lane): the 06-04
+> report's 34 items were harvested - everything this repo could close
+> was closed IN the session (anchor/TOC gate, CI read-back, workspace
+> hygiene, dated README verify pass, version lockstep check, claim
+> hygiene, doctrine lines, living-docs truth, verification rides,
+> decision pack), so only three residue rows were ADDED: the C54
+> owner nod, the mechanization-queue taste call, and the SKILLS-repo
+> guide mirror.
 
 ## Status legend
 

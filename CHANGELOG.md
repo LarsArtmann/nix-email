@@ -198,6 +198,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- Documentation truth sweep (2026-11-02): SECURITY.md claimed "all changes
+  are code-reviewed before merge" and "automated security scanning runs in
+  CI" - neither is true here (the commit daemon lands on master with branch
+  protection bypassed per C18, and `vulnix` is disabled fleet-wide), so the
+  policy now describes the real posture (the gate, the pinned rev,
+  Dependabot for Actions, hand-tracked upstream CVEs) and keeps its existing
+  48 h / 72 h / 90 day SLA. GitHub repo metadata: About text was already
+  accurate; topics gained `jmap` and `carddav`. The mechanization queue
+  (`docs/planning/2026-11-02_06-55_mechanization-queue.md`) prices six
+  automation proposals: three landed (the status-report scope line in the
+  SKILLS repo, the SECURITY.md correction, the topic refresh), one is
+  closed NO-GO (external link checker), and the remaining two carry a
+  recommendation not to build. TODO_LIST gained three residue rows and no
+  more: every other item from the 06-04 report was closed in-session.
 - Living-docs truth pass (2026-11-02): FEATURES.md's backup row claimed
   `stalwart-vandelay` is absent from the pinned nixpkgs (it has been in
   since fe132422 at 1.0.12, eval-verified 2026-10-31 - only the live-store
