@@ -452,8 +452,13 @@ This pass closes that list rather than queueing it.
 | Text-gate map              | DONE      | CONTRIBUTING "Text gates" table (seven scripts, one failure class each) + `scripts/selftest-docs-gates.sh` so the map is executable                                                                                                                      |
 | Docs truth sweep           | DONE      | AGENTS text-gate command list, FEATURES rows for both lints, CI row freed of run ids, TODO_LIST row-change notes merged, ADR count re-read (8), `docs/probes/README.md` index, DOMAIN_LANGUAGE scope note, CONTRIBUTING daemon/branch-protection honesty |
 
-Gate for this pass: both flake checks build green (cache-cold), their aarch64
-derivations eval, `check-inventory.sh` 0, the full `nix flake check` 0,
-`nix fmt -- . --check` 0, every text gate 0, ruff floor 0, shellcheck 0,
-actionlint 0. Pushed with the pre-push guards green; CI `ci.yml` green on the
-resulting head on 2026-11-02 (run ids stay in status reports, not here).
+Gate for this pass, at the resulting HEAD: both flake checks re-executed
+(`--rebuild`) and the aarch64 pair BUILT under binfmt emulation,
+`check-inventory.sh` 0, `nix flake check` 0 ("all checks passed!"),
+`nix fmt -- . --check` 0, every text gate 0 (including the new fixture
+self-test), ruff floor 0, shellcheck 0, actionlint 0, `buildflow --max-time
+30m` 0 ("passed with warnings": the known bandit/vulture/nix-checker noise).
+
+NOT pushed in this sitting - the owner had not asked for a push, and the
+daemon's auto-commits already own the history of this working tree (see §f
+item 43: squashing them is an owner call that needs force-push approval).
