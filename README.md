@@ -26,6 +26,18 @@ host: [SystemNix integration](#systemnix-integration).
 > recorded in [CHANGELOG.md](CHANGELOG.md); live work in
 > [TODO_LIST.md](TODO_LIST.md); the transcript-pinned fact set in the
 > [ledger](#verified-facts-ledger-do-not-re-derive-from-memory).
+>
+> **Verified 2026-11-02** against this tree and the pin: every option
+> name in the module sections, the migration script's marker/port/dump
+> paths, the runbooks' package claims (`imapsync` 2.314,
+> `stalwart-vandelay` 1.0.12, `parsedmarc` 11.0.2, `stalwart_0_16`
+> 0.16.26 via `nix eval`), the demo port table (contract-pinned by
+> `demo-eval`), the catalog exporter (selftest green) and every
+> `docs/probes/` path this README cites (all present). GAPS, still on
+> their original dates: the Hetzner port-block policy (2026-09-14) and
+> the upstream 0.16.23-0.16.26 delta details (2026-10-18) were not
+> re-fetched, and JMAP behavior remains transcript-pinned to 0.16.22
+> per the ledger's ride-along note.
 
 ## Contents
 
@@ -739,8 +751,8 @@ Gatus checks for the VPS (on evo-x2, external viewpoint):
 
 nix-email is a fully governed EventCatalog source:
 `scripts/export-catalog.py` emits the catalog tree (authored service
-pages for `mail-server` and `dmarc-monitor` plus seven ADRs) and the
-eventcatalog-hub consumes it via its `sources.manual.json` - a MANUAL
+pages for `mail-server` and `dmarc-monitor` plus the decision records) and
+the eventcatalog-hub consumes it via its `sources.manual.json` - a MANUAL
 source, because the hub's depgraph only discovers Go modules.
 Composition rule: our tree provides the service BODIES, deployment
 badges union in from the SystemNix inventory tree (first-wins body,
