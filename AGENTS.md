@@ -56,6 +56,12 @@ transcript-pinned dialect).
     proves BOTH toolchains; extract
     cross-file identifiers mechanically (`grep -o`, `git diff` read-back),
     never from memory.
+- The markdown lints (`check-md-table-pipes`, `-list-markers`,
+  `-anchors`) read the git INDEX, not the working tree: `git ls-files`
+  supplies the file list, so an uncommitted ADD/DELETE makes them scan a
+  different set than the tree you are looking at (the deletion that made
+  the pipe lint die on `awk: cannot open file`). Stage first, or pass the
+  paths explicitly.
 - Adding/removing a flake check = TWO sites: edit
   `tests/check-expected.json` AND the README check list (CI-enforced
   anti-drift); a missed site ships red master (daemon pushes bypass the
@@ -161,6 +167,21 @@ transcript-pinned dialect).
   belong to the CONSUMER wrapper, not here.
 
 ## Working rules (learned the hard way)
+
+- NEVER move the verified-facts ledger out of README.md (C52). Owner
+  decision C52 (2026-10-23, `docs/planning/decision-batch.md`) ratified
+  "README-as-ledger" as permanent and rejected `docs/LEDGER.md`: the
+  pointer web (AGENTS, CONTRIBUTING, scripts/export-catalog.py, ~20 module
+  and test comments) is load-bearing. On 2026-11-02 a docs-health-style
+  "a README is a sales page" instinct executed the move; it was reverted
+  byte-identically within the session. Sweep decision records BEFORE any
+  structural README edit, and mitigate the 39%-of-file cost with the
+  `## Contents` table, never with a split.
+- The README top is a FRONT DOOR, not a diary: what this is, why it
+  exists, and the one command that runs it, above the fold. Dated pin
+  facts belong in the status blockquote and CHANGELOG.md. Any heading
+  change owns its `## Contents` row in the same commit
+  (`sh scripts/check-md-anchors.sh`; CONTRIBUTING "Editing the README").
 
 - systemd namespace semantics (three VM runs, 2026-10-28):
   ReadWritePaths with the `-` prefix is evaluated ONCE at namespace
