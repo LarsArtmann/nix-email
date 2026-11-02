@@ -186,6 +186,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- README verification date (2026-11-02): the top status block now states
+  what was re-verified against this tree and the pin (every module option
+  name, the migration marker/port/dump paths, the runbook package versions
+  via `nix eval` on the lock, the demo port table against its `demo-eval`
+  contract, the catalog exporter selftest, every cited `docs/probes/`
+  path) and, just as explicitly, what was NOT (the Hetzner port-block
+  policy, the upstream 0.16.23-0.16.26 delta details, JMAP behavior -
+  still transcript-pinned to 0.16.22). The catalog paragraph's ADR count
+  was wrong ("seven" for eight) and is now count-free so it cannot rot
+  again.
 - README front-door rework (2026-11-02): the 28-line STATUS banner became
   a five-line status block (the pin facts it carried are already in this
   file), a `## Contents` index now lists every section, and the demo VM
