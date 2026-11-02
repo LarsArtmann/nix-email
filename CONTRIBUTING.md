@@ -135,22 +135,35 @@ not by the tool).
 Distilled from the FIFO-console and 0.16-upgrade sessions (2026-10).
 AGENTS.md keeps only pointers to this section.
 
-Demo VM (`nix run .#vm`): debug via a FIFO console (`mkfifo in && cat in |
-<vm-closure>/bin/run-demo-vm > log`, with a `sleep infinity > in` holder) -
-more reliable than the driver for ad-hoc runs. Probe LAYERED: guest service
--> guest loopback -> HOST port; "connects but never answers" behind a port
-forward is a FIREWALL signature (ledger (k)).
+Demo VM (`nix run .#vm`): debug via a FIFO console - MECHANIZED as
+`scripts/demo-console.sh [timeout-seconds]` (session dir with FIFO +
+console log, `sleep infinity` holder, hard timeout, orphan-QEMU sweep;
+the manual recipe - `mkfifo in && cat in |
+<vm-closure>/bin/run-demo-vm > log` - is one wrong redirection away from
+a hung orphan QEMU holding the demo-disk write lock). A one-command
+post-bump smoke against the forwarded ports ships as
+`python3 scripts/demo-smoke.py` (5 legs, transcript
+`docs/probes/2026-11-01_demo-smoke-tooling/`). Probe LAYERED: guest
+service -> guest loopback -> HOST port; "connects but never answers"
+behind a port forward is a FIREWALL signature (ledger (k)).
 
 VM-test debug loop rules (the driver dance itself is MECHANIZED below):
 driver python runs on the HOST - VM-port work must be packaged scripts or
 `machine.succeed`, never host socket code.
 
-The dance is MECHANIZED: `scripts/vm-debug.sh [check] [test-script]` builds
-the GC root, extracts the per-test driver from the check derivation's
-buildCommand (the check output itself is an EMPTY dir; `runNixOSTest` puts
-no bin/ there), generates a starter script with the rules below baked in,
-and runs the driver (`--test-script ... -o ...`). Verified 2026-10-19
-through driver invocation (smoke script, no boot). Unit-script PATH trap
+The dance is MECHANIZED: `scripts/vm-debug.sh [--script-only] [--check]
+[check] [test-script]` builds the GC root, extracts the per-test driver
+from the check derivation's buildCommand (the check output itself is an
+EMPTY dir; `runNixOSTest` puts no bin/ there), generates a starter
+script with the rules below baked in (under
+`~/.cache/nix-email/vm-debug/`, never `/tmp` - user scripts from `/tmp`
+are copied there first; a sweeper broke a run mid-session once), lints
+(`--check`: py_compile + rules (b)/(f) + host-socket detection), and
+runs the driver (`--test-script ... -o ...`); `--script-only` prints
+the driver command line instead of executing. Verified 2026-10-19
+through driver invocation (smoke script, no boot); `--check` +
+`--script-only` verified 2026-11-01 (transcript
+`docs/probes/2026-11-01_demo-smoke-tooling/`). Unit-script PATH trap
 (pbx run 15, 2026-10-20): a unit's `ExecStartPre` PATH is NOT the console
 PATH - bare tool names that work in `machine.succeed` (`ip`) fail inside
 unit scripts (`command not found`, looping into the start timeout and
