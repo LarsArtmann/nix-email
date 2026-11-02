@@ -160,6 +160,21 @@ jobs:
           git ls-files -z '*.md' > /tmp/md-files2.list
           xargs -0 bash scripts/check-md-list-markers.sh < /tmp/md-files2.list
 
+      - name: Lint markdown anchors + Contents completeness (fail-closed, self-tested)
+        run: |
+          # FRONT-DOOR INTEGRITY LINT (2026-11-02): the README is 1600+
+          # lines with 39% of it the ledger (C52 keeps it there), so the
+          # `## Contents` table IS the navigation. Every in-file `#anchor`
+          # must resolve to a heading and every level-2 heading must be
+          # listed exactly once - link rot and TOC drift fail a build
+          # instead of waiting for a session to notice. The script
+          # self-tests three negative fixtures and one positive before
+          # the tree-wide pass (a never-firing lint is a false green).
+          set -eu
+          sh scripts/check-md-anchors.sh --self-test
+          git ls-files -z '*.md' > /tmp/md-files3.list
+          xargs -0 sh scripts/check-md-anchors.sh < /tmp/md-files3.list
+
       - name: Check-set drift alarm (fail-closed, self-tested)
         run: |
           # DRIFT ALARM (the 6->7 count rot, mechanized): AGENTS.md and

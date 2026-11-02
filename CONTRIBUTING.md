@@ -38,6 +38,28 @@ fixture traps"): dovecot settings values must not use dovecot's own
 the ini generator renders booleans Python-style (`True`/`False`, not
 `true`/`false`) — one failed VM run each, 2026-09-15.
 
+## Editing the README: it is a front door, not a note pile
+
+`README.md` is the first thing a stranger reads and 39% of it is the
+verified-facts ledger. Owner decision **C52** ratified the ledger staying
+there (`docs/planning/decision-batch.md`): do NOT move or split it - the
+pointer web (this file, `AGENTS.md`, `scripts/export-catalog.py`, module and
+test comments) is load-bearing. Discoverability instead rests on the
+`## Contents` table at the top, so that table is part of the contract:
+
+- **Adding or removing an `##` heading means editing `## Contents` in the
+  same commit.** One row per level-2 heading, exactly once.
+- Run `sh scripts/check-md-anchors.sh` before pushing. It fails on (a) any
+  in-file `#anchor` that resolves to no heading and (b) any level-2 heading
+  missing from (or duplicated in) `## Contents`. `--self-test` proves the
+  lint can fail. CI and the pre-push hook run both.
+- Anchors are GitHub slugs: lowercase, everything but letters/digits/
+  space/hyphen stripped, spaces to hyphens (`Module: services.mail-server`
+  becomes `#module-servicesmail-server`).
+- Keep the two clocks honest: the top of the README is a front door (what
+  this is, why, how to start in one command); dated pin facts live in the
+  status block and `CHANGELOG.md`, not as a diary at the top.
+
 ## Changes to the wrapper modules
 
 - All wrapper defaults are `mkDefault`; consumers override through
