@@ -9,12 +9,10 @@ DMARC/TLS-RPT monitor, packaged as a NixOS flake for consumption by
 
 Self-hosted **inbound** mail on a Hetzner VPS (the residential evo-x2 can
 never be an MX), **outbound** relayed through Resend for clean-IP
-deliverability, DMARC/TLS-RPT reports polled and parsed on evo-x2. Design
-basis: the internal `~/projects/reports/selfhosted-email-guide.md` study.
-Heavy stacks (Mailcow 6-8 GiB, Elasticsearch for parsedmarc, Piler
-archiving) are deliberately rejected: Stalwart is one Rust binary
-(~512 MB-1 GiB RAM) with spam filter, DKIM, JMAP, CalDAV/CardDAV and
-web admin built in.
+deliverability, DMARC/TLS-RPT reports polled and parsed on evo-x2. Heavy
+docker-first and search-backed stacks are deliberately rejected (see
+[Non-goals](#non-goals)): Stalwart is one Rust binary with spam filter,
+DKIM, JMAP, CalDAV/CardDAV and web admin built in.
 
 **Try it:** `nix run github:LarsArtmann/nix-email#vm` boots the whole
 stack in a throwaway VM (x86_64-linux) - accounts, ports and API probes

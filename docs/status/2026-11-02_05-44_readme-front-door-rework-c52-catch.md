@@ -9,12 +9,12 @@
 
 ## 0. TL;DR
 
-| Question                   | Answer                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| What was asked?            | Fix the README review findings: no TOC, 38-line pin-advance banner before any value prop, first runnable command at ~50% depth, ledger inline, no install snippet, no LICENSE/SECURITY/CONTRIBUTING links, stale root `demo.qcow2`.                                                                                                                                                                                      |
-| What shipped?              | Hero (pitch -> one-command try -> 5-line status), `## Contents` (18 rows, every anchor machine-checked), demo VM hoisted to `## Quickstart: try it in a VM` (command now on line 19), SystemNix section de-staled + full flake-input/`nixosModules.default` snippet, LICENSE/Security/Contributing footer, split delta heading fixed, stale "`nix fmt` is alejandra only" claim fixed, 20 MB stale `demo.qcow2` trashed. |
-| What was REFUSED, and why? | Moving the ledger to `docs/LEDGER.md` - **owner decision C52 (ratified 2026-10-23): "Accept README-as-ledger"**, the move explicitly rejected as "rewrites many pointers". The move was executed, then reverted byte-identically; only its discoverability changed (status link + TOC row).                                                                                                                              |
-| Verification               | `nix flake check` EXIT 0 ("all checks passed!"), `nix fmt -- . --check` EXIT 0, md pipe/list-marker/check-set-drift lints EXIT 0, inventory lockstep EXIT 0, testScript shell lint EXIT 0, link+anchor checker: 0 broken.                                                                                                                                                                                                |
+| Question                                   | Answer                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| What was asked?                            | Fix the README review findings: no TOC, 38-line pin-advance banner before any value prop, first runnable command at ~50% depth, ledger inline, no install snippet, no LICENSE/SECURITY/CONTRIBUTING links, stale root `demo.qcow2`.                                                                                                                                                                                      |
+| What shipped?                              | Hero (pitch -> one-command try -> 5-line status), `## Contents` (18 rows, every anchor machine-checked), demo VM hoisted to `## Quickstart: try it in a VM` (command now on line 19), SystemNix section de-staled + full flake-input/`nixosModules.default` snippet, LICENSE/Security/Contributing footer, split delta heading fixed, stale "`nix fmt` is alejandra only" claim fixed, 20 MB stale `demo.qcow2` trashed. |
+| What was REFUSED, and why?                 | Moving the ledger to `docs/LEDGER.md` - **owner decision C52 (ratified 2026-10-23): "Accept README-as-ledger"**, the move explicitly rejected as "rewrites many pointers". The move was executed, then reverted byte-identically; only its discoverability changed (status link + TOC row).                                                                                                                              |
+| Verification (scope: README + this report) | `nix flake check` EXIT 0 ("all checks passed!"), `nix fmt -- . --check` EXIT 0, md pipe/list-marker/check-set-drift lints EXIT 0, inventory lockstep EXIT 0, testScript shell lint EXIT 0, link+anchor checker: 0 broken.                                                                                                                                                                                                |
 
 ## a) FULLY DONE
 
@@ -92,4 +92,12 @@
 2. If the README ever grows past readability again, the C52-compatible
    lever is moving the RUNBOOKS (go-live + pin-advance) to `docs/`, not the
    ledger: runbooks are procedures, the ledger is the pointer web C52
-   protects.
+   protects. This is NOT a new task - it is ROADMAP open question 4
+   ("README ops-detail level: keep as-is, trim to outline, or move detail
+   into a private consumer doc?"), still unanswered. Harvest it from there
+   when the owner sits; do not mint a parallel TODO row.
+3. Out of scope this round, so NOT verified: FEATURES/TODO_LIST/ROADMAP
+   freshness beyond the few rows cross-read for this report; the ledger's
+   ~150 bullets beyond the pin/version/check-set arms; external competitor
+   claims (the hero's unsourced Mailcow RAM figure was dropped rather than
+   dated, because no fetch was performed).
