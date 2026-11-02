@@ -242,18 +242,14 @@ ideas, all D1-gated:
   ADR-id vs ROADMAP-decision-id SYNC check (needs a decision-id source
   of truth outside the exporter) - parked
 - CI/devtool parked ideas (2026-10-31 E16 session): (a) ruff-floor CI
-  cost - the CI floor step pays `nix run github:...#ruff` cold (~13 s/step
-  from CI logs; warm local is 0.14 s, so the cost is fresh-runner flake
-  eval + store download, NOT nix being slow). Ideas, cheapest first: pin
-  the floor to an app output of THIS flake (`.#ruff-floor`, lock-resolved,
-  no GitHub-ref eval walk) or run it inside the devShell CI already builds
-  for the fmt step (`nix develop -c ruff ...`) - instrument the CI step
-  timing first, then pick; (b) `scripts/vm-debug.sh` convenience modes:
-  `--script-only` (emit the generated starter script for hand-editing and
-  exit, no driver run) and `--check` (eval + driver-extract + script-gen
-  dry run, no GC-root build, no boot) - both are pure bash additions to
-  the existing extractor, worth one small session the next time a VM debug
-  loop actually hurts
+  cost - DONE 2026-11-01: measured 10 s fresh-runner (CI run
+  41265954894, the whole step budget was the `github:...#ruff` eval
+  walk); the floor moved to the `.#ruff-floor` app (lock-resolved, no
+  GitHub-ref eval walk) with the never-firing self-test kept; (b)
+  `scripts/vm-debug.sh` convenience modes - DONE 2026-11-01:
+  `--script-only` (prints the driver command line, skips the GC-root
+  build which IS the VM test run) and `--check` (py_compile + baked-in
+  debug-rule lint) both shipped
 - A drift-alarm arm for the TODO sweep-banner date (routed 2026-10-23
   f/27, re-routed 2026-10-30, still unbuilt - parked until a stale sweep
   banner actually costs a session)

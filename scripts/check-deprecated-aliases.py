@@ -324,10 +324,7 @@ def self_test() -> int:
         # yields there, the floor must turn the vacuous scan loud.
         reformatted = root / "reformatted.nix"
         reformatted.write_text(
-            "{\n"
-            "  stalwart =\n"
-            '    warnAlias "moved to its own line" stalwart_0_15;\n'
-            "}\n"
+            '{\n  stalwart =\n    warnAlias "moved to its own line" stalwart_0_15;\n}\n'
         )
         if check_alias_floor(parse_warn_aliases(reformatted)) is None:
             print("self-test FAIL: reformat scenario must trip the floor")
