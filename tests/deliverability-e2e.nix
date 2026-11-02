@@ -5,15 +5,18 @@
 # canary auth failure) - the classes a green-path-only test cannot see.
 #
 # DNS shape (the relay-e2e lesson, adapted): the node runs dnsmasq on
-# 127.0.0.1 serving a REAL zone for the provisioned mail domain. The
-# `server = ["10.0.2.3"]` entry below is a DEAD END in the test-driver
-# network (the QEMU user-net resolver is instantly unreachable there -
-# dig exit 9 in ~60 ms; docs/probes/2026-10-31-dnsmasq-forward/), NOT a
-# working upstream - it is kept because nothing here needs it: pyzor is
-# disabled (below), the probe's DNS inventory is the local zone + the
-# DNSBL mock, and the `local = [...]` lines force authoritative local
-# answers. Scope split: single-VM contexts DO have live slirp DNS at
-# 10.0.2.3; the multi-node test-driver network does not.
+# 127.0.0.1 serving a REAL zone for the provisioned mail domain. There
+# is NO upstream forward ON PURPOSE (2026-11-02, the inbound-canary
+# lesson): the historical dead `server = ["10.0.2.3"]` entry forwarded
+# every name outside the local zones (openssl -starttls's own EHLO
+# domain, the post-DATA sender-auth lookups) into the test-driver black
+# hole for a ~15 s stall per lookup - exactly the probe's socket
+# timeout, so the inbound canary died while its dialog was instant
+# (take-4 debug transcript: EHLO/MAIL/RCPT/DATA-354 all 0.0 s, post-DATA
+# reply still missing after 25 s). With no upstream, dnsmasq REFUSES
+# foreign names instantly - the fast-failure posture a real host's
+# resolver has. Scope split: single-VM contexts DO have live slirp DNS
+# at 10.0.2.3; the multi-node test-driver network does not.
 #   mail.example.test.   MX 10 mail.example.test.   (points at the host)
 #   mail.example.test.   TXT "v=spf1 mx -all"
 #   _dmarc.mail.example.test. TXT "v=DMARC1; p=reject"
@@ -183,15 +186,15 @@ in
         };
 
         # The DNS the probe (and 0.16 reload validation) sees: a real
-        # local zone for the mail domain + the DNSBL mock + upstream
-        # forward (see the header comment for the record inventory).
+        # local zone for the mail domain + the DNSBL mock, with NO
+        # upstream forward (see the header comment for the record
+        # inventory and the no-dead-forward doctrine).
         dnsmasq = {
           enable = true;
           settings = {
             listen-address = "127.0.0.1";
             bind-interfaces = true;
             no-resolv = true;
-            server = ["10.0.2.3"];
             # dnsbl.test is LOCAL too: an unlisted IP must get an
             # authoritative NXDOMAIN from dnsmasq, never a forwarded
             # query into the QEMU resolver's black hole (the first run's
@@ -253,6 +256,15 @@ in
       machine.wait_for_unit("stalwart-provision.service", timeout=180)
       machine.wait_for_open_port(25, timeout=120)
       machine.wait_for_open_port(993, timeout=120)
+      # The Persistent timer fires on boot and can overlap the manual
+      # battery start: two concurrent batteries = ~18 SMTP connections
+      # from one IP within a second, past upstream's built-in per-IP
+      # connection limiter - the excess connections get instantly closed
+      # and BOTH runs' canary legs fail (isolated 2026-11-02: 5 rapid
+      # clean connections OK, #6+ closed, healthy again after 2 s). The
+      # timer's SHAPE is pinned by the eval contract + is-enabled below;
+      # stop it so the battery runs deterministically alone.
+      machine.succeed("systemctl stop mail-deliverability-probe.timer")
 
       with subtest("probe unit: full battery green incl. round-trip canary"):
         machine.succeed(

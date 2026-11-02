@@ -135,6 +135,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   the whole measured 10 s step budget (run 41265954894). Same rule
   floor (E4,E7,E9,F), identical binary to the devShell; the
   never-firing self-test fixture is kept.
+- Deliverability probe battery extension (2026-11-02, the 2026-10-30
+  f/6-25 residue): IPv6 in `--ips`/DNSBL/PTR (family-correct reverse
+  notation - v4 octets, v6 exploded nibbles); certificate expiry on the
+  25/587 STARTTLS legs (openssl `-starttls smtp`); per-check wall-clock
+  budgets (`--check-timeout`, 300 s default, SIGALRM-enforced - a
+  wedged check fails as a timeout instead of hanging the probe); an
+  opt-in `metrics-endpoint` check (assert the `metrics.enable` URL
+  serves exposition format) and `dmarc-sink-freshness` check (newest
+  parsedmarc sink output younger than N hours, warning severity); the
+  `canaryInbound` leg (unauthenticated :25 submission to the canary
+  mailbox - the world-facing path; the recipient must EXIST first, the
+  1 h directory negative-cache trap); and a distinct delivered-to-junk
+  WARN verdict (INBOX searched first, Junk only on miss). The overall
+  verdict now fails ONLY on CRITICAL-severity failures - the
+  documented exit contract became code (a warning-severity FAIL like a
+  stale DMARC sink surfaces in gauges without paging). Wrapper options:
+  `deliverabilityChecks.canaryInbound/.metricsUrl/.dmarcSinkDirectory/
+  .dmarcSinkMaxAgeHours`; the `enable = false` default is eval-pinned
+  (module-import-eval). DIAGNOSES transcript-pinned in the e2e header:
+  stalwart's own resolver (NOT the system one by default) sent
+  sender-auth lookups into the test net's dead upstream for ~15 s per
+  name (fixed: the node pins `DnsResolver` Custom -> its dnsmasq, which
+  now has NO upstream so foreign names are refused instantly), and the
+  boot Persistent-timer race double-ran the battery past upstream's
+  built-in per-IP connection limiter (fixed: the test stops the timer;
+  the probe's canary connects retry once on an instant disconnect -
+  five rapid connections OK, the sixth closed, healthy again in 2 s).
 
 ### Changed
 

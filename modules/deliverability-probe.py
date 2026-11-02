@@ -400,6 +400,27 @@ def smtp_starttls_context(config):
     return context
 
 
+def smtp_connect(config, port):
+    """Connect + EHLO with ONE retry on an instant disconnect: upstream
+    ships a built-in per-IP connection rate limiter (isolated 2026-11-02:
+    five rapid sequential connections OK, the sixth instantly closed,
+    healthy again ~2 s later), and a probe that makes many transport
+    connections in one run can brush against it on a real host too - a
+    single short backoff keeps the canary legs from failing on exactly
+    the transient a monitoring probe must ride out."""
+    last_exc = None
+    for attempt in (1, 2):
+        try:
+            client = smtplib.SMTP(config.host, port, timeout=config.timeout)
+            client.ehlo(ehlo_domain(config))
+            return client
+        except smtplib.SMTPServerDisconnected as exc:
+            last_exc = exc
+            if attempt == 1:
+                time.sleep(2)
+    raise last_exc
+
+
 def check_smtp_starttls(config, port, expect_banner):
     with smtplib.SMTP(config.host, port, timeout=config.timeout) as client:
         code, banner = client.ehlo(ehlo_domain(config))
@@ -702,8 +723,7 @@ def check_canary(config):
     message.set_content(f"Automated deliverability probe round-trip token {token}.\n")
 
     try:
-        with smtplib.SMTP(config.host, 587, timeout=config.timeout) as client:
-            client.ehlo(ehlo_domain(config))
+        with smtp_connect(config, 587) as client:
             client.starttls(context=smtp_starttls_context(config))
             client.ehlo(ehlo_domain(config))
             client.login(config.canary_address, config.canary_password)
@@ -770,8 +790,7 @@ def check_canary_inbound(config):
     message.set_content(f"Automated inbound canary token {token}.\n")
 
     try:
-        with smtplib.SMTP(config.host, 25, timeout=config.timeout) as client:
-            client.ehlo(ehlo_domain(config))
+        with smtp_connect(config, 25) as client:
             client.send_message(message)
     except (smtplib.SMTPException, OSError) as exc:
         return _canary_fail(
