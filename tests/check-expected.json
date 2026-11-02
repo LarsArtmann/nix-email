@@ -6,7 +6,8 @@
     "migrate-convert-eval",
     "module-import-eval",
     "provision-plan-eval",
-    "readme-version-lockstep"
+    "readme-version-lockstep",
+    "readme-version-lockstep-fires"
   ],
   "x86_64-linux": [
     "check-set-lockstep",
@@ -19,6 +20,7 @@
     "parsedmarc-e2e",
     "provision-plan-eval",
     "readme-version-lockstep",
+    "readme-version-lockstep-fires",
     "stalwart-bind-e2e",
     "stalwart-e2e",
     "stalwart-migrate-e2e",

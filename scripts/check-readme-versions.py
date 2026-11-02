@@ -8,10 +8,14 @@ land in flake.lock and in the module defaults while the README kept claiming
 the old pair - a front door that lies about what it ships.
 
 This check compares the two canonical anchors in the status blockquote
-against the versions the flake actually builds. Deliberately scoped: only the
-status block is canonical. Other `0.16.x` mentions in the README are HISTORY
-("0.16.22 until the 2026-10-28 advance", the delta table) and must stay
-untouched - a blanket textual check would fail on correct prose.
+against the versions the flake actually builds. Deliberately scoped twice
+over: only the status block is canonical, and inside it only the FIRST
+blockquote paragraph (the `> **Status (`...`)**` paragraph) - a second
+paragraph such as the dated verification note may legitimately name
+versions without being the canonical pair. Other `0.16.x` mentions in the
+README are HISTORY ("0.16.22 until the 2026-10-28 advance", the delta
+table) and must stay untouched - a blanket textual check would fail on
+correct prose.
 
 Fail-closed on absence: if the anchors cannot be found the check fails, so a
 rewording cannot silently disable it.
@@ -20,6 +24,7 @@ Usage:
   check-readme-versions.py --readme README.md \\
       --stalwart 0.16.26 --parsedmarc 11.0.2
   check-readme-versions.py --self-test
+  check-readme-versions.py --quiet --readme README.md --stalwart ... 
 """
 
 from __future__ import annotations
@@ -34,13 +39,18 @@ PARSEDMARC_RE = re.compile(r"parsedmarc \*\*(\d+\.\d+\.\d+)\*\*")
 
 
 def status_block(text: str) -> list[str]:
-    """Return the blockquote lines that carry the status block."""
+    """Return the first blockquote paragraph of the status block."""
     lines = text.splitlines()
     for index, line in enumerate(lines):
         if STATUS_MARKER in line and line.lstrip().startswith(">"):
             block = []
             for follow in lines[index:]:
-                if not follow.lstrip().startswith(">"):
+                stripped = follow.lstrip()
+                if not stripped.startswith(">"):
+                    break
+                if stripped == ">":
+                    # A bare `>` separates paragraphs inside one quote: the
+                    # canonical pair lives in the first, so stop here.
                     break
                 block.append(follow)
             return block
@@ -115,6 +125,34 @@ def self_test() -> int:
             "11.0.2",
             ["status block does not state parsedmarc (no `parsedmarc **x.y.z**` anchor)"],
         ),
+        (
+            "marker outside a blockquote is not a status block",
+            "# T\n\n**Status (2026-10-28):** Stalwart **0.16.26**, parsedmarc **11.0.2**.\n",
+            "0.16.26",
+            "11.0.2",
+            [
+                "no status blockquote (`> **Status (`...) found - the version anchors are gone"
+            ],
+        ),
+        (
+            "second blockquote paragraph is not canonical",
+            good.replace("# T\n\n", "")
+            + ">\n> **Verified 2026-11-02:** Stalwart **0.99.99** named as prose.\n",
+            "0.16.26",
+            "11.0.2",
+            [],
+        ),
+        (
+            "version named twice with different values",
+            "# T\n\n> **Status (2026-10-28):** Stalwart **0.16.26**, Stalwart **0.16.27**, "
+            "parsedmarc **11.0.2**.\n",
+            "0.16.26",
+            "11.0.2",
+            [
+                "status block states Stalwart more than once with different values: "
+                "['0.16.26', '0.16.27']"
+            ],
+        ),
     ]
     failed = 0
     for name, text, stalwart, parsedmarc, expected in cases:
@@ -134,6 +172,7 @@ def main(argv: list[str]) -> int:
     parser.add_argument("--stalwart", help="Stalwart version the flake builds")
     parser.add_argument("--parsedmarc", help="parsedmarc version the flake builds")
     parser.add_argument("--self-test", action="store_true", help="prove the check can fail")
+    parser.add_argument("--quiet", action="store_true", help="no success summary line")
     args = parser.parse_args(argv)
 
     if args.self_test:
@@ -160,12 +199,12 @@ def main(argv: list[str]) -> int:
         print(f"offender: {args.readme}: {finding}")
     if findings:
         return 1
-    print(
-        "check-readme-versions: README status block matches the pin "
-        f"(Stalwart {args.stalwart}, parsedmarc {args.parsedmarc})"
-    )
+    if not args.quiet:
+        print(
+            "check-readme-versions: README status block matches the pin "
+            f"(Stalwart {args.stalwart}, parsedmarc {args.parsedmarc})"
+        )
     return 0
-
 
 if __name__ == "__main__":
     sys.exit(main(sys.argv[1:]))

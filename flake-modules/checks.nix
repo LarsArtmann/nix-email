@@ -16,7 +16,29 @@
     pkgs,
     system,
     ...
-  }: {
+  }: let
+    # The Stalwart version this flake actually deploys, DERIVED from the
+    # wrapper module's own default (evaluated with the mail server enabled)
+    # instead of retyping `pkgs.stalwart_0_16` here: a pin that renames the
+    # package attr must not leave the README check comparing a stale one.
+    # `parsedmarc` needs no such hop - the dmarc module wraps the plain
+    # nixpkgs attr, which is also what tests/dmarc-eval.nix asserts.
+    deployedStalwart =
+      (inputs.nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          ../modules/mail-server.nix
+          {
+            services.mail-server.enable = true;
+            services.mail-server.hostname = "mail.example.test";
+            boot.loader.grub.enable = false;
+            fileSystems."/".device = "/dev/null";
+            system.stateVersion = "26.11";
+          }
+        ];
+      })
+      .config.services.stalwart.package;
+  in {
     # NixOS VM tests only run reliably on x86_64-linux. MEASURED
     # 2026-09-15 (one emulated stalwart-e2e attempt on an x86 host with
     # qemu-aarch64 binfmt): the aarch64 guest BUILDS and BOOTS fine
@@ -117,14 +139,15 @@
         # canonical place stating which versions this flake ships, and it
         # used to be hand-maintained prose - a pin advance could move
         # flake.lock and the module defaults while the front door kept
-        # claiming the old pair. Both values come from the SAME pkgs the
-        # build uses (`stalwart_0_16` is the wrapper default in
-        # modules/mail-server.nix, `parsedmarc` the attr the dmarc module
-        # wraps), so an advance that forgets the README fails HERE.
-        # Deliberately scoped to the status block: every other 0.16.x
-        # mention is history ("0.16.22 until the 2026-10-28 advance", the
-        # delta table) and a blanket textual check would fail on correct
-        # prose. Self-tested both directions first.
+        # claiming the old pair. The Stalwart value comes from
+        # `deployedStalwart` above (the wrapper module's own default, not a
+        # retyped attr); parsedmarc is the attr the dmarc module wraps. An
+        # advance that forgets the README fails HERE. Deliberately scoped to
+        # the status block's FIRST paragraph: every other 0.16.x mention is
+        # history ("0.16.22 until the 2026-10-28 advance", the delta table)
+        # and a blanket textual check would fail on correct prose.
+        # Self-tested both directions; `readme-version-lockstep-fires`
+        # proves the drift class is actually caught.
         readme-version-lockstep =
           pkgs.runCommand "readme-version-lockstep" {
             nativeBuildInputs = [pkgs.python3];
@@ -132,8 +155,31 @@
             python3 ${../scripts/check-readme-versions.py} --self-test
             python3 ${../scripts/check-readme-versions.py} \
               --readme ${../README.md} \
-              --stalwart ${pkgs.stalwart_0_16.version} \
+              --stalwart ${deployedStalwart.version} \
               --parsedmarc ${pkgs.parsedmarc.version}
+            touch $out
+          '';
+        # A gate is proven by the drift it catches, not by its green: this
+        # builds a writable copy of the REAL README, plants a wrong version
+        # in the status block and fails if the lint accepts it. Without it a
+        # regex that stops matching keeps the check above green forever.
+        readme-version-lockstep-fires =
+          pkgs.runCommand "readme-version-lockstep-fires" {
+            nativeBuildInputs = [pkgs.python3];
+          } ''
+            cp ${../README.md} README.md
+            chmod u+w README.md
+            sed -i \
+              's/Stalwart \*\*[0-9][0-9.]*\*\*/Stalwart **0.0.0**/' \
+              README.md
+            if python3 ${../scripts/check-readme-versions.py} \
+              --quiet \
+              --readme README.md \
+              --stalwart ${deployedStalwart.version} \
+              --parsedmarc ${pkgs.parsedmarc.version}; then
+              echo "FATAL: planted version drift was accepted" >&2
+              exit 1
+            fi
             touch $out
           '';
       }
