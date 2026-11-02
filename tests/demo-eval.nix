@@ -3,7 +3,7 @@
 # by probe (a failing assertion injected into nixosConfigurations.demo
 # fails the gate) - so eval ROT is caught. What that does NOT catch is the
 # demo's HUMAN contract silently regressing while still evaluating clean:
-# the README "Try it in a VM" quickstart port forwards, the declarative
+# the README "Quickstart: try it in a VM" port forwards, the declarative
 # demo account (0.16: roles User variant; submission is refused without
 # it), the fallback-admin login the quickstart prints, and the pyzor-off
 # posture (stalwart-e2e lesson: network dependence for zero demo value).

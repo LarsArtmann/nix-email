@@ -175,6 +175,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- README front-door rework (2026-11-02): the 28-line STATUS banner became
+  a five-line status block (the pin facts it carried are already in this
+  file), a `## Contents` index now lists every section, and the demo VM
+  section moved from a subsection of Development to
+  `## Quickstart: try it in a VM` near the top - the first runnable
+  command sits 19 lines in instead of ~825. The SystemNix section lost
+  its stale "planned shape" label and gained a complete flake-input +
+  `nixosModules.default` consumption snippet; LICENSE, Security and
+  Contributing landed as footer sections; the 0.16.22 -> 0.16.26 delta
+  table's split heading and the stale "`nix fmt` is alejandra only"
+  claim were fixed. The verified-facts ledger STAYS in this README:
+  owner decision C52 (README-as-ledger, ratified 2026-10-23) rejected
+  the `docs/LEDGER.md` move, so only its discoverability changed.
 - docs/TELEMETRY.md 0.15-era compression (2026-11-01): the operative
   truth now leads - the 2026-10-31 D8 re-verify of the 0.16.26 binary
   (37-series HELP set identical to the 0.16.22 transcription,
