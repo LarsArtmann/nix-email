@@ -1614,7 +1614,10 @@ set), the relay stays the opt-in smarthost path, and no search-stack or
 archiving dependency has entered the tree.
 
 Piler (archiving - maildir snapshots + paperless cover personal use),
-Mailcow/Mailu (Docker-first, heavy), Elasticsearch for parsedmarc (a search
+Mailcow/Mailu (Docker-first and heavy: container-per-service stacks, judged
+from their own published compose layouts at the 2026-09-14 assessment and
+not re-measured since - a lifetime-footprint benchmark is deliberately not
+made here), Elasticsearch for parsedmarc (a search
 stack to read 16 domains' DMARC mail), a wrapper around
 `services.mailpit.instances` (single option, nothing to layer), direct-to-MX
 outbound (fresh-IP reputation; the Resend relay is the design). POP3 is

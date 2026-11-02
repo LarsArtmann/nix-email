@@ -198,6 +198,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- README claim hygiene (2026-11-02): the Non-goals paragraph's competitor
+  judgement (Mailcow/Mailu "Docker-first, heavy") now carries its
+  assessment date and says it was not re-measured, instead of reading like
+  a timeless benchmark. The upstream-issue claims were re-checked live:
+  NixOS/nixpkgs#563651 and #563777 are still OPEN (0 comments), #563652 is
+  OPEN with its last comment 2026-09-18 (the README's "no further
+  movement" holds), mjs/imapclient#662 is CLOSED and #663 MERGED - all as
+  the README states. No stale number had to be dropped otherwise; the
+  Stalwart memory figure the todo item expected is no longer in the file.
+  Verdict on a scheduled external-link checker: NO-GO - the README carries
+  16 link-shaped strings across 7 hosts, 9 of them GitHub issues already
+  covered by the state re-check above, so a lychee workflow would add CI
+  surface for near-zero signal (recorded in the mechanization queue).
 - README verification date (2026-11-02): the top status block now states
   what was re-verified against this tree and the pin (every module option
   name, the migration marker/port/dump paths, the runbook package versions
