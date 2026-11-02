@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Markdown anchor/Contents lint (`scripts/check-md-anchors.sh`,
+  2026-11-02): every in-file `#anchor` must resolve to a heading and every
+  level-2 heading must appear exactly once in a file's `## Contents`
+  section. GitHub slug rules (lowercase, non-word stripped, spaces to
+  hyphens, `-1`/`-2` duplicate suffixes), code fences and inline code spans
+  ignored. Self-tested with three negative fixtures and one positive, wired
+  into the CI markdown leg and the pre-push hook, because the README's TOC
+  is the only navigation for a 1600-line file whose ledger stays put (C52)
+  and the audit used to be an ad-hoc snippet that ran by hand. Seeded-defect
+  probes on copies of the real README: a new `##` heading and a typo'd
+  anchor each fail with a `file:line` offender.
 - Continuous deliverability checks (`services.mail-server.deliverabilityChecks`,
   owner request 2026-10-30): a timer-driven probe unit
   (`mail-deliverability-probe.service`) running a stdlib-only Python probe -
