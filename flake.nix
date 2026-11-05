@@ -65,6 +65,7 @@
         ./flake-modules/checks.nix
         ./flake-modules/devshells.nix
         ./flake-modules/probe-package.nix
+        ./flake-modules/stalwart-1-package.nix
       ];
     };
 }
