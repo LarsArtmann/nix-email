@@ -226,6 +226,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- Consumer-webmail version contract re-verified against primary sources
+  (2026-11-05): Bulwark (the C34 non-goal webmail on the consumer host)
+  upstream is at 1.20.0 (2026-11-03) while nixpkgs ships 1.14.2 with the
+  open bump PR #574920 targeting 1.19.1 and `stalwart_1_0` 1.0.0 packaged
+  with NO module. The README ledger's Bulwark bullet now carries the
+  pairing contract (Bulwark needs Stalwart >= 0.16.6; Stalwart 1.0 needs
+  Bulwark >= 1.18.0 - so a future `stalwart_1_0` pin advance must ride a
+  deployed Bulwark >= 1.18.0) and TODO_LIST gained the release-train
+  watch row (BLOCKED on #574920). The deployed 1.20.0 + the ten-plugin
+  re-survey themselves live in pbx-artmann's host overlay, not here.
 - Documentation truth sweep (2026-11-02): SECURITY.md claimed "all changes
   are code-reviewed before merge" and "automated security scanning runs in
   CI" - neither is true here (the commit daemon lands on master with branch
