@@ -28,7 +28,7 @@
   foundationdb,
   zstd,
   stdenv,
-  rocksdb,
+  cmake,
   callPackage,
   cacert,
   libredirect,
@@ -51,14 +51,23 @@ rustPlatform.buildRustPackage (finalAttrs: {
 
   cargoHash = "sha256-QOdPdcCa5HxckfMiNkgnkGMuOlRGIfMMylQs7QUGI5Q=";
 
+  # LOCAL DELTA vs nixpkgs master (build-correctness, 2026-11-05): the
+  # ROCKSDB_INCLUDE_DIR/ROCKSDB_LIB_DIR env vars are DROPPED. Stalwart
+  # 1.x locks `librocksdb-sys 0.19.0+11.8.1` from the stalwartlabs fork
+  # (Cargo.lock), whose FFI expects RocksDB 11.8 - linking the pin's
+  # nixpkgs rocksdb 10.10.1 fails with `rocksdb_slicetransform_create`
+  # arity errors (E0061/E0308, proven this build). Without the env vars
+  # librocksdb-sys builds its vendored 11.8.1 via cmake/cc, which is
+  # also how upstream ships it. nixpkgs master (stalwart_1_0 = 1.0.0)
+  # still links the system 10.10.1 - the 1.0.0 lock pairs with it; the
+  # divergence starts at upstream 1.0.1 ("RocksDB: Updated to 11.8.1",
+  # v1.0.1 release notes).
   env = {
     # https://docs.rs/openssl/latest/openssl/#manual
     OPENSSL_NO_VENDOR = true;
     OPENSSL_DIR = lib.getDev openssl;
     OPENSSL_LIB_DIR = "${lib.getLib openssl}/lib";
     ZSTD_SYS_USE_PKG_CONFIG = true;
-    ROCKSDB_INCLUDE_DIR = "${rocksdb}/include";
-    ROCKSDB_LIB_DIR = "${rocksdb}/lib";
   }
   //
     lib.optionalAttrs
@@ -72,6 +81,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
   depsBuildBuild = [
     pkg-config
     zstd
+    cmake # librocksdb-sys (vendored RocksDB 11.8.1) builds via cmake
   ];
 
   nativeBuildInputs = [
@@ -125,7 +135,9 @@ rustPlatform.buildRustPackage (finalAttrs: {
   '';
 
   passthru = {
-    inherit rocksdb; # make used rocksdb version available (e.g., for backup scripts)
+    # NOTE vs nixpkgs: no `inherit rocksdb;` here - the 1.x binary links
+    # the librocksdb-sys-vendored 11.8.1, not a system rocksdb, so there
+    # is no meaningful system package to expose for backup scripts.
     webui = callPackage ./webui.nix { };
     spam-filter = callPackage ./spam-filter.nix { };
   };
