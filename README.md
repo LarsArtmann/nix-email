@@ -1136,7 +1136,13 @@ gate is missing - but treat aarch64 as untested until someone runs it.
   9b15e1f) has the fix drafted in
   `docs/drafts/552103-webui-resource-comment.md` - owner-review-gated
   (gh auth LIVE since 2026-10-30). User webmail remains a non-goal (C34):
-  Bulwark on the consumer host is the JMAP-native client.
+  Bulwark on the consumer host is the JMAP-native client (version
+  contract re-verified 2026-11-05: Bulwark needs Stalwart >= 0.16.6 and
+  Stalwart 1.0 needs Bulwark >= 1.18.0, so a future `stalwart_1_0` pin
+  advance must ride a deployed Bulwark >= 1.18.0; nixpkgs ships
+  `stalwart_1_0` 1.0.0 with NO module, its bulwark is still 1.14.2, the
+  open bump PR is #574920 -> 1.19.1, and the consumer stays ahead via a
+  host overlay).
 
 ### Stalwart 0.15.5 era (historical facts; several are superseded above)
 
