@@ -327,7 +327,14 @@ in {
             "file://${pkgs.publicsuffix-list}/share/publicsuffix/public_suffix_list.dat"
           ];
         };
-        spam-filter.resource = lib.mkDefault "file://${cfg.package.spam-filter}/spam-filter.toml";
+        # Version-aware payload (2026-11-05, Stalwart 1.x): the 0.16 pin's
+        # spam-filter subpackage installs spam-filter.toml; the 1.x line
+        # ships spam-filter-rules.json.gz and exposes its path via
+        # passthru.resource (pkgs/stalwart_1_0/spam-filter.nix) - same
+        # attr-detection shape as the webui/webadmin seam below.
+        spam-filter.resource = lib.mkDefault (
+          cfg.package.spam-filter.resource or "file://${cfg.package.spam-filter}/spam-filter.toml"
+        );
         webadmin = let
           hasHttpListener = builtins.any (listener: listener.protocol == "http") (
             lib.attrValues (cfg.settings.server.listener or {})

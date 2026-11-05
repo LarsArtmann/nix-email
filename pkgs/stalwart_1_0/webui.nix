@@ -20,7 +20,7 @@ buildNpmPackage (finalAttrs: {
     hash = "sha256-3kOGg3RGSJeGK4/hX/yxSPcpOs7VhyYCtC7HwuKlk/U=";
   };
 
-  npmDepsHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+  npmDepsHash = "sha256-AOgnRg8lcNvQUm7kAgdPKgttBj78pUz0oFU26C/7Z6A=";
   __structuredAttrs = true;
 
   env = {

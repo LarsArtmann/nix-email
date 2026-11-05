@@ -1011,8 +1011,12 @@ in {
     services.stalwart = {
       enable = true;
       # The 0.16 package attr; pkgs.stalwart is still the 0.15 line at this
-      # pin (and warns loudly if used with this module).
-      package = pkgs.stalwart_0_16;
+      # pin (and warns loudly if used with this module). mkDefault so a
+      # consumer that has MIGRATED its store can override with the 1.x
+      # line (this flake's packages.stalwart_1_0, vendored ahead of
+      # nixpkgs since 2026-11-05) - a 1.x binary on a 0.16 store is the
+      # poison class; the migration runbook gates that override.
+      package = lib.mkDefault pkgs.stalwart_0_16;
       # 0.16 fact (binary-proven 2026-10-17): the config file carries ONLY
       # the store backend — server.listener/tracer/hostname keys are
       # SILENTLY IGNORED, and listeners live exclusively in the datastore

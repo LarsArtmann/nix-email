@@ -49,7 +49,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
     hash = "sha256-4NUb6Peivb5yG4jZSKUSwYijoF4JTvw4+u2uvN4tGqU=";
   };
 
-  cargoHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+  cargoHash = "sha256-QOdPdcCa5HxckfMiNkgnkGMuOlRGIfMMylQs7QUGI5Q=";
 
   env = {
     # https://docs.rs/openssl/latest/openssl/#manual
