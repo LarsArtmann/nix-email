@@ -17,6 +17,11 @@ rustPlatform.buildRustPackage (finalAttrs: {
   pname = "stalwart-migrate";
   version = "1.0.6";
 
+  nativeBuildInputs = [
+    # bindgen (via a locked *-sys crate) needs libclang at build time
+    rustPlatform.bindgenHook
+  ];
+
   src = fetchFromGitHub {
     owner = "stalwartlabs";
     repo = "stalwart-migrate";
