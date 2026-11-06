@@ -236,6 +236,15 @@
         # switch-to-configuration ever runs (the 2026-10-17 single-node
         # switch stopped backdoor.service and wedged the driver).
         stalwart-migrate-e2e = import ../tests/stalwart-migrate-e2e.nix {inherit pkgs;};
+        # 0.16 -> 1.0 migration REHEARSAL (the gold-standard gate before
+        # any live 1.x flip): a REAL 0.16.26 store (schema 6 - accepted by
+        # the tool's exact-match gate, which 0.16.27 also ships) with a
+        # delivered needle mail is migrated OFFLINE by the vendored
+        # stalwart-migrate v1.0.6 into a fresh v1 store, and the vendored
+        # 1.0.3 package then serves it: the 0.16 password and the mail
+        # both survive the id-space renumbering. prepare runs through a
+        # pty answering every question with the recommended default.
+        stalwart-migrate-1x-e2e = import ../tests/stalwart-migrate-1x-e2e.nix {inherit pkgs;};
         stalwart-relay-e2e = import ../tests/stalwart-relay-e2e.nix {inherit pkgs;};
         parsedmarc-e2e = import ../tests/parsedmarc-e2e.nix {inherit pkgs;};
         # Continuous deliverability checks (services.mail-server.

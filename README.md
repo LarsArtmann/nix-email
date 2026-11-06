@@ -19,8 +19,12 @@ stack in a throwaway VM (x86_64-linux) - accounts, ports and API probes
 in [Quickstart](#quickstart-try-it-in-a-vm). Consuming it from a NixOS
 host: [SystemNix integration](#systemnix-integration).
 
-> **Status (2026-10-28 pin advance, fe132422):** Stalwart **0.16.26**,
-> parsedmarc **11.0.2**, full check set green, `v0.5.0` tagged and
+> **Status (2026-11-06, all-latest train):** Stalwart **0.16.26**
+> (1.0.3 vendored ahead of nixpkgs, continuously VM-tested - see
+> [pkgs/stalwart_1_0](pkgs/stalwart_1_0/)), parsedmarc **11.2.1**
+> (vendored ahead of nixpkgs with mailsuite 2.3.4, SECURITY fix
+> GHSA-3588-2mr7-vrcm - see [pkgs/parsedmarc](pkgs/parsedmarc/)), full
+> check set green, `v0.5.0` tagged and
 > released. The advance's ride-alongs (0.16.26 x86-64-v2 CPUs, the
 > localMail storage contract, the `provision.opensearch` port) are
 > recorded in [CHANGELOG.md](CHANGELOG.md); live work in
@@ -407,6 +411,15 @@ and nothing else:
   apply, marker), the VERIFIED end-state boot (stable unit + provision
   apply), the 0.15 password authenticating on 0.16, and restart
   persistence.
+- `stalwart-migrate-1x-e2e`: TWO-node VM - the 0.16 -> 1.0 migration
+  REHEARSAL (the gold-standard gate before any live 1.x flip): a 0.16.26
+  node (schema 6, accepted by the tool's exact-match gate) receives a
+  needle mail over IMAP, the stopped store travels to the vendored-1.0.3
+  consumer node, `stalwart-migrate` v1.0.6 `prepare` (pty, recommended
+  answers) + `run --final --yes` builds the fresh v1 store offline, and
+  the 1.0.3 server then serves it - the 0.16 password and the delivered
+  mail both survive the 1.0 id-space renumbering, and the declarative
+  plan still applies post-cutover.
 
 ## Module: `services.mail-server`
 

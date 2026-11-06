@@ -213,7 +213,7 @@ in {
         program = "${pkgs.writeShellScript "host-parse-fixture-app" ''
           exec ${pkgs.python3}/bin/python3 ${../scripts/host-parse-fixture.py} "$@"
         ''}";
-        meta.description = "Run the PINNED parsedmarc parser on a fixture file (~30 s host-side dry-run; --check parsedmarc-e2e)";
+        meta.description = "Run the DEPLOYED parsedmarc parser (wrapper default) on a fixture file (~30 s host-side dry-run; --check parsedmarc-e2e)";
       };
     };
   };

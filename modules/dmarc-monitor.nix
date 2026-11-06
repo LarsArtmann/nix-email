@@ -245,8 +245,24 @@ in {
     # the ReadWritePaths comment). "d" = mkdir -p + owner/mode,
     # idempotent, never touches delivered mail; group stays root,
     # irrelevant at mode 0700.
-    systemd.tmpfiles.rules = lib.optionals config.services.parsedmarc.provision.localMail.enable [
-      "d ${localMailMaildirPath} 0700 ${config.services.parsedmarc.provision.localMail.recipientName} - -"
-    ];
+    #
+    # The new/cur/tmp SUBDIRECTORIES are pre-created too (VM transcript
+    # 2026-11-06, parsedmarc 11.2.1 + mailsuite 2.3.4): 2.3.3's
+    # MaildirConnection rewrite (GHSA-9jx3-p8wm-g8vw) no longer
+    # bootstraps a bare maildir - mailbox.Maildir._refresh stats cur/
+    # and dies FileNotFoundError before postfix's first delivery can
+    # create the layout. 11.0.x-era parsedmarc created the structure at
+    # connect time; the 2.3.4 watcher assumes a well-formed Maildir.
+    systemd.tmpfiles.rules =
+      lib.optionals config.services.parsedmarc.provision.localMail.enable
+      (
+        map
+        (
+          sub:
+            "d ${localMailMaildirPath}${lib.optionalString (sub != "") "/${sub}"} 0700 "
+            + "${config.services.parsedmarc.provision.localMail.recipientName} - -"
+        )
+        ["" "new" "cur" "tmp"]
+      );
   };
 }

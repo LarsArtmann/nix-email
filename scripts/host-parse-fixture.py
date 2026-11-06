@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
-"""Host-side dry-run of the PINNED parsedmarc parser on a fixture.
+"""Host-side dry-run of the DEPLOYED parsedmarc parser on a fixture.
 
 The VM tests (tests/parsedmarc-e2e.nix) parse fixtures inside a NixOS VM;
 each red costs ~5 minutes. The parser itself is a pure library - this
-script runs the EXACT pinned nixpkgs parsedmarc (from the check
-derivation's closure) on the host in ~30 s, so parser-vs-fixture blame is
+script runs the EXACT parsedmarc the wrapper deploys (from the check
+derivation's closure - the vendored-ahead-of-nixpkgs closure since
+2026-11-06, pkgs/parsedmarc/, previously the pin's nixpkgs attr) on the
+host in ~30 s, so parser-vs-fixture blame is
 settled before any VM run. Verified live 2026-10-05 on the pinned
 forensic fixture (see AGENTS.md dry-run rule).
 

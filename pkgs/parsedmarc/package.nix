@@ -52,11 +52,20 @@ buildPythonPackage (finalAttrs: {
 
   build-system = [hatchling];
 
-  # requires-python ">=3.10,<3.15" and the pin's python3 is 3.14.7 -
-  # in range, so the nixpkgs-master requires_python rewrite patch is
-  # NOT carried. The master postPatch's grafana dashboard output is
-  # also dropped: it is only consumed by the nixpkgs module's grafana
-  # provision option, which this wrapper never enables.
+  # postPatch carries the nixpkgs-master pyproject rewrite: upstream
+  # parks `requires_python` inside [build-system], which is NOT a valid
+  # build-system property - the pin's hatchling refuses the build with
+  # "Failed to validate `build-system`: Unknown properties:
+  # requires_python" (VM-free build transcript 2026-11-06). It is
+  # metadata-only (the requires-python range is 3.10-3.15; the pin's
+  # python3 3.14.7 is in range regardless). The master postPatch's
+  # grafana dashboard output is NOT carried: it is only consumed by the
+  # nixpkgs module's grafana provision option, which this wrapper never
+  # enables.
+  postPatch = ''
+    substituteInPlace pyproject.toml \
+      --replace-fail 'requires_python = ">=3.10,<3.15"' ""
+  '';
 
   # Upstream's own suite contacts DNS servers at 1.1.1.1/8.8.8.8 by
   # design; behavior verification here is the parsedmarc-e2e VM battery

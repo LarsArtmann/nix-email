@@ -162,10 +162,22 @@
   ];
   localMailReadWriteOk = builtins.elem moduleMaildirPath (lib.toList localMailUnit.ReadWritePaths);
   localMailDashRegression = builtins.elem "-${moduleMaildirPath}" (lib.toList localMailUnit.ReadWritePaths);
-  localMailHasTmpfilesRule =
-    builtins.any
-    (rule: lib.isString rule && lib.hasPrefix "d ${moduleMaildirPath} " rule)
+  # Each of the four layout dirs needs its own boot-time rule: the root
+  # rule existed since 2026-10-28 (namespace-setup race); new/cur/tmp
+  # became REQUIRED with parsedmarc 11.2.1 + mailsuite 2.3.4 (VM
+  # transcript 2026-11-06: Maildir._refresh stats cur/ and dies
+  # FileNotFoundError on a bare dir before postfix's first delivery).
+  localMailTmpfilesRules =
+    builtins.filter
+    (rule: lib.isString rule && lib.hasPrefix "d ${moduleMaildirPath}" rule)
     (lib.toList localMailEval.config.systemd.tmpfiles.rules);
+  localMailHasTmpfilesRule =
+    builtins.all
+    (
+      dir:
+        builtins.any (rule: lib.hasPrefix "d ${moduleMaildirPath}${dir} " rule) localMailTmpfilesRules
+    )
+    ["" "/new" "/cur" "/tmp"];
 in
   assert versionOk || throw "dmarc-monitor contract is verified against parsedmarc >= 11.2 (got ${parsedmarcVersion}) - re-verify the [imap]/_secret/output semantics AND the security floor before touching it.";
   assert lib.isList execStartPre || throw "dmarc-eval: parsedmarc ExecStartPre is not a list - lib.last would return a character, not the strip script; re-verify the unit shape.";
@@ -176,7 +188,7 @@ in
   assert lib.isList localMailExecStartPre || throw "dmarc-eval: localMail ExecStartPre is not a list - re-verify the unit shape.";
   assert localMailReadWriteOk || throw "dmarc-eval: under provision.localMail the wrapper must whitelist the module's maildir (${moduleMaildirPath}) in ReadWritePaths - ProtectSystem=strict makes the spool read-only and parsedmarc's .Archive mkdirs die with OSError Errno 30 (VM transcripts 2026-10-28).";
   assert !localMailDashRegression || throw "dmarc-eval: the localMail ReadWritePaths entry must NOT carry the '-' ignore-missing prefix - the whitelist is evaluated once at namespace setup and the maildir (postfix creates it at first delivery) is missing at unit start, so a '-' entry silently leaves the spool read-only (two VM transcripts 2026-10-28).";
-  assert localMailHasTmpfilesRule || throw "dmarc-eval: the localMail maildir tmpfiles rule (boot-time pre-creation) is missing - without it the unprefixed ReadWritePaths entry fails the unit at start (ExecStartPre cannot pre-create: systemd namespaces every ExecStartPre command, status 226/NAMESPACE).";
+  assert localMailHasTmpfilesRule || throw "dmarc-eval: the localMail maildir tmpfiles rules (boot-time pre-creation of the root dir AND new/cur/tmp - mailsuite 2.3.4's Maildir watcher dies on a bare dir, VM transcript 2026-11-06) are missing - without the root rule the unprefixed ReadWritePaths entry fails the unit at start (ExecStartPre cannot pre-create: systemd namespaces every ExecStartPre command, status 226/NAMESPACE).";
     builtins.derivation {
       name = "dmarc-eval";
       inherit system;
