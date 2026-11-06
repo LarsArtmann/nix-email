@@ -85,8 +85,13 @@
 # NOT covered (needs DNS + external relay creds): outbound smarthost relay
 # (see stalwart-relay-e2e). Those stay live-host go-live checks - see
 # README verified-facts ledger for the keys.
-{pkgs}: let
+{pkgs, package ? pkgs.stalwart_0_16}: let
   common = import ./common.nix;
+
+  # Stalwart 1.x dialect branch (EmailAlias.enabled -> enable,
+  # SCHEMA_CHANGES 3.1): the same fixture renders the plan key the
+  # deployed schema knows.
+  aliasEnableKey = if pkgs.lib.versionAtLeast package.version "1.0" then "enable" else "enabled";
 
   # JMAP EventSource listener (W6.6): raw-socket long-poll of the
   # eventSourceUrl path on the loopback listener; exits 0 as soon as a
@@ -329,6 +334,11 @@ in
           admin.secretFile = "/etc/test-admin-secret";
         };
 
+        # Stalwart 1.x variant runs THIS SAME battery against the
+        # vendored ahead-of-nixpkgs package (checks.nix stalwart-e2e-v1;
+        # default stays the pin's 0.16 line - a 1.x flip is a
+        # store-migration event, see pkgs/stalwart_1_0/package.nix).
+        stalwart.package = package;
         # DNS-less-VM reload-validation patches (DnsResolver Cloudflare
         # + pyzor off) ride the imports above (tests/common.nix holds
         # the canonical copy and rationale).
@@ -367,7 +377,7 @@ in
                       {
                         name = "alias4";
                         domainId = "#domain";
-                        enabled = true;
+                        ${aliasEnableKey} = true;
                       }
                     ];
                   };
@@ -431,6 +441,7 @@ in
 
       system.stateVersion = "26.05";
 
+      services.stalwart.package = package;
       services.mail-server = {
         enable = true;
         hostname = "mail.flood.test";

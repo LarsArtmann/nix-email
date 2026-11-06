@@ -194,6 +194,19 @@
           demoConfig = self.nixosConfigurations.demo.config;
         };
         stalwart-e2e = import ../tests/stalwart-e2e.nix {inherit pkgs;};
+        # The SAME battery against the vendored Stalwart 1.x package
+        # (pkgs/stalwart_1_0/, ahead of nixpkgs by owner decision
+        # 2026-11-05): proves the 1.x line stays deployable through the
+        # wrapper WITHOUT flipping the fleet default - the 0.16 -> 1.0
+        # store boundary is a migration event (SCHEMA_CHANGES.md), so
+        # the default stays 0.16 until a consumer migrates. Expect
+        # dialect-fix iterations here when upstream renames provision
+        # keys (EmailAlias.enabled -> enable etc.); fix the wrapper or
+        # version-gate in the test, never the module defaults.
+        stalwart-e2e-v1 = import ../tests/stalwart-e2e.nix {
+          inherit pkgs;
+          package = pkgs.callPackage ../pkgs/stalwart_1_0/package.nix {};
+        };
         # Dedicated non-default httpBind bootstrap (nix-email#4): the
         # virgin-store fallback class stalwart-e2e cannot cover (its bind
         # coincides with the built-in 8080).

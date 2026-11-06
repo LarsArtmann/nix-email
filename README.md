@@ -323,6 +323,15 @@ and nothing else:
   silence). GREEN end-to-end on 0.16.22 as of 2026-10-17 AND on 0.16.26
   as of 2026-10-28 (fe132422 advance, `-cpu max` v2CpuPatches) - all 17
   subtests incl. GTUBE, native DMARC ingestion, and the flood limiter.
+- `stalwart-e2e-v1`: the SAME battery (same test file, `package`
+  parameter) against the vendored Stalwart **1.0.3** package
+  (`pkgs/stalwart_1_0/`, ahead of nixpkgs - the pin carries no
+  `stalwart_1_0` attr; owner decision 2026-11-05 "all my tech latest").
+  Keeps the 1.x line continuously deployable through the wrapper without
+  flipping the fleet default: the 0.16 -> 1.0 store boundary requires
+  `stalwartlabs/stalwart-migrate` (1.0.0 redesigned the database layout
+  and renumbered every id space - raw store copies are unsafe), so the
+  default stays `stalwart_0_16` until a consumer has migrated.
 - `stalwart-bind-e2e`: dedicated non-default `httpBind` (`127.0.0.1:8082`,
   the pbx-artmann consumer shape) on a virgin store - the bootstrap class
   `stalwart-e2e` cannot cover (its bind coincides with the built-in 8080,

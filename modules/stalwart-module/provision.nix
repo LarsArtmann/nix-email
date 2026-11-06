@@ -8,6 +8,9 @@
 }: let
   cfg = config.services.stalwart.provision;
   stalwart = config.services.stalwart;
+  # 0.16 tlsImplicit -> 1.0 implicitTls (stalwart-migrate SCHEMA_CHANGES
+  # 3.1); render the key the deployed schema knows.
+  since1_0 = lib.versionAtLeast stalwart.package.version "1.0";
 in {
   options.services.stalwart.provision = {
     enable = lib.mkEnableOption "Stalwart Configuration Provisioning";
@@ -91,7 +94,7 @@ in {
               bind = {
                 "[::]:465" = true;
               };
-              tlsImplicit = true;
+              ${if since1_0 then "implicitTls" else "tlsImplicit"} = true;
             };
           };
         };

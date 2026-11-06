@@ -23,6 +23,7 @@
     "readme-version-lockstep-fires",
     "stalwart-bind-e2e",
     "stalwart-e2e",
+    "stalwart-e2e-v1",
     "stalwart-migrate-e2e",
     "stalwart-relay-e2e"
   ]

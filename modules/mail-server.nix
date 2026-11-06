@@ -809,7 +809,17 @@ in {
     };
   };
 
-  config = lib.mkIf cfg.enable {
+  config = let
+    # Stalwart 1.x dialect branch (owner "ahead of nixpkgs" train,
+    # 2026-11-05): 0.16 `NetworkListener.tlsImplicit` renamed to
+    # `implicitTls` and `MtaRouteRelay.address` to `host` in v1
+    # (stalwart-migrate SCHEMA_CHANGES 3.1; the plan validator rejects
+    # the old keys against a 1.x schema - proven by the first
+    # stalwart-e2e-v1 run). The wrapper OPTIONS stay version-stable;
+    # only the rendered plan key branches.
+    since1_0 = lib.versionAtLeast config.services.stalwart.package.version "1.0";
+  in
+    lib.mkIf cfg.enable {
     assertions =
       [
         {
@@ -1017,6 +1027,14 @@ in {
       # nixpkgs since 2026-11-05) - a 1.x binary on a 0.16 store is the
       # poison class; the migration runbook gates that override.
       package = lib.mkDefault pkgs.stalwart_0_16;
+      # 1.x dialect: the pin's stalwart-cli 1.0.13 cannot parse a 1.x
+      # server's schema (unknown variant `sieve` - the v1 schema's new
+      # field type; proven by stalwart-e2e-v1 round 2, 2026-11-05), so
+      # provisioning rides the vendored 1.0.14 CLI for 1.x binaries.
+      # The 0.16 path contributes nothing here (module default stands).
+      provision.package =
+        lib.mkIf since1_0
+        (lib.mkDefault (pkgs.callPackage ../pkgs/stalwart-cli-1_0/package.nix {}));
       # 0.16 fact (binary-proven 2026-10-17): the config file carries ONLY
       # the store backend — server.listener/tracer/hostname keys are
       # SILENTLY IGNORED, and listeners live exclusively in the datastore
@@ -1152,7 +1170,7 @@ in {
                 # five ids win on collision (REPLACING a wrapper-owned
                 # listener stays a mkForce move, README "0.16 provisioning").
                 # Shape mapping: static { bind = [...]; protocol; tls.implicit }
-                # -> plan { name; protocol; bind; tlsImplicit }.
+                # -> plan { name; protocol; bind; tlsImplicit | implicitTls }.
                 # Binary-proven end-to-end (pbx pop3 995 listener,
                 # 2026-10-17): reconcile accepts the merged object and the
                 # restarted server binds it (implicit-TLS POP3 banner).
@@ -1161,7 +1179,7 @@ in {
                     (name: listener: {
                       inherit name;
                       inherit (listener) protocol bind;
-                      tlsImplicit = listener.tls.implicit or false;
+                      ${if since1_0 then "implicitTls" else "tlsImplicit"} = listener.tls.implicit or false;
                     })
                     (config.services.stalwart.settings.server.listener or {}))
                   // {
@@ -1179,13 +1197,13 @@ in {
                       name = "submissions";
                       protocol = "smtp";
                       bind = ["[::]:465"];
-                      tlsImplicit = true;
+                      ${if since1_0 then "implicitTls" else "tlsImplicit"} = true;
                     };
                     imaps = {
                       name = "imaps";
                       protocol = "imap";
                       bind = ["[::]:993"];
-                      tlsImplicit = true;
+                      ${if since1_0 then "implicitTls" else "tlsImplicit"} = true;
                     };
                     http = {
                       name = "http";
@@ -1257,7 +1275,9 @@ in {
                 {
                   "@type" = "Relay";
                   name = cfg.relay.routeId;
-                  address = cfg.relay.address;
+                  # 0.16 `address` -> 1.0 `host` (SCHEMA_CHANGES 3.1,
+                  # MtaRouteRelay); same value, renamed plan key.
+                  ${if since1_0 then "host" else "address"} = cfg.relay.address;
                   port = cfg.relay.port;
                   protocol = "smtp";
                   implicitTls = cfg.relay.tlsImplicit;

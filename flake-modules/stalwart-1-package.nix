@@ -16,5 +16,11 @@
 {
   perSystem = {pkgs, ...}: {
     packages.stalwart_1_0 = pkgs.callPackage ../pkgs/stalwart_1_0/package.nix {};
+    # The 1.x-era provision CLI (the wrapper callPackages it itself for
+    # 1.x binaries; exported for `nix run` debugging).
+    packages.stalwart-cli-1_0 = pkgs.callPackage ../pkgs/stalwart-cli-1_0/package.nix {};
+    # The official v0.16 -> v1 store migration tool (hard prerequisite
+    # for pointing any live deployment at packages.stalwart_1_0).
+    packages.stalwart-migrate = pkgs.callPackage ../pkgs/stalwart-migrate/package.nix {};
   };
 }
