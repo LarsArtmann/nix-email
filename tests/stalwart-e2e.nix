@@ -93,6 +93,15 @@
   # deployed schema knows.
   aliasEnableKey = if pkgs.lib.versionAtLeast package.version "1.0" then "enable" else "enabled";
 
+  # Runtime-apply CLI: the pin's stalwart-cli 1.0.13 cannot parse a 1.x
+  # server's schema (`unknown variant \`sieve\``), so the catch-all
+  # subtest's in-VM apply rides the same vendored 1.0.14 CLI the wrapper
+  # wires into services.stalwart.provision.package for 1.x binaries.
+  cli =
+    if pkgs.lib.versionAtLeast package.version "1.0"
+    then pkgs.callPackage ../pkgs/stalwart-cli-1_0/package.nix {}
+    else pkgs.stalwart-cli;
+
   # JMAP EventSource listener (W6.6): raw-socket long-poll of the
   # eventSourceUrl path on the loopback listener; exits 0 as soon as a
   # StateChange event arrives (probe-proven shape, demo VM 2026-10-18:
@@ -666,7 +675,7 @@ in
           applyStatus = machine.execute(
               "STALWART_URL=http://127.0.0.1:8080 STALWART_USER=admin "
               "STALWART_PASSWORD=${common.testAdminSecret} "
-              "stalwart-cli apply --file /tmp/catchall-plan.ndjson"
+              "${pkgs.lib.getExe cli} apply --file /tmp/catchall-plan.ndjson"
               " > /tmp/catchall-apply.log 2>&1"
           )[0]
           machine.succeed("cat /tmp/catchall-apply.log >&2")

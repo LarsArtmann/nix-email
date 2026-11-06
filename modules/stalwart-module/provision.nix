@@ -219,7 +219,12 @@ in {
           fi
         done
         echo "stalwart-provision: management API answering at $chosen (configured: $cfg_url)"
-        STALWART_PASSWORD=`systemd-creds cat password` STALWART_URL="$chosen" ${lib.getExe pkgs.stalwart-cli} apply --file ${sorted}
+        # LOCAL DELTA vs upstream PR #552103 (2026-11-05): honor the
+        # module's own provision.package option - upstream hardcodes
+        # pkgs.stalwart-cli here, so overriding the option (as the
+        # wrapper does for 1.x binaries, where the pin's cli 1.0.13
+        # cannot parse the v1 schema) silently kept the old binary.
+        STALWART_PASSWORD=`systemd-creds cat password` STALWART_URL="$chosen" ${lib.getExe cfg.package} apply --file ${sorted}
       '';
       restartAndVerify = pkgs.writeShellScript "stalwart-provision-restart-verify" ''
         ${pkgs.systemd}/bin/systemctl try-restart stalwart.service
