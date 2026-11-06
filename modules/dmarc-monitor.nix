@@ -1,5 +1,7 @@
 # Thin opinionated wrapper around the nixpkgs parsedmarc module
-# (services.parsedmarc - 11.0.2 at the fe132422 pin).
+# (services.parsedmarc; the nixpkgs pin ships 11.0.2, but the PARSER
+# this stack deploys is the vendored-ahead-of-nixpkgs 11.2.1 closure
+# via the `package` option below - see pkgs/parsedmarc/default.nix).
 #
 # PURPOSE: close the domains-repo findings H1/H2 ("no rua anywhere - the
 # reject domains enforce blindly") with a deliberately LIGHT footprint:
@@ -63,6 +65,26 @@ in {
         if the backup tool owns expiry). A busy domain's rua traffic is
         small (KBs/day), but an unbounded forever-directory on a mail
         host is still a disk-fill risk.
+      '';
+    };
+
+    # The parsedmarc PACKAGE this stack runs. The pin's nixpkgs module
+    # hardcodes `ExecStart = ${lib.getExe pkgs.parsedmarc}` (no package
+    # option), so the wrapper renders the unit line itself. Default is
+    # the vendored ahead-of-nixpkgs closure (11.2.1 + mailsuite 2.3.4,
+    # SECURITY fix GHSA-3588-2mr7-vrcm - parsedmarc is a stateless
+    # parser/poller, no store-migration boundary, so unlike stalwart_1_0
+    # the wrapper DEFAULT is the ahead line; owner decision 2026-11-05).
+    # The ini-contract facts in the header comment still hold for 11.2.x
+    # (VM-proven by parsedmarc-e2e).
+    package = lib.mkOption {
+      type = lib.types.package;
+      default = import ../pkgs/parsedmarc {inherit pkgs;};
+      description = ''
+        parsedmarc package the dmarc-monitor unit runs. Defaults to the
+        vendored ahead-of-nixpkgs closure (pkgs/parsedmarc/); when the
+        nixpkgs pin advance ships parsedmarc >= 11.2.1, this default
+        returns to `pkgs.parsedmarc` and the vendor tree is deleted.
       '';
     };
 
@@ -203,6 +225,14 @@ in {
           '')
         ]
       );
+      # The pin's nixpkgs module hardcodes
+      # `ExecStart = ${lib.getExe pkgs.parsedmarc} -c ...` (no package
+      # option, nixos/modules/services/monitoring/parsedmarc.nix), so the
+      # wrapper owns the line to run `package` above. mkForce: the
+      # OPTION is the sanctioned consumer seam (it re-renders this line
+      # consistently); a consumer needing the module's stock behavior
+      # can still out-prioritize with mkOverride.
+      ExecStart = lib.mkForce "${lib.getExe cfg.package} -c /run/parsedmarc/parsedmarc.ini";
     };
 
     # localMail: materialize the provisioned maildir (owned by the

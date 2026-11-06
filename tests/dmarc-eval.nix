@@ -22,7 +22,12 @@
   pkgs = nixpkgs.legacyPackages.${system};
   inherit (nixpkgs) lib;
 
-  parsedmarcVersion = pkgs.parsedmarc.version;
+  # The version floor below tracks the DEPLOYED parser (the wrapper's
+  # services.dmarc-monitor.package default - vendored ahead of nixpkgs
+  # since 2026-11-06, pkgs/parsedmarc/), not the pin's pkgs.parsedmarc:
+  # the unit semantics being asserted here are those of the package the
+  # ExecStart actually runs.
+  parsedmarcVersion = eval.config.services.dmarc-monitor.package.version;
 
   # The nixpkgs parsedmarc module's _secret handling REQUIRES a string
   # (isString gate in its ini generator; a path VALUE throws at unit
@@ -140,7 +145,11 @@
   # escape prefix stripped in case a future nixpkgs adds one to ours.
   stripScript = lib.removePrefix "+" (lib.last execStartPre);
 
-  versionOk = lib.versionAtLeast parsedmarcVersion "11";
+  # Floor 11.2 = the security-fix line (GHSA-3588-2mr7-vrcm, STARTTLS
+  # credential leak - fixed in parsedmarc 11.2.1 via mailsuite 2.3.4's
+  # plain-text auth refusal). A seam regression back to the pin's
+  # pkgs.parsedmarc (11.0.2) fails HERE, not in production.
+  versionOk = lib.versionAtLeast parsedmarcVersion "11.2";
   syscallDrops = builtins.filter (f: !builtins.elem f unit.SystemCallFilter) [
     "@system-service"
     "~@privileged"
@@ -158,7 +167,7 @@
     (rule: lib.isString rule && lib.hasPrefix "d ${moduleMaildirPath} " rule)
     (lib.toList localMailEval.config.systemd.tmpfiles.rules);
 in
-  assert versionOk || throw "dmarc-monitor contract is verified against parsedmarc >= 11 (got ${parsedmarcVersion}) - re-verify the [imap]/_secret/output semantics before touching the floor.";
+  assert versionOk || throw "dmarc-monitor contract is verified against parsedmarc >= 11.2 (got ${parsedmarcVersion}) - re-verify the [imap]/_secret/output semantics AND the security floor before touching it.";
   assert lib.isList execStartPre || throw "dmarc-eval: parsedmarc ExecStartPre is not a list - lib.last would return a character, not the strip script; re-verify the unit shape.";
   assert execStartPreCount >= 2 || throw "dmarc-eval: ExecStartPre must hold the module's ini step plus the wrapper's strip script (>= 2 entries, strip last) - got ${toString execStartPreCount}, which makes lib.last an invalid ordering proof.";
   assert unit.DynamicUser == true || throw "dmarc-eval: the pinned parsedmarc module dropped DynamicUser hardening (got ${toString unit.DynamicUser}) - re-verify the unit sandbox before advancing the pin.";

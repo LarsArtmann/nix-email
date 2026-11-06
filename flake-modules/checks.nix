@@ -21,8 +21,10 @@
     # wrapper module's own default (evaluated with the mail server enabled)
     # instead of retyping `pkgs.stalwart_0_16` here: a pin that renames the
     # package attr must not leave the README check comparing a stale one.
-    # `parsedmarc` needs no such hop - the dmarc module wraps the plain
-    # nixpkgs attr, which is also what tests/dmarc-eval.nix asserts.
+    # `parsedmarc` needed no such hop until 2026-11-06: the dmarc module
+    # now vendors 11.2.1 ahead of nixpkgs (services.dmarc-monitor.package
+    # default; pkgs.parsedmarc at the pin is still 11.0.2), so the README
+    # check must follow the WRAPPER's default, same doctrine as Stalwart.
     deployedStalwart =
       (inputs.nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
@@ -38,6 +40,20 @@
         ];
       })
       .config.services.stalwart.package;
+    deployedParsedmarc =
+      (inputs.nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          ../modules/dmarc-monitor.nix
+          {
+            services.dmarc-monitor.enable = true;
+            boot.loader.grub.enable = false;
+            fileSystems."/".device = "/dev/null";
+            system.stateVersion = "26.11";
+          }
+        ];
+      })
+      .config.services.dmarc-monitor.package;
   in {
     # NixOS VM tests only run reliably on x86_64-linux. MEASURED
     # 2026-09-15 (one emulated stalwart-e2e attempt on an x86 host with
@@ -156,7 +172,7 @@
             python3 ${../scripts/check-readme-versions.py} \
               --readme ${../README.md} \
               --stalwart ${deployedStalwart.version} \
-              --parsedmarc ${pkgs.parsedmarc.version}
+              --parsedmarc ${deployedParsedmarc.version}
             touch $out
           '';
         # A gate is proven by the drift it catches, not by its green: this
@@ -176,7 +192,7 @@
               --quiet \
               --readme README.md \
               --stalwart ${deployedStalwart.version} \
-              --parsedmarc ${pkgs.parsedmarc.version}; then
+              --parsedmarc ${deployedParsedmarc.version}; then
               echo "FATAL: planted version drift was accepted" >&2
               exit 1
             fi

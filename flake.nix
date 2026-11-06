@@ -66,6 +66,7 @@
         ./flake-modules/devshells.nix
         ./flake-modules/probe-package.nix
         ./flake-modules/stalwart-1-package.nix
+        ./flake-modules/parsedmarc-package.nix
       ];
     };
 }
