@@ -95,10 +95,7 @@
   '';
 
   # Minimal account plan shared by both nodes (same domain via hostname).
-  nodeConfig = {
-    config,
-    ...
-  }: {
+  nodeConfig = {config, ...}: {
     imports = [
       ../modules/mail-server.nix
       common.dnslessVmPatches

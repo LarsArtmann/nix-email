@@ -9,6 +9,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Stalwart 1.x availability train (owner decision 2026-11-05, "all
+  latest, ahead of nixpkgs"): vendored `packages.stalwart_1_0` = server
+  1.0.3 + webui 2.0.5 + spam-filter 3.0.4, `packages.stalwart-cli-1_0`
+  = 1.0.14 (the pin's cli 1.0.13 cannot parse the 1.x schema), and
+  `packages.stalwart-migrate` = v1.0.6 - built WITHOUT its default
+  `enterprise` feature, because the tool's own contract requires the
+  tool edition to match the server edition and our server is the OSS
+  build (round-4 rehearsal caught the default writing an
+  enterprise-flavored store). The module DEFAULT stays 0.16: 1.0.0 is a
+  hard store-migration boundary. The wrapper renders both dialects
+  version-aware (`tlsImplicit` -> `implicitTls`,
+  `MtaRouteRelay.address` -> `host`), pinned by the new
+  `stalwart-e2e-v1` check (the full 20-subtest battery against the
+  vendored 1.0.3) and proven a 0.16 no-op by a default-`stalwart-e2e`
+  rerun. New check `stalwart-migrate-1x-e2e`: the two-node 0.16 -> 1.0
+  migration REHEARSAL - a 0.16.26 node seeds a real store (provision +
+  authenticated 587 needle mail), the stopped store travels as a tar,
+  `prepare` runs interactively through a pty (`script -qec` +
+  `yes "" | head -200`, all-recommended), `run --final --yes --owner`
+  builds the v1 store offline, and the 1.0.3 server serves it with the
+  0.16 password, the delivered mail, and a re-applied declarative plan
+  - GREEN end to end 2026-11-06. The schema gate is the store's schema
+  number (6 in both 0.16.26 and 0.16.27 - exact-match accepted), not
+  the binary version; facts in the README ledger "Stalwart 1.x".
+- parsedmarc 11.2.1 + mailsuite 2.3.4 vendored ahead of nixpkgs
+  (2026-11-06): the wrapper default is now the vendored closure via the
+  new `services.dmarc-monitor.package` option (the nixpkgs module has
+  no package option and hardcodes `ExecStart = pkgs.parsedmarc`; the
+  wrapper renders ExecStart with `mkForce` from its own option).
+  Carries the STARTTLS-strip credential-leak fix
+  (GHSA-3588-2mr7-vrcm, parsedmarc <= 11.2.0 / fixed via mailsuite
+  2.3.4's plain-text auth refusal) plus the Maildir poison fix
+  (GHSA-9jx3-p8wm-g8vw). REAL upstream contract change found and
+  handled: mailsuite 2.3.3+'s `MaildirConnection` no longer bootstraps
+  a bare maildir (`FileNotFoundError` on `cur/`), so the wrapper's
+  tmpfiles now pre-create root + new/cur/tmp (four rules,
+  recipient-owned 0700), eval-pinned in `dmarc-eval`. The README
+  version lockstep derives the parsedmarc version from a NixOS-eval of
+  the wrapper default (`deployedParsedmarc` hop, mirroring
+  `deployedStalwart`), and `dmarc-eval` floors the DEPLOYED version at
+  11.2 (the security-fix line). A pin advance shipping >= 11.2.1 +
+  mailsuite >= 2.3.4 deletes the whole vendor tree (attr names match
+  nixpkgs by design).
 - README version lockstep check (`readme-version-lockstep`,
   2026-11-02): the status block's `Stalwart **x**` / `parsedmarc **y**`
   anchors are compared against the versions the flake actually builds,

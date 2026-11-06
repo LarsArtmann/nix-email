@@ -1036,8 +1036,25 @@ gate is missing - but treat aarch64 as untested until someone runs it.
   `script -qec` + `yes "" | head -200`; `--non-interactive` only
   VALIDATES an existing answers.toml) and `run --final --yes --owner
   <uid:gid>`; the 1.0.3 server then serves the migrated store with the
-  0.16 password and needle mail intact. THIS is the gate a live flip
-  must pass first.
+  0.16 password and needle mail intact, and the declarative plan
+  re-applies. **GREEN end to end 2026-11-06** - this is the gate a live
+  flip must pass first, and it passes.
+- **stalwart-migrate's Cargo defaults include `enterprise`** (its
+  `default = ["rocks", "enterprise"]`): a default build writes an
+  enterprise-flavored target store, and the tool's own contract is "the
+  edition of the v1 server that will open the target must match the
+  edition of this tool". The wrapper's vendored package builds with
+  `buildNoDefaultFeatures` + `["rocks"]` to match the OSS
+  `stalwart_1_0` (VM-proven: round 4's run log said
+  `"edition":"enterprise"`, round 5's `"community"` with a clean
+  cutover).
+- **The 0.16 store guard is a format-blind heuristic** (non-empty db
+  without the marker = refuse): it CANNOT distinguish a
+  migrate-written 1.0 store from a pre-0.16 store. A wiped-dataDir
+  rehearsal must re-mark via its own escape hatch (`touch
+  <dataDir>/v016-store-migrated`); a live pbx flip does NOT need this
+  (the marker survives from the 0.16 era). The consumer-flip runbook
+  owns guard semantics for the 1.x line.
 - **The 1.x binary needs x86-64-v2**: VM tests get it structurally via
   `tests/common.nix` `v2CpuPatches` (`-cpu max`, TCG-safe, applied at
   test level in every `runNixOSTest`); a real host needs a consumer-side
@@ -1057,8 +1074,8 @@ gate is missing - but treat aarch64 as untested until someone runs it.
   as a PIN FACT - the nixpkgs module has NO package option and hardcodes
   `ExecStart = ${lib.getExe pkgs.parsedmarc}`, so the wrapper renders
   ExecStart with `mkForce` from its own option. A pin advance that ships
-  >= 11.2.1 deletes the whole vendor tree wholesale (attr names match
-  nixpkgs by design).
+  > = 11.2.1 deletes the whole vendor tree wholesale (attr names match
+  > nixpkgs by design).
 - **mailsuite 2.3.3+ no longer bootstraps a bare Maildir** (VM-proven,
   parsedmarc-e2e round 1): `MaildirConnection.__init__` stats `cur/` and
   dies `FileNotFoundError` on a bare root dir - the wrapper's tmpfiles
