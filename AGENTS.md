@@ -224,6 +224,14 @@ transcript-pinned dialect).
   fail the unit loudly; the dmarc localMail contract is eval-pinned in
   dmarc-eval's localMail-shape eval.
 
+- RESUME RITUAL ADDITION (2026-11-06, nearly lost a session): `git town
+  sync` can STASH uncommitted work ("Git Town WIP") and reset the tree -
+  the daemon then commits the RESET state and the session's last edits
+  exist ONLY in `git stash list`. On any resume where expected work is
+  missing from the tree, check the stash list FIRST, `git stash apply`
+  (never pop - keep the backup until the gate is green), and re-read the
+  newest status report from the stash if it vanished.
+
 - The 0.15 -> 0.16 store boundary is a POISON class (pbx outage
   2026-10-17): the 0.16 binary PANICS (exit 101) on a pre-0.16 store AND
   poisons the settings subspace for 0.15.5 BEFORE panicking - the unit
