@@ -30,7 +30,6 @@ this file and waits.
 
 ## a) FULLY DONE
 
-<<<<<<< Updated upstream
 | Item                                   | Proof                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 | -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | stalwart-migrate build fix             | `nativeBuildInputs = [rustPlatform.bindgenHook]` (bindgen needs libclang); `nix build .#stalwart-migrate` EXIT:0; `--help` smoke shows the full prepare/run/verify/status/report/rollback interface                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
@@ -49,26 +48,6 @@ this file and waits.
 | Migration rehearsal: test + wiring     | tests/stalwart-migrate-1x-e2e.nix (two nodes: 0.16.26 seeder -> tar via /tmp/shared -> vendored-1.0.3 consumer; prepare via pty `script -qec` + `yes "" \| head -200` = all-recommended; run --final --yes --owner stalwart-uid:gid; cutover assertions: 0.16 password + needle mail over IMAP + plan re-apply). Wired at checks.nix + check-expected.json (surgical one-line) + README check row; attrNames + aarch64 eval guards green; check-set-lockstep green                                                                                                                                                                                                                |
 | Rehearsal rounds 1-2 lessons landed    | round 1: swaks raced the provision reload-restart (fixed: post-Result double port re-wait both nodes). round 2: port-25 EXTERNAL-sender delivery stalls past swaks --timeout on RCPT policy lookups in the DNS-less VM (fixed: the e2e's proven authenticated 587 submission shape)                                                                                                                                                                                                                                                                                                                                                                                               |
 | Small truth-ups                        | host-parse-fixture.py docstring + demo-vm app description: "PINNED parsedmarc" -> "DEPLOYED parsedmarc (wrapper default)"                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-=======
-| Item | Proof |
-| --- | --- |
-| stalwart-migrate build fix | `nativeBuildInputs = [rustPlatform.bindgenHook]` (bindgen needs libclang); `nix build .#stalwart-migrate` EXIT:0; `--help` smoke shows the full prepare/run/verify/status/report/rollback interface |
-| stalwart-e2e-v1 round 5 GREEN | `nix build .#checks.x86_64-linux.stalwart-e2e-v1 -L` EXIT:0 - the whole battery incl. runtime catch-all apply (subtest 13, the round-4 blocker), JMAP, ARF ingestion, metrics, on vendored Stalwart 1.0.3 + webui 2.0.5 |
-| Default stalwart-e2e rerun GREEN | EXIT:0 - the provision.nix applyScript change (pkgs.stalwart-cli -> cfg.package) is a 0.16 no-op, VM-proven |
-| Parsedmarc deps re-derived from source | 11.2.1's own pyproject.toml fetched and read: base deps ONLY (dnspython[doh] expiringdict httpx lxml mailsuite>=2.3.4 maxminddb publicsuffixlist python-dateutil tqdm xmltodict pyyaml); 11.2.x moved every heavy sink to EXTRAS (issue #883) - dateparser/requests/urllib3/elasticsearch/kafka/azure GONE from base. mailsuite 2.3.4 pyproject also re-derived (same dep set as master's 2.3.2 expression) |
-| Pin floors verified by eval | pin fe132422: python3 3.14.7, httpx 0.28.1, python-dateutil 2.9.0, dnspython 2.8.0 WITH optional-dependencies.doh (httpx+h2+httpcore), imapclient 4.1.0, mail-parser 4.8.0, cryptography 50.0.0, expiringdict 1.2.2, publicsuffix2/authres/dkimpy/html2text/tqdm/xmltodict/maxminddb/publicsuffixlist/lxml/pyyaml all present and in-range |
-| Vendored closure builds | pkgs/parsedmarc/{package.nix (11.2.1), mailsuite.nix (2.3.4), default.nix (single-source assembler)}; both src hashes via `nix store prefetch-file --unpack`; `nix build .#parsedmarc` EXIT:0 incl. pythonImportsCheck |
-| requires_python build fix | round-1 build red: upstream parks `requires_python` inside [build-system] (invalid property; the pin's hatchling refuses: "Unknown properties: requires_python"). The nixpkgs-master postPatch was a REAL fix, not a python-range patch - reinstated with an honest comment (my "in range, drop it" inference was wrong, caught by the build) |
-| Wrapper package seam | `services.dmarc-monitor.package` option (default = the vendored closure) + ExecStart mkForce rendering from it: the pin's nixpkgs module hardcodes `ExecStart = ${lib.getExe pkgs.parsedmarc}` with NO package option (verified: services.parsedmarc exposes only enable/provision/settings - NixOS-eval probe; module source at nixos/modules/services/monitoring/parsedmarc.nix) |
-| Lockstep follows the wrapper | checks.nix `deployedParsedmarc` = NixOS-eval hop mirroring deployedStalwart (README check now derives BOTH versions from wrapper module defaults); `--parsedmarc ${deployedParsedmarc.version}` at both lockstep sites; readme-version-lockstep + -fires build green against the updated status block |
-| dmarc-eval contract raised | parsedmarcVersion now reads the DEPLOYED package (eval.config...package.version, not pkgs.parsedmarc) and the floor moved 11 -> 11.2 (the security-fix line); builds green |
-| parsedmarc-e2e GREEN | round 1 red: parsedmarc 11.2.1 + mailsuite 2.3.4 unit died FileNotFoundError '/var/spool/mail/dmarc/cur' at start - 2.3.3's MaildirConnection rewrite (GHSA-9jx3-p8wm-g8vw) no longer bootstraps a bare maildir and the unit races postfix's first delivery. FIX: wrapper tmpfiles pre-creates root+new+cur+tmp (four rules, recipient-owned 0700); dmarc-eval extended to pin ALL FOUR rules. Round 2: EXIT:0 |
-| README status block | now "Stalwart **0.16.26** (1.0.3 vendored ahead...), parsedmarc **11.2.1** (vendored ahead... SECURITY fix GHSA-3588-2mr7-vrcm)" - lockstep-verified |
-| Migration rehearsal: research | (1) The tool's version gate is EXACT schema equality (source-v016/adapter/mod.rs: `StoreSchema::V016(SCHEMA_VERSION)`); DATABASE_SCHEMA_VERSION = 6 in BOTH v0.16.26 and v0.16.27 (both tags' crates/common/src/lib.rs) - the pin's 0.16.26 seeder IS accepted; README's "must run v0.16.27" is prose conservatism. (2) answers.toml format from answers.rs (version int + [global.PromptId] tables; per-object under [instance]). (3) prepare needs a TTY; --non-interactive only VALIDATES. (4) target config.json shape == the module's own top-level RocksDb shape. (5) run --final --yes watches change counters 30 s, finalizes, verifies a sample, writes final-report.txt |
-| Migration rehearsal: test + wiring | tests/stalwart-migrate-1x-e2e.nix (two nodes: 0.16.26 seeder -> tar via /tmp/shared -> vendored-1.0.3 consumer; prepare via pty `script -qec` + `yes "" \| head -200` = all-recommended; run --final --yes --owner stalwart-uid:gid; cutover assertions: 0.16 password + needle mail over IMAP + plan re-apply). Wired at checks.nix + check-expected.json (surgical one-line) + README check row; attrNames + aarch64 eval guards green; check-set-lockstep green |
-| Rehearsal rounds 1-2 lessons landed | round 1: swaks raced the provision reload-restart (fixed: post-Result double port re-wait both nodes). round 2: port-25 EXTERNAL-sender delivery stalls past swaks --timeout on RCPT policy lookups in the DNS-less VM (fixed: the e2e's proven authenticated 587 submission shape) |
-| Small truth-ups | host-parse-fixture.py docstring + demo-vm app description: "PINNED parsedmarc" -> "DEPLOYED parsedmarc (wrapper default)" |
->>>>>>> Stashed changes
 
 ## b) PARTIALLY DONE
 
@@ -168,10 +147,7 @@ this file and waits.
 ## f) NEXT - prioritized
 
 P0 - land the reds and close the session cleanly:
-<<<<<<< Updated upstream
 
-=======
->>>>>>> Stashed changes
 1. Rehearsal round 4: dump prepare.log unconditionally; rehearse the
    pty mechanics host-side first (script + an interactive python
    prompt). Iterate to green (candidates after the log: script/tty
@@ -202,7 +178,6 @@ P0 - land the reds and close the session cleanly:
 
 P1 - after P0:
 9. Owner-gated: webmail 1.20.0 switch handoff + my post-switch no-SSH
-<<<<<<< Updated upstream
 verify-live arms (unchanged from the 02-06 g-1).
 10. Owner-gated: live 1.0 flip timing - with the rehearsal green this
 becomes a concrete maintenance-window plan (backup -> migrate ->
@@ -238,56 +213,13 @@ without VM rounds (02-06 e-5, still open).
 22. Store-survey + release-watch mechanization (02-06 P2-18, open).
 23. webui-1.0.10: add the 1.x-side webui 2.0.5 fact to the ledger
 bullet (the existing 1142 line stays true for the pin line).
-=======
-   verify-live arms (unchanged from the 02-06 g-1).
-10. Owner-gated: live 1.0 flip timing - with the rehearsal green this
-    becomes a concrete maintenance-window plan (backup -> migrate ->
-    1.0.3 opt-in + consumer-side renames + 1.0.2/1.0.3 one-shots).
-11. Owner-gated: external-link-warning backends (02-06 g-3).
-12. Upstream filings (owner-review-gated): #552103 applyScript bug;
-    parsedmarc/mailsuite bumps; stalwart 1.0.3 with the FFI insight.
-13. aarch64: `nix flake check --all-systems --no-build` + consider a
-    cross build of stalwart_1_0 + parsedmarc (ARM CAX readiness).
-14. docs/TELEMETRY.md: 1.0.1 stalwart_* series renames section +
-    MONITORING.md consumer note.
-15. 1.0 consumer-flip runbook (README or docs/; the c-4 list as a
-    doc): Pocket ID scopes urn:stalwart:oauth:scope:{security,
-    settings,full} for the Bulwark client, OidcDirectory rename
-    verification (requireAudience -> acceptedAudiences) BEFORE the
-    flip, encryption-at-rest posture, STALWART_UPDATE_ROLE_
-    PERMISSIONS one-shot.
-16. host-parse-fixture dry-run against 11.2.1 on the aggregate
-    fixture (~30 s host-side; also proves the docstring change).
-17. pbx truth-ups: CHANGELOG row for the vi+th callback fix (verify
-    the daemon carried it), AGENTS LOCALE-CALLBACK WATCH table row.
-18. lessons.md candidates (crush-config, by commit): prior-session-
-    spec-as-a-lead, pre-flight-grep-before-VM-rounds, the new-VM-test
-    checklist, patch-purpose-before-dropping.
-19. Archive the 02-06 report + this one once P0s land (docs/status
-    policy: dprint BEFORE the git mv).
-20. Watch nixpkgs for stalwart_1_0 + a 1.x MODULE (the vendored-tree
-    wholesale-deletion trigger) and for parsedmarc >= 11.2.1 /
-    mailsuite >= 2.3.4 (pkgs/parsedmarc deletion trigger).
-21. Consider the eval-level "1.x dialect smoke" (render plan ndjson +
-    apply script for both lines, diff) to catch dialect breaks
-    without VM rounds (02-06 e-5, still open).
-22. Store-survey + release-watch mechanization (02-06 P2-18, open).
-23. webui-1.0.10: add the 1.x-side webui 2.0.5 fact to the ledger
-    bullet (the existing 1142 line stays true for the pin line).
->>>>>>> Stashed changes
 24. Boot-smoke script for webmail bumps (prior P2-34).
 25. stalwart-review.sh read-only webmail-health leg (prior P2-35).
 26. Re-check .buildflow.yml skip rationale after the new packages.
 27. Demo-VM quickstart re-check (still 0.16 default; README says so).
 28. Review this session's daemon auto-commits for split completeness
-<<<<<<< Updated upstream
 (0cfa36e..5e35264 batch).
 29. Post-switch webmail watches (MemoryMax, ?v= keys, junk-count leg) - owner-gated on the switch.
-=======
-    (0cfa36e..5e35264 batch).
-29. Post-switch webmail watches (MemoryMax, ?v= keys, junk-count leg)
-    - owner-gated on the switch.
->>>>>>> Stashed changes
 30. IFD-free locale->callback count gate (pbx; prior P2-36).
 
 ## g) Questions for the owner (not derivable from any tree)
