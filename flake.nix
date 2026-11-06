@@ -16,6 +16,15 @@
     # provision CLI - must stay >= 1.0.2). PR #566282 (parsedmarc
     # OpenSearch switch) IS in this pin: provision.elasticsearch is
     # mkRemovedOptionModule - the wrapper ports to provision.opensearch.
+    # AHEAD OF NIXPKGS (owner decision 2026-11-05, "all latest"): the
+    # pin's parsedmarc 11.0.2 is a PIN FACT ONLY - the wrapper default is
+    # the vendored 11.2.1 + mailsuite 2.3.4 closure via
+    # services.dmarc-monitor.package (pkgs/parsedmarc/; delete wholesale
+    # when the pin ships >= 11.2.1). Stalwart 1.0.3 (+ webui 2.0.5 +
+    # spam-filter 3.0.4 + cli 1.0.14 + migrate v1.0.6) is vendored in
+    # pkgs/stalwart_1_0* - the module DEFAULT stays 0.16 (1.x is a hard
+    # store boundary; stalwart-e2e-v1 + the migration rehearsal keep it
+    # continuously deployable).
     # ADVANCED 2026-10-28 6774f7bc -> fe132422 to track SystemNix's lock
     # (their nixpkgs floats nixos-unstable; they moved first - their
     # follows already forced this rev onto the wrapper's contract check).

@@ -31,6 +31,18 @@ rustPlatform.buildRustPackage (finalAttrs: {
 
   cargoHash = "sha256-t9t7eWQP+qfeupRkSJgYcq1V+2Xgahh/pEe7te3a96I=";
 
+  # The tool's default features are ["rocks", "enterprise"]: a default
+  # build is the ENTERPRISE edition and writes an enterprise-flavored
+  # target store. The tool's own contract (mapping/prompts.toml edition
+  # prompt + run.rs EDITION const): "The edition of the v1 server that
+  # will open the target must match the edition of this tool." Our
+  # vendored stalwart_1_0 is the OSS build (stalwartEnterprise ? false),
+  # so build the tool OSS too - default features OFF, rocks only.
+  # Caught in the migration rehearsal 2026-11-06: the round-4 run log
+  # recorded "edition":"enterprise" against an OSS server.
+  buildNoDefaultFeatures = true;
+  buildFeatures = ["rocks"];
+
   # Upstream's own test suite runs against live stores by design; our
   # verification is the VM migration rehearsal (tests/stalwart-migrate
   # pattern), not cargo test.

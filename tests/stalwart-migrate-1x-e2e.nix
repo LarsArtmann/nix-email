@@ -234,31 +234,45 @@ in
           mig1x.succeed("mkdir -p /var/lib/migrate-state")
           # prepare is interactive by design: drive it through a pty,
           # answering every question with Enter (= the recommended
-          # answer) and confirming the answers.toml write.
+          # answer) and confirming the answers.toml write. The log is
+          # dumped UNCONDITIONALLY before the exit code propagates
+          # (round-3 lesson: a redirected, success-only dump is a
+          # dump that never runs on the round you need it).
           mig1x.succeed(
-              'yes "" | head -200 | script -qec '
+              "sh -c 'yes \"\" | head -200 | script -qec "
               '"stalwart-migrate prepare '
-              '--source /run/source-config.json '
-              '--state /var/lib/migrate-state" /dev/null '
-              "> /tmp/prepare.log 2>&1"
+              "--source /run/source-config.json "
+              "--state /var/lib/migrate-state\" /dev/null "
+              "> /tmp/prepare.log 2>&1; "
+              "rc=$?; head -c 12000 /tmp/prepare.log >&2; "
+              "tail -c 8000 /tmp/prepare.log >&2; exit $rc'"
           )
-          mig1x.succeed("cat /tmp/prepare.log >&2")
           mig1x.succeed("test -f /var/lib/migrate-state/answers.toml")
           owner = mig1x.succeed(
               "id -u stalwart | tr -d '\\n'; echo -n :; id -g stalwart"
           ).strip()
           mig1x.succeed(
-              "stalwart-migrate run --final --yes "
+              "sh -c 'stalwart-migrate run --final --yes "
               "--source /run/source-config.json "
               "--target /run/target-config.json "
               "--state /var/lib/migrate-state "
-              f"--owner {owner} > /tmp/run-final.log 2>&1"
+              f"--owner {owner} > /tmp/run-final.log 2>&1; "
+              "rc=$?; tail -c 12000 /tmp/run-final.log >&2; exit $rc'"
           )
-          mig1x.succeed("cat /tmp/run-final.log >&2")
           mig1x.succeed("test -f /var/lib/migrate-state/final-report.txt")
           mig1x.succeed("test -d /var/lib/stalwart/db")
 
       with subtest("cutover: 1.0.3 serves the migrated store"):
+          # The 0.16 store guard (modules/stalwart-module/default.nix) is
+          # a shell heuristic: non-empty db dir + no marker = pre-0.16
+          # store, refuse. The rehearsal wiped the dataDir (the tool
+          # requires an empty target), taking the virgin-boot marker with
+          # it; the migrate-written 1.0 store then trips the heuristic.
+          # Use the guard's OWN documented escape hatch for "this store
+          # was migrated by other means" - which is literally true here.
+          # A live pbx flip does NOT need this (its marker survives from
+          # the 0.16 era); the consumer-flip runbook owns that note.
+          mig1x.succeed("touch /var/lib/stalwart/v016-store-migrated")
           mig1x.succeed("systemctl start stalwart.service")
           mig1x.wait_for_unit("stalwart.service", timeout=180)
           mig1x.wait_for_open_port(25, timeout=120)

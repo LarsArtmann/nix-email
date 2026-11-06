@@ -1004,6 +1004,85 @@ gate is missing - but treat aarch64 as untested until someone runs it.
 
 ## Verified-facts ledger (do not re-derive from memory)
 
+### Stalwart 1.x (vendored ahead of nixpkgs; continuously VM-tested, NOT deployed)
+
+- **The vendored train** (owner decision 2026-11-05, "all latest, ahead of
+  nixpkgs"): `packages.stalwart_1_0` = server **1.0.3** + webui **2.0.5** +
+  spam-filter **3.0.4** ([pkgs/stalwart_1_0](pkgs/stalwart_1_0/)),
+  `packages.stalwart-cli-1_0` = cli **1.0.14** (the pin's `stalwart-cli`
+  1.0.13 CANNOT parse the 1.x schema - the "unknown variant `sieve`"
+  apply failure class), and `packages.stalwart-migrate` = **v1.0.6**. The
+  module default stays `stalwart_0_16`: 1.0.0 is a HARD store-migration
+  boundary (new DB layout, renumbered ids) - a 1.x binary on a pre-1.0
+  store is the same poison class as 0.16-on-0.15.
+- **1.0 dialect renames (VM-proven by `stalwart-e2e-v1`, the full battery
+  on 1.0.3)**: listener/relay plan key `tlsImplicit` -> `implicitTls`
+  (three render sites in `modules/mail-server.nix` + the
+  `provision.nix` example), and `MtaRouteRelay` `address` -> `host` -
+  both cross-checked against stalwart-migrate's `SCHEMA_CHANGES.md`.
+  The wrapper renders both dialects version-aware
+  (`lib.versionAtLeast (lib.getVersion cfg.package) "1.0"` branches).
+- **The migration tool's schema gate is EXACT-VERSION on the store's
+  schema number, not the binary version** (source-settled 2026-11-06):
+  `source-v016` adapter matches `StoreSchema::V016(SCHEMA_VERSION)`
+  exactly, and `DATABASE_SCHEMA_VERSION = 6` in BOTH v0.16.26 and
+  v0.16.27 (both tags' `crates/common/src/lib.rs`) - so the pin's
+  0.16.26 store IS accepted by the tool; the tool README's "run 0.16.27
+  first" is prose conservatism, not a gate.
+- **Migration rehearsal**: `tests/stalwart-migrate-1x-e2e` (two-node VM)
+  seeds a real 0.16.26 store (wrapper provision + authenticated 587
+  needle mail), hands the stopped store over as a tar, and drives
+  stalwart-migrate v1.0.6 `prepare` (interactive, through a pty -
+  `script -qec` + `yes "" | head -200`; `--non-interactive` only
+  VALIDATES an existing answers.toml) and `run --final --yes --owner
+  <uid:gid>`; the 1.0.3 server then serves the migrated store with the
+  0.16 password and needle mail intact. THIS is the gate a live flip
+  must pass first.
+- **The 1.x binary needs x86-64-v2**: VM tests get it structurally via
+  `tests/common.nix` `v2CpuPatches` (`-cpu max`, TCG-safe, applied at
+  test level in every `runNixOSTest`); a real host needs a consumer-side
+  CPU check before flipping.
+- **webui pairing**: the 1.x line pairs with webui **2.0.5** (vendored in
+  `pkgs/stalwart_1_0/webui.nix`); the `webui-1.0.10` fact below is the
+  0.16/`stalwart_0_16` line and stays true for it.
+
+### parsedmarc / mailsuite (vendored 11.2.1 + 2.3.4 ahead of nixpkgs, 2026-11-06)
+
+- **The wrapper default IS the vendored closure**: parsedmarc **11.2.1**
+  (2026-11-01, latest; carries the GHSA-3588-2mr7-vrcm fix - the
+  STARTTLS-strip credential leak affecting <= 11.2.0) with mailsuite
+  **2.3.4** (fixes GHSA-2x4j-7g3q-wr6f and the Maildir poison GHSA
+  GHSA-9jx3-p8wm-g8vw), via `services.dmarc-monitor.package` (default
+  `import ../pkgs/parsedmarc`). The pin's `pkgs.parsedmarc` stays 11.0.2
+  as a PIN FACT - the nixpkgs module has NO package option and hardcodes
+  `ExecStart = ${lib.getExe pkgs.parsedmarc}`, so the wrapper renders
+  ExecStart with `mkForce` from its own option. A pin advance that ships
+  >= 11.2.1 deletes the whole vendor tree wholesale (attr names match
+  nixpkgs by design).
+- **mailsuite 2.3.3+ no longer bootstraps a bare Maildir** (VM-proven,
+  parsedmarc-e2e round 1): `MaildirConnection.__init__` stats `cur/` and
+  dies `FileNotFoundError` on a bare root dir - the wrapper's tmpfiles
+  now pre-create root + `new/cur/tmp` (FOUR rules, recipient-owned
+  0700), eval-pinned by `tests/dmarc-eval.nix`
+  (`localMailTmpfilesRules`).
+- **parsedmarc 11.2.x moved every heavy sink to EXTRAS** (upstream issue
+  #883): the base dep set is dnspython[doh], expiringdict, httpx, lxml,
+  mailsuite>=2.3.4, maxminddb, publicsuffixlist, python-dateutil, tqdm,
+  xmltodict, pyyaml - dateparser/requests/elasticsearch/kafka/azure are
+  GONE from base (the vendored expression re-derived deps from 11.2.1's
+  own pyproject.toml).
+- **Upstream parks `requires_python` inside `[build-system]`** - an
+  invalid build-system property; hatchling REFUSES the build ("Unknown
+  properties: requires_python"). The vendored package carries the
+  nixpkgs-master postPatch that strips it (metadata-only; the pin's
+  python 3.14.7 is inside the >= 3.10, < 3.15 range regardless). Do NOT
+  drop that patch on an "in range" inference.
+- **Lockstep follows the wrapper**: `readme-version-lockstep` derives the
+  parsedmarc version from a NixOS-eval of the wrapper default
+  (`deployedParsedmarc` hop in `flake-modules/checks.nix`, mirroring
+  `deployedStalwart`), and `tests/dmarc-eval.nix` floors the DEPLOYED
+  version at 11.2 (the security-fix line).
+
 ### Stalwart 0.16 (transcript-pinned during the 2026-10-16/17 upgrade)
 
 > **PIN RIDE-ALONG 2026-10-28**: the fe132422 advance moved the binary

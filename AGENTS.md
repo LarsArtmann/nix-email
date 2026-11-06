@@ -139,6 +139,18 @@ transcript-pinned dialect).
   options-existence cannot discriminate VM evals - qemu-vm.nix
   declares its options in EVERY NixOS eval (provision-plan-eval
   proved it). Proven 2026-10-28).
+- ALL-LATEST VENDOR TRAIN (owner decision 2026-11-05, standing): (a)
+  parsedmarc is VENDORED-AHEAD - the wrapper default is the 11.2.1 +
+  mailsuite 2.3.4 closure via `services.dmarc-monitor.package`
+  (single-source: `pkgs/parsedmarc/default.nix`; the pin's 11.0.2 is a
+  pin FACT; the nixpkgs module has NO package option, so the wrapper
+  renders ExecStart with mkForce); (b) Stalwart 1.0.3 + webui 2.0.5 +
+  spam-filter 3.0.4 + cli 1.0.14 + migrate v1.0.6 are vendored
+  (`pkgs/stalwart_1_0*`) but the module DEFAULT stays 0.16 - 1.0.0 is a
+  hard store boundary (migration rehearsal = `stalwart-migrate-1x-e2e`;
+  stalwart-migrate MUST be built without its default `enterprise`
+  feature to match the OSS server). Version facts live in the README
+  ledger, never restate here (split-brain rule).
 - flake-parts: FLOATING input (lock-pinned only - the fleet's control);
   `nixpkgs-lib.follows = "nixpkgs"` is NOT optional (a dropped follow
   smuggles a second nixpkgs into every consumer lock). Rejected without
