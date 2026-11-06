@@ -820,543 +820,563 @@ in {
     since1_0 = lib.versionAtLeast config.services.stalwart.package.version "1.0";
   in
     lib.mkIf cfg.enable {
-    assertions =
-      [
-        {
-          assertion = lib.hasInfix "." cfg.hostname;
-          message = "services.mail-server.hostname must be an FQDN (got \"${cfg.hostname}\") - a bare host name breaks MX/PTR alignment.";
-        }
-        {
-          assertion = cfg.admin.secretFile != null;
-          message = "services.mail-server.admin.secretFile is REQUIRED - the 0.16 fallback admin is the provisioning CLI's only credential path (systemd-creds), and without it stalwart-provision cannot authenticate.";
-        }
-      ]
-      ++ lib.optionals (cfg.relay != null) [
-        {
-          assertion = builtins.match ".*[a-zA-Z].*" cfg.relay.address != null;
-          message = "services.mail-server.relay.address must be a DNS-resolvable hostname (got \"${cfg.relay.address}\") - Stalwart resolves relay targets via A lookup and refuses bare IP literals with \"record not found for MX\". Give the smarthost a hostname (e.g. smtp.resend.com).";
-        }
-        {
-          # The ledger's loopback fact, mechanized at eval time: Stalwart
-          # REFUSES to relay to loopback-resolving targets ("host resolves
-          # loopback address", SSRF guard) - a config pointing the smarthost
-          # at localhost fails at first submission, not at build time, unless
-          # caught here.
-          assertion = builtins.match ".*(localhost|127\\.0\\.0\\.1|::1|0\\.0\\.0\\.0).*" cfg.relay.address == null;
-          message = "services.mail-server.relay.address must not be a loopback name or address (got \"${cfg.relay.address}\") - Stalwart refuses to relay to loopback targets with \"host resolves loopback address\" (SSRF guard, README ledger). Point the relay at the real smarthost hostname.";
-        }
-        {
-          assertion = (cfg.relay.username == null) == (cfg.relay.secretFile == null);
-          message = "services.mail-server.relay: set username AND secretFile together (or neither) - partial SASL credentials would fail at first submission.";
-        }
-      ]
-      ++ lib.optionals cfg.rateLimits.enable [
-        {
-          assertion = lib.all (k: lib.elem k rateLimiterKeys) cfg.rateLimits.keys;
-          message = "services.mail-server.rateLimits.keys contains an invalid throttle key - Stalwart would reject the whole throttle object. Valid keys (snake_case; translated to the 0.16 MtaInboundThrottleKey enum): ${lib.concatStringsSep ", " rateLimiterKeys}.";
-        }
-      ]
-      ++ lib.concatLists (lib.mapAttrsToList (id: srv: [
-          {
-            assertion = srv.zone != "";
-            message = "services.mail-server.spamFilter.dnsbl.servers.\"${id}\".zone must be a non-empty DNSBL zone (e.g. zen.spamhaus.org).";
-          }
-        ])
-        cfg.spamFilter.dnsbl.servers)
-      ++ lib.optionals (cfg.certificate.mode == "acme") [
-        {
-          assertion = cfg.certificate.acme.contact != [];
-          message = "services.mail-server.certificate.acme.contact must list at least one contact address - the AcmeProvider schema requires minItems 1.";
-        }
-        {
-          assertion = cfg.certificate.acme.domains != [];
-          message = "services.mail-server.certificate.acme.domains must list at least one domain (typically the mail hostname) - with no domains the Automatic certificateManagement has nothing to issue for.";
-        }
-        {
-          assertion = lib.elem cfg.hostname cfg.certificate.acme.domains;
-          message = "services.mail-server.certificate.acme.domains must include the mail hostname (\"${cfg.hostname}\") - the wrapper's Domain object carries the Automatic certificateManagement, so the hostname itself is the primary issuance target.";
-        }
-      ]
-      ++ lib.optionals (cfg.certificate.mode == "manual") [
-        {
-          assertion = cfg.certificate.manual.certFile != null && cfg.certificate.manual.keyFile != null;
-          message = "services.mail-server.certificate.manual: both certFile and keyFile are required in manual mode - a certificate without its key (or vice versa) is silently unusable and implicit-TLS would serve nothing.";
-        }
-      ]
-      ++ lib.optionals deliverabilityChecks.enable [
-        {
-          assertion = (deliverabilityChecks.canary.address == null) == (deliverabilityChecks.canary.secretFile == null);
-          message = "services.mail-server.deliverabilityChecks.canary: set address AND secretFile together (or neither) - a canary without credentials (or vice versa) cannot run the round-trip probe.";
-        }
-        {
-          assertion = deliverabilityChecks.canary.address == null || lib.hasInfix "@" deliverabilityChecks.canary.address;
-          message = "services.mail-server.deliverabilityChecks.canary.address must be a full address (got \"${toString deliverabilityChecks.canary.address}\") - 0.16 SMTP AUTH and IMAP LOGIN both resolve the synthesized name@domain form.";
-        }
-      ];
-
-    warnings =
-      lib.optionals (cfg.enable && !httpBindIsLoopback) [
-        ''
-          services.mail-server.httpBind ("${cfg.httpBind}") is not a loopback address: the Stalwart
-          web admin, JMAP and management API would be exposed raw on every interface.
-          README doctrine: keep the bind on loopback and put a TLS-terminating reverse proxy
-          (with auth) in front instead.
-        ''
-      ]
-      ++ lib.optionals (cfg.enable && cfg.certificate.mode != "acme" && (cfg.certificate.acme.contact != [] || cfg.certificate.acme.domains != [])) [
-        "services.mail-server.certificate.acme.* is set but certificate.mode is \"${cfg.certificate.mode}\" - the ACME settings are IGNORED. Set certificate.mode = \"acme\" to use them."
-      ]
-      ++ lib.optionals (cfg.enable && cfg.certificate.mode != "manual" && (cfg.certificate.manual.certFile != null || cfg.certificate.manual.keyFile != null)) [
-        "services.mail-server.certificate.manual.* is set but certificate.mode is \"${cfg.certificate.mode}\" - the manual certificate files are IGNORED. Set certificate.mode = \"manual\" to use them."
-      ]
-      ++ lib.optionals (cfg.enable && cfg.certificate.mode == "acme") [
-        ''
-          services.mail-server.certificate.mode = "acme": the 0.16 AcmeProvider object is emitted
-          from the schema, but NO VM test exercises live ACME (needs real DNS + a reachable CA).
-          Verify issuance against a live host before prod (README go-live runbook owns that gate).
-        ''
-      ];
-
-    # x86-64-v2 runtime preflight (owner verdict 2026-10-28, "handle now"):
-    # stalwart_0_16 >= 0.16.26 requires x86-64-v2 on x86_64 and dies with a
-    # bare SIGILL on older silicon. VM nodes are covered structurally
-    # (tests/common.nix v2CpuPatches at TEST level); REAL hosts (pbx,
-    # evo-x2, the VPS - anything rebuilding after the fe132422 pin advance)
-    # get this check at BOOT, before the binary ever executes. Lives HERE
-    # (upstream) so every consumer inherits it: SystemNix's wrapper module,
-    # pbx's direct import, the demo. aarch64 skips (no v2 concept). Flag
-    # set = the glibc x86-64-v2 baseline; pure-bash (no unit-PATH traps -
-    # see CONTRIBUTING on unit-script PATH).
-    systemd = {
-      services.stalwart-cpu-preflight = lib.mkIf pkgs.stdenv.hostPlatform.isx86_64 {
-        description = "Verify x86-64-v2 CPU features before Stalwart (0.16 requirement)";
-        wantedBy = ["multi-user.target"];
-        before = ["${stalwartUnit}.service"];
-        requiredBy = ["${stalwartUnit}.service"];
-        serviceConfig = {
-          Type = "oneshot";
-          RemainAfterExit = true;
-          ExecStart = "${pkgs.writeShellScript "stalwart-cpu-preflight" ''
-            flags=""
-            while IFS= read -r line; do
-              case "$line" in
-                flags*) flags="$line"; break ;;
-              esac
-            done < /proc/cpuinfo
-            missing=""
-            for f in cx16 lahf_lm popcnt sse4_1 sse4_2 ssse3; do
-              case " $flags " in
-                *" $f "*) ;;
-                *) missing="$missing $f" ;;
-              esac
-            done
-            # SSE3 is named "pni" in /proc/cpuinfo (the kernel never emits a
-            # standalone "sse3" token - the substring only ever appears inside
-            # "ssse3"; caught live on the demo VM, 2026-10-28). Accept either.
-            case " $flags " in
-              *" pni "*|*" sse3 "*) ;;
-              *) missing="$missing sse3(pni)" ;;
-            esac
-            if [ -n "$missing" ]; then
-              echo "stalwart-cpu-preflight: CPU lacks x86-64-v2 flags:$missing" >&2
-              echo "  Stalwart 0.16.26+ (x86_64 builds) requires x86-64-v2 and would SIGILL at start." >&2
-              echo "  This host cannot run the deployed mail stack - halt the migration here." >&2
-              exit 1
-            fi
-          ''}";
-        };
-      };
-
-      # Continuous deliverability probes (owner request 2026-10-30): a
-      # oneshot service + timer running the shared probe derivation. EMISSION
-      # ONLY by doctrine - no OnFailure here: SystemNix's onFailure layer
-      # (Discord/ntfy push -> desktop) keys off the unit NAME
-      # mail-deliverability-probe.service and its non-zero exit; SigNoz
-      # scrapes the textfile gauges; Gatus covers the external TCP/TLS view
-      # (docs/MONITORING.md owns the three wiring specs). The unit NEVER
-      # blocks boot or stalwart: it is ordered after, wanted by nobody but
-      # its timer. One `systemd` block for every wrapper unit (statix [20]
-      # collapse-all-the-way-down doctrine).
-      services.mail-deliverability-probe = lib.mkIf deliverabilityChecks.enable {
-        description = "Deliverability probe (DNS/DNSBL/transport/cert/canary; report + Prometheus textfile)";
-        after = ["network-online.target" "${stalwartUnit}.service" "stalwart-provision.service"];
-        wants = ["network-online.target"];
-        serviceConfig = {
-          Type = "oneshot";
-          DynamicUser = true;
-          StateDirectory = "mail-deliverability-probe";
-          LoadCredential =
-            lib.optionals (deliverabilityChecks.canary.secretFile != null)
-            ["canary-password:${toString deliverabilityChecks.canary.secretFile}"];
-          # dig + openssl live on the probe wrapper's own PATH; this PATH is
-          # belt-and-suspenders for the python subprocess lookups.
-          Environment = ''PATH="${lib.makeBinPath [pkgs.dnsutils pkgs.openssl]}"'';
-          ExecStart = "${deliverabilityProbe}/bin/deliverability-probe ${lib.concatStringsSep " " probeArgs}";
-          # The parsedmarc wrapper's hardening set, mirrored (the unit writes
-          # nothing outside its StateDirectory, which ProtectSystem=strict +
-          # StateDirectory auto-whitelist covers).
-          ProtectSystem = "strict";
-          PrivateTmp = true;
-          NoNewPrivileges = true;
-          RestrictNamespaces = true;
-          RestrictRealtime = true;
-          RestrictSUIDSGID = true;
-          SystemCallArchitectures = "native";
-          RestrictAddressFamilies = ["AF_INET" "AF_INET6" "AF_UNIX"];
-          CapabilityBoundingSet = "";
-        };
-      };
-
-      timers.mail-deliverability-probe = lib.mkIf deliverabilityChecks.enable {
-        description = "Run the deliverability probe continuously";
-        wantedBy = ["timers.target"];
-        timerConfig = {
-          OnCalendar = deliverabilityChecks.frequency;
-          Persistent = true;
-          RandomizedDelaySec = 120;
-        };
-      };
-    };
-
-    services.stalwart = {
-      enable = true;
-      # The 0.16 package attr; pkgs.stalwart is still the 0.15 line at this
-      # pin (and warns loudly if used with this module). mkDefault so a
-      # consumer that has MIGRATED its store can override with the 1.x
-      # line (this flake's packages.stalwart_1_0, vendored ahead of
-      # nixpkgs since 2026-11-05) - a 1.x binary on a 0.16 store is the
-      # poison class; the migration runbook gates that override.
-      package = lib.mkDefault pkgs.stalwart_0_16;
-      # 1.x dialect: the pin's stalwart-cli 1.0.13 cannot parse a 1.x
-      # server's schema (unknown variant `sieve` - the v1 schema's new
-      # field type; proven by stalwart-e2e-v1 round 2, 2026-11-05), so
-      # provisioning rides the vendored 1.0.14 CLI for 1.x binaries.
-      # The 0.16 path contributes nothing here (module default stands).
-      provision.package =
-        lib.mkIf since1_0
-        (lib.mkDefault (pkgs.callPackage ../pkgs/stalwart-cli-1_0/package.nix {}));
-      # 0.16 fact (binary-proven 2026-10-17): the config file carries ONLY
-      # the store backend — server.listener/tracer/hostname keys are
-      # SILENTLY IGNORED, and listeners live exclusively in the datastore
-      # (NetworkListener plan objects; on a virgin store the built-in
-      # default set binds, which is smtp 25 + http 8080 serving the SPA
-      # for every path). The management httpBind is therefore plan-only,
-      # which is why a non-8080 httpBind BOOTSTRAPS through the built-in
-      # endpoint: the provision unit probes cfg.url and then the built-in
-      # 127.0.0.1:8080, applies against whichever answered, restarts
-      # stalwart so the plan's listeners bind, and verifies cfg.url
-      # (provision.nix applyScript/restartAndVerify). That closes the
-      # 2026-10-17 pbx 43-min self-deadlock wedge (nix-email#4) and makes
-      # "listeners never activated" fail the unit loudly; the
-      # stalwart-bind-e2e check pins the non-default-bind class.
-      inherit (cfg) stateVersion;
-      # nixpkgs' openFirewall derives ports from provision listener binds,
-      # which would punch the management port through the firewall on every
-      # interface. The wrapper owns the exact public port list below;
-      # loopback needs no firewall rule.
-      openFirewall = false;
-
-      url =
-        if cfg.publicUrl != null
-        then cfg.publicUrl
-        else "https://${cfg.hostname}";
-
-      admin = {
-        enable = true;
-        username = cfg.admin.username;
-      };
-
-      credentials = lib.mergeAttrsList (
+      assertions =
         [
-          {${cfg.admin.username} = toString cfg.admin.secretFile;}
+          {
+            assertion = lib.hasInfix "." cfg.hostname;
+            message = "services.mail-server.hostname must be an FQDN (got \"${cfg.hostname}\") - a bare host name breaks MX/PTR alignment.";
+          }
+          {
+            assertion = cfg.admin.secretFile != null;
+            message = "services.mail-server.admin.secretFile is REQUIRED - the 0.16 fallback admin is the provisioning CLI's only credential path (systemd-creds), and without it stalwart-provision cannot authenticate.";
+          }
         ]
-        ++ lib.optionals (cfg.relay != null && cfg.relay.username != null) [
-          {mail-server-relay = toString cfg.relay.secretFile;}
+        ++ lib.optionals (cfg.relay != null) [
+          {
+            assertion = builtins.match ".*[a-zA-Z].*" cfg.relay.address != null;
+            message = "services.mail-server.relay.address must be a DNS-resolvable hostname (got \"${cfg.relay.address}\") - Stalwart resolves relay targets via A lookup and refuses bare IP literals with \"record not found for MX\". Give the smarthost a hostname (e.g. smtp.resend.com).";
+          }
+          {
+            # The ledger's loopback fact, mechanized at eval time: Stalwart
+            # REFUSES to relay to loopback-resolving targets ("host resolves
+            # loopback address", SSRF guard) - a config pointing the smarthost
+            # at localhost fails at first submission, not at build time, unless
+            # caught here.
+            assertion = builtins.match ".*(localhost|127\\.0\\.0\\.1|::1|0\\.0\\.0\\.0).*" cfg.relay.address == null;
+            message = "services.mail-server.relay.address must not be a loopback name or address (got \"${cfg.relay.address}\") - Stalwart refuses to relay to loopback targets with \"host resolves loopback address\" (SSRF guard, README ledger). Point the relay at the real smarthost hostname.";
+          }
+          {
+            assertion = (cfg.relay.username == null) == (cfg.relay.secretFile == null);
+            message = "services.mail-server.relay: set username AND secretFile together (or neither) - partial SASL credentials would fail at first submission.";
+          }
         ]
-        ++ lib.optionals (cfg.certificate.mode == "manual" && cfg.certificate.manual.certFile != null) [
-          {mail-server-certificate = toString cfg.certificate.manual.certFile;}
+        ++ lib.optionals cfg.rateLimits.enable [
+          {
+            assertion = lib.all (k: lib.elem k rateLimiterKeys) cfg.rateLimits.keys;
+            message = "services.mail-server.rateLimits.keys contains an invalid throttle key - Stalwart would reject the whole throttle object. Valid keys (snake_case; translated to the 0.16 MtaInboundThrottleKey enum): ${lib.concatStringsSep ", " rateLimiterKeys}.";
+          }
         ]
-        ++ lib.optionals (cfg.certificate.mode == "manual" && cfg.certificate.manual.keyFile != null) [
-          {mail-server-certificate-key = toString cfg.certificate.manual.keyFile;}
+        ++ lib.concatLists (lib.mapAttrsToList (id: srv: [
+            {
+              assertion = srv.zone != "";
+              message = "services.mail-server.spamFilter.dnsbl.servers.\"${id}\".zone must be a non-empty DNSBL zone (e.g. zen.spamhaus.org).";
+            }
+          ])
+          cfg.spamFilter.dnsbl.servers)
+        ++ lib.optionals (cfg.certificate.mode == "acme") [
+          {
+            assertion = cfg.certificate.acme.contact != [];
+            message = "services.mail-server.certificate.acme.contact must list at least one contact address - the AcmeProvider schema requires minItems 1.";
+          }
+          {
+            assertion = cfg.certificate.acme.domains != [];
+            message = "services.mail-server.certificate.acme.domains must list at least one domain (typically the mail hostname) - with no domains the Automatic certificateManagement has nothing to issue for.";
+          }
+          {
+            assertion = lib.elem cfg.hostname cfg.certificate.acme.domains;
+            message = "services.mail-server.certificate.acme.domains must include the mail hostname (\"${cfg.hostname}\") - the wrapper's Domain object carries the Automatic certificateManagement, so the hostname itself is the primary issuance target.";
+          }
         ]
-      );
+        ++ lib.optionals (cfg.certificate.mode == "manual") [
+          {
+            assertion = cfg.certificate.manual.certFile != null && cfg.certificate.manual.keyFile != null;
+            message = "services.mail-server.certificate.manual: both certFile and keyFile are required in manual mode - a certificate without its key (or vice versa) is silently unusable and implicit-TLS would serve nothing.";
+          }
+        ]
+        ++ lib.optionals deliverabilityChecks.enable [
+          {
+            assertion = (deliverabilityChecks.canary.address == null) == (deliverabilityChecks.canary.secretFile == null);
+            message = "services.mail-server.deliverabilityChecks.canary: set address AND secretFile together (or neither) - a canary without credentials (or vice versa) cannot run the round-trip probe.";
+          }
+          {
+            assertion = deliverabilityChecks.canary.address == null || lib.hasInfix "@" deliverabilityChecks.canary.address;
+            message = "services.mail-server.deliverabilityChecks.canary.address must be a full address (got \"${toString deliverabilityChecks.canary.address}\") - 0.16 SMTP AUTH and IMAP LOGIN both resolve the synthesized name@domain form.";
+          }
+        ];
 
-      provision = {
-        enable = true;
-        url = provisionUrl;
+      warnings =
+        lib.optionals (cfg.enable && !httpBindIsLoopback) [
+          ''
+            services.mail-server.httpBind ("${cfg.httpBind}") is not a loopback address: the Stalwart
+            web admin, JMAP and management API would be exposed raw on every interface.
+            README doctrine: keep the bind on loopback and put a TLS-terminating reverse proxy
+            (with auth) in front instead.
+          ''
+        ]
+        ++ lib.optionals (cfg.enable && cfg.certificate.mode != "acme" && (cfg.certificate.acme.contact != [] || cfg.certificate.acme.domains != [])) [
+          "services.mail-server.certificate.acme.* is set but certificate.mode is \"${cfg.certificate.mode}\" - the ACME settings are IGNORED. Set certificate.mode = \"acme\" to use them."
+        ]
+        ++ lib.optionals (cfg.enable && cfg.certificate.mode != "manual" && (cfg.certificate.manual.certFile != null || cfg.certificate.manual.keyFile != null)) [
+          "services.mail-server.certificate.manual.* is set but certificate.mode is \"${cfg.certificate.mode}\" - the manual certificate files are IGNORED. Set certificate.mode = \"manual\" to use them."
+        ]
+        ++ lib.optionals (cfg.enable && cfg.certificate.mode == "acme") [
+          ''
+            services.mail-server.certificate.mode = "acme": the 0.16 AcmeProvider object is emitted
+            from the schema, but NO VM test exercises live ACME (needs real DNS + a reachable CA).
+            Verify issuance against a live host before prod (README go-live runbook owns that gate).
+          ''
+        ];
 
-        singletons = lib.mkMerge (
-          [
-            {
-              SystemSettings =
-                {
-                  defaultHostname = cfg.hostname;
-                  # REQUIRED server-side (0.16 apply: "defaultDomainId:
-                  # required", VM transcript 2026-10-16) - points at the
-                  # wrapper Domain object defined below.
-                  defaultDomainId = "#${wrapperDomainId}";
-                }
-                // lib.optionalAttrs (cfg.certificate.mode == "manual" && cfg.certificate.manual.default) {
-                  defaultCertificateId = "#${cfg.certificate.manual.id}";
-                };
-            }
-          ]
-          ++ lib.optionals (cfg.directoryCacheTtlNegative != null) [
-            {
-              # SINGLETON (x:Cache): negativeTtl is integer MILLISECONDS
-              # upstream - the wrapper option stays in seconds
-              # (0.15-compat for consumers).
-              Cache = {
-                negativeTtl = secondsToMs cfg.directoryCacheTtlNegative;
-              };
-            }
-          ]
-          ++ lib.optionals cfg.metrics.enable [
-            {
-              Metrics.prometheus."@type" = "Enabled";
-            }
-          ]
-          ++ lib.optionals (cfg.relay != null) [
-            {
-              # SINGLETON (x:MtaOutboundStrategy): the route Expression.
-              # Shape mirrors the 0.16 built-in default (is_local_domain ->
-              # 'local', else -> 'mx') with the relay NAME replacing 'mx'.
-              MtaOutboundStrategy.route = {
-                match = [
-                  {
-                    "if" = "is_local_domain(rcpt_domain)";
-                    "then" = "'local'";
-                  }
-                ];
-                "else" = "'${cfg.relay.routeId}'";
-              };
-            }
-          ]
-        );
+      # x86-64-v2 runtime preflight (owner verdict 2026-10-28, "handle now"):
+      # stalwart_0_16 >= 0.16.26 requires x86-64-v2 on x86_64 and dies with a
+      # bare SIGILL on older silicon. VM nodes are covered structurally
+      # (tests/common.nix v2CpuPatches at TEST level); REAL hosts (pbx,
+      # evo-x2, the VPS - anything rebuilding after the fe132422 pin advance)
+      # get this check at BOOT, before the binary ever executes. Lives HERE
+      # (upstream) so every consumer inherits it: SystemNix's wrapper module,
+      # pbx's direct import, the demo. aarch64 skips (no v2 concept). Flag
+      # set = the glibc x86-64-v2 baseline; pure-bash (no unit-PATH traps -
+      # see CONTRIBUTING on unit-script PATH).
+      systemd = {
+        services.stalwart-cpu-preflight = lib.mkIf pkgs.stdenv.hostPlatform.isx86_64 {
+          description = "Verify x86-64-v2 CPU features before Stalwart (0.16 requirement)";
+          wantedBy = ["multi-user.target"];
+          before = ["${stalwartUnit}.service"];
+          requiredBy = ["${stalwartUnit}.service"];
+          serviceConfig = {
+            Type = "oneshot";
+            RemainAfterExit = true;
+            ExecStart = "${pkgs.writeShellScript "stalwart-cpu-preflight" ''
+              flags=""
+              while IFS= read -r line; do
+                case "$line" in
+                  flags*) flags="$line"; break ;;
+                esac
+              done < /proc/cpuinfo
+              missing=""
+              for f in cx16 lahf_lm popcnt sse4_1 sse4_2 ssse3; do
+                case " $flags " in
+                  *" $f "*) ;;
+                  *) missing="$missing $f" ;;
+                esac
+              done
+              # SSE3 is named "pni" in /proc/cpuinfo (the kernel never emits a
+              # standalone "sse3" token - the substring only ever appears inside
+              # "ssse3"; caught live on the demo VM, 2026-10-28). Accept either.
+              case " $flags " in
+                *" pni "*|*" sse3 "*) ;;
+                *) missing="$missing sse3(pni)" ;;
+              esac
+              if [ -n "$missing" ]; then
+                echo "stalwart-cpu-preflight: CPU lacks x86-64-v2 flags:$missing" >&2
+                echo "  Stalwart 0.16.26+ (x86_64 builds) requires x86-64-v2 and would SIGILL at start." >&2
+                echo "  This host cannot run the deployed mail stack - halt the migration here." >&2
+                exit 1
+              fi
+            ''}";
+          };
+        };
 
-        objects = lib.mkMerge (
-          [
-            {
-              # The wrapper's own domain, present from first boot so
-              # is_local_domain never sees a cold cache for it.
-              Domain.objects.${wrapperDomainId} = {
-                name = cfg.hostname;
-                dkimManagement."@type" = "Manual";
-                dnsManagement."@type" = "Manual";
-                certificateManagement =
-                  if cfg.certificate.mode == "acme"
-                  then {
-                    "@type" = "Automatic";
-                    acmeProviderId = "#${cfg.certificate.acme.id}";
-                  }
-                  else {"@type" = "Manual";};
-              };
+        # Continuous deliverability probes (owner request 2026-10-30): a
+        # oneshot service + timer running the shared probe derivation. EMISSION
+        # ONLY by doctrine - no OnFailure here: SystemNix's onFailure layer
+        # (Discord/ntfy push -> desktop) keys off the unit NAME
+        # mail-deliverability-probe.service and its non-zero exit; SigNoz
+        # scrapes the textfile gauges; Gatus covers the external TCP/TLS view
+        # (docs/MONITORING.md owns the three wiring specs). The unit NEVER
+        # blocks boot or stalwart: it is ordered after, wanted by nobody but
+        # its timer. One `systemd` block for every wrapper unit (statix [20]
+        # collapse-all-the-way-down doctrine).
+        services.mail-deliverability-probe = lib.mkIf deliverabilityChecks.enable {
+          description = "Deliverability probe (DNS/DNSBL/transport/cert/canary; report + Prometheus textfile)";
+          after = ["network-online.target" "${stalwartUnit}.service" "stalwart-provision.service"];
+          wants = ["network-online.target"];
+          serviceConfig = {
+            Type = "oneshot";
+            DynamicUser = true;
+            StateDirectory = "mail-deliverability-probe";
+            LoadCredential =
+              lib.optionals (deliverabilityChecks.canary.secretFile != null)
+              ["canary-password:${toString deliverabilityChecks.canary.secretFile}"];
+            # dig + openssl live on the probe wrapper's own PATH; this PATH is
+            # belt-and-suspenders for the python subprocess lookups.
+            Environment = ''PATH="${lib.makeBinPath [pkgs.dnsutils pkgs.openssl]}"'';
+            ExecStart = "${deliverabilityProbe}/bin/deliverability-probe ${lib.concatStringsSep " " probeArgs}";
+            # The parsedmarc wrapper's hardening set, mirrored (the unit writes
+            # nothing outside its StateDirectory, which ProtectSystem=strict +
+            # StateDirectory auto-whitelist covers).
+            ProtectSystem = "strict";
+            PrivateTmp = true;
+            NoNewPrivileges = true;
+            RestrictNamespaces = true;
+            RestrictRealtime = true;
+            RestrictSUIDSGID = true;
+            SystemCallArchitectures = "native";
+            RestrictAddressFamilies = ["AF_INET" "AF_INET6" "AF_UNIX"];
+            CapabilityBoundingSet = "";
+          };
+        };
 
-              NetworkListener = {
-                reconcile = true;
-                match = ["name"];
-                # 0.16 renders set-typed fields (bind, SAN sets) as JSON
-                # MAPS on the plan wire; the lua sorter normalizes these
-                # Nix lists into that shape (binary-proven 2026-10-17:
-                # a hand-added LIST bind dies invalidPatch).
-                #
-                # STATIC EXTRAS MERGE (2026-10-17): 0.16 silently ignores
-                # config-file server.listener keys (only the store backend
-                # survives in the TOML), so a consumer's
-                # services.stalwart.settings.server.listener.<name>
-                # addition - the documented 0.15 extension surface - was
-                # dropped WITHOUT trace. Extras are merged into the
-                # reconcile set as plan objects instead; the wrapper's own
-                # five ids win on collision (REPLACING a wrapper-owned
-                # listener stays a mkForce move, README "0.16 provisioning").
-                # Shape mapping: static { bind = [...]; protocol; tls.implicit }
-                # -> plan { name; protocol; bind; tlsImplicit | implicitTls }.
-                # Binary-proven end-to-end (pbx pop3 995 listener,
-                # 2026-10-17): reconcile accepts the merged object and the
-                # restarted server binds it (implicit-TLS POP3 banner).
-                objects =
-                  (lib.mapAttrs
-                    (name: listener: {
-                      inherit name;
-                      inherit (listener) protocol bind;
-                      ${if since1_0 then "implicitTls" else "tlsImplicit"} = listener.tls.implicit or false;
-                    })
-                    (config.services.stalwart.settings.server.listener or {}))
-                  // {
-                    smtp = {
-                      name = "smtp";
-                      protocol = "smtp";
-                      bind = ["[::]:25"];
-                    };
-                    submission = {
-                      name = "submission";
-                      protocol = "smtp";
-                      bind = ["[::]:587"];
-                    };
-                    submissions = {
-                      name = "submissions";
-                      protocol = "smtp";
-                      bind = ["[::]:465"];
-                      ${if since1_0 then "implicitTls" else "tlsImplicit"} = true;
-                    };
-                    imaps = {
-                      name = "imaps";
-                      protocol = "imap";
-                      bind = ["[::]:993"];
-                      ${if since1_0 then "implicitTls" else "tlsImplicit"} = true;
-                    };
-                    http = {
-                      name = "http";
-                      protocol = "http";
-                      bind = [cfg.httpBind];
-                      useTls = false;
-                    };
-                  };
-              };
-            }
-          ]
-          ++ lib.optionals cfg.rateLimits.enable [
-            {
-              MtaInboundThrottle = {
-                # match ["description"]: MtaInboundThrottle has NO name
-                # field; the server's implicit upsert match key for this
-                # type is `description` and it refuses the op when the
-                # field is missing ("match property `description` is
-                # missing", VM transcript 2026-10-16). Carrying the field
-                # makes re-applies update instead of value-match.
-                match = ["description"];
-                objects.${cfg.rateLimits.id} = {
-                  description = cfg.rateLimits.id;
-                  enable = true;
-                  key = map (k: throttleKeyMap.${k}) cfg.rateLimits.keys;
-                  rate = parseRate cfg.rateLimits.rate;
-                };
-              };
-            }
-          ]
-          # ALWAYS reconciled (not optionals): HISTORICAL ROOT (0.16.22,
-          # VM transcripts 2026-10-16, docs/status/2026-10-16_20-48_*):
-          # the binary SHIPPED 18 default SpamDnsblServer rows whose tag
-          # expressions use an operator ("bit_and") its own parser
-          # rejected - every apply's reload validation FAILED on them and
-          # the core never swapped (provisioned listeners never
-          # activate). 0.16.23 ADDED bit_and, so on the 0.16.26 pin
-          # (since 2026-10-28) the defaults no longer break validation -
-          # but the reconcile posture STAYS: it mechanizes the wrapper's
-          # long-standing "DNSBL off by default" posture (DNS-less E2E
-          # lesson), and 0.16.24 made upstream rule updates INSERT-ONLY
-          # for existing installs ("upstream changes to existing rules,
-          # DNSBL servers, HTTP lookups ... never reach an existing
-          # installation") - only a reconciled declarative set converges.
-          # Consumers merging their own servers into this set keep them;
-          # reconcile deletes only rows outside the plan.
-          ++ [
-            {
-              SpamDnsblServer = {
-                reconcile = true;
-                match = ["name"];
-                objects = lib.mapAttrs (id: srv:
-                  {
-                    "@type" = dnsblScopeVariant.${srv.scope};
-                    name = id;
-                    enable = true;
-                    zone = constantExpr srv.zone;
-                  }
-                  // lib.optionalAttrs (srv.tag != null) {
-                    tag = constantExpr srv.tag;
-                  })
-                cfg.spamFilter.dnsbl.servers;
-              };
-            }
-          ]
-          ++ lib.optionals (cfg.relay != null) [
-            {
-              MtaRoute.objects.${cfg.relay.routeId} =
-                {
-                  "@type" = "Relay";
-                  name = cfg.relay.routeId;
-                  # 0.16 `address` -> 1.0 `host` (SCHEMA_CHANGES 3.1,
-                  # MtaRouteRelay); same value, renamed plan key.
-                  ${if since1_0 then "host" else "address"} = cfg.relay.address;
-                  port = cfg.relay.port;
-                  protocol = "smtp";
-                  implicitTls = cfg.relay.tlsImplicit;
-                }
-                // lib.optionalAttrs (cfg.relay.username != null) {
-                  authUsername = cfg.relay.username;
-                  authSecret."@type" = "File";
-                  authSecret.filePath = credentialPath "mail-server-relay";
-                };
-            }
-          ]
-          ++ lib.optionals (cfg.certificate.mode == "acme") [
-            {
-              AcmeProvider.objects.${cfg.certificate.acme.id} = {
-                directory = cfg.certificate.acme.directory;
-                contact = cfg.certificate.acme.contact;
-                challengeType = acmeChallengeEnum.${cfg.certificate.acme.challenge};
-              };
-            }
-          ]
-          ++ lib.optionals (cfg.certificate.mode == "manual") [
-            {
-              # subjectAlternativeNames is the ONLY filter property of
-              # Certificate AND is server-set (derived from the PEM) in
-              # 0.16.26: an upsert with no explicit match demands the
-              # implicit filter key in the object body and dies with
-              # "match property `subjectAlternativeNames` is missing from
-              # the object body" (binary-proven 2026-10-17 on a virgin
-              # store; the VM e2es never caught it - they run self-signed
-              # mode, which provisions no Certificate object at all).
-              # Carrying match + the SAN list (the lua sorter validates
-              # set-typed fields as unique arrays; the server treats the
-              # entry as a MATCH KEY, not a write - server-set fields are
-              # rejected as writes) makes the first apply create and
-              # re-applies UPDATE in place: the cert-rotation story.
-              Certificate = {
-                match = ["subjectAlternativeNames"];
-                objects.${cfg.certificate.manual.id} = {
-                  certificate."@type" = "File";
-                  certificate.filePath = credentialPath "mail-server-certificate";
-                  privateKey."@type" = "File";
-                  privateKey.filePath = credentialPath "mail-server-certificate-key";
-                  subjectAlternativeNames = [cfg.hostname];
-                };
-              };
-            }
-          ]
-        );
+        timers.mail-deliverability-probe = lib.mkIf deliverabilityChecks.enable {
+          description = "Run the deliverability probe continuously";
+          wantedBy = ["timers.target"];
+          timerConfig = {
+            OnCalendar = deliverabilityChecks.frequency;
+            Persistent = true;
+            RandomizedDelaySec = 120;
+          };
+        };
       };
-    };
 
-    # The module owns the listener contract, so it owns the firewall ports
-    # for it. Plain definition (NOT mkDefault), root-caused 2026-09-15: the
-    # module system keeps only the numerically-LOWEST-priority definitions
-    # (lib/modules.nix filterOverrides'), and base nixpkgs ships UNCONDITIONAL
-    # empty defs at priority 100 on this option - podman's network-socket.nix
-    # (`lib.optional (enable && openFirewall) port`) and udp-over-tcp.nix
-    # (`getFirewallPorts cfg.tcp2udp`) both yield [] even when their services
-    # are disabled. A mkDefault list (priority 1000) is therefore discarded
-    # wholesale - lists concat only WITHIN one priority tier. `lib.optional`
-    # instead of `mkIf` is the upstream anti-pattern (mkIf contributes no
-    # definition when false); `services.openssh.ports` has no such base def,
-    # which is why mkDefault works fine THERE. Lists concat: consumer port
-    # lists merge additively; mkForce yours to replace.
-    #
-    # The httpBind port joins ONLY on a non-loopback bind (demo-VM hostfwd
-    # root cause, transcript 2026-09-22: `httpBind = "0.0.0.0:8080"` with the
-    # port firewalled makes every remote connection OPEN and then hang
-    # forever - SYN dropped after slirp/proxy already accepted host-side;
-    # in-guest loopback keeps working, SMTP ports flow, so the failure mode
-    # is a near-undebuggable "connects but never answers"). The non-loopback
-    # warning above already flags the raw-exposure tradeoff.
-    networking.firewall.allowedTCPPorts =
-      [
-        25
-        465
-        587
-        993
-      ]
-      ++ lib.optionals (!httpBindIsLoopback && httpBindPort != null) [httpBindPort];
-  };
+      services.stalwart = {
+        enable = true;
+        # The 0.16 package attr; pkgs.stalwart is still the 0.15 line at this
+        # pin (and warns loudly if used with this module). mkDefault so a
+        # consumer that has MIGRATED its store can override with the 1.x
+        # line (this flake's packages.stalwart_1_0, vendored ahead of
+        # nixpkgs since 2026-11-05) - a 1.x binary on a 0.16 store is the
+        # poison class; the migration runbook gates that override.
+        package = lib.mkDefault pkgs.stalwart_0_16;
+        # 1.x dialect: the pin's stalwart-cli 1.0.13 cannot parse a 1.x
+        # server's schema (unknown variant `sieve` - the v1 schema's new
+        # field type; proven by stalwart-e2e-v1 round 2, 2026-11-05), so
+        # provisioning rides the vendored 1.0.14 CLI for 1.x binaries.
+        # The 0.16 path contributes nothing here (module default stands).
+        provision.package =
+          lib.mkIf since1_0
+          (lib.mkDefault (pkgs.callPackage ../pkgs/stalwart-cli-1_0/package.nix {}));
+        # 0.16 fact (binary-proven 2026-10-17): the config file carries ONLY
+        # the store backend — server.listener/tracer/hostname keys are
+        # SILENTLY IGNORED, and listeners live exclusively in the datastore
+        # (NetworkListener plan objects; on a virgin store the built-in
+        # default set binds, which is smtp 25 + http 8080 serving the SPA
+        # for every path). The management httpBind is therefore plan-only,
+        # which is why a non-8080 httpBind BOOTSTRAPS through the built-in
+        # endpoint: the provision unit probes cfg.url and then the built-in
+        # 127.0.0.1:8080, applies against whichever answered, restarts
+        # stalwart so the plan's listeners bind, and verifies cfg.url
+        # (provision.nix applyScript/restartAndVerify). That closes the
+        # 2026-10-17 pbx 43-min self-deadlock wedge (nix-email#4) and makes
+        # "listeners never activated" fail the unit loudly; the
+        # stalwart-bind-e2e check pins the non-default-bind class.
+        inherit (cfg) stateVersion;
+        # nixpkgs' openFirewall derives ports from provision listener binds,
+        # which would punch the management port through the firewall on every
+        # interface. The wrapper owns the exact public port list below;
+        # loopback needs no firewall rule.
+        openFirewall = false;
+
+        url =
+          if cfg.publicUrl != null
+          then cfg.publicUrl
+          else "https://${cfg.hostname}";
+
+        admin = {
+          enable = true;
+          username = cfg.admin.username;
+        };
+
+        credentials = lib.mergeAttrsList (
+          [
+            {${cfg.admin.username} = toString cfg.admin.secretFile;}
+          ]
+          ++ lib.optionals (cfg.relay != null && cfg.relay.username != null) [
+            {mail-server-relay = toString cfg.relay.secretFile;}
+          ]
+          ++ lib.optionals (cfg.certificate.mode == "manual" && cfg.certificate.manual.certFile != null) [
+            {mail-server-certificate = toString cfg.certificate.manual.certFile;}
+          ]
+          ++ lib.optionals (cfg.certificate.mode == "manual" && cfg.certificate.manual.keyFile != null) [
+            {mail-server-certificate-key = toString cfg.certificate.manual.keyFile;}
+          ]
+        );
+
+        provision = {
+          enable = true;
+          url = provisionUrl;
+
+          singletons = lib.mkMerge (
+            [
+              {
+                SystemSettings =
+                  {
+                    defaultHostname = cfg.hostname;
+                    # REQUIRED server-side (0.16 apply: "defaultDomainId:
+                    # required", VM transcript 2026-10-16) - points at the
+                    # wrapper Domain object defined below.
+                    defaultDomainId = "#${wrapperDomainId}";
+                  }
+                  // lib.optionalAttrs (cfg.certificate.mode == "manual" && cfg.certificate.manual.default) {
+                    defaultCertificateId = "#${cfg.certificate.manual.id}";
+                  };
+              }
+            ]
+            ++ lib.optionals (cfg.directoryCacheTtlNegative != null) [
+              {
+                # SINGLETON (x:Cache): negativeTtl is integer MILLISECONDS
+                # upstream - the wrapper option stays in seconds
+                # (0.15-compat for consumers).
+                Cache = {
+                  negativeTtl = secondsToMs cfg.directoryCacheTtlNegative;
+                };
+              }
+            ]
+            ++ lib.optionals cfg.metrics.enable [
+              {
+                Metrics.prometheus."@type" = "Enabled";
+              }
+            ]
+            ++ lib.optionals (cfg.relay != null) [
+              {
+                # SINGLETON (x:MtaOutboundStrategy): the route Expression.
+                # Shape mirrors the 0.16 built-in default (is_local_domain ->
+                # 'local', else -> 'mx') with the relay NAME replacing 'mx'.
+                MtaOutboundStrategy.route = {
+                  match = [
+                    {
+                      "if" = "is_local_domain(rcpt_domain)";
+                      "then" = "'local'";
+                    }
+                  ];
+                  "else" = "'${cfg.relay.routeId}'";
+                };
+              }
+            ]
+          );
+
+          objects = lib.mkMerge (
+            [
+              {
+                # The wrapper's own domain, present from first boot so
+                # is_local_domain never sees a cold cache for it.
+                Domain.objects.${wrapperDomainId} = {
+                  name = cfg.hostname;
+                  dkimManagement."@type" = "Manual";
+                  dnsManagement."@type" = "Manual";
+                  certificateManagement =
+                    if cfg.certificate.mode == "acme"
+                    then {
+                      "@type" = "Automatic";
+                      acmeProviderId = "#${cfg.certificate.acme.id}";
+                    }
+                    else {"@type" = "Manual";};
+                };
+
+                NetworkListener = {
+                  reconcile = true;
+                  match = ["name"];
+                  # 0.16 renders set-typed fields (bind, SAN sets) as JSON
+                  # MAPS on the plan wire; the lua sorter normalizes these
+                  # Nix lists into that shape (binary-proven 2026-10-17:
+                  # a hand-added LIST bind dies invalidPatch).
+                  #
+                  # STATIC EXTRAS MERGE (2026-10-17): 0.16 silently ignores
+                  # config-file server.listener keys (only the store backend
+                  # survives in the TOML), so a consumer's
+                  # services.stalwart.settings.server.listener.<name>
+                  # addition - the documented 0.15 extension surface - was
+                  # dropped WITHOUT trace. Extras are merged into the
+                  # reconcile set as plan objects instead; the wrapper's own
+                  # five ids win on collision (REPLACING a wrapper-owned
+                  # listener stays a mkForce move, README "0.16 provisioning").
+                  # Shape mapping: static { bind = [...]; protocol; tls.implicit }
+                  # -> plan { name; protocol; bind; tlsImplicit | implicitTls }.
+                  # Binary-proven end-to-end (pbx pop3 995 listener,
+                  # 2026-10-17): reconcile accepts the merged object and the
+                  # restarted server binds it (implicit-TLS POP3 banner).
+                  objects =
+                    (lib.mapAttrs
+                      (name: listener: {
+                        inherit name;
+                        inherit (listener) protocol bind;
+                        ${
+                          if since1_0
+                          then "implicitTls"
+                          else "tlsImplicit"
+                        } =
+                          listener.tls.implicit or false;
+                      })
+                      (config.services.stalwart.settings.server.listener or {}))
+                    // {
+                      smtp = {
+                        name = "smtp";
+                        protocol = "smtp";
+                        bind = ["[::]:25"];
+                      };
+                      submission = {
+                        name = "submission";
+                        protocol = "smtp";
+                        bind = ["[::]:587"];
+                      };
+                      submissions = {
+                        name = "submissions";
+                        protocol = "smtp";
+                        bind = ["[::]:465"];
+                        ${
+                          if since1_0
+                          then "implicitTls"
+                          else "tlsImplicit"
+                        } =
+                          true;
+                      };
+                      imaps = {
+                        name = "imaps";
+                        protocol = "imap";
+                        bind = ["[::]:993"];
+                        ${
+                          if since1_0
+                          then "implicitTls"
+                          else "tlsImplicit"
+                        } =
+                          true;
+                      };
+                      http = {
+                        name = "http";
+                        protocol = "http";
+                        bind = [cfg.httpBind];
+                        useTls = false;
+                      };
+                    };
+                };
+              }
+            ]
+            ++ lib.optionals cfg.rateLimits.enable [
+              {
+                MtaInboundThrottle = {
+                  # match ["description"]: MtaInboundThrottle has NO name
+                  # field; the server's implicit upsert match key for this
+                  # type is `description` and it refuses the op when the
+                  # field is missing ("match property `description` is
+                  # missing", VM transcript 2026-10-16). Carrying the field
+                  # makes re-applies update instead of value-match.
+                  match = ["description"];
+                  objects.${cfg.rateLimits.id} = {
+                    description = cfg.rateLimits.id;
+                    enable = true;
+                    key = map (k: throttleKeyMap.${k}) cfg.rateLimits.keys;
+                    rate = parseRate cfg.rateLimits.rate;
+                  };
+                };
+              }
+            ]
+            # ALWAYS reconciled (not optionals): HISTORICAL ROOT (0.16.22,
+            # VM transcripts 2026-10-16, docs/status/2026-10-16_20-48_*):
+            # the binary SHIPPED 18 default SpamDnsblServer rows whose tag
+            # expressions use an operator ("bit_and") its own parser
+            # rejected - every apply's reload validation FAILED on them and
+            # the core never swapped (provisioned listeners never
+            # activate). 0.16.23 ADDED bit_and, so on the 0.16.26 pin
+            # (since 2026-10-28) the defaults no longer break validation -
+            # but the reconcile posture STAYS: it mechanizes the wrapper's
+            # long-standing "DNSBL off by default" posture (DNS-less E2E
+            # lesson), and 0.16.24 made upstream rule updates INSERT-ONLY
+            # for existing installs ("upstream changes to existing rules,
+            # DNSBL servers, HTTP lookups ... never reach an existing
+            # installation") - only a reconciled declarative set converges.
+            # Consumers merging their own servers into this set keep them;
+            # reconcile deletes only rows outside the plan.
+            ++ [
+              {
+                SpamDnsblServer = {
+                  reconcile = true;
+                  match = ["name"];
+                  objects = lib.mapAttrs (id: srv:
+                    {
+                      "@type" = dnsblScopeVariant.${srv.scope};
+                      name = id;
+                      enable = true;
+                      zone = constantExpr srv.zone;
+                    }
+                    // lib.optionalAttrs (srv.tag != null) {
+                      tag = constantExpr srv.tag;
+                    })
+                  cfg.spamFilter.dnsbl.servers;
+                };
+              }
+            ]
+            ++ lib.optionals (cfg.relay != null) [
+              {
+                MtaRoute.objects.${cfg.relay.routeId} =
+                  {
+                    "@type" = "Relay";
+                    name = cfg.relay.routeId;
+                    # 0.16 `address` -> 1.0 `host` (SCHEMA_CHANGES 3.1,
+                    # MtaRouteRelay); same value, renamed plan key.
+                    ${
+                      if since1_0
+                      then "host"
+                      else "address"
+                    } =
+                      cfg.relay.address;
+                    port = cfg.relay.port;
+                    protocol = "smtp";
+                    implicitTls = cfg.relay.tlsImplicit;
+                  }
+                  // lib.optionalAttrs (cfg.relay.username != null) {
+                    authUsername = cfg.relay.username;
+                    authSecret."@type" = "File";
+                    authSecret.filePath = credentialPath "mail-server-relay";
+                  };
+              }
+            ]
+            ++ lib.optionals (cfg.certificate.mode == "acme") [
+              {
+                AcmeProvider.objects.${cfg.certificate.acme.id} = {
+                  directory = cfg.certificate.acme.directory;
+                  contact = cfg.certificate.acme.contact;
+                  challengeType = acmeChallengeEnum.${cfg.certificate.acme.challenge};
+                };
+              }
+            ]
+            ++ lib.optionals (cfg.certificate.mode == "manual") [
+              {
+                # subjectAlternativeNames is the ONLY filter property of
+                # Certificate AND is server-set (derived from the PEM) in
+                # 0.16.26: an upsert with no explicit match demands the
+                # implicit filter key in the object body and dies with
+                # "match property `subjectAlternativeNames` is missing from
+                # the object body" (binary-proven 2026-10-17 on a virgin
+                # store; the VM e2es never caught it - they run self-signed
+                # mode, which provisions no Certificate object at all).
+                # Carrying match + the SAN list (the lua sorter validates
+                # set-typed fields as unique arrays; the server treats the
+                # entry as a MATCH KEY, not a write - server-set fields are
+                # rejected as writes) makes the first apply create and
+                # re-applies UPDATE in place: the cert-rotation story.
+                Certificate = {
+                  match = ["subjectAlternativeNames"];
+                  objects.${cfg.certificate.manual.id} = {
+                    certificate."@type" = "File";
+                    certificate.filePath = credentialPath "mail-server-certificate";
+                    privateKey."@type" = "File";
+                    privateKey.filePath = credentialPath "mail-server-certificate-key";
+                    subjectAlternativeNames = [cfg.hostname];
+                  };
+                };
+              }
+            ]
+          );
+        };
+      };
+
+      # The module owns the listener contract, so it owns the firewall ports
+      # for it. Plain definition (NOT mkDefault), root-caused 2026-09-15: the
+      # module system keeps only the numerically-LOWEST-priority definitions
+      # (lib/modules.nix filterOverrides'), and base nixpkgs ships UNCONDITIONAL
+      # empty defs at priority 100 on this option - podman's network-socket.nix
+      # (`lib.optional (enable && openFirewall) port`) and udp-over-tcp.nix
+      # (`getFirewallPorts cfg.tcp2udp`) both yield [] even when their services
+      # are disabled. A mkDefault list (priority 1000) is therefore discarded
+      # wholesale - lists concat only WITHIN one priority tier. `lib.optional`
+      # instead of `mkIf` is the upstream anti-pattern (mkIf contributes no
+      # definition when false); `services.openssh.ports` has no such base def,
+      # which is why mkDefault works fine THERE. Lists concat: consumer port
+      # lists merge additively; mkForce yours to replace.
+      #
+      # The httpBind port joins ONLY on a non-loopback bind (demo-VM hostfwd
+      # root cause, transcript 2026-09-22: `httpBind = "0.0.0.0:8080"` with the
+      # port firewalled makes every remote connection OPEN and then hang
+      # forever - SYN dropped after slirp/proxy already accepted host-side;
+      # in-guest loopback keeps working, SMTP ports flow, so the failure mode
+      # is a near-undebuggable "connects but never answers"). The non-loopback
+      # warning above already flags the raw-exposure tradeoff.
+      networking.firewall.allowedTCPPorts =
+        [
+          25
+          465
+          587
+          993
+        ]
+        ++ lib.optionals (!httpBindIsLoopback && httpBindPort != null) [httpBindPort];
+    };
 }

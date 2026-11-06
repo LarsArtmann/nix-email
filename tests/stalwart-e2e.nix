@@ -85,13 +85,19 @@
 # NOT covered (needs DNS + external relay creds): outbound smarthost relay
 # (see stalwart-relay-e2e). Those stay live-host go-live checks - see
 # README verified-facts ledger for the keys.
-{pkgs, package ? pkgs.stalwart_0_16}: let
+{
+  pkgs,
+  package ? pkgs.stalwart_0_16,
+}: let
   common = import ./common.nix;
 
   # Stalwart 1.x dialect branch (EmailAlias.enabled -> enable,
   # SCHEMA_CHANGES 3.1): the same fixture renders the plan key the
   # deployed schema knows.
-  aliasEnableKey = if pkgs.lib.versionAtLeast package.version "1.0" then "enable" else "enabled";
+  aliasEnableKey =
+    if pkgs.lib.versionAtLeast package.version "1.0"
+    then "enable"
+    else "enabled";
 
   # Runtime-apply CLI: the pin's stalwart-cli 1.0.13 cannot parse a 1.x
   # server's schema (`unknown variant \`sieve\``), so the catch-all

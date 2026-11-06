@@ -25,7 +25,6 @@
   buildPythonPackage,
   fetchFromGitHub,
   hatchling,
-
   # dependencies
   dnspython,
   expiringdict,

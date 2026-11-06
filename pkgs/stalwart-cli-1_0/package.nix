@@ -29,7 +29,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
   cargoHash = "sha256-/vYb083UVPDZQpDWh16XkMWk+n9081OiV9S1i1om5zQ=";
   __structuredAttrs = true;
   # `Result::unwrap()` on an `Err` value: Network(reqwest::Error { kind: Builder, source: General("No CA certificates were loaded from the system") })
-  nativeCheckInputs = [ cacert ];
+  nativeCheckInputs = [cacert];
 
   meta = {
     description = "Stalwart Command Line Interface";

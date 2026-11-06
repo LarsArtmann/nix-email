@@ -27,7 +27,6 @@
   buildPythonPackage,
   fetchFromGitHub,
   hatchling,
-
   # dependencies
   authres,
   cryptography,

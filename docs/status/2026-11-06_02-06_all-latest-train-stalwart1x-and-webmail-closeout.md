@@ -39,25 +39,25 @@ Stalwart 1.x / ahead-of-nixpkgs train). Current time at writing:
 
 ## a) FULLY DONE
 
-| Item | Proof |
-| --- | --- |
-| vi+th callback fix, 4 live sites | desired.json 31 callbacks (json.tool count 31, th+vi in place); pocketid_test.go ok; `nix build .#checks.x86_64-linux.nix-email-contract` EXIT:0 |
-| Prior session's locale spec CORRECTED | 1.20.0 i18n/routing.ts SUPPORTED_LOCALES counted (30 incl. th+vi) vs 1.17.2 (28) - the "29 -> 30" spec was wrong, this is the verify-external-claims discipline paying off |
-| Boot smoke bulwark 1.20.0 | unit env replicated on ::8199: /api/health, /plugin-sandbox, /pst-worker.js, /, /en-,/vi-,/th-/auth/callback ALL 200; log clean ("Bulwark Webmail v1.20.0", no errors); sandbox manifest resolves via server.js's process.chdir(__dirname) - the cwd=/ concern disproven at the source level first |
-| Full pbx toplevel build | EXIT:0, nixos-system-pbx built (first attempt hit the documented --rebuild-on-never-built trap; dropped the flag) |
-| Stalwart version facts, primary sources | releases.atom raw: 1.0.3 latest, 1.0.0 breaking + migration tool; pin eval: no stalwart_1_0, stalwart_0_16=0.16.26; webui 2.0.5 (released 2026-11-05); spam-filter 3.0.4; cli 1.0.14 upstream (pin 1.0.13, master 1.0.14) |
-| parsedmarc currency fact | 11.2.1 latest (2026-11-01) incl. SECURITY fix GHSA-3588-2mr7-vrcm (STARTTLS-strip credential leak, affects <=11.2.0); we ship 11.0.2, master has 11.0.4, pin mailsuite 2.3.2 < required 2.3.4 |
-| Vendored stalwart_1_0 package tree | pkgs/stalwart_1_0/{package,webui,spam-filter}.nix from nixpkgs master fb5c4451 shape, all 5 hashes discovered (3 prefetch + cargoHash + npmDepsHash zero-hash rounds), builds green, `stalwart --version` = 1.0.3 |
-| RocksDB 11.8.1 FFI fix | pin/master rocksdb 10.10.1 vs locked librocksdb-sys 0.19.0+11.8.1 (stalwartlabs fork): dropped ROCKSDB_* env + added cmake + dropped the rocksdb passthru, delta documented in-file |
-| webui 2.0.5 + spam-filter 3.0.4 subpackages | both build green; spam-filter gained passthru.resource for the module seam |
-| Flakes wiring + eval guards | flake-modules/stalwart-1-package.nix (3 packages) + flake.nix import; x86_64 + aarch64 eval "1.0.3"; drift script exit 0; attrNames eval carries stalwart-e2e-v1 |
-| Wrapper seams | services.stalwart.package now mkDefault (1.x override path); stalwart-module spam-filter.resource version-aware (`.resource or` .toml fallback) |
-| stalwart-e2e-v1 check, 3 anti-drift sites | checks.nix + tests/check-expected.json + README check list row |
-| 1.0 dialect fixes (wrapper, version-aware since1_0) | tlsImplicit->implicitTls (3 render sites + provision.nix example), MtaRouteRelay address->host; default-path eval checks green (provision-plan-eval, module-import-eval, dmarc-eval) |
-| Vendored stalwart-cli-1_0 1.0.14 | pkgs/stalwart-cli-1_0 (master hashes verbatim), builds green; wrapper auto-wires provision.package for 1.x (NixOS-eval probe: provisionPackage resolves "1.0.14" against the 1.0.3 binary) |
-| VENDORED MODULE BUG fixed | provision.nix applyScript hardcoded pkgs.stalwart-cli, ignoring provision.package (upstream PR #552103 bug) - now lib.getExe cfg.package, local-delta comment; THIS was why round 3 burned |
-| Boot provision under 1.0.3 PROVEN | round 4: cli 1.0.14 applies the plan clean (the `unknown variant \`sieve\`` error gone); subtests 1-12 passed (test reached 13) |
-| stalwart-migrate packaged (hashes) | v1.0.6, src + cargoHash via FOD rounds (build itself red - see c-1) |
+| Item                                                | Proof                                                                                                                                                                                                                                                                                              |
+| --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| vi+th callback fix, 4 live sites                    | desired.json 31 callbacks (json.tool count 31, th+vi in place); pocketid_test.go ok; `nix build .#checks.x86_64-linux.nix-email-contract` EXIT:0                                                                                                                                                   |
+| Prior session's locale spec CORRECTED               | 1.20.0 i18n/routing.ts SUPPORTED_LOCALES counted (30 incl. th+vi) vs 1.17.2 (28) - the "29 -> 30" spec was wrong, this is the verify-external-claims discipline paying off                                                                                                                         |
+| Boot smoke bulwark 1.20.0                           | unit env replicated on ::8199: /api/health, /plugin-sandbox, /pst-worker.js, /, /en-,/vi-,/th-/auth/callback ALL 200; log clean ("Bulwark Webmail v1.20.0", no errors); sandbox manifest resolves via server.js's process.chdir(__dirname) - the cwd=/ concern disproven at the source level first |
+| Full pbx toplevel build                             | EXIT:0, nixos-system-pbx built (first attempt hit the documented --rebuild-on-never-built trap; dropped the flag)                                                                                                                                                                                  |
+| Stalwart version facts, primary sources             | releases.atom raw: 1.0.3 latest, 1.0.0 breaking + migration tool; pin eval: no stalwart_1_0, stalwart_0_16=0.16.26; webui 2.0.5 (released 2026-11-05); spam-filter 3.0.4; cli 1.0.14 upstream (pin 1.0.13, master 1.0.14)                                                                          |
+| parsedmarc currency fact                            | 11.2.1 latest (2026-11-01) incl. SECURITY fix GHSA-3588-2mr7-vrcm (STARTTLS-strip credential leak, affects <=11.2.0); we ship 11.0.2, master has 11.0.4, pin mailsuite 2.3.2 < required 2.3.4                                                                                                      |
+| Vendored stalwart_1_0 package tree                  | pkgs/stalwart_1_0/{package,webui,spam-filter}.nix from nixpkgs master fb5c4451 shape, all 5 hashes discovered (3 prefetch + cargoHash + npmDepsHash zero-hash rounds), builds green, `stalwart --version` = 1.0.3                                                                                  |
+| RocksDB 11.8.1 FFI fix                              | pin/master rocksdb 10.10.1 vs locked librocksdb-sys 0.19.0+11.8.1 (stalwartlabs fork): dropped ROCKSDB_* env + added cmake + dropped the rocksdb passthru, delta documented in-file                                                                                                                |
+| webui 2.0.5 + spam-filter 3.0.4 subpackages         | both build green; spam-filter gained passthru.resource for the module seam                                                                                                                                                                                                                         |
+| Flakes wiring + eval guards                         | flake-modules/stalwart-1-package.nix (3 packages) + flake.nix import; x86_64 + aarch64 eval "1.0.3"; drift script exit 0; attrNames eval carries stalwart-e2e-v1                                                                                                                                   |
+| Wrapper seams                                       | services.stalwart.package now mkDefault (1.x override path); stalwart-module spam-filter.resource version-aware (`.resource or` .toml fallback)                                                                                                                                                    |
+| stalwart-e2e-v1 check, 3 anti-drift sites           | checks.nix + tests/check-expected.json + README check list row                                                                                                                                                                                                                                     |
+| 1.0 dialect fixes (wrapper, version-aware since1_0) | tlsImplicit->implicitTls (3 render sites + provision.nix example), MtaRouteRelay address->host; default-path eval checks green (provision-plan-eval, module-import-eval, dmarc-eval)                                                                                                               |
+| Vendored stalwart-cli-1_0 1.0.14                    | pkgs/stalwart-cli-1_0 (master hashes verbatim), builds green; wrapper auto-wires provision.package for 1.x (NixOS-eval probe: provisionPackage resolves "1.0.14" against the 1.0.3 binary)                                                                                                         |
+| VENDORED MODULE BUG fixed                           | provision.nix applyScript hardcoded pkgs.stalwart-cli, ignoring provision.package (upstream PR #552103 bug) - now lib.getExe cfg.package, local-delta comment; THIS was why round 3 burned                                                                                                         |
+| Boot provision under 1.0.3 PROVEN                   | round 4: cli 1.0.14 applies the plan clean (the ``unknown variant \``sieve\`` error gone); subtests 1-12 passed (test reached 13)                                                                                                                                                                  |
+| stalwart-migrate packaged (hashes)                  | v1.0.6, src + cargoHash via FOD rounds (build itself red - see c-1)                                                                                                                                                                                                                                |
 
 ## b) PARTIALLY DONE
 
@@ -175,14 +175,15 @@ Stalwart 1.x / ahead-of-nixpkgs train). Current time at writing:
    the fix survives the vendoring retirement (verify-before-filing +
    github-voice).
 5. Consider a fast eval-level "1.x dialect smoke" (render plan ndjson
-   + apply script for BOTH package lines, diff vs expectations) to
-   catch dialect breaks without a VM round.
+   - apply script for BOTH package lines, diff vs expectations) to
+     catch dialect breaks without a VM round.
 6. Zero-hash FOD discipline held perfectly this session (bulwark
    lesson internalized) - 5/5 hashes discovered on first failure.
 
 ## f) NEXT - prioritized (up to 50)
 
 P0 - land the current reds:
+
 1. Round 5 of stalwart-e2e-v1 (test cli fix staged); iterate subtests
    13-20 to green.
 2. Fix stalwart-migrate build (bindgenHook + clang), build, smoke
@@ -198,30 +199,30 @@ P0 - land the current reds:
 
 P1 - finish the latest-everywhere mandate:
 7. parsedmarc 11.2.1 + mailsuite >= 2.3.4 vendoring + parsedmarc-e2e
-   green + readme-version-lockstep derivation/README/AGENTS updates
-   (SECURITY fix - highest value left).
+green + readme-version-lockstep derivation/README/AGENTS updates
+(SECURITY fix - highest value left).
 8. 0.16 -> 1.0 migration rehearsal VM test (see c-2).
 9. Docs pass: README ledger (1.x availability, rocksdb 11.8.1, cli
-   1.0.14, migrate tool, pairing), TODO_LIST watch rows (stalwart_1_0
-   bump watch, parsedmarc watch), CHANGELOG both repos, AGENTS
-   truth-ups, webui-1.0.10 stale refs.
+1.0.14, migrate tool, pairing), TODO_LIST watch rows (stalwart_1_0
+bump watch, parsedmarc watch), CHANGELOG both repos, AGENTS
+truth-ups, webui-1.0.10 stale refs.
 10. pbx TODO row: staged-switch-ready pointer (the §1070 row).
 11. aarch64 eval/build of stalwart_1_0 (ARM CAX recreate readiness).
 12. stalwart_1_0 doCheck consideration: master's cargo check config
-    was dropped (tests private since 1.0.0) - keep an eye on whether
-    upstream restores public tests.
+was dropped (tests private since 1.0.0) - keep an eye on whether
+upstream restores public tests.
 
 P2 - upstream and ecosystem:
 13. File the provision.package hardcode on PR #552103.
 14. #574920 sandbox pre-steps comment (owner-gated; evidence pack).
 15. nixpkgs bump candidates: stalwart 1.0.3 (needs the rocksdb
-    11.8.1/FFI insight), parsedmarc 11.2.1, mailsuite 2.3.4
-    (owner-gated; the rocksdb one is genuinely non-obvious).
+11.8.1/FFI insight), parsedmarc 11.2.1, mailsuite 2.3.4
+(owner-gated; the rocksdb one is genuinely non-obvious).
 16. 1.0 consumer-flip runbook (c-4's list as a README/runbook doc).
 17. Telemetry truth-up: docs/TELEMETRY.md 1.0.1 series renames section
-    (stalwart_* conventions) + MONITORING.md consumer note.
+(stalwart_* conventions) + MONITORING.md consumer note.
 18. Store-survey + release-watch mechanization (prior report, still
-    open).
+open).
 19. Locale-callback coupling gate in the pbx contract (prior e-3).
 20. aarch64 build of the bulwark 1.20.0 closure (prior P1-14).
 21. Watch nixpkgs for stalwart_1_0 + a 1.x MODULE (flip trigger).
@@ -231,49 +232,49 @@ P2 - upstream and ecosystem:
 25. AI Assistant 2.2.1 owner review (prior P1-18).
 26. structuredMailEnabled posture decision (prior P1-19).
 27. Wire /api/health/live|ready + /api/metrics into the monitor stack
-    (prior P1-20).
+(prior P1-20).
 28. Harvest/annotate pbx audit-all's 3 foreign items (prior P2-23).
 29. pbx AGENTS: zero-hash FOD habit + app-bump checklist (prior
-    P2-24/25).
+P2-24/25).
 30. lessons.md candidates: summarizer/prior-session-spec-as-lead,
-    pre-flight-grep-before-VM-rounds (crush-config, by commit).
+pre-flight-grep-before-VM-rounds (crush-config, by commit).
 31. Split-brain pass: pairing contract single-home (prior P2-27).
 32. Next plugin survey: read manifests first (prior P2-29).
 33. On next app bump: diff .env.example + types.ts (prior P2-30).
 34. Boot-smoke script for webmail bumps (pre-switch ritual; this
-    session's python3 probe is the seed).
+session's python3 probe is the seed).
 35. Extend scripts/stalwart-review.sh with a read-only webmail-health
-    leg (in kind) for post-switch MemoryMax/journal observation.
+leg (in kind) for post-switch MemoryMax/journal observation.
 36. Consider IFD-free locale->callback count gate: derive 31 from the
-    package's SUPPORTED_LOCALES at eval time (small design).
+package's SUPPORTED_LOCALES at eval time (small design).
 37. pbx mail.nix Oidc directory: verify 1.0's OidcDirectory renames
-    (requireAudience -> acceptedAudiences list-type) before the flip.
+(requireAudience -> acceptedAudiences list-type) before the flip.
 38. Pocket ID: create urn:stalwart:oauth:scope:{security,settings,full}
-    scopes + assign to bulwark-webmail client (1.0.3 requirement).
+scopes + assign to bulwark-webmail client (1.0.3 requirement).
 39. Encryption-at-rest posture on 1.0.2+ (per-key cipher; server-wide
-    atRestEnable default true) - decide before the pbx flip.
+atRestEnable default true) - decide before the pbx flip.
 40. VM-test fixtures: keep >= 1 non-UTC offset (arrival_date_utc
-    normalization proof) - unchanged by 1.0, re-verify post-flip.
+normalization proof) - unchanged by 1.0, re-verify post-flip.
 
 P3 - hygiene:
 41. Run the five text gates after the docs pass (selftest-docs-gates).
 42. Re-check `.buildflow.yml` skip rationale still accurate after the
-    new packages (vulnix still skipped, etc.).
+new packages (vulnix still skipped, etc.).
 43. Confirm the demo VM stays 0.16 (default unchanged) and its README
-    quickstart still matches.
+quickstart still matches.
 44. Check `nix flake check --all-systems --no-build` for aarch64
-    package eval drift after the parsedmarc train.
+package eval drift after the parsedmarc train.
 45. Keep the /tmp/v1-probe.nix pattern as a debugging recipe (fast
-     config-resolution probe without a VM) - write it into CONTRIBUTING
-     if it generalizes.
+config-resolution probe without a VM) - write it into CONTRIBUTING
+if it generalizes.
 46. Review this session's daemon auto-commits for split completeness
-    (git log shows heuristic batches 76ac899..5e35264).
+(git log shows heuristic batches 76ac899..5e35264).
 47. Post-switch: watch webmail MemoryMax 1G under 1.20 feature
-    surface for a few days (journal).
+surface for a few days (journal).
 48. Post-switch: confirm the ?v= branding keys survived (upgrade-safe;
-    downgrade needs re-upload).
+downgrade needs re-upload).
 49. Post-switch: junk-count JMAP leg + cert-parity/dns loops from
-    verify-live.
+verify-live.
 50. Archive this report when its P0s land (docs/status policy).
 
 ## g) Questions for the owner (not derivable from any tree)

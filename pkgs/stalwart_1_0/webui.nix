@@ -29,7 +29,7 @@ buildNpmPackage (finalAttrs: {
     VITE_API_BASE_URL = "";
   };
 
-  nativeBuildInputs = [ zip ];
+  nativeBuildInputs = [zip];
   preBuild = ''
     rm .env.development
   '';

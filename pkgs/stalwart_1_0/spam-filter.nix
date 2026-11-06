@@ -14,7 +14,6 @@
   stdenvNoCC,
   python3,
 }:
-
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "spam-filter";
   version = "3.0.4";
@@ -28,7 +27,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
 
   __structuredAttrs = true;
 
-  nativeBuildInputs = [ python3 ];
+  nativeBuildInputs = [python3];
 
   buildPhase = ''
     runHook preBuild
@@ -51,8 +50,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     description = "Spam filter module for the Stalwart server";
     homepage = "https://github.com/stalwartlabs/spam-filter";
     changelog = "https://github.com/stalwartlabs/spam-filter/blob/${finalAttrs.src.tag}/CHANGELOG.md";
-    license =
-      with lib.licenses;
+    license = with lib.licenses;
       OR [
         mit
         asl20

@@ -30,9 +30,6 @@
   stdenv,
   cmake,
   callPackage,
-  cacert,
-  libredirect,
-  writeTextFile,
   withFoundationdb ? false,
   stalwartEnterprise ? false,
 }:
@@ -62,21 +59,21 @@ rustPlatform.buildRustPackage (finalAttrs: {
   # still links the system 10.10.1 - the 1.0.0 lock pairs with it; the
   # divergence starts at upstream 1.0.1 ("RocksDB: Updated to 11.8.1",
   # v1.0.1 release notes).
-  env = {
-    # https://docs.rs/openssl/latest/openssl/#manual
-    OPENSSL_NO_VENDOR = true;
-    OPENSSL_DIR = lib.getDev openssl;
-    OPENSSL_LIB_DIR = "${lib.getLib openssl}/lib";
-    ZSTD_SYS_USE_PKG_CONFIG = true;
-  }
-  //
-    lib.optionalAttrs
-      (stdenv.hostPlatform.isLinux && (stdenv.hostPlatform.isAarch64 || stdenv.hostPlatform.isArmv7))
-      {
-        # Required to fix Stalwart on ARM systems with 16 KB page size.
-        # Using rust-jemalloc-sys causes segmentation faults on x86_64.
-        JEMALLOC_SYS_WITH_LG_PAGE = 16;
-      };
+  env =
+    {
+      # https://docs.rs/openssl/latest/openssl/#manual
+      OPENSSL_NO_VENDOR = true;
+      OPENSSL_DIR = lib.getDev openssl;
+      OPENSSL_LIB_DIR = "${lib.getLib openssl}/lib";
+      ZSTD_SYS_USE_PKG_CONFIG = true;
+    }
+    // lib.optionalAttrs
+    (stdenv.hostPlatform.isLinux && (stdenv.hostPlatform.isAarch64 || stdenv.hostPlatform.isArmv7))
+    {
+      # Required to fix Stalwart on ARM systems with 16 KB page size.
+      # Using rust-jemalloc-sys causes segmentation faults on x86_64.
+      JEMALLOC_SYS_WITH_LG_PAGE = 16;
+    };
 
   depsBuildBuild = [
     pkg-config
@@ -89,28 +86,30 @@ rustPlatform.buildRustPackage (finalAttrs: {
     rustPlatform.bindgenHook
   ];
 
-  buildInputs = [
-    bzip2
-    openssl
-    sqlite
-    zstd
-  ]
-  ++ lib.optionals (stdenv.hostPlatform.isLinux && withFoundationdb) [ foundationdb ];
+  buildInputs =
+    [
+      bzip2
+      openssl
+      sqlite
+      zstd
+    ]
+    ++ lib.optionals (stdenv.hostPlatform.isLinux && withFoundationdb) [foundationdb];
 
   # Issue: https://github.com/stalwartlabs/stalwart/issues/1104
   buildNoDefaultFeatures = true;
-  buildFeatures = [
-    "sqlite"
-    "postgres"
-    "mysql"
-    "rocks"
-    "s3"
-    "redis"
-    "azure"
-    "nats"
-  ]
-  ++ lib.optionals withFoundationdb [ "foundationdb" ]
-  ++ lib.optionals stalwartEnterprise [ "enterprise" ];
+  buildFeatures =
+    [
+      "sqlite"
+      "postgres"
+      "mysql"
+      "rocks"
+      "s3"
+      "redis"
+      "azure"
+      "nats"
+    ]
+    ++ lib.optionals withFoundationdb ["foundationdb"]
+    ++ lib.optionals stalwartEnterprise ["enterprise"];
 
   cargoBuildFlags = [
     "-p"
@@ -138,8 +137,8 @@ rustPlatform.buildRustPackage (finalAttrs: {
     # NOTE vs nixpkgs: no `inherit rocksdb;` here - the 1.x binary links
     # the librocksdb-sys-vendored 11.8.1, not a system rocksdb, so there
     # is no meaningful system package to expose for backup scripts.
-    webui = callPackage ./webui.nix { };
-    spam-filter = callPackage ./spam-filter.nix { };
+    webui = callPackage ./webui.nix {};
+    spam-filter = callPackage ./spam-filter.nix {};
   };
 
   meta = {
@@ -149,12 +148,13 @@ rustPlatform.buildRustPackage (finalAttrs: {
     '';
     homepage = "https://github.com/stalwartlabs/stalwart";
     changelog = "https://github.com/stalwartlabs/stalwart/blob/${finalAttrs.src.tag}/CHANGELOG.md";
-    license = [
-      lib.licenses.agpl3Only
-    ]
-    ++ lib.optionals stalwartEnterprise [
-      lib.licenses.stalwart
-    ];
+    license =
+      [
+        lib.licenses.agpl3Only
+      ]
+      ++ lib.optionals stalwartEnterprise [
+        lib.licenses.stalwart
+      ];
     maxSilent = 14400; # 4 hours
     mainProgram = "stalwart";
   };
