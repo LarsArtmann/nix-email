@@ -95,7 +95,14 @@
   '';
 
   # Minimal account plan shared by both nodes (same domain via hostname).
+<<<<<<< Updated upstream
   nodeConfig = {config, ...}: {
+=======
+  nodeConfig = {
+    config,
+    ...
+  }: {
+>>>>>>> Stashed changes
     imports = [
       ../modules/mail-server.nix
       common.dnslessVmPatches
@@ -231,6 +238,7 @@ in
           mig1x.succeed("mkdir -p /var/lib/migrate-state")
           # prepare is interactive by design: drive it through a pty,
           # answering every question with Enter (= the recommended
+<<<<<<< Updated upstream
           # answer) and confirming the answers.toml write. The log is
           # dumped UNCONDITIONALLY before the exit code propagates
           # (round-3 lesson: a redirected, success-only dump is a
@@ -244,11 +252,23 @@ in
               "rc=$?; head -c 12000 /tmp/prepare.log >&2; "
               "tail -c 8000 /tmp/prepare.log >&2; exit $rc'"
           )
+=======
+          # answer) and confirming the answers.toml write.
+          mig1x.succeed(
+              'yes "" | head -200 | script -qec '
+              '"stalwart-migrate prepare '
+              '--source /run/source-config.json '
+              '--state /var/lib/migrate-state" /dev/null '
+              "> /tmp/prepare.log 2>&1"
+          )
+          mig1x.succeed("cat /tmp/prepare.log >&2")
+>>>>>>> Stashed changes
           mig1x.succeed("test -f /var/lib/migrate-state/answers.toml")
           owner = mig1x.succeed(
               "id -u stalwart | tr -d '\\n'; echo -n :; id -g stalwart"
           ).strip()
           mig1x.succeed(
+<<<<<<< Updated upstream
               "sh -c 'stalwart-migrate run --final --yes "
               "--source /run/source-config.json "
               "--target /run/target-config.json "
@@ -256,10 +276,20 @@ in
               f"--owner {owner} > /tmp/run-final.log 2>&1; "
               "rc=$?; tail -c 12000 /tmp/run-final.log >&2; exit $rc'"
           )
+=======
+              "stalwart-migrate run --final --yes "
+              "--source /run/source-config.json "
+              "--target /run/target-config.json "
+              "--state /var/lib/migrate-state "
+              f"--owner {owner} > /tmp/run-final.log 2>&1"
+          )
+          mig1x.succeed("cat /tmp/run-final.log >&2")
+>>>>>>> Stashed changes
           mig1x.succeed("test -f /var/lib/migrate-state/final-report.txt")
           mig1x.succeed("test -d /var/lib/stalwart/db")
 
       with subtest("cutover: 1.0.3 serves the migrated store"):
+<<<<<<< Updated upstream
           # The 0.16 store guard (modules/stalwart-module/default.nix) is
           # a shell heuristic: non-empty db dir + no marker = pre-0.16
           # store, refuse. The rehearsal wiped the dataDir (the tool
@@ -270,6 +300,8 @@ in
           # A live pbx flip does NOT need this (its marker survives from
           # the 0.16 era); the consumer-flip runbook owns that note.
           mig1x.succeed("touch /var/lib/stalwart/v016-store-migrated")
+=======
+>>>>>>> Stashed changes
           mig1x.succeed("systemctl start stalwart.service")
           mig1x.wait_for_unit("stalwart.service", timeout=180)
           mig1x.wait_for_open_port(25, timeout=120)
