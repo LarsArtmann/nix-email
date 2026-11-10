@@ -180,7 +180,8 @@
     then tracerBody.events
     else builtins.attrNames tracerBody.events;
   tracerPostureOk =
-    tracerSet != null
+    tracerSet
+    != null
     && tracerSet.reconcile or false
     && tracerSet.match or null == "*"
     && tracerSet.scope or null == {"@type" = "Journal";}

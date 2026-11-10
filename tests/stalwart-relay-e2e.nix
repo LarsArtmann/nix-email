@@ -330,8 +330,10 @@ in
           # Kill the smarthost (TCP refusal = the production outage shape).
           # 0.16 accepts the message at SMTP (queue semantics) and must hold
           # it deferred - never drop, never bounce while retryable. The
-          # assertions ride the Prometheus queue series + Mailpit only
-          # (journal greps are forbidden here: 0.16 is silent on this class).
+          # assertions ride the Prometheus queue series + Mailpit (the
+          # gauge-free backlog proof); the delivery-trail subtest below now
+          # also pins the journal fate lines (the wrapper tracer re-enabled
+          # the stream that default 0.16 drops).
           relay.systemctl("stop mailpit-catchall.service")
           smtp.succeed(
               "swaks --timeout 120 --server 127.0.0.1:587 --tls --auth PLAIN "
@@ -378,6 +380,25 @@ in
               "-o /tmp/relay-messages3.json "
               "&& grep -q '${bounceNeedle}' /tmp/relay-messages3.json",
               timeout=300,
+          )
+
+      with subtest("delivery trail: wrapper tracer emits the per-message fate lines"):
+          # Transcript-pinned 2026-11-10 (this test's own journal dump, EXIT:0
+          # run): the wrapper's Journal tracer (deliveryTracking, always
+          # provisioned) logs the full fate chain - relay path: queued ->
+          # delivered -> DSN -> completed; bounce path: queued -> rescheduled
+          # -> delivered -> DSN -> completed. The 0.15 retry signature
+          # `Message rescheduled for delivery` is BACK via the tracer (it
+          # was unobservable only because 0.16 release builds ship NO default
+          # tracer - empty global event interests drop the stream wholesale).
+          # File-based greps over a dump (never producer | grep).
+          smtp.succeed(
+              "journalctl -u stalwart -b 0 -o cat > /tmp/journal-trail.log && { "
+              "grep -q 'Queued message submission for delivery' /tmp/journal-trail.log && "
+              "grep -q 'Message delivered' /tmp/journal-trail.log && "
+              "grep -q 'Message rescheduled for delivery' /tmp/journal-trail.log && "
+              "grep -q 'DSN success notification' /tmp/journal-trail.log && "
+              "grep -q 'Delivery completed' /tmp/journal-trail.log; }"
           )
 
       with subtest("no crashes"):
