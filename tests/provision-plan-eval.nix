@@ -194,9 +194,9 @@
     && builtins.all (ev: builtins.elem ev tracerEvents) fateEventIds;
 
   trackingOff =
-    mkConfig {
+    (mkConfig {
       deliveryTracking.enable = false;
-    }
+    })
     .config
     .services
     .stalwart
