@@ -443,10 +443,15 @@ in {
           out of the default set) remains one config edit away via
           services.stalwart.provision.
 
-          Trail query: `journalctl -t stalwart _TRANSPORT=journal` (the
-          tracer writes natively to journald; MESSAGE carries the event
-          description, structured keys - queue id, domain, reason - land as
-          separate journal fields visible under `-o json`/`-o verbose`).
+          Trail query: `journalctl -t stalwart` (the tracer writes natively
+          to journald with SYSLOG_IDENTIFIER=stalwart; every entry's MESSAGE
+          is the event description - "Queued message submission for
+          delivery", "Message delivered", "Message rescheduled for
+          delivery", DSN lines, "Message ingested"). Correlation is
+          chronological: the structured keys (queueId, accountId, ...) are
+          sent as journal fields but journald DROPS their mixed-case names
+          (host-proven 2026-11-10 - only [A-Z0-9_] field names persist), so
+          no per-message field survives; the trail is the fate sequence.
           Ownership: the reconcile op scopes to `@type = Journal`, so this
           wrapper owns the Journal-tracer slot (one is allowed server-side);
           consumer-created Log/Otel tracers are untouched. Setting false
@@ -1316,10 +1321,14 @@ in {
                     # blob-not-found / overload), the outbound delivery
                     # outcomes (delivered / temp-fail / perm-fail classes /
                     # DSN / double-bounce), and the local ingest fates
-                    # (inbox / Junk / duplicate / ingestion ERROR - the
-                    # over-quota journal-silence class). Attempt-level
-                    # diagnostics (mx/connect/ehlo/auth chatter) stay OUT of
-                    # the default set; promote via provision if wanted.
+                    # (inbox / Junk / duplicate / ingestion ERROR). The
+                    # over-quota fate rides queue.rescheduled: ingest fails,
+                    # the queue treats it as a temp failure and reschedules
+                    # (VM transcript 2026-11-10 - the ledger's journal-
+                    # silence gap closes with exactly this line).
+                    # Attempt-level diagnostics (mx/connect/ehlo/auth
+                    # chatter) stay OUT of the default set; promote via
+                    # provision if wanted.
                     events = [
                       "queue.message-queued"
                       "queue.authenticated-message-queued"

@@ -735,19 +735,20 @@ in
           machine.succeed(
               "imap-probe absent needle-quota-9e3b user3@example.test '${testPass}' 21"
           )
-          # 0.16.22 JOURNAL SILENCE (debug-driver transcripts 2026-10-17,
-          # three independent boots): the 0.15 retry signature `Message
-          # rescheduled for delivery` is GONE - across 200 s of post-accept
-          # polling the journal carries NO quota/retry/reschedule/4xx line
-          # and never re-mentions the queue id; at default verbosity 0.16
-          # logs nothing per-message. The observable contract is therefore
-          # SMTP-accept + delivery-absence + journal silence; the queue's
-          # long-term fate (retry-forever vs deferred) is not
-          # journal-observable on 0.16 (README ledger carries the delta).
+          # 0.16.22 HISTORY (debug-driver transcripts 2026-10-17, three
+          # independent boots): with NO provisioned tracer the journal was
+          # silent - 0.16 release builds ship no default tracer, the event
+          # stream drops wholesale (telemetry.rs Tracers::parse). The
+          # wrapper's deliveryTracking Journal tracer re-enabled it, and the
+          # over-quota fate is now observable (transcript-pinned 2026-11-10,
+          # THIS subtest's own dump): the queue emits `Message rescheduled
+          # for delivery` - ingest fails, the queue treats it as a temp
+          # failure and retries (the 0.15 retry semantics, back in view).
+          # The line carries no queue id (journald drops the tracer's
+          # mixed-case field names), so the assertion is the line itself.
           machine.succeed(
-              "journalctl -u stalwart.service -b 0 -o cat > /tmp/journal-quota.log && { "
-              "cat /tmp/journal-quota.log >&2; "
-              "if grep -qiE 'rescheduled|over quota' /tmp/journal-quota.log; then exit 1; fi; }"
+              "journalctl -u stalwart.service -b 0 -o cat > /tmp/journal-quota.log && "
+              "grep -q 'Message rescheduled for delivery' /tmp/journal-quota.log"
           )
 
       with subtest("spam: GTUBE message gets X-Spam-Status (no auto-Junk filing)"):

@@ -400,6 +400,13 @@ in
               "grep -q 'DSN success notification' /tmp/journal-trail.log && "
               "grep -q 'Delivery completed' /tmp/journal-trail.log; }"
           )
+          # The tracer writes NATIVELY to journald (SYSLOG_IDENTIFIER=stalwart,
+          # _TRANSPORT=journal) - the identifier filter sees the same lines
+          # without the unit context.
+          smtp.succeed(
+              "journalctl -t stalwart -b 0 -o cat > /tmp/journal-trail-id.log && "
+              "grep -q 'Message delivered' /tmp/journal-trail-id.log"
+          )
 
       with subtest("no crashes"):
           smtp.succeed(
