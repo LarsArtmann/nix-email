@@ -517,9 +517,20 @@ IfBlocks).
   rescheduled for delivery` is GONE - across 200 s of post-accept
   polling the journal carries no quota/retry/reschedule/4xx line and
   never re-mentions the queue id (default verbosity logs nothing
-  per-message); the queue's long-term fate (0.15: retried forever) is
-  NOT journal-observable on 0.16. Asserting the behavior means asserting
-  delivery-absence over IMAP + journal silence, never SMTP refusal.
+  per-message). ROOT CAUSE (source-proven 2026-11-10,
+  telemetry.rs `Tracers::parse`): 0.16 release builds ship NO default
+  tracer - with zero provisioned `Tracer` objects the event interests
+  stay empty and the whole event stream drops before any subscriber sees
+  it. The wrapper's `deliveryTracking` Journal tracer (always
+  provisioned since 2026-11-10) re-enables the stream: the over-quota
+  fate IS now journal-observable as `Message rescheduled for delivery`
+  (ingest fails, the queue retries; VM transcript stalwart-e2e
+  2026-11-10, quota subtest re-pinned positively). The trail is
+  description-lines only - journald DROPS the tracer's mixed-case field
+  names (`queueId` et al., host-proven 2026-11-10), so per-message
+  correlation stays chronological. Asserting the behavior means
+  asserting delivery-absence over IMAP + the reschedule trail line,
+  never SMTP refusal.
 - **Catch-all** is `Domain.catchAllAddress` pointing at an ACCOUNT's email
   address (0.16 object model; the 0.15 `"@<domain>"` principal shape is
   dead). It makes EVERY local part deliverable, which silently disables
@@ -632,6 +643,33 @@ $ nix run github:LarsArtmann/nix-email#deliverability-probe -- \
 Self-signed-tier note: `tlsVerification = "opportunistic"` (default) WARNs
 on untrusted certificates instead of failing - switch to `"required"`
 together with `certificate.mode = "acme"`/`"manual"` on production hosts.
+
+### Delivery tracking (`services.mail-server.deliveryTracking`, on by default)
+
+While the canary tracks SYNTHETIC round-trips, the delivery trail tracks
+REAL mail: one journald `Tracer` (include-scoped to the fate events, INFO
+level) is always provisioned, so every message's fate is readable in the
+journal - accepted into the queue, delivered, deferred (`Message
+rescheduled for delivery`), DSN emitted, permanently rejected, or
+ingested locally (`Message ingested`, Junk filing, duplicate,
+ingest-error).
+
+```console
+$ journalctl -t stalwart -o short-full | grep -E 'Queued message|Message delivered|Message rescheduled|DSN|Message ingested'
+```
+
+Why this needs provisioning at all: 0.16 release builds ship NO default
+tracer - with zero `Tracer` objects the event stream is dropped before
+any subscriber sees it (source-proven at the pin,
+`telemetry.rs Tracers::parse`), which is why 0.16 looked per-message
+silent. The tracer is `reconcile`d with an `@type = Journal` scope, so
+the wrapper owns the Journal slot (only one is allowed server-side) while
+consumer-added Log/Otel tracers survive; `deliveryTracking.enable =
+false` renders it disabled rather than stranded. The trail is
+description-lines only - journald drops the tracer's mixed-case field
+names (`queueId` et al.), so correlation is chronological. Metrics still
+own the backlog view (no queue-depth gauge exists; MONITORING.md row 2),
+and the canary owns the delivery SLO.
 
 ## Migrating from 0.15 (the store guard + `stalwart-migrate-from-015`)
 

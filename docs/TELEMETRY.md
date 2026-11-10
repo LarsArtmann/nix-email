@@ -303,6 +303,28 @@ by the live-SSE per-key filters and present in webhook/trace payloads):
 
 ## 8. Wiring into this flake (nix-email) — checklist
 
+0. **SHIPPED DEFAULT (2026-11-10):** the wrapper always provisions ONE
+   `Journal` Tracer via a `reconcile` plan op (`match = "*"`, scope
+   `@type = Journal`) include-scoped to the per-message fate events at
+   `info` (`services.mail-server.deliveryTracking.enable`, default true).
+   Why a provisioned tracer is REQUIRED at all (source-proven at the
+   pin, `telemetry.rs Tracers::parse`): 0.16 release builds ship NO
+   default tracer - with zero provisioned `Tracer` objects the global
+   event interests stay EMPTY and the stream drops before any subscriber
+   (this retro-explains the 2026-10-17 quota-journal-silence probe; the
+   0.16.22 and 0.16.26 level tables are identical, all `delivery.*`/
+   `queue.*`/`message-ingest.*` lifecycle events are default `Info`).
+   The wildcard match is load-bearing: `x:Tracer` has NO label property,
+   so a matchOn-less `reconcile` is refused ("has no match key"); value
+   matching keys on the comparable SCALAR fields and the `events` SET
+   patches in place on drift; the `@type = Journal` scope keeps
+   consumer-created Log/Otel tracers out of the leak-destroy pass.
+   Trail reality (transcript-pinned relay-e2e + stalwart-e2e
+   2026-11-10): description lines only under `journalctl -t stalwart` -
+   journald DROPS the tracer's mixed-case journal fields (`queueId` et
+   al.; journald accepts only `[A-Z0-9_]` names, host-proven), so
+   per-message correlation is chronological, never field-keyed.
+
 1. **Version truth first:** the pin ships Stalwart **0.16.26** and the
    object model is binary-verified at that version (see the verdict
    above). Provision singletons still evolve between minors - before
