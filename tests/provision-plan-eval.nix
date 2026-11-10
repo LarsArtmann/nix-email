@@ -141,12 +141,80 @@
     && throttleSet.objects."wrapper-sustained" ? description
     && builtins.isList throttleSet.objects."wrapper-sustained".key;
 
+  # Delivery-tracker posture (2026-11-10): the Tracer op must stay a
+  # reconcile with the wildcard match (x:Tracer has NO label property - a
+  # matchOn-less reconcile is refused by the plan CLI), the Journal @type
+  # scope, and the fate-focused include set. enable rides the option: the
+  # disabled config must still render the tracer (disabled in place, not
+  # stranded - an optional would leave a LIVE tracer in the store).
+  fateEventIds = [
+    "queue.message-queued"
+    "queue.authenticated-message-queued"
+    "queue.dsn-queued"
+    "queue.rescheduled"
+    "queue.blob-not-found"
+    "queue.quota-exceeded"
+    "queue.rate-limit-exceeded"
+    "queue.concurrency-limit-exceeded"
+    "queue.back-pressure"
+    "delivery.delivered"
+    "delivery.completed"
+    "delivery.failed"
+    "delivery.rcpt-to-rejected"
+    "delivery.message-rejected"
+    "delivery.dsn-success"
+    "delivery.dsn-temp-fail"
+    "delivery.dsn-perm-fail"
+    "delivery.double-bounce"
+    "message-ingest.ham"
+    "message-ingest.spam"
+    "message-ingest.error"
+    "message-ingest.duplicate"
+  ];
+  tracerSet = objects.Tracer or null;
+  tracerBody = (tracerSet.objects or {}).wrapper-delivery-trail or null;
+  tracerEvents =
+    if tracerBody == null
+    then null
+    else if builtins.isList tracerBody.events
+    then tracerBody.events
+    else builtins.attrNames tracerBody.events;
+  tracerPostureOk =
+    tracerSet != null
+    && tracerSet.reconcile or false
+    && tracerSet.match or null == "*"
+    && tracerSet.scope or null == {"@type" = "Journal";}
+    && tracerBody != null
+    && tracerBody."@type" or "" == "Journal"
+    && tracerBody.enable or false == true
+    && tracerBody.level or "" == "info"
+    && tracerBody.eventsPolicy or "" == "include"
+    && tracerBody.lossy or true == false
+    && tracerEvents != null
+    && builtins.all (ev: builtins.elem ev tracerEvents) fateEventIds;
+
+  trackingOff =
+    mkConfig {
+      deliveryTracking.enable = false;
+    }
+    .config
+    .services
+    .stalwart
+    .provision
+    .objects
+    .Tracer
+    .objects
+    .wrapper-delivery-trail
+    or null;
+  trackingOffOk = trackingOff != null && !(trackingOff.enable or true);
+
   inherit (nixpkgs.legacyPackages.${system}) lib;
 
   renderedAttrs = {
     inherit domainName hostname;
     inherit reconcileWithoutMatch noMatchOutsideAllowlist accountSetMatchWrong;
     inherit listenerPostureOk settingsCoherent throttleOk;
+    inherit tracerPostureOk trackingOffOk;
     multilineExecs = builtins.length multilineExecs == 0;
     wrapperAssertionsClean = builtins.length wrapperAssertionFires == 0;
   };
@@ -169,6 +237,8 @@ in
   assert settingsCoherent || throw "provision-plan-eval: SystemSettings.defaultHostname/defaultDomainId drifted from the wrapper hostname/Domain id.";
   assert (builtins.length multilineExecs == 0) || throw "provision-plan-eval: multi-line text found in Exec* of ${toString multilineExecs} - systemd rejects it ('Unbalanced quoting'); scripts must stay on store paths.";
   assert throttleOk || throw "provision-plan-eval: the MtaInboundThrottle set lost its description match key / body key vocabulary.";
+  assert tracerPostureOk || throw "provision-plan-eval: the delivery-tracker Tracer op drifted (reconcile + match \"*\" + Journal scope + wrapper-delivery-trail body with the fate include set) - the per-message journal trail depends on this exact shape.";
+  assert trackingOffOk || throw "provision-plan-eval: deliveryTracking.enable=false must still render the Tracer provisioned-but-disabled (enable=false), not omit it.";
   assert (builtins.length wrapperAssertionFires == 0) || throw "provision-plan-eval: the base config carries firing wrapper assertions: ${toString (map (a: a.message) wrapperAssertionFires)}";
     builtins.derivation {
       name = "provision-plan-eval-${system}";
@@ -188,6 +258,8 @@ in
           grep -q '"settingsCoherent":true' "$renderedPath"
           grep -q '"multilineExecs":true' "$renderedPath"
           grep -q '"throttleOk":true' "$renderedPath"
+          grep -q '"tracerPostureOk":true' "$renderedPath"
+          grep -q '"trackingOffOk":true' "$renderedPath"
           grep -q '"wrapperAssertionsClean":true' "$renderedPath"
           touch "$out"
         ''

@@ -426,6 +426,36 @@ in {
       };
     };
 
+    deliveryTracking = {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = ''
+          Per-message delivery tracking: provision a scoped journald Tracer
+          so every message's FATE is observable in the journal. Root cause
+          this fixes (source-proven at the 0.16.26 pin): 0.16 ships NO
+          default tracer in release builds - with zero provisioned Tracer
+          objects the event stream is dropped entirely, so the default-level
+          INFO queue/delivery/message-ingest lifecycle events (accepted,
+          delivered, deferred, DSN, local ingest) never reach the journal.
+          The wrapper's tracer is `include`-scoped to the fate event set at
+          INFO; the whole event stream (including failure diagnostics kept
+          out of the default set) remains one config edit away via
+          services.stalwart.provision.
+
+          Trail query: `journalctl -t stalwart _TRANSPORT=journal` (the
+          tracer writes natively to journald; MESSAGE carries the event
+          description, structured keys - queue id, domain, reason - land as
+          separate journal fields visible under `-o json`/`-o verbose`).
+          Ownership: the reconcile op scopes to `@type = Journal`, so this
+          wrapper owns the Journal-tracer slot (one is allowed server-side);
+          consumer-created Log/Otel tracers are untouched. Setting false
+          renders the tracer provisioned-but-DISABLED (a live switch, no
+          stranded store object).
+        '';
+      };
+    };
+
     directoryCacheTtlNegative = lib.mkOption {
       type = lib.types.nullOr lib.types.ints.positive;
       default = null;
@@ -1245,6 +1275,75 @@ in {
                     enable = true;
                     key = map (k: throttleKeyMap.${k}) cfg.rateLimits.keys;
                     rate = parseRate cfg.rateLimits.rate;
+                  };
+                };
+              }
+            ]
+            # ALWAYS rendered (not optionals): deliveryTracking is a switch
+            # on a provisioned tracer, not a presence toggle - an optional
+            # would strand a LIVE Journal tracer in the store when the
+            # consumer sets enable=false (the relay-retiring trap class).
+            # The op is `reconcile` with match "*" and scope @type=Journal:
+            # x:Tracer carries NO label property (schema lists.x:Tracer), so
+            # the plan CLI refuses a matchOn-less reconcile ("has no match
+            # key") - "*" is the explicit match-by-value form, keyed on the
+            # comparable SCALAR fields (enable/level/eventsPolicy/lossy; the
+            # `events` SET is patched in place on drift). The @type scope
+            # makes the wrapper own the Journal slot (exactly one is allowed
+            # server-side - a second trips "Only one journal tracer is
+            # allowed" and aborts every later reload) while consumer
+            # Log/Otel tracers stay out of scope and untouched; the
+            # reconcile leak pass deletes any drifted Journal straggler.
+            # Root cause for existing at all (source-proven at the pin,
+            # telemetry.rs Tracers::parse): no provisioned Tracer = empty
+            # global event interests = the per-message fate stream is
+            # dropped BEFORE any subscriber sees it.
+            ++ [
+              {
+                Tracer = {
+                  reconcile = true;
+                  match = "*";
+                  scope = {"@type" = "Journal";};
+                  objects.wrapper-delivery-trail = {
+                    "@type" = "Journal";
+                    enable = cfg.deliveryTracking.enable;
+                    level = "info";
+                    lossy = false;
+                    eventsPolicy = "include";
+                    # Fate-focused include set (all default-level INFO or
+                    # ERROR upstream, so the INFO tracer contains them): the
+                    # queue lifecycle (accepted / rescheduled / DSN /
+                    # blob-not-found / overload), the outbound delivery
+                    # outcomes (delivered / temp-fail / perm-fail classes /
+                    # DSN / double-bounce), and the local ingest fates
+                    # (inbox / Junk / duplicate / ingestion ERROR - the
+                    # over-quota journal-silence class). Attempt-level
+                    # diagnostics (mx/connect/ehlo/auth chatter) stay OUT of
+                    # the default set; promote via provision if wanted.
+                    events = [
+                      "queue.message-queued"
+                      "queue.authenticated-message-queued"
+                      "queue.dsn-queued"
+                      "queue.rescheduled"
+                      "queue.blob-not-found"
+                      "queue.quota-exceeded"
+                      "queue.rate-limit-exceeded"
+                      "queue.concurrency-limit-exceeded"
+                      "queue.back-pressure"
+                      "delivery.delivered"
+                      "delivery.completed"
+                      "delivery.failed"
+                      "delivery.rcpt-to-rejected"
+                      "delivery.message-rejected"
+                      "delivery.dsn-success"
+                      "delivery.dsn-temp-fail"
+                      "delivery.dsn-perm-fail"
+                      "delivery.double-bounce"
+                      "message-ingest.ham"
+                      "message-ingest.spam"
+                      "message-ingest.error"
+                      "message-ingest.duplicate"
+                    ];
                   };
                 };
               }
