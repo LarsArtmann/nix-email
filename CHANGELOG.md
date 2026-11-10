@@ -9,6 +9,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Per-message delivery tracking (`services.mail-server.deliveryTracking`,
+  default ON, 2026-11-10): 0.16 release builds ship NO default tracer -
+  with zero provisioned `Tracer` objects the event stream drops before
+  any subscriber sees it (source-proven at the pin,
+  `telemetry.rs Tracers::parse`), which retro-explains the documented
+  per-message journal silence (the 2026-10-17 quota probe; the 0.16.22
+  and 0.16.26 level tables are identical - every lifecycle event is
+  default `Info`). The wrapper now always reconciles ONE `Journal`
+  Tracer (`match = "*"` - `x:Tracer` has no label property, so a
+  matchOn-less reconcile is refused; scope `@type = Journal` keeps
+  consumer Log/Otel tracers untouched; `enable = false` renders the
+  tracer disabled in place, never stranded), include-scoped to the fate
+  events at `info`: queue lifecycle (accepted / rescheduled / DSN /
+  blob-not-found / overload), outbound outcomes (delivered / temp-fail /
+  perm-fail classes / DSN / double-bounce), local ingest fates (inbox /
+  Junk / duplicate / ingest-error). The trail is `journalctl -t
+  stalwart` description lines (journald drops the tracer's mixed-case
+  field names, host-proven - chronological correlation only). VM-proven
+  2026-11-10: relay-e2e gained a delivery-trail subtest (queued ->
+  delivered -> DSN -> completed, plus the deferral -> reschedule ->
+  drain cycle) and the stalwart-e2e quota subtest re-pinned POSITIVELY -
+  the over-quota fate is now journal-observable as `Message rescheduled
+  for delivery`, closing the ledger gap. Eval contract
+  (`provision-plan-eval`) pins the op shape and the disabled-still-
+  rendered posture.
 - Stalwart 1.x availability train (owner decision 2026-11-05, "all
   latest, ahead of nixpkgs"): vendored `packages.stalwart_1_0` = server
   1.0.3 + webui 2.0.5 + spam-filter 3.0.4, `packages.stalwart-cli-1_0`

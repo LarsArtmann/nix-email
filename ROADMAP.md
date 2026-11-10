@@ -42,8 +42,12 @@ Raw ideas:
   key in the sops key group + MONTHLY restore drill
 - Queue-depth/queue-age alerting: the `GET /api/queue/messages` lever was
   0.15.5-verified (transcript-proven 2026-09-22, MONITORING.md row 2 +
-  §5.4); 0.16 removed the REST family - the 0.16 queue-observability
-  surface needs re-verification before the consumer poll is built
+  §5.4); 0.16 removed the REST family and the poll idea is dead
+  permanently - the per-message fate surface SHIPPED 2026-11-10 as the
+  wrapper's deliveryTracking Journal tracer (per-message trail,
+  description lines only), a queue-depth/age GAUGE still does not exist
+  upstream, so the counter-divergence spec (MONITORING row 2) remains
+  the backlog alert and the canary (row 10) remains the delivery SLO
 
 ### 2. DNS estate (gated on D1)
 
