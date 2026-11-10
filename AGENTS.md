@@ -189,7 +189,11 @@ transcript-pinned dialect).
   `hostname` = provisioned Domain (auth 535 / MAIL FROM 501), provision
   BEFORE any SMTP probe (1 h directory negative cache), catch-all AFTER
   unknown-recipient probes, over-quota = SMTP-accept + IMAP absence +
-  JOURNAL SILENCE) live in the README ledger - do NOT restate here
+  the deliveryTracking trail line (`Message rescheduled for delivery` -
+  the 2026-10-17 "journal silence" was the NO-TRACER era: 0.16 releases
+  ship no default tracer, so the event stream dropped wholesale;
+  README ledger owns the transcript + the journald-drops-camelCase-
+  fields fact) live in the README ledger - do NOT restate here
   (split-brain rule); `provision-plan-eval` + the e2e checks pin the
   load-bearing ones in code.
 - SystemNix layers (sops, ports, Gatus, onFailure, backup-coordination)
