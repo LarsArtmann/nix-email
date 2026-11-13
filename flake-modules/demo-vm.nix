@@ -99,6 +99,28 @@ in {
               };
             };
             Domain.objects.domain.catchAllAddress = "catchall@mail.demo.test";
+
+            # T5.2 (2026-11-13 contacts plan): the AddressBook family —
+            # the schema-validated experiment the whole provision path
+            # hinges on. The 0.16.27 schema has the object ("a named
+            # collection of contact cards belonging to an account"; fields
+            # name/description/sortOrder/isSubscribed/shareWith, NO
+            # parentId) but the schema alone does not answer OWNERSHIP:
+            # whether an apply-sourced book lands in the demo account's
+            # addressbook-home-set (or fails the apply) is exactly what
+            # the boot apply + a DAV PROPFIND must prove. The build gate
+            # (provision-check-sort.lua against the real schema.json)
+            # already validates shape at eval time.
+            AddressBook = {
+              reconcile = false;
+              match = [ "name" ];
+              objects = {
+                demoContacts = {
+                  name = "Contacts";
+                  description = "demo account personal book (T5.2 probe)";
+                };
+              };
+            };
           };
           getty.autologinUser = "root";
         };
