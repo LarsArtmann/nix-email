@@ -99,28 +99,17 @@ in {
               };
             };
             Domain.objects.domain.catchAllAddress = "catchall@mail.demo.test";
-
-            # T5.2 (2026-11-13 contacts plan): the AddressBook family —
-            # the schema-validated experiment the whole provision path
-            # hinges on. The 0.16.27 schema has the object ("a named
-            # collection of contact cards belonging to an account"; fields
-            # name/description/sortOrder/isSubscribed/shareWith, NO
-            # parentId) but the schema alone does not answer OWNERSHIP:
-            # whether an apply-sourced book lands in the demo account's
-            # addressbook-home-set (or fails the apply) is exactly what
-            # the boot apply + a DAV PROPFIND must prove. The build gate
-            # (provision-check-sort.lua against the real schema.json)
-            # already validates shape at eval time.
-            AddressBook = {
-              reconcile = false;
-              match = [ "name" ];
-              objects = {
-                demoContacts = {
-                  name = "Contacts";
-                  description = "demo account personal book (T5.2 probe)";
-                };
-              };
-            };
+            # NO AddressBook family here (T5.2 runtime verdict, 2026-11-13):
+            # the plan dialect CANNOT provision address books on this pin.
+            # Live transcript (demo VM stalwart-0.16.26 + stalwart-cli
+            # 1.0.13): `upsert` -> "cannot upsert singleton `AddressBook`
+            # (operation #6); use update instead" (apply aborts, remaining
+            # ops skipped); `update` -> server "invalidPatch | Invalid
+            # property | Properties: demoContacts". Either way the book
+            # never lands and stalwart-provision.service FAILS the boot.
+            # Per-account books are MKCOL-only until upstream grows
+            # owned-addressbook provisioning (see SystemNix status report
+            # 2026-11-13 superb-contacts-plan §f/§g).
           };
           getty.autologinUser = "root";
         };
