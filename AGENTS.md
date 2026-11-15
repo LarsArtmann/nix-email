@@ -146,10 +146,13 @@ transcript-pinned dialect).
   pin FACT; the nixpkgs module has NO package option, so the wrapper
   renders ExecStart with mkForce); (b) Stalwart 1.0.3 + webui 2.0.5 +
   spam-filter 3.0.4 + cli 1.0.14 + migrate v1.0.6 are vendored
-  (`pkgs/stalwart_1_0*`) but the module DEFAULT stays 0.16 - 1.0.0 is a
-  hard store boundary (migration rehearsal = `stalwart-migrate-1x-e2e`;
-  stalwart-migrate MUST be built without its default `enterprise`
-  feature to match the OSS server). Version facts live in the README
+  (`pkgs/stalwart_1_0*`) and the module DEFAULT is that 1.0.3 line since
+  the owner flip of 2026-11-15 (supersedes the "default stays 0.16"
+  posture) - 1.0.0 is a hard store boundary: a pre-1.0 store runs the
+  migration (`stalwart-migrate-1x-e2e` is the rehearsal) BEFORE
+  switching, or pins `stalwart_0_16`; the migrate e2es pin their 0.16
+  seeding nodes explicitly; stalwart-migrate MUST be built without its
+  default `enterprise` feature to match the OSS server. Version facts live in the README
   ledger, never restate here (split-brain rule).
 - flake-parts: FLOATING input (lock-pinned only - the fleet's control);
   `nixpkgs-lib.follows = "nixpkgs"` is NOT optional (a dropped follow

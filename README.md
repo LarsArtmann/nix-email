@@ -19,9 +19,11 @@ stack in a throwaway VM (x86_64-linux) - accounts, ports and API probes
 in [Quickstart](#quickstart-try-it-in-a-vm). Consuming it from a NixOS
 host: [SystemNix integration](#systemnix-integration).
 
-> **Status (2026-11-06, all-latest train):** Stalwart **0.16.26**
-> (1.0.3 vendored ahead of nixpkgs, continuously VM-tested - see
-> [pkgs/stalwart_1_0](pkgs/stalwart_1_0/)), parsedmarc **11.2.1**
+> **Status (2026-11-15, 1.x default flip):** Stalwart **1.0.3**
+> (vendored ahead of nixpkgs and IS the wrapper default since this
+> flip, continuously VM-tested - see
+> [pkgs/stalwart_1_0](pkgs/stalwart_1_0/); a 0.16 store must run the
+> migration runbook BEFORE switching), parsedmarc **11.2.1**
 > (vendored ahead of nixpkgs with mailsuite 2.3.4, SECURITY fix
 > GHSA-3588-2mr7-vrcm - see [pkgs/parsedmarc](pkgs/parsedmarc/)), full
 > check set green, `v0.5.0` tagged and
@@ -85,7 +87,9 @@ is dead) - provisioning is the declarative plan applied by
 `stalwart-provision` at boot, and the account password is
 `demo-nixemail-2026` (0.16 enforces zxcvbn strength; `demo` is rejected).
 The domain is `mail.demo.test`, not `mail.demo.invalid` - 0.16 hostname
-validation rejects the special-use `.invalid` TLD. **Fresh 0.16.26 smoke:
+validation rejects the special-use `.invalid` TLD. The demo boots the
+wrapper DEFAULT - Stalwart 1.0.3 since the 2026-11-15 flip (a virgin
+demo store, no migration needed). **Fresh 0.16.26 smoke:
 DONE 2026-10-31** (anon JMAP session shape, AUTH submission -> IMAPS
 round-trip, catch-all SMTP-accept + strict rejection outside the
 provisioned domain; transcript
@@ -178,7 +182,7 @@ internet: Internet {
 
 proxy: Reverse proxy (Caddy on consumer host, TLS)
 
-stalwart: Stalwart 0.16.26 (services.mail-server wrapper) {
+stalwart: Stalwart 1.0.3 (services.mail-server wrapper) {
   smtp_in: SMTP listeners (25 MX, 587 submission, 465 submissions)
   imaps: IMAPS listener (993, implicit TLS)
   http: HTTP listener (127.0.0.1:8080, loopback only)
@@ -312,8 +316,9 @@ and nothing else:
   `readme-version-lockstep-fires` plants a wrong version in a copy of this
   README and fails if the guard accepts it - the drift class is proven
   caught, not assumed.
-- `stalwart-e2e`: real Stalwart 0.16.26 in a VM (0.16.22 until the
-  2026-10-28 fe132422 advance) - declarative provisioning
+- `stalwart-e2e`: real Stalwart in a VM - the wrapper DEFAULT
+  (1.0.3 since the 2026-11-15 flip; 0.16.26 until it, 0.16.22 before
+  the fe132422 advance) - declarative provisioning
   plan applied clean (accounts incl. quota + alias, dual declarative DKIM
   rsa+ed25519, listeners, singletons; idempotent second apply),
   unknown-recipient 550 rejection, implicit-TLS IMAPS greeting, JMAP
@@ -331,11 +336,12 @@ and nothing else:
   parameter) against the vendored Stalwart **1.0.3** package
   (`pkgs/stalwart_1_0/`, ahead of nixpkgs - the pin carries no
   `stalwart_1_0` attr; owner decision 2026-11-05 "all my tech latest").
-  Keeps the 1.x line continuously deployable through the wrapper without
-  flipping the fleet default: the 0.16 -> 1.0 store boundary requires
-  `stalwartlabs/stalwart-migrate` (1.0.0 redesigned the database layout
-  and renumbered every id space - raw store copies are unsafe), so the
-  default stays `stalwart_0_16` until a consumer has migrated.
+  Ran ahead of the 2026-11-15 default flip (the wrapper default IS this
+  package now) and keeps proving the 1.x dialect explicitly: the
+  0.16 -> 1.0 store boundary requires `stalwartlabs/stalwart-migrate`
+  (1.0.0 redesigned the database layout and renumbered every id space -
+  raw store copies are unsafe), so a consumer whose store is still 0.16
+  must migrate BEFORE switching to the flipped default.
 - `stalwart-bind-e2e`: dedicated non-default `httpBind` (`127.0.0.1:8082`,
   the pbx-artmann consumer shape) on a virgin store - the bootstrap class
   `stalwart-e2e` cannot cover (its bind coincides with the built-in 8080,
@@ -412,8 +418,10 @@ and nothing else:
   apply), the 0.15 password authenticating on 0.16, and restart
   persistence.
 - `stalwart-migrate-1x-e2e`: TWO-node VM - the 0.16 -> 1.0 migration
-  REHEARSAL (the gold-standard gate before any live 1.x flip): a 0.16.26
-  node (schema 6, accepted by the tool's exact-match gate) receives a
+  REHEARSAL (the gold-standard gate that gated the 2026-11-15 default
+  flip): a 0.16.26 node (PINNED since the flip - the wrapper default is
+  the 1.x line; schema 6, accepted by the tool's exact-match gate)
+  receives a
   needle mail over IMAP, the stopped store travels to the vendored-1.0.3
   consumer node, `stalwart-migrate` v1.0.6 `prepare` (pty, recommended
   answers) + `run --final --yes` builds the fresh v1 store offline, and
@@ -800,8 +808,9 @@ consumer-config flip plus filling the real
 
 PIN DISCIPLINE: consumers of this flake SHOULD pin it by a hard rev/tag
 (not `?ref=master`): the wrapper is verified against a SPECIFIC Stalwart
-version (0.16.26 via the vendored module + the pin's `stalwart_0_16`
-since the 2026-10-28 fe132422 advance) at a specific
+version (1.0.3 via the vendored module's `pkgs/stalwart_1_0` since the
+2026-11-15 default flip; the pin's `stalwart_0_16` 0.16.26 served until
+then) at a specific
 nixpkgs rev, and both repos deliberately pin the SAME nixpkgs rev (compat
 doctrine - bump both together; Renovate PRs are approval-gated so a nixpkgs
 move never lands unreviewed). STATUS 2026-10-28: SystemNix currently
@@ -964,12 +973,15 @@ inside nixpkgs are invisible to it, so the checks below are manual):
      five e2e fixtures re-verified host-side first
      (`scripts/host-parse-fixture.py`, incl. the three transcribed
      `arrival_date_utc` values and the aggregate identity fields).
-   - Stalwart version surface (updated 2026-10-28): the wrapper vendors
+   - Stalwart version surface (updated 2026-11-15): the wrapper vendors
      the 0.16 module (`modules/stalwart-module/`, nixpkgs PR #552103 -
-     still OPEN 2026-10-28, `pkgs.stalwart` is still the 0.15.5 line at
-     fe132422, so the vendored dir stays) and the binary is the pin's
-     `stalwart_0_16` - **0.16.26** since the fe132422 advance (was
-     0.16.22). The re-verification surface at a bump: (a) when PR
+     still OPEN, `pkgs.stalwart` is still the 0.15.5 line at
+     fe132422, so the vendored dir stays) and the DEFAULT binary is the
+     vendored `pkgs/stalwart_1_0` **1.0.3** since the owner default
+     flip of 2026-11-15 (was the pin's `stalwart_0_16` **0.16.26**
+     since the fe132422 advance - still the migration-line pin: a
+     pre-1.0 store migrates via stalwart-migrate BEFORE switching, or
+     pins `stalwart_0_16`). The re-verification surface at a bump: (a) when PR
      #552103 merges into the pinned rev, retire the vendored dir
      (checklist in the module header); (b) re-verify the wrapper's 0.16
      object shapes if `stalwart_0_16` moves (schema.json diff via the
@@ -1042,7 +1054,7 @@ gate is missing - but treat aarch64 as untested until someone runs it.
 
 ## Verified-facts ledger (do not re-derive from memory)
 
-### Stalwart 1.x (vendored ahead of nixpkgs; continuously VM-tested, NOT deployed)
+### Stalwart 1.x (vendored ahead of nixpkgs; continuously VM-tested, the DEFAULT since 2026-11-15)
 
 - **The vendored train** (owner decision 2026-11-05, "all latest, ahead of
   nixpkgs"): `packages.stalwart_1_0` = server **1.0.3** + webui **2.0.5** +
@@ -1050,9 +1062,12 @@ gate is missing - but treat aarch64 as untested until someone runs it.
   `packages.stalwart-cli-1_0` = cli **1.0.14** (the pin's `stalwart-cli`
   1.0.13 CANNOT parse the 1.x schema - the "unknown variant `sieve`"
   apply failure class), and `packages.stalwart-migrate` = **v1.0.6**. The
-  module default stays `stalwart_0_16`: 1.0.0 is a HARD store-migration
-  boundary (new DB layout, renumbered ids) - a 1.x binary on a pre-1.0
-  store is the same poison class as 0.16-on-0.15.
+  module default IS `pkgs/stalwart_1_0` since the owner flip of
+  2026-11-15: 1.0.0 is a HARD store-migration boundary (new DB layout,
+  renumbered ids) - a 1.x binary on a pre-1.0 store is the same poison
+  class as 0.16-on-0.15, so a pre-1.0 store migrates BEFORE switching
+  (or pins `stalwart_0_16`; the migrate e2es pin their 0.16 seeding
+  nodes).
 - **1.0 dialect renames (VM-proven by `stalwart-e2e-v1`, the full battery
   on 1.0.3)**: listener/relay plan key `tlsImplicit` -> `implicitTls`
   (three render sites in `modules/mail-server.nix` + the
@@ -1075,8 +1090,8 @@ gate is missing - but treat aarch64 as untested until someone runs it.
   VALIDATES an existing answers.toml) and `run --final --yes --owner
   <uid:gid>`; the 1.0.3 server then serves the migrated store with the
   0.16 password and needle mail intact, and the declarative plan
-  re-applies. **GREEN end to end 2026-11-06** - this is the gate a live
-  flip must pass first, and it passes.
+  re-applies. **GREEN end to end 2026-11-06** - the gate that gated the
+  2026-11-15 default flip, and it passed.
 - **stalwart-migrate's Cargo defaults include `enterprise`** (its
   `default = ["rocks", "enterprise"]`): a default build writes an
   enterprise-flavored target store, and the tool's own contract is "the

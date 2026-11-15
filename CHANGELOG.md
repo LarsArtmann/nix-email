@@ -294,6 +294,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- The wrapper's default Stalwart is the vendored **1.0.3** line
+  (`pkgs/stalwart_1_0`; owner decision 2026-11-15, superseding the
+  "default stays 0.16" posture of the all-latest train). HARD STORE
+  BOUNDARY: a 1.x binary panics on a pre-1.0 store - run the
+  0.16 -> 1.0 migration (`stalwart-migrate` v1.0.6, rehearsed green by
+  `stalwart-migrate-1x-e2e` on 2026-11-06) BEFORE switching a live
+  host, or pin `services.stalwart.package = pkgs.stalwart_0_16`
+  (0.16.26) until migrated; both migrate e2es now pin their 0.16
+  seeding nodes so the flip cannot dissolve them. Bulwark pairing
+  holds (Stalwart 1.0 needs Bulwark >= 1.18.0; the fleet ships
+  1.20.0). Provisioning rides the vendored 1.0.14 CLI (the pin's
+  1.0.13 cannot parse the 1.x schema); listeners/relay render the 1.x
+  plan keys (`implicitTls`, `host`).
+
 - Consumer-webmail version contract re-verified against primary sources
   (2026-11-05): Bulwark (the C34 non-goal webmail on the consumer host)
   upstream is at 1.20.0 (2026-11-03) while nixpkgs ships 1.14.2 with the
