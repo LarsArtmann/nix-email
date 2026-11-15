@@ -7,12 +7,14 @@
 # (or the directory is deleted and consumers read pkgs.stalwart_1_0
 # directly) with zero consumer churn.
 #
-# The wrapper DEFAULT stays pkgs.stalwart_0_16 (modules/mail-server.nix):
-# a 1.x binary cannot run against a 0.16 store (v1.0.0 redesigned the
+# The wrapper DEFAULT is this vendored 1.0.3 expression since the owner
+# flip of 2026-11-15 (modules/mail-server.nix callPackages it directly):
+# a 1.x binary cannot run against a pre-1.0 store (v1.0.0 redesigned the
 # database layout and renumbered every id space - migration via
 # stalwartlabs/stalwart-migrate is a hard prerequisite; ledger + the
-# package.nix doctrine comment own the details). Consumers that HAVE
-# migrated override services.stalwart.package with this attr.
+# package.nix doctrine comment own the details). Consumers still on a
+# pre-1.0 store pin services.stalwart.package = pkgs.stalwart_0_16
+# until migrated.
 {
   perSystem = {pkgs, ...}: {
     packages = {

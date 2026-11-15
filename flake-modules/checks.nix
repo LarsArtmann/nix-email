@@ -212,13 +212,15 @@
         stalwart-e2e = import ../tests/stalwart-e2e.nix {inherit pkgs;};
         # The SAME battery against the vendored Stalwart 1.x package
         # (pkgs/stalwart_1_0/, ahead of nixpkgs by owner decision
-        # 2026-11-05): proves the 1.x line stays deployable through the
-        # wrapper WITHOUT flipping the fleet default - the 0.16 -> 1.0
-        # store boundary is a migration event (SCHEMA_CHANGES.md), so
-        # the default stays 0.16 until a consumer migrates. Expect
-        # dialect-fix iterations here when upstream renames provision
-        # keys (EmailAlias.enabled -> enable etc.); fix the wrapper or
-        # version-gate in the test, never the module defaults.
+        # 2026-11-05): ran ahead of the 2026-11-15 flip and now pins the
+        # 1.x line EXPLICITLY - the default-e2e twin runs the same
+        # package through the module default, so this check isolates a
+        # default-regression (a flip-back would fail stalwart-e2e here
+        # first). The 0.16 -> 1.0 store boundary stays a migration event
+        # (SCHEMA_CHANGES.md). Expect dialect-fix iterations here when
+        # upstream renames provision keys (EmailAlias.enabled -> enable
+        # etc.); fix the wrapper or version-gate in the test, never the
+        # module defaults.
         stalwart-e2e-v1 = import ../tests/stalwart-e2e.nix {
           inherit pkgs;
           package = pkgs.callPackage ../pkgs/stalwart_1_0/package.nix {};
