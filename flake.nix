@@ -22,9 +22,11 @@
     # services.dmarc-monitor.package (pkgs/parsedmarc/; delete wholesale
     # when the pin ships >= 11.2.1). Stalwart 1.0.3 (+ webui 2.0.5 +
     # spam-filter 3.0.4 + cli 1.0.14 + migrate v1.0.6) is vendored in
-    # pkgs/stalwart_1_0* - the module DEFAULT stays 0.16 (1.x is a hard
-    # store boundary; stalwart-e2e-v1 + the migration rehearsal keep it
-    # continuously deployable).
+    # pkgs/stalwart_1_0* - the module DEFAULT is that 1.0.3 line since
+    # the owner flip of 2026-11-15 (1.x is a hard store boundary: a
+    # pre-1.0 store migrates via stalwart-migrate BEFORE switching, or
+    # pins stalwart_0_16; stalwart-e2e + the migration rehearsal keep
+    # the flip verified).
     # ADVANCED 2026-10-28 6774f7bc -> fe132422 to track SystemNix's lock
     # (their nixpkgs floats nixos-unstable; they moved first - their
     # follows already forced this rev onto the wrapper's contract check).

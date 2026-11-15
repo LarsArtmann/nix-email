@@ -25,7 +25,8 @@
 #     (modules/stalwart-module/default.nix settings default).
 #
 # Subtests:
-#   1. mig016 (0.16.26, wrapper default): provision applies, a needle
+#   1. mig016 (0.16.26, PINNED - the wrapper default is the vendored 1.x
+#      line since the 2026-11-15 flip): provision applies, a needle
 #      mail is delivered to user1 and visible over IMAP (pre-state proof)
 #   2. handoff: stop, tar the store to /tmp/shared
 #   3. mig1x (vendored 1.0.3) baseline: virgin store + plan apply green
@@ -131,7 +132,14 @@ in
     defaults = common.v2CpuPatches;
 
     nodes = {
-      mig016 = nodeConfig;
+      # PIN the 0.16 line: the migration under test seeds a REAL 0.16
+      # store (schema 6) - the wrapper default is the vendored 1.x line
+      # since the 2026-11-15 flip, and a 1.x binary cannot seed it
+      # (poison class). Plain set beats the module's mkDefault.
+      mig016 = {...}: {
+        imports = [nodeConfig];
+        services.stalwart.package = pkgs.stalwart_0_16;
+      };
 
       mig1x = {...}: {
         imports = [nodeConfig];

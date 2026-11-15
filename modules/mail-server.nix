@@ -1055,13 +1055,17 @@ in {
 
       services.stalwart = {
         enable = true;
-        # The 0.16 package attr; pkgs.stalwart is still the 0.15 line at this
-        # pin (and warns loudly if used with this module). mkDefault so a
-        # consumer that has MIGRATED its store can override with the 1.x
-        # line (this flake's packages.stalwart_1_0, vendored ahead of
-        # nixpkgs since 2026-11-05) - a 1.x binary on a 0.16 store is the
-        # poison class; the migration runbook gates that override.
-        package = lib.mkDefault pkgs.stalwart_0_16;
+        # The vendored Stalwart 1.0.3 line (pkgs/stalwart_1_0/, ahead of
+        # the pin's stalwart_1_0 1.0.0) - the DEFAULT since the owner
+        # flip of 2026-11-15 ("update to latest stalwart"), VM-proven as
+        # the stalwart-e2e-v1 battery and rehearsal-proven across the
+        # 0.16 -> 1.0 store migration (stalwart-migrate-1x-e2e). mkDefault
+        # so a consumer can pin the 0.16 line - REQUIRED for any host
+        # whose store is still pre-1.0: a 1.x binary on a 0.16 store is
+        # the poison class; run the migration runbook FIRST, then switch.
+        # Bulwark pairing holds (Stalwart 1.0 needs Bulwark >= 1.18.0;
+        # the fleet ships 1.20.0).
+        package = lib.mkDefault (pkgs.callPackage ../pkgs/stalwart_1_0/package.nix {});
         # 1.x dialect: the pin's stalwart-cli 1.0.13 cannot parse a 1.x
         # server's schema (unknown variant `sieve` - the v1 schema's new
         # field type; proven by stalwart-e2e-v1 round 2, 2026-11-05), so

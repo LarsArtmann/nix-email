@@ -103,6 +103,12 @@ in
           common.testAdminSecretModule
         ];
 
+        # PIN the 0.16 line: this node boots the 0.15 -> 0.16 MIGRATED
+        # store (schema 6); the wrapper default is the vendored 1.x line
+        # since the 2026-11-15 flip and would hit the store boundary.
+        # Plain set beats the module's mkDefault.
+        services.stalwart.package = pkgs.stalwart_0_16;
+
         system.stateVersion = "26.05";
         services.mail-server = {
           enable = true;
