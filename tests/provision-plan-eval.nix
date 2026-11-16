@@ -188,7 +188,17 @@
     && tracerBody != null
     && tracerBody."@type" or "" == "Journal"
     && tracerBody.enable or false == true
-    && tracerBody.level or "" == "info"
+    # Level is dialect-aware: 0.16 fate events are Info-default, but
+    # 1.0.3 dropped the Info arms for delivery.completed/dsn-success
+    # (they default to Debug), so the wrapper renders "debug" there -
+    # the include set stays the fate filter either way.
+    && tracerBody.level
+    or ""
+    == (
+      if lib.versionAtLeast base.config.services.stalwart.package.version "1.0"
+      then "debug"
+      else "info"
+    )
     && tracerBody.eventsPolicy or "" == "include"
     && tracerBody.lossy or true == false
     && tracerEvents != null

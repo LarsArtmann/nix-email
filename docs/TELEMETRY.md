@@ -306,7 +306,10 @@ by the live-SSE per-key filters and present in webhook/trace payloads):
 0. **SHIPPED DEFAULT (2026-11-10):** the wrapper always provisions ONE
    `Journal` Tracer via a `reconcile` plan op (`match = "*"`, scope
    `@type = Journal`) include-scoped to the per-message fate events at
-   `info` (`services.mail-server.deliveryTracking.enable`, default true).
+   `info` on 0.16, `debug` on 1.x (1.0.3's trc `level()` table dropped
+   the explicit Info arms for `delivery.completed`/`delivery.dsn-success`,
+   so they default to Debug; the include set stays the fate filter)
+   (`services.mail-server.deliveryTracking.enable`, default true).
    Why a provisioned tracer is REQUIRED at all (source-proven at the
    pin, `telemetry.rs Tracers::parse`): 0.16 release builds ship NO
    default tracer - with zero provisioned `Tracer` objects the global

@@ -1316,7 +1316,20 @@ in {
                   objects.wrapper-delivery-trail = {
                     "@type" = "Journal";
                     enable = cfg.deliveryTracking.enable;
-                    level = "info";
+                    # 1.x dropped the explicit Info arms for TWO fate
+                    # events: v1.0.3's trc level() table (crates/trc/src/
+                    # event/enums_impl.rs) has no Delivery(Completed) /
+                    # Delivery(DsnSuccess) arms, so they fall to the
+                    # `_ => Level::Debug` default (0.16.26 carried both as
+                    # Info - source + transcript 2026-11-15). An info-level
+                    # tracer therefore SKIPS the completed/DSN-success
+                    # lines on 1.x; debug keeps the same include set
+                    # fate-focused (eventsPolicy=include still bounds the
+                    # volume) while admitting them again.
+                    level =
+                      if since1_0
+                      then "debug"
+                      else "info";
                     lossy = false;
                     eventsPolicy = "include";
                     # Fate-focused include set (all default-level INFO or

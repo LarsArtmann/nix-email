@@ -655,8 +655,12 @@ together with `certificate.mode = "acme"`/`"manual"` on production hosts.
 ### Delivery tracking (`services.mail-server.deliveryTracking`, on by default)
 
 While the canary tracks SYNTHETIC round-trips, the delivery trail tracks
-REAL mail: one journald `Tracer` (include-scoped to the fate events, INFO
-level) is always provisioned, so every message's fate is readable in the
+REAL mail: one journald `Tracer` (include-scoped to the fate events;
+INFO level on 0.16, DEBUG on 1.x - 1.0.3 dropped the explicit Info arms
+for `delivery.completed`/`delivery.dsn-success` in its trc `level()`
+table, so they default to Debug there; `eventsPolicy = include` keeps
+the volume fate-focused on both lines) is always provisioned, so every
+message's fate is readable in the
 journal - accepted into the queue, delivered, deferred (`Message
 rescheduled for delivery`), DSN emitted, permanently rejected, or
 ingested locally (`Message ingested`, Junk filing, duplicate,
