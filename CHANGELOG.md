@@ -306,7 +306,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   holds (Stalwart 1.0 needs Bulwark >= 1.18.0; the fleet ships
   1.20.0). Provisioning rides the vendored 1.0.14 CLI (the pin's
   1.0.13 cannot parse the 1.x schema); listeners/relay render the 1.x
-  plan keys (`implicitTls`, `host`).
+  plan keys (`implicitTls`, `host`), and the metrics series names gain
+  the OpenMetrics `stalwart_` prefix + `_total` suffix on 1.x. The
+  0.16 -> 1.0 migration runbook gains an orphan-purge step
+  (VM-transcribed 2026-11-15): the migrated Tracer row rides a new
+  opaque id and 1.x enforces "Only one journal tracer is allowed" at
+  reload, so provisioned Tracers are deleted via the CLI before the
+  plan applies - rehearsed as the `orphan purge` subtest in
+  `stalwart-migrate-1x-e2e`. The
+  wrapper's delivery-trail tracer renders `level = "debug"` on 1.x:
+  1.0.3's trc `level()` table dropped the explicit Info arms for
+  `delivery.completed`/`delivery.dsn-success` (they default to Debug;
+  0.16.26 carried both as Info - source-settled at both tags
+  2026-11-15), so an info-level tracer silently skipped those two fate
+  lines; `eventsPolicy = include` keeps the journal volume
+  fate-focused on both lines. The relay e2e's eval asserts and metrics
+  grep are dialect-aware accordingly.
 
 - Consumer-webmail version contract re-verified against primary sources
   (2026-11-05): Bulwark (the C34 non-goal webmail on the consumer host)

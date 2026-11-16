@@ -1096,6 +1096,17 @@ gate is missing - but treat aarch64 as untested until someone runs it.
   0.16 password and needle mail intact, and the declarative plan
   re-applies. **GREEN end to end 2026-11-06** - the gate that gated the
   2026-11-15 default flip, and it passed.
+- **Migrated tracers are orphans, and 1.x caps journal tracers at ONE**
+  (round-gate transcript 2026-11-15): stalwart-migrate carries the
+  0.16-era Tracer row into the v1 store under a NEW opaque id, and the
+  wrapper's Tracer reconcile (`match = "*"`; `x:Tracer` has no label
+  property) can never destroy it - so the cutover plan apply fails at
+  reload with `Only one journal tracer is allowed`. RUNBOOK STEP before
+  the plan applies: with the 1.x server serving the migrated store,
+  `stalwart-cli query Tracer` then `delete Tracer <id>` for each
+  Journal-type tracer (the wrapper re-provisions its own; consumer
+  Log/Otel tracers are not Journal-type and are unaffected by the cap).
+  Rehearsal-pinned as the `orphan purge` subtest.
 - **stalwart-migrate's Cargo defaults include `enterprise`** (its
   `default = ["rocks", "enterprise"]`): a default build writes an
   enterprise-flavored target store, and the tool's own contract is "the

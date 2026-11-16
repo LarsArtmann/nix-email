@@ -35,6 +35,10 @@
 #      all-recommended), run --final --yes --owner <stalwart uid:gid>
 #   5. cutover: 1.0.3 boots on the migrated store; user1's 0.16 password
 #      authenticates over IMAP and the needle mail survived
+#   6. orphan purge + plan apply: the migrated Tracer row rides a NEW
+#      opaque id (id spaces renumbered) and 1.x allows exactly ONE
+#      journal tracer - the runbook deletes provisioned Tracers via the
+#      CLI, then the declarative plan applies clean
 {
   pkgs,
   package ? (pkgs.callPackage ../pkgs/stalwart_1_0/package.nix {}),
@@ -149,6 +153,7 @@ in
         services.stalwart.package = package;
         environment.systemPackages = [
           migrate
+          (pkgs.callPackage ../pkgs/stalwart-cli-1_0/package.nix {})
         ];
       };
     };
@@ -285,6 +290,28 @@ in
           # The 0.16 password and the delivered mail both survived the
           # id-space renumbering: login + needle fetch over IMAP.
           mig1x.succeed("imap-wait user1@migrate1x.test '${testPass}' ${needle}")
+
+      with subtest("orphan purge: journal tracers the migration brought over"):
+          # stalwart-migrate carries the 0.16-era Tracer row into the v1
+          # store under a NEW opaque id (every id space is renumbered).
+          # The wrapper's Tracer reconcile matches "*": x:Tracer has NO
+          # label property, so the plan can never destroy the orphan -
+          # and 1.x reload validation enforces "Only one journal tracer
+          # is allowed" (round-gate transcript 2026-11-15). RUNBOOK STEP:
+          # with the 1.x server serving the migrated store, delete every
+          # provisioned Tracer before the plan applies (the plan
+          # recreates the wrapper's own; this store holds ONLY the
+          # orphan - a live store must filter to Journal-type tracers
+          # here, consumer Log/Otel tracers are unaffected by the cap).
+          mig1x.succeed(
+              "sh -c 'set -e; PW=$(cat /etc/test-admin-secret); "
+              "run() { stalwart-cli --url http://127.0.0.1:8080 "
+              "--user admin --password \"$PW\" \"$@\"; }; "
+              "ids=$(run query Tracer); "
+              "if [ -n \"$ids\" ]; then for id in $ids; do "
+              "echo \"purge migrated journal tracer: $id\" >&2; "
+              "run delete Tracer \"$id\"; done; fi'"
+          )
 
       with subtest("post-cutover: the declarative plan still applies"):
           mig1x.succeed("systemctl start stalwart-provision.service")
