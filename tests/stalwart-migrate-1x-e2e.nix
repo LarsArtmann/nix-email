@@ -99,6 +99,12 @@
     sys.exit(1)
   '';
 
+  # The 1.x-capable CLI - ABSOLUTE path in the purge script, never bare
+  # `stalwart-cli`: the vendored module puts the pin's 1.0.13 on PATH
+  # even for 1.x, and 1.0.13 cannot parse a 1.x schema (unknown variant
+  # `sieve` - the vendor-train transcript, 2026-11-05).
+  cli = pkgs.callPackage ../pkgs/stalwart-cli-1_0/package.nix {};
+
   # Minimal account plan shared by both nodes (same domain via hostname).
   nodeConfig = {...}: {
     imports = [
@@ -153,7 +159,6 @@ in
         services.stalwart.package = package;
         environment.systemPackages = [
           migrate
-          (pkgs.callPackage ../pkgs/stalwart-cli-1_0/package.nix {})
         ];
       };
     };
@@ -305,7 +310,7 @@ in
           # here, consumer Log/Otel tracers are unaffected by the cap).
           mig1x.succeed(
               "sh -c 'set -e; PW=$(cat /etc/test-admin-secret); "
-              "run() { stalwart-cli --url http://127.0.0.1:8080 "
+              "run() { ${cli}/bin/stalwart-cli --url http://127.0.0.1:8080 "
               "--user admin --password \"$PW\" \"$@\"; }; "
               "ids=$(run query Tracer); "
               "if [ -n \"$ids\" ]; then for id in $ids; do "
