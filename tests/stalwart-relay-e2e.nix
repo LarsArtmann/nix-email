@@ -81,6 +81,10 @@
   # exports `queue_rescheduled` (2026-10-26 transcript), 1.0.3 exports
   # the OpenMetrics-prefixed counter `stalwart_queue_rescheduled_total`
   # (gate transcript 2026-11-15).
+  relayRescheduleSeries =
+    if pkgs.lib.versionAtLeast nullRelayConfig.services.stalwart.package.version "1.0"
+    then "stalwart_queue_rescheduled_total"
+    else "queue_rescheduled";
   nullRelayAsserts = assert nullRelayRoute ? ${routeAddressKey};
   assert nullRelayRoute."@type" == "Relay";
   assert !(nullRelayRoute ? authUsername);
