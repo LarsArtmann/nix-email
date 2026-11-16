@@ -69,13 +69,25 @@
     }).config;
 
   nullRelayRoute = nullRelayConfig.services.stalwart.provision.objects.MtaRoute.objects."smarthost";
-  nullRelayAsserts = assert nullRelayRoute ? address;
+  # 1.x renames the MtaRouteRelay plan key `address` -> `host`
+  # (SCHEMA_CHANGES 3.1; the wrapper renders both version-aware) - assert
+  # the dialect the DEFAULT package speaks (1.0.3 since the 2026-11-15
+  # flip), never a hard-coded 0.16 key.
+  routeAddressKey =
+    if pkgs.lib.versionAtLeast nullRelayConfig.services.stalwart.package.version "1.0"
+    then "host"
+    else "address";
+  # Metrics series naming changed too (both transcript-pinned): 0.16
+  # exports `queue_rescheduled` (2026-10-26 transcript), 1.0.3 exports
+  # the OpenMetrics-prefixed counter `stalwart_queue_rescheduled_total`
+  # (gate transcript 2026-11-15).
+  nullRelayAsserts = assert nullRelayRoute ? ${routeAddressKey};
   assert nullRelayRoute."@type" == "Relay";
   assert !(nullRelayRoute ? authUsername);
   assert !(nullRelayRoute ? authSecret);
   assert !(nullRelayConfig.services.stalwart.credentials ? mail-server-relay);
   assert nullRelayConfig.services.stalwart.provision.singletons.MtaOutboundStrategy.route."else" == "'smarthost'";
-    nullRelayRoute.address;
+    nullRelayRoute.${routeAddressKey};
 in
   pkgs.testers.runNixOSTest {
     name = "stalwart-relay-e2e";
@@ -351,7 +363,9 @@ in
           # deferred state on the observed series (file-based, never piped).
           # 0.16 exposes NO queue-depth gauge - only counters (2026-10-26
           # transcript: queue_authenticated_message_queued 2,
-          # queue_rescheduled 1 at +5 s with the smarthost down). The
+          # queue_rescheduled 1 at +5 s with the smarthost down; 1.0.3
+          # renames the series, relayRescheduleSeries owns the dialect).
+          # The
           # reschedule counter IS the deferred state: it ticks when the
           # first delivery attempt fails and the queue schedules a retry
           # (the 0.15 'Message rescheduled for delivery' journal line is
@@ -363,7 +377,7 @@ in
           smtp.wait_until_succeeds(
               "curl -fsS http://127.0.0.1:8080/metrics/prometheus "
               "-o /tmp/metrics-bounce.prom "
-              "&& grep -qE '^queue_rescheduled [1-9]' /tmp/metrics-bounce.prom",
+              "&& grep -qE '^${relayRescheduleSeries} [1-9]' /tmp/metrics-bounce.prom",
               timeout=90,
           )
 
