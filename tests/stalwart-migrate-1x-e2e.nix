@@ -316,7 +316,7 @@ in
               "run query Tracer >&2 || exit 1; "
               "ids=$(run query Tracer | grep \"  Journal \" | sed \"s/ .*//\"); "
               "if [ -n \"$ids\" ]; then "
-              "printf \"%s\\n\" \"$ids\" | run delete Tracer; fi'"
+              "printf \"%s\\n\" \"$ids\" | run delete Tracer --stdin; fi'"
           )
 
       with subtest("post-cutover: the declarative plan still applies"):
