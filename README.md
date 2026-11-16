@@ -1103,9 +1103,10 @@ gate is missing - but treat aarch64 as untested until someone runs it.
   property) can never destroy it - so the cutover plan apply fails at
   reload with `Only one journal tracer is allowed`. RUNBOOK STEP before
   the plan applies: with the 1.x server serving the migrated store,
-  `stalwart-cli query Tracer` then `delete Tracer <id>` for each
-  Journal-type tracer (the wrapper re-provisions its own; consumer
-  Log/Otel tracers are not Journal-type and are unaffected by the cap).
+  `stalwart-cli query Tracer`, filter the `Journal` rows, and delete
+  their ids via `stalwart-cli delete Tracer --stdin` (ids on stdin; the
+  wrapper re-provisions its own; the store also carries a migrated
+  `Log` tracer - fine, the 1.x cap is journal-only).
   Rehearsal-pinned as the `orphan purge` subtest.
 - **stalwart-migrate's Cargo defaults include `enterprise`** (its
   `default = ["rocks", "enterprise"]`): a default build writes an
