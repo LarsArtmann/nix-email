@@ -314,7 +314,7 @@ in
               "--user admin --password \"$PW\" \"$@\"; }; "
               "echo \"raw tracer query (transcript-first):\" >&2; "
               "run query Tracer >&2 || exit 1; "
-              "ids=$(run query Tracer | tail -n +2 | awk '{print $1}'); "
+              "ids=$(run query Tracer | tail -n +2 | sed \"1d;s/ .*//\"); "
               "if [ -n \"$ids\" ]; then for id in $ids; do "
               "echo \"purge migrated journal tracer: $id\" >&2; "
               "run delete Tracer \"$id\"; done; fi'"
