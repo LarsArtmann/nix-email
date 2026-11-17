@@ -373,3 +373,25 @@ overlay 1.20.0 (2026-11-05) > nix-email pin 1.14.2 > host base 1.12.0.
 The owned artifact is 3 releases back; the un-owned base it is built on
 is 10 back. Any "why are we behind" answer that cites 1.14.2 without
 naming the follows is wrong about the host.
+
+## Addendum - "has the new Bulwark merged?" verified three ways
+
+Owner asked whether the 1.21.x bump has already merged upstream. NO:
+
+1. `gh pr view 574920 --json state,mergedAt,mergeCommit` ->
+   `state: OPEN`, `mergedAt: null`, `mergeCommit: null` (unchanged since
+   2026-11-14).
+2. Branch evals, all three channels: `nix eval --raw
+   github:NixOS/nixpkgs/<ref>#bulwark.version` answers 1.14.2 for
+   `nixos-unstable`, `nixpkgs-unstable` AND `master`. The bump exists
+   only in the PR branch.
+3. Sibling PRs are CLOSED WITHOUT MERGE: `#578730` (bulwark 1.17.2) and
+   the twelve `bulwark-plugins.*` bumps (`#583892`-`#583903`) all carry
+   `mergedAt: null`, i.e. superseded/folded rather than landed. One
+   adjacent PR stays open: `#561326` (avoid IFD in the plugin registry),
+   which bears on how the plugin set is exposed to consumers.
+
+Consequence: the overlay removal trigger is still unmet. Nothing in the
+nixpkgs pipeline carries 1.21.x, so the consumer fork remains the only
+path to the security release, and a "merged" impression can only come
+from a CLOSED sibling PR or from the upstream release tag itself.
