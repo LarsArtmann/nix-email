@@ -340,3 +340,36 @@ Architecture / exit:
    and accept weaker systemd integration. Each changes who owns future
    bumps. Do you want to pick one now, or defer until #574920's fate is
    known?
+
+## Correction appended during the session - the real dependency chain
+
+The owner asked whether pbx-artmann depends on SystemNix's lock via
+nix-email. Checked the actual `flake.lock`, and the answer is NO:
+
+- pbx-artmann has NO SystemNix input at all. The chain is
+  pbx-artmann -> `github:LarsArtmann/nix-email?ref=master` (locked at
+  baf594630849, which is current master) with
+  `inputs.nixpkgs.follows = "nixpkgs"`, and pbx-artmann's own nixpkgs
+  follows `telephony`'s nixpkgs (root input map:
+  `nixpkgs = ["telephony", "nixpkgs"]`, rev a7868a727837).
+- CONSEQUENCE: nix-email's own pin (fe13242281, bulwark 1.14.2) is
+  DISCARDED inside pbx-artmann by the follows. The consumer base is
+  telephony's nixpkgs, and `nix eval github:NixOS/nixpkgs/a7868a727837
+  #bulwark.version` = 1.12.0, i.e. TWO releases behind this repo's pin
+  and TEN behind upstream 1.21.2.
+- So "nixpkgs lags at 1.14.2" (this repo's ledger) describes the nix-email
+  gate, not the deployed host. The host's starting point is 1.12.0, and
+  the overlay replicates the expression from THAT base, including
+  `prev.bulwark-plugins.mkBulwarkPlugin` and the module options.
+- METHOD ERROR worth recording: I first evaluated the pin with a
+  FABRICATED full SHA (expanded from the 8-char `fe132422`), got a 404,
+  then read the real rev from `flake.lock`. Never expand a short rev by
+  hand.
+
+## Revision to the "behind" count
+
+Version ladder now fully receipted: upstream 1.21.2 (2026-11-13) >
+overlay 1.20.0 (2026-11-05) > nix-email pin 1.14.2 > host base 1.12.0.
+The owned artifact is 3 releases back; the un-owned base it is built on
+is 10 back. Any "why are we behind" answer that cites 1.14.2 without
+naming the follows is wrong about the host.
