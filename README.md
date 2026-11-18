@@ -326,6 +326,17 @@ and nothing else:
   never gated); because a silently-broken statix would then be a false
   green, the check first proves statix still exits nonzero on a planted
   syntax error before scanning the tree.
+- `text-gates`: pure-build guard running the markdown text lints
+  hermetically - the table-pipe, list-marker, anchor/Contents, and
+  check-set count-drift scripts over the flake source with the PINNED
+  gawk/python3, with the full selftest matrix replayed first so every
+  gate is proven able to fire before the tree pass. These lints used to
+  be CI-only steps on the runner's ambient toolchain (a runner image
+  update could change the awk flavor under the gate); CI now builds this
+  check as its fail-fast lane, and the scripts stay nix-free for the
+  dev loop (`sh scripts/selftest-docs-gates.sh`). The readme-version
+  tree pass is deliberately not repeated here:
+  `readme-version-lockstep` owns it against the real deployed values.
 - `stalwart-e2e`: real Stalwart in a VM - the wrapper DEFAULT
   (1.0.3 since the 2026-11-15 flip; 0.16.26 until it, 0.16.22 before
   the fe132422 advance) - declarative provisioning

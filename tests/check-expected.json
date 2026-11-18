@@ -8,7 +8,8 @@
     "provision-plan-eval",
     "readme-version-lockstep",
     "readme-version-lockstep-fires",
-    "statix-lint"
+    "statix-lint",
+    "text-gates"
   ],
   "x86_64-linux": [
     "check-set-lockstep",
@@ -28,6 +29,7 @@
     "stalwart-e2e-v1",
     "stalwart-migrate-1x-e2e",
     "stalwart-migrate-e2e",
-    "stalwart-relay-e2e"
+    "stalwart-relay-e2e",
+    "text-gates"
   ]
 }

@@ -177,6 +177,34 @@
             statix check ${../.}
             touch $out
           '';
+        # Hermetic text gates (2026-11-18): the markdown/count-drift
+        # lints used to exist only as CI steps on the runner's AMBIENT
+        # bash/gawk/python3 - a runner image update could change the awk
+        # flavor under the gate (the gawk-treats-backslash-b lesson that
+        # once made a lint a never-firing false green), and a local
+        # `nix flake check` stayed green while CI red. This check runs
+        # the SAME scripts CI ran, over the flake source (git-known
+        # files - the same set the index-reading CI steps saw) with the
+        # PINNED gawk/python3, and replays the FULL selftest matrix
+        # first so every gate is proven able to fire
+        # (never-firing-lint doctrine) before the tree pass. The
+        # readme-version tree pass is deliberately NOT repeated here -
+        # readme-version-lockstep owns it with the real deployed values.
+        # The scripts stay nix-free for the dev loop (AGENTS
+        # "Text gates"); CI builds this check as its fail-fast lane.
+        # Pure build, arch-independent.
+        text-gates =
+          pkgs.runCommand "text-gates" {
+            nativeBuildInputs = [pkgs.bash pkgs.gawk pkgs.python3];
+          } ''
+            sh ${../scripts/selftest-docs-gates.sh}
+            md=$(find ${../.} -name '*.md')
+            bash ${../scripts/check-md-table-pipes.sh} $md
+            bash ${../scripts/check-md-list-markers.sh} $md
+            python3 ${../scripts/check-md-anchors.py} --quiet $md
+            bash ${../scripts/check-check-set-drift.sh} ${../AGENTS.md} ${../README.md}
+            touch $out
+          '';
         # README version lockstep (2026-11-02): the status block is the ONE
         # canonical place stating which versions this flake ships, and it
         # used to be hand-maintained prose - a pin advance could move
