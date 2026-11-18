@@ -137,37 +137,22 @@ jobs:
           # tree scan (never-firing-lint doctrine).
           nix build .#checks.x86_64-linux.statix-lint -L
 
-      - name: Ban piped grep/tail/head assertions in tests (fail-closed)
+      - name: VM-test lints (pipe assertions + testScript shell, fail-closed)
         run: |
-          # PIPE LINT (the exit-23 lesson, mechanized): in-VM assertions must
-          # be dump-to-file + grep-the-file, never `producer | grep -q`.
-          # Under the test shell's pipefail, grep -q's early exit EPIPEs the
-          # producer (observed ONCE in CI as curl exit 23 on a MATCHING
-          # payload, 2026-09-15); the negated form `! p | grep -q` can
-          # phantom-green. `| tail`/`| head` are the same class (exit-code
-          # eating / early close). Comment lines (nix or embedded python) are
-          # exempt so the doctrine can be stated in comments.
-          # No pipes on gate commands: a single awk prints offenders and sets
-          # the exit status; any hit fails the step. NOTE: the word boundary
-          # is ([^[:alnum:]]|$), NOT \b - gawk 5.x regex constants treat \b as
-          # backspace, which makes the lint a never-firing false green
-          # (caught by the 2026-09-16 local negative test).
-          awk 'match($0, /\|[[:space:]]*!?[[:space:]]*(grep|tail|head)([^[:alnum:]]|$)/) && $0 !~ /^[[:space:]]*#/ {printf "offender: %s:%d: %s\n", FILENAME, FNR, $0; bad=1} END {exit bad}' tests/*.nix
-
-      - name: Lint VM-testScript shell fragments (fail-closed, self-tested)
-        run: |
-          # TESTSCRIPT SHELL LINT (the 28e5dd7 unclosed-brace lesson,
-          # mechanized): testScript shell commands are Python string
-          # constants inside a Nix indented string, so nix eval, alejandra
-          # and the awk pipe lint all pass them. An unbalanced brace group
-          # only surfaces when bash runs it in the VM. The script extracts
-          # every testScript, folds implicit string concatenation with
-          # Python's ast, and runs `bash -n` on each constant argument.
-          # Self-test first (never-firing-lint doctrine): the 28e5dd7 broken
-          # shape MUST fail and the closed shape MUST pass before the real
-          # tree is checked, and zero extracted fragments is itself a fail.
-          python3 scripts/check-testscript-shell.py --self-test
-          python3 scripts/check-testscript-shell.py
+          # HERMETIC VM-TEST LINTS (2026-11-18): the piped
+          # grep/tail/head assertion ban (the exit-23 EPIPE lesson) and
+          # the testScript bash-fragments lint consolidated into the
+          # vm-test-lint FLAKE CHECK - pinned gawk/python3/bash, both
+          # self-tests replayed first, tree pass over the flake source's
+          # tests. The awk program moved from this file into
+          # scripts/check-vm-pipe-assertions.sh (a raw awk inline in a
+          # workflow was untestable in place); in-VM shell plumbing is
+          # exempted per line via `# vm-pipe-ok: <reason>`. The exit-23
+          # and unclosed-brace failure classes live in the script header
+          # and CONTRIBUTING. Local parity:
+          # bash scripts/check-vm-pipe-assertions.sh --self-test or
+          # nix build .#checks.x86_64-linux.vm-test-lint -L.
+          nix build .#checks.x86_64-linux.vm-test-lint -L
 
       - name: Assert CI expected-checks match the flake (lockstep, fail-closed)
         run: |
