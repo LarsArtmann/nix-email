@@ -165,16 +165,16 @@ over the flake source, self-tests first) - CI builds those checks as its
 fail-fast lane instead of running the runner's ambient shell tools; the
 raw scripts remain the nix-free dev loop.
 
-| Script                                | Owns            | Fails on                                                                                                             |
-| ------------------------------------- | --------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `scripts/check-md-table-pipes.sh`     | table integrity | an unescaped pipe character inside a cell (GFM splits the row and silently drops columns)                            |
-| `scripts/check-md-list-markers.sh`    | list integrity  | a `-`/`*` marker that starts a line because a prose line wrapped                                                     |
-| `scripts/check-check-set-drift.sh`    | count rot       | a numeric check-set claim ("the 7 checks") in `README.md`/`AGENTS.md`                                                |
-| `scripts/check-md-anchors.py`         | front door      | an in-file anchor with no heading; a level-2 heading missing from or duplicated in `## Contents`                     |
-| `scripts/check-readme-versions.py`    | version truth   | the README status block naming a Stalwart/parsedmarc version the flake does not build (a flake check, not a CI step) |
-| `scripts/check-testscript-shell.py`   | test scripts    | a bash syntax error inside a `testScript` string literal                                                             |
+| Script                                | Owns            | Fails on                                                                                                                          |
+| ------------------------------------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `scripts/check-md-table-pipes.sh`     | table integrity | an unescaped pipe character inside a cell (GFM splits the row and silently drops columns)                                         |
+| `scripts/check-md-list-markers.sh`    | list integrity  | a `-`/`*` marker that starts a line because a prose line wrapped                                                                  |
+| `scripts/check-check-set-drift.sh`    | count rot       | a numeric check-set claim ("the 7 checks") in `README.md`/`AGENTS.md`                                                             |
+| `scripts/check-md-anchors.py`         | front door      | an in-file anchor with no heading; a level-2 heading missing from or duplicated in `## Contents`                                  |
+| `scripts/check-readme-versions.py`    | version truth   | the README status block naming a Stalwart/parsedmarc version the flake does not build (a flake check, not a CI step)              |
+| `scripts/check-testscript-shell.py`   | test scripts    | a bash syntax error inside a `testScript` string literal                                                                          |
 | `scripts/check-vm-pipe-assertions.sh` | test assertions | a piped `grep`/`tail`/`head` assertion in `tests/*.nix` (exit-23 class); per-line `# vm-pipe-ok: <reason>` exempts in-VM plumbing |
-| `scripts/check-deprecated-aliases.py` | eval noise      | a `warnAlias` nixpkgs attribute named in a default or fixture (a per-switch warning for every consumer)              |
+| `scripts/check-deprecated-aliases.py` | eval noise      | a `warnAlias` nixpkgs attribute named in a default or fixture (a per-switch warning for every consumer)                           |
 
 Every one of them carries `--self-test` and every self-test is re-run in
 the session that mutates the tool (see "The gate"). The anchor lint is the
