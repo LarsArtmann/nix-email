@@ -17,9 +17,13 @@
 #   sh scripts/selftest-docs-gates.sh                       # all five
 #   sh scripts/selftest-docs-gates.sh --only anchors        # one gate
 #
-# ci.yml calls one selector per lint step, so the fixtures live HERE and
-# not in two places. Exit 0 when every gate fires, 1 when a gate accepted
-# a planted defect or rejected a clean input, 2 on usage error.
+# ci.yml builds the hermetic text-gates flake check over the FULL matrix,
+# so the fixtures live HERE and not in two places. The unicode fixtures
+# use POSIX OCTAL escapes (\303\274), never bash-only \xHH: the runner's
+# /bin/sh did not decode \xHH and the anchors gate red four CI runs
+# (2026-11-13..17) on fixture text, not on the tree - octal is portable
+# across every POSIX printf. Exit 0 when every gate fires, 1 when a gate
+# accepted a planted defect or rejected a clean input, 2 on usage error.
 set -eu
 
 repo="$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)"
@@ -87,9 +91,9 @@ check_anchors() {
 	must_pass "anchors (self-test matrix)" python3 "$repo/scripts/check-md-anchors.py" --self-test
 	printf '# T\n\n## Contents\n\n- [Alpha](#alpha)\n\n## Alpha\n\nSee [Beta](#beta).\n' >"$f"
 	must_fail "anchors (dead link)" python3 "$repo/scripts/check-md-anchors.py" --quiet "$f"
-	printf '# T\n\n## Contents\n\n- [Gr\xc3\xbc\xc3\x9fe & Ma\xc3\x9f](#gr\xc3\xbc\xc3\x9fe--ma\xc3\x9f)\n\n## Gr\xc3\xbc\xc3\x9fe & Ma\xc3\x9f\n\nbody\n' >"$f"
+	printf '# T\n\n## Contents\n\n- [Gr\303\274\303\237e & Ma\303\237](#gr\303\274\303\237e--ma\303\237)\n\n## Gr\303\274\303\237e & Ma\303\237\n\nbody\n' >"$f"
 	must_pass "anchors (unicode slug, correct)" python3 "$repo/scripts/check-md-anchors.py" --quiet "$f"
-	printf '# T\n\n## Contents\n\n- [Gr\xc3\xbc\xc3\x9fe & Ma\xc3\x9f](#gre--ma)\n\n## Gr\xc3\xbc\xc3\x9fe & Ma\xc3\x9f\n\nbody\n' >"$f"
+	printf '# T\n\n## Contents\n\n- [Gr\303\274\303\237e & Ma\303\237](#gre--ma)\n\n## Gr\303\274\303\237e & Ma\303\237\n\nbody\n' >"$f"
 	must_fail "anchors (unicode slug, ascii-stripped)" python3 "$repo/scripts/check-md-anchors.py" --quiet "$f"
 	printf '# T\n\nSee [b][b].\n\n[b]: #nope\n' >"$f"
 	must_fail "anchors (reference definition)" python3 "$repo/scripts/check-md-anchors.py" --quiet "$f"

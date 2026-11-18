@@ -14,13 +14,19 @@
 # never-firing false green (caught by the 2026-09-16 local negative
 # test; now replayed by --self-test on every invocation).
 #
+# Line-level exemption (2026-11-18): append `# vm-pipe-ok: <reason>` to
+# a line whose pipe is INSIDE an in-VM shell string as plumbing (a pty
+# feeder, a data pump with explicit rc propagation) - NOT a driver-side
+# assertion pipe. The marker is per-line, must carry a reason, and is
+# itself covered by --self-test (a marked offender line MUST pass).
+#
 # Argless mode lints every git-tracked tests/*.nix. Fail-closed:
 # prints every offender as file:line and exits nonzero.
 set -eu
 
 lint() {
 	awk '
-	  match($0, /\|[[:space:]]*!?[[:space:]]*(grep|tail|head)([^[:alnum:]]|$)/) && $0 !~ /^[[:space:]]*#/ {printf "offender: %s:%d: %s\n", FILENAME, FNR, $0; bad=1} END {exit bad}
+	  match($0, /\|[[:space:]]*!?[[:space:]]*(grep|tail|head)([^[:alnum:]]|$)/) && $0 !~ /^[[:space:]]*#/ && $0 !~ /#[[:space:]]*vm-pipe-ok/ {printf "offender: %s:%d: %s\n", FILENAME, FNR, $0; bad=1} END {exit bad}
 	' "$@"
 }
 
@@ -40,7 +46,9 @@ case "${1:-}" in
 	lint "$tmp/good.nix"
 	printf '# doctrine comment: never producer | grep -q\n' >"$tmp/comment.nix"
 	lint "$tmp/comment.nix"
-	echo "vm pipe-assertion lint self-test: planted pipe rejected, dump-to-file and comment forms accepted"
+	printf 'machine.succeed("feed | head -200 | script -qec x") # vm-pipe-ok: pty feeder, rc propagated\n' >"$tmp/marked.nix"
+	lint "$tmp/marked.nix"
+	echo "vm pipe-assertion lint self-test: planted pipe rejected, dump-to-file/comment/vm-pipe-ok forms accepted"
 	exit 0
 	;;
 -h | --help)

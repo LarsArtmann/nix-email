@@ -254,7 +254,7 @@ in
           # (round-3 lesson: a redirected, success-only dump is a
           # dump that never runs on the round you need it).
           mig1x.succeed(
-              "sh -c 'yes \"\" | head -200 | script -qec "
+              "sh -c 'yes \"\" | head -200 | script -qec " # vm-pipe-ok: pty feeder (200 Enters), rc propagated below
               '"stalwart-migrate prepare '
               "--source /run/source-config.json "
               "--state /var/lib/migrate-state\" /dev/null "
@@ -314,7 +314,7 @@ in
               "--user admin --password \"$PW\" \"$@\"; }; "
               "echo \"raw tracer query (transcript-first):\" >&2; "
               "run query Tracer >&2 || exit 1; "
-              "ids=$(run query Tracer | grep \"  Journal \" | sed \"s/ .*//\"); "
+              "ids=$(run query Tracer | grep \"  Journal \" | sed \"s/ .*//\"); " # vm-pipe-ok: extraction pump, empty ids checked below
               "if [ -n \"$ids\" ]; then "
               "printf \"%s\\n\" \"$ids\" | run delete Tracer --stdin; fi'"
           )
