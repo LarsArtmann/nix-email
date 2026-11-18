@@ -193,16 +193,21 @@
         # The scripts stay nix-free for the dev loop (AGENTS
         # "Text gates"); CI builds this check as its fail-fast lane.
         # Pure build, arch-independent.
+        # NOTE: every reference goes through ${../.} (the ONE filtered
+        # source tree), never ${../scripts/<file>} - a lone file path
+        # interpolates to its OWN store copy, and the selftest's
+        # $0-relative repo discovery then finds no sibling scripts
+        # (first build failed with repo=/nix).
         text-gates =
           pkgs.runCommand "text-gates" {
             nativeBuildInputs = [pkgs.bash pkgs.gawk pkgs.python3];
           } ''
-            sh ${../scripts/selftest-docs-gates.sh}
+            sh ${../.}/scripts/selftest-docs-gates.sh
             md=$(find ${../.} -name '*.md')
-            bash ${../scripts/check-md-table-pipes.sh} $md
-            bash ${../scripts/check-md-list-markers.sh} $md
-            python3 ${../scripts/check-md-anchors.py} --quiet $md
-            bash ${../scripts/check-check-set-drift.sh} ${../AGENTS.md} ${../README.md}
+            bash ${../.}/scripts/check-md-table-pipes.sh $md
+            bash ${../.}/scripts/check-md-list-markers.sh $md
+            python3 ${../.}/scripts/check-md-anchors.py --quiet $md
+            bash ${../.}/scripts/check-check-set-drift.sh ${../.}/AGENTS.md ${../.}/README.md
             touch $out
           '';
         # README version lockstep (2026-11-02): the status block is the ONE

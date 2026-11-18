@@ -90,63 +90,22 @@ jobs:
       - name: "Enforce formatting: alejandra (.nix) + dprint (fail-closed)"
         run: nix fmt -- . --check
 
-      - name: Lint markdown tables for unescaped pipes (fail-closed, self-tested)
+      - name: Text gates (markdown pipes/list/anchors + count drift, fail-closed)
         run: |
-          # TABLE PIPE LINT (the 2026-09-23 eaten-rows lesson, mechanized):
-          # dprint re-splits markdown table rows on UNESCAPED pipes and
-          # DROPS overflow cells when a row has more than its header - two
-          # status-report rows were silently eaten that way. Every row must
-          # match its header's unescaped-pipe count; literal pipes in a
-          # cell MUST be escaped. The fixtures live in ONE place
-          # (scripts/selftest-docs-gates.sh, the gawk-\b lesson: a
-          # never-firing lint is a false green) and are replayed here.
-          set -eu
-          sh scripts/selftest-docs-gates.sh --only pipes
-          git ls-files -z '*.md' > /tmp/md-files.list
-          xargs -0 bash scripts/check-md-table-pipes.sh < /tmp/md-files.list
-
-      - name: Lint prose-wrap list markers (fail-closed, self-tested)
-        run: |
-          # LIST-MARKER LINT (the dprint rewrap incidents, mechanized and
-          # empirically scoped 2026-10-19): a list marker directly after a
-          # column-0 prose line is the one list-adjacency shape dprint
-          # normalizes (it inserts the blank line itself) - in a formatted
-          # tree that means unfresh formatting or a mistyped wrap. Wrapped
-          # items, siblings, and nested lists are dprint-stable shapes and
-          # are NOT flagged (verified against dprint behavior). Fixtures
-          # live in scripts/selftest-docs-gates.sh.
-          set -eu
-          sh scripts/selftest-docs-gates.sh --only list
-          git ls-files -z '*.md' > /tmp/md-files2.list
-          xargs -0 bash scripts/check-md-list-markers.sh < /tmp/md-files2.list
-
-      - name: Lint markdown anchors + Contents completeness (fail-closed, self-tested)
-        run: |
-          # FRONT-DOOR INTEGRITY LINT (2026-11-02, hardened same day): the
-          # README is 1600+ lines with 39% of it the ledger (C52 keeps it
-          # there), so the `## Contents` table IS the navigation. Every
-          # in-file anchor must resolve to a heading and every level-2
-          # heading must be listed exactly once - link rot and TOC drift
-          # fail a build instead of waiting for a session to notice.
-          # Anchors are recognised in all three markdown forms (inline,
-          # reference definitions, HTML href) and slugs are unicode-aware.
-          # The self-test matrix runs before the tree-wide pass (a
-          # never-firing lint is a false green).
-          set -eu
-          sh scripts/selftest-docs-gates.sh --only anchors
-          python3 scripts/check-md-anchors.py
-
-      - name: Check-set drift alarm (fail-closed, self-tested)
-        run: |
-          # DRIFT ALARM (the 6->7 count rot, mechanized): AGENTS.md and
-          # README.md must not carry NUMERIC check-set claims ("9-check
-          # set", "the 7 checks") - counts rot within hours. The canonical
-          # set lives in the ci.yml lockstep lists + scripts/check-inventory.sh;
-          # README "What is built and verified" names checks individually.
-          # Fixtures live in scripts/selftest-docs-gates.sh.
-          set -eu
-          sh scripts/selftest-docs-gates.sh --only drift
-          bash scripts/check-check-set-drift.sh AGENTS.md README.md
+          # HERMETIC TEXT GATES (2026-11-18): the four markdown/count-
+          # drift lints consolidated into the text-gates FLAKE CHECK -
+          # same scripts, but built with the PINNED gawk/python3 and
+          # the full selftest matrix (every gate proven able to fire
+          # before the tree pass, never-firing-lint doctrine). The old
+          # per-lint steps ran on the runner's AMBIENT bash/gawk/
+          # python3, so a runner image update could change the awk
+          # flavor under the gate (the gawk-treats-backslash-b lesson
+          # once made a lint a false green). The eaten-rows, list-
+          # marker, anchor/Contents, and count-drift failure classes
+          # live in CONTRIBUTING "Text gates". Local parity:
+          # sh scripts/selftest-docs-gates.sh (nix-free, dev loop) or
+          # nix build .#checks.x86_64-linux.text-gates -L.
+          nix build .#checks.x86_64-linux.text-gates -L
 
       - name: Assert README names every flake check (anti-drift)
         run: |
