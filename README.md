@@ -337,6 +337,17 @@ and nothing else:
   dev loop (`sh scripts/selftest-docs-gates.sh`). The readme-version
   tree pass is deliberately not repeated here:
   `readme-version-lockstep` owns it against the real deployed values.
+- `vm-test-lint`: pure-build guard running the two VM-test lints
+  hermetically - the piped `grep`/`tail`/`head` assertion ban (the
+  exit-23 EPIPE lesson; the awk program moved out of ci.yml into
+  `scripts/check-vm-pipe-assertions.sh`, where `--self-test` plants a
+  piped assertion instead of relying on a one-off 2026-09-16 manual
+  test) and the testScript bash-fragments lint (`bash -n` over every
+  string constant). In-VM shell plumbing (pty feeders, extraction
+  pumps) is exempted per line with a `# vm-pipe-ok: <reason>` marker -
+  the raw-line heuristic cannot tell it from driver-side assertion
+  pipes, and that class had the ambient CI step red since 2026-11-06
+  hidden behind the runner-shell anchors red.
 - `stalwart-e2e`: real Stalwart in a VM - the wrapper DEFAULT
   (1.0.3 since the 2026-11-15 flip; 0.16.26 until it, 0.16.22 before
   the fe132422 advance) - declarative provisioning

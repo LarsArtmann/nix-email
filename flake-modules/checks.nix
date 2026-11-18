@@ -210,6 +210,33 @@
             bash ${../.}/scripts/check-check-set-drift.sh ${../.}/AGENTS.md ${../.}/README.md
             touch $out
           '';
+        # Hermetic VM-test lints (2026-11-18): the pipe-assertion ban
+        # (the exit-23 lesson) and the testScript bash-fragments lint
+        # used to be inline CI steps on the runner's ambient awk/python3
+        # - and the pipe ban lived as a raw awk program inside ci.yml,
+        # untestable in place. The awk moved into
+        # scripts/check-vm-pipe-assertions.sh with a --self-test that
+        # plants a piped assertion (until now the negative direction was
+        # proven only by a one-off local test, 2026-09-16) plus a
+        # per-line `# vm-pipe-ok: <reason>` exemption for in-VM shell
+        # plumbing (pty feeders, extraction pumps with downstream
+        # checks) that the raw-line heuristic cannot distinguish from
+        # driver-side assertion pipes - the class that had the AMBIENT
+        # CI step red since 2026-11-06, hidden behind the anchors-dash
+        # red. This check runs both lints hermetically over the flake
+        # source's tests/*.nix with the pinned gawk/python3/bash
+        # (check-testscript-shell.py subprocesses bash -n), self-tests
+        # first. Pure build, arch-independent.
+        vm-test-lint =
+          pkgs.runCommand "vm-test-lint" {
+            nativeBuildInputs = [pkgs.bash pkgs.gawk pkgs.python3];
+          } ''
+            bash ${../.}/scripts/check-vm-pipe-assertions.sh --self-test
+            python3 ${../.}/scripts/check-testscript-shell.py --self-test
+            bash ${../.}/scripts/check-vm-pipe-assertions.sh ${../.}/tests/*.nix
+            python3 ${../.}/scripts/check-testscript-shell.py ${../.}/tests/*.nix
+            touch $out
+          '';
         # README version lockstep (2026-11-02): the status block is the ONE
         # canonical place stating which versions this flake ships, and it
         # used to be hand-maintained prose - a pin advance could move
