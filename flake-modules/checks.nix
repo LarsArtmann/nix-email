@@ -151,6 +151,32 @@
               --aliases ${pkgs.path}/pkgs/top-level/aliases.nix ${../.}
             touch $out
           '';
+        # Structural nix lint (2026-11-18): statix over the flake source
+        # with the SAME nixpkgs pin the build uses, so findings are
+        # reproducible locally (`nix build .#checks.x86_64-linux.
+        # statix-lint -L`) without the registry eval walk the old CI
+        # step (`nix run github:NixOS/nixpkgs/$rev#statix`) paid on
+        # every run - the same measured pain the ruff-floor app removed
+        # for ruff (run 41265954894). MEASURED on this statix build:
+        # ERRORS exit 1, warnings exit 0, so the contract here is "no
+        # statix errors" (W20-class warnings are fixed by hand, never
+        # gated). Because that contract makes a silently-broken statix a
+        # false green, the check FIRST proves statix still exits nonzero
+        # on a planted syntax error (never-firing-lint doctrine) before
+        # scanning the tree. Pure build, arch-independent.
+        statix-lint =
+          pkgs.runCommand "statix-lint" {
+            nativeBuildInputs = [pkgs.statix];
+          } ''
+            mkdir probe
+            echo 'a = (1;' > probe/bad.nix
+            if statix check probe > /dev/null 2>&1; then
+              echo "FATAL: statix accepted a planted syntax error (never-firing lint)" >&2
+              exit 1
+            fi
+            statix check ${../.}
+            touch $out
+          '';
         # README version lockstep (2026-11-02): the status block is the ONE
         # canonical place stating which versions this flake ships, and it
         # used to be hand-maintained prose - a pin advance could move

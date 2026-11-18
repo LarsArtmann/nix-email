@@ -7,7 +7,8 @@
     "module-import-eval",
     "provision-plan-eval",
     "readme-version-lockstep",
-    "readme-version-lockstep-fires"
+    "readme-version-lockstep-fires",
+    "statix-lint"
   ],
   "x86_64-linux": [
     "check-set-lockstep",
@@ -21,6 +22,7 @@
     "provision-plan-eval",
     "readme-version-lockstep",
     "readme-version-lockstep-fires",
+    "statix-lint",
     "stalwart-bind-e2e",
     "stalwart-e2e",
     "stalwart-e2e-v1",

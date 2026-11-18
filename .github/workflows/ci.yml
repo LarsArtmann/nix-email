@@ -164,15 +164,19 @@ jobs:
           done
           echo "README names all $(echo "$names" | jq -r '. | length') checks"
 
-      - name: Statix lint Nix files (fail-closed)
+      - name: Statix lint Nix files (fail-closed, hermetic)
         run: |
-          # STATIX: structural nix warnings (W20-class collapses ship as
-          # deliberate styles here - the pinned statix must be the SAME
-          # rev the repo pins, so findings are reproducible locally:
-          # `nix run github:NixOS/nixpkgs/$(nix flake metadata --json . |
-          # jq -r .locks.nodes.nixpkgs.locked.rev)#statix -- check .`).
-          rev="$(nix flake metadata --json . | jq -r '.locks.nodes.nixpkgs.locked.rev')"
-          nix run "github:NixOS/nixpkgs/$rev#statix" -- check .
+          # STATIX: structural nix errors, now the statix-lint FLAKE CHECK
+          # - built from the SAME nixpkgs pin the repo pins, so findings
+          # are reproducible locally with the identical derivation and
+          # CI stops paying the per-run registry eval walk the old
+          # `nix run github:NixOS/nixpkgs/<rev>#statix` form cost.
+          # MEASURED: statix errors exit nonzero, warnings exit zero -
+          # the gated contract is "no statix errors" (W20-class warnings
+          # are fixed by hand, never gated); the check self-proves
+          # statix still fires on a planted syntax error before the
+          # tree scan (never-firing-lint doctrine).
+          nix build .#checks.x86_64-linux.statix-lint -L
 
       - name: Ban piped grep/tail/head assertions in tests (fail-closed)
         run: |

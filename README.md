@@ -316,6 +316,16 @@ and nothing else:
   `readme-version-lockstep-fires` plants a wrong version in a copy of this
   README and fails if the guard accepts it - the drift class is proven
   caught, not assumed.
+- `statix-lint`: pure-build guard running statix over the flake source
+  with the SAME nixpkgs pin the build uses - findings are reproducible
+  locally (`nix build .#checks.x86_64-linux.statix-lint -L`) without the
+  per-run registry eval walk the old CI step
+  (`nix run github:NixOS/nixpkgs/<rev>#statix`) paid. MEASURED on this
+  statix build: errors exit nonzero, warnings exit zero, so the gated
+  contract is "no statix errors" (W20-class warnings are fixed by hand,
+  never gated); because a silently-broken statix would then be a false
+  green, the check first proves statix still exits nonzero on a planted
+  syntax error before scanning the tree.
 - `stalwart-e2e`: real Stalwart in a VM - the wrapper DEFAULT
   (1.0.3 since the 2026-11-15 flip; 0.16.26 until it, 0.16.22 before
   the fe132422 advance) - declarative provisioning
