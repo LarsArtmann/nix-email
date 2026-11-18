@@ -54,10 +54,22 @@ transcript-pinned dialect).
   with "some outputs are not valid, so checking is not possible" - it
   implies --check against a prior build; drop it for first builds (they
   execute anyway).
-- Text gates, fast and nix-free (`sh scripts/selftest-docs-gates.sh` runs
-  all five with both directions proven): `bash
-  scripts/check-md-table-pipes.sh`, `bash scripts/check-md-list-markers.sh`,
-  `bash scripts/check-check-set-drift.sh`, `python3
+- Text gates, nix-free for the dev loop (`sh
+  scripts/selftest-docs-gates.sh` runs all five with both directions
+  proven) and HERMETIC in the gate since 2026-11-18: the flake checks
+  `text-gates` (markdown pipes/list/anchors/drift over the flake
+  source, pinned gawk/python3, full selftest matrix first) and
+  `vm-test-lint` (the pipe-assertion ban +
+  `scripts/check-testscript-shell.py`, ditto) - CI builds them as its
+  fail-fast lane instead of running ambient bash/gawk/python3 on the
+  runner (the anchors fixture once red CI for four days on a
+  runner-shell printf difference). The VM pipe ban lives in
+  `scripts/check-vm-pipe-assertions.sh` (`--self-test`; per-line
+  `# vm-pipe-ok: <reason>` exemption for in-VM shell plumbing), NOT
+  inline in ci.yml anymore. Raw invocations:
+  `bash scripts/check-md-table-pipes.sh`, `bash
+  scripts/check-md-list-markers.sh`, `bash
+  scripts/check-check-set-drift.sh`, `python3
   scripts/check-md-anchors.py [--quiet]`, and `python3
   scripts/check-readme-versions.py --readme README.md --stalwart <v>
   --parsedmarc <v>` (the flake checks derive both versions themselves:

@@ -157,8 +157,13 @@ not by the tool).
 
 ## Text gates: which lint owns which failure class
 
-Seven scripts guard the text side of the tree. Knowing which one fired is
-the difference between a one-line fix and an afternoon.
+Eight scripts guard the text side of the tree. Knowing which one fired is
+the difference between a one-line fix and an afternoon. Since 2026-11-18
+the markdown four and the two VM-test lints also run HERMETICALLY as the
+`text-gates` and `vm-test-lint` flake checks (pinned gawk/python3/bash,
+over the flake source, self-tests first) - CI builds those checks as its
+fail-fast lane instead of running the runner's ambient shell tools; the
+raw scripts remain the nix-free dev loop.
 
 | Script                                | Owns            | Fails on                                                                                                             |
 | ------------------------------------- | --------------- | -------------------------------------------------------------------------------------------------------------------- |
@@ -168,14 +173,16 @@ the difference between a one-line fix and an afternoon.
 | `scripts/check-md-anchors.py`         | front door      | an in-file anchor with no heading; a level-2 heading missing from or duplicated in `## Contents`                     |
 | `scripts/check-readme-versions.py`    | version truth   | the README status block naming a Stalwart/parsedmarc version the flake does not build (a flake check, not a CI step) |
 | `scripts/check-testscript-shell.py`   | test scripts    | a bash syntax error inside a `testScript` string literal                                                             |
+| `scripts/check-vm-pipe-assertions.sh` | test assertions | a piped `grep`/`tail`/`head` assertion in `tests/*.nix` (exit-23 class); per-line `# vm-pipe-ok: <reason>` exempts in-VM plumbing |
 | `scripts/check-deprecated-aliases.py` | eval noise      | a `warnAlias` nixpkgs attribute named in a default or fixture (a per-switch warning for every consumer)              |
 
 Every one of them carries `--self-test` and every self-test is re-run in
 the session that mutates the tool (see "The gate"). The anchor lint is the
 one to reach for first when a heading edit "looks fine" but CI disagrees,
 and `sh scripts/selftest-docs-gates.sh` proves all five text gates at once
-(0.7 s) - CI replays it with one `--only <gate>` selector per lint step, so
-the fixtures live in that ONE file.
+(0.7 s; POSIX-octal fixtures - bash-only printf escapes once red CI for
+four days on the runner's shell) - the `text-gates` flake check replays
+the FULL matrix hermetically, so the fixtures live in that ONE file.
 
 Convention for new repo python: `#!/usr/bin/env python3`, `from __future__
 import annotations`, typed signatures on the helpers, `check=False` where
