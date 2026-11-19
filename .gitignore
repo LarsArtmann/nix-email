@@ -70,4 +70,7 @@ htmlcov/
 
 ## VM run artifacts
 *.qcow2
-.config/
+# `.config/*` (not `.config/`): a dir-level exclude would make any
+# negation impotent; the fleet's project metadata is a tracked convention
+.config/*
+!.config/metadata.yaml
